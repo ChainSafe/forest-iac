@@ -3,7 +3,6 @@
 version: "3.7"
 
 services:
-  # Forest mainnet instance
   forest_mainnet:
     image: ghcr.io/chainsafe/forest:${FOREST_TAG}
     hostname: forest-mainnet
@@ -12,25 +11,16 @@ services:
       - mainnet
     volumes:
       - type: volume
-        source: forest_data
+        source: forest-data
         target: ${FOREST_TARGET_DATA}
-      - type: bind
-        read_only: true
-        source: ./sync_check.toml
-        target: ${FOREST_TARGET_DATA}/sync_check.toml
-      # Uncomment on the first-run to bootstrap the db.
-      # - type: bind
-      #   read_only: true
-      #   source: ${FOREST_HOST_MAINNET_SNAPSHOT_PATH}
-      #   target: "${FOREST_TARGET_SNAPSHOTS}/mainnet.car"
+      - type: volume
+        source: sync-check
+        target: ${FOREST_TARGET_SCRIPTS}
     command:
-      # Uncomment on the first-run to boostrap the db.
-      # - '--import-snapshot'
-      # - ${FOREST_TARGET_SNAPSHOTS}/mainnet.car
       - '--chain'
       - 'mainnet'
       - '--config'
-      - ${FOREST_TARGET_DATA}/sync_check.toml
+      - ${FOREST_TARGET_SCRIPTS}/sync_check.toml
     restart: unless-stopped
     labels:
       com.centurylinklabs.watchtower.enable: true
@@ -42,25 +32,16 @@ services:
       - calibnet
     volumes:
       - type: volume
-        source: forest_data
+        source: forest-data
         target: ${FOREST_TARGET_DATA}
-      - type: bind
-        read_only: true
-        source: ./sync_check.toml
-        target: ${FOREST_TARGET_DATA}/sync_check.toml
-      # Uncomment on the first-run to bootstrap the db.
-      # - type: bind
-      #   read_only: true
-      #   source: ${FOREST_HOST_CALIBNET_SNAPSHOT_PATH}
-      #   target: ${FOREST_TARGET_SNAPSHOTS}/calibnet.car
+      - type: volume
+        source: sync-check
+        target: ${FOREST_TARGET_SCRIPTS}
     command:
-      # Uncomment on the first-run to boostrap the db.
-      # - '--import-snapshot'
-      # - ${FOREST_TARGET_SNAPSHOTS}/calibnet.car
       - '--chain'
       - 'calibnet'
       - '--config'
-      - ${FOREST_TARGET_DATA}/sync_check.toml
+      - ${FOREST_TARGET_SCRIPTS}/sync_check.toml
     restart: unless-stopped
     labels:
       com.centurylinklabs.watchtower.enable: true
@@ -69,25 +50,26 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-tester
+    container_name: forest-tester
     networks:
       - mainnet
       - calibnet
     volumes:
-      - type: bind
+      - type: volume
+        source: forest-data
+        target: ${FOREST_TARGET_DATA}
+      - type: volume
         read_only: true
-        source: .
+        source: sync-check
         target: ${FOREST_TARGET_SCRIPTS}
       # Put common Ruby utils into a path that should be by default in Ruby PATH
-      - type: bind
+      - type: volume
         read_only: true
-        source: ../ruby_common
+        source: ruby-common
         target: /usr/local/share/ruby/site_ruby/cs_utils
-      - type: bind
-        source: ${FOREST_HOST_LOGS}
-        target: ${FOREST_TARGET_LOGS}
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      - LOG_DIR=${FOREST_TARGET_LOGS}
+      - LOG_DIR=${FOREST_TARGET_DATA}
       - SCRIPTS_DIR=${FOREST_TARGET_SCRIPTS}
       - SLACK_API_TOKEN=${FOREST_SLACK_API_TOKEN}
       - SLACK_NOTIF_CHANNEL=${FOREST_SLACK_NOTIF_CHANNEL}
@@ -103,16 +85,17 @@ services:
     labels:
       com.centurylinklabs.watchtower.enable: true
       com.centurylinklabs.watchtower.depends-on: "forest-mainnet,forest-calibnet"
-  watchtower:
-    image: containrrr/watchtower
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /root/.docker/config.json:/config.json
-    command: --label-enable --interval 30
-    restart: unless-stopped
 
 volumes:
-  forest_data: {}
+  forest-data:
+    external: true
+    name: forest-data
+  sync-check:
+    external: true
+    name: sync-check
+  ruby-common:
+    external: true
+    name: ruby-common
 
 networks:
   mainnet:

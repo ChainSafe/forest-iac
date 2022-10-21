@@ -1,0 +1,11 @@
+FROM fedora:36
+
+# Install dependencies
+RUN dnf install -y docker docker-compose ruby ruby-devel make gcc
+RUN gem install docker-api slack-ruby-client sys-filesystem
+
+WORKDIR /chainsafe
+
+COPY ruby_common ruby_common
+COPY sync_check/* ./
+ENTRYPOINT ["/bin/bash", "run_service.sh"]
