@@ -24,27 +24,27 @@ services:
     restart: unless-stopped
     labels:
       com.centurylinklabs.watchtower.enable: true
-  forest_calibnet:
-    image: ghcr.io/chainsafe/forest:${FOREST_TAG}
-    hostname: forest-calibnet
-    container_name: forest-calibnet
-    networks:
-      - calibnet
-    volumes:
-      - type: volume
-        source: forest-data
-        target: ${FOREST_TARGET_DATA}
-      - type: volume
-        source: sync-check
-        target: ${FOREST_TARGET_SCRIPTS}
-    command:
-      - '--chain'
-      - 'calibnet'
-      - '--config'
-      - ${FOREST_TARGET_SCRIPTS}/sync_check.toml
-    restart: unless-stopped
-    labels:
-      com.centurylinklabs.watchtower.enable: true
+  #forest_calibnet:
+    #image: ghcr.io/chainsafe/forest:${FOREST_TAG}
+    #hostname: forest-calibnet
+    #container_name: forest-calibnet
+    #networks:
+      #- calibnet
+    #volumes:
+      #- type: volume
+        #source: forest-data
+        #target: ${FOREST_TARGET_DATA}
+      #- type: volume
+        #source: sync-check
+        #target: ${FOREST_TARGET_SCRIPTS}
+    #command:
+      #- '--chain'
+      #- 'calibnet'
+      #- '--config'
+      #- ${FOREST_TARGET_SCRIPTS}/sync_check.toml
+    #restart: unless-stopped
+    #labels:
+      #com.centurylinklabs.watchtower.enable: true
   # Probe container to validate Forest syncing. Needs to be on the same network.
   forest_tester:
     build:
@@ -53,7 +53,7 @@ services:
     container_name: forest-tester
     networks:
       - mainnet
-      - calibnet
+      #- calibnet
     volumes:
       - type: volume
         source: forest-data
@@ -77,11 +77,11 @@ services:
     command:
       - |
         ruby ${FOREST_TARGET_SCRIPTS}/sync_check.rb forest-mainnet &
-        ruby ${FOREST_TARGET_SCRIPTS}/sync_check.rb forest-calibnet &
+        #ruby ${FOREST_TARGET_SCRIPTS}/sync_check.rb forest-calibnet &
         sleep infinity
     depends_on:
       - forest_mainnet
-      - forest_calibnet
+      #- forest_calibnet
     labels:
       com.centurylinklabs.watchtower.enable: true
       com.centurylinklabs.watchtower.depends-on: "forest-mainnet,forest-calibnet"
@@ -99,5 +99,5 @@ volumes:
 
 networks:
   mainnet:
-  calibnet:
+  #calibnet:
 
