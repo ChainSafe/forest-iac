@@ -55,16 +55,6 @@ class SyncCheck
     1 - stat.blocks_available.fdiv(stat.blocks)
   end
 
-  # Cleans up the sync check
-  def cleanup
-    @logger.info 'Cleaning up sync check'
-    @client.post_message '🧹 Cleaning up sync check'
-
-    FileUtils.rm_rf(Dir.glob("#{FOREST_DATA}/**"))
-
-    @client.attach_comment '🧹 Cleanup finished ✅'
-  end
-
   # Downloads snapshots from trusted sources.
   def download_snapshots
     @logger.info 'Downloading snapshots'
@@ -120,6 +110,17 @@ class SyncCheck
     logger.error error.message
     @client.post_message '💀 Sync check fiasco ❌'
     @client.attach_comment error.message
+  end
+
+  # Cleans up the sync check
+  def cleanup
+    @logger.info 'Cleaning up sync check'
+    @client.post_message '🧹 Cleaning up sync check'
+
+    stop_services
+    FileUtils.rm_rf(Dir.glob("#{FOREST_DATA}/**"))
+
+    @client.attach_comment '🧹 Cleanup finished ✅'
   end
 
   # start the sync check loop
