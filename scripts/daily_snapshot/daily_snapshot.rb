@@ -2,20 +2,13 @@
 
 require_relative 'ruby_common/slack_client'
 require_relative 'ruby_common/docker_utils'
+require_relative 'ruby_common/utils'
 require_relative 'snapshots_prune'
 
 require 'date'
 require 'logger'
 require 'fileutils'
 require 'active_support/time'
-
-# Retrieves an environmental variable, failing if its not set or empty.
-def get_and_assert_env_variable(name)
-  var = ENV[name]
-  raise "Please set #{name} environmental variable" if var.nil? || var.empty?
-
-  var
-end
 
 BASE_FOLDER = get_and_assert_env_variable 'BASE_FOLDER'
 SLACK_TOKEN = get_and_assert_env_variable 'SLACK_API_TOKEN'
