@@ -58,7 +58,7 @@ class SyncCheck
   # Downloads snapshots from trusted sources.
   def download_snapshots
     @logger.info 'Downloading snapshots'
-    # run_forest_cli '--chain calibnet snapshot fetch'
+    run_forest_cli '--chain calibnet snapshot fetch'
     run_forest_cli '--chain mainnet snapshot fetch'
   end
 
@@ -70,14 +70,14 @@ class SyncCheck
   # Imports the snapshots
   def import_snapshots
     @logger.info 'Importing snapshots'
-    # run_forest "--chain calibnet --halt-after-import --import-snapshot #{snapshot_path('calibnet')}"
+    run_forest "--chain calibnet --halt-after-import --import-snapshot #{snapshot_path('calibnet')}"
     run_forest "--chain mainnet --halt-after-import --import-snapshot #{snapshot_path('mainnet')}"
   end
 
   # Deletes all snapshots to free up memory.
   def delete_snapshots
     @logger.info 'Deleting snapshots'
-    # run_forest_cli '--chain calibnet snapshot clean --force'
+    run_forest_cli '--chain calibnet snapshot clean --force'
     run_forest_cli '--chain mainnet snapshot clean --force'
   end
 
