@@ -59,7 +59,7 @@ do
   timeout=$((timeout-1))
 done
 
-if [ $timeout -le 0 ]; then
+if [ "$timeout" -le 0 ]; then
   echo "❌ Timed out on sync wait"
   exit "$RET_SYNC_TIMEOUT"
 fi
