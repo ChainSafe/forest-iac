@@ -11,4 +11,4 @@ Fedora Linux 36 (Cloud Edition) x86_64
 ## Installation
 * ensure all environmental variables are set,
 * run `./boot_service.sh`
-* To use the enviromental variables, create a new file called `.env` before adding the credentials for testing. Get the credentials from the content of the `env-develop` file. 
+* To use the enviromental variables, create a new file called `.env` before adding the credentials for testing. Get the credentials from the content of the `dot-env-template` file. 
