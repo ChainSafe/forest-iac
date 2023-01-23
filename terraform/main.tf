@@ -25,31 +25,17 @@ variable "agent" {}
 variable "protocol" {}
 variable "source_addresses" {}
 
-resource "digitalocean_space" "forest" {
-  name             = "forest"
-  region           = "lon1"
+resource "digitalocean_ssh_key" "sammy-key" {
+  name       = "sammy-key"
+  public_key = file("~/sammy.pub")
 }
 
-resource "digitalocean_space_access_key" "forest" {
-  space_id = digitalocean_space.forest.id
-}
-
-resource "digitalocean_secret" "forest" {
-  name         = "forest"
-  value        = "YOUR_SECRET_KEY"
-}
-
-resource "digitalocean_ssh_key" "samuel-ssh-key" {
-  name       = "sam-ssh-key"
-  public_key = file("~/.ssh/samuel.pub")
-}
-
-resource "digitalocean_volume" "forest-volume" {
+resource "digitalocean_volume" "forest-volu" {
   region                  = "lon1"
-  name                    = "forest-volume"
+  name                    = "forest-volu"
   size                    = 600
   initial_filesystem_type = "ext4"
-  description             = "forrst storage volume"
+  description             = "forest storage volume"
 }
 
 resource "digitalocean_droplet" "forest-samuel" {
@@ -58,7 +44,7 @@ resource "digitalocean_droplet" "forest-samuel" {
   region = var.region
   size   = var.size
   backups = var.backups
-  ssh_keys = [digitalocean_ssh_key.samuel-ssh-key.fingerprint]
+  ssh_keys = [digitalocean_ssh_key.sammy-key.fingerprint]
 
   lifecycle {
     create_before_destroy = true
@@ -70,7 +56,7 @@ resource "digitalocean_droplet" "forest-samuel" {
     connection {
       type = var.type
       user = var.user
-      private_key = file("~/.ssh/samuel")
+      private_key = file("~/sammy")
       host = self.ipv4_address
       agent = var.agent
     }
@@ -80,18 +66,17 @@ resource "digitalocean_droplet" "forest-samuel" {
     inline = [
       "sudo apt-get update",
       "sudo apt-get install -y docker.io",
-      "sudo systemctl start docker",
-      "sudo git clone --recursive https://github.com/chainsafe/forest",
-      "sudo docker run --init -it --rm --entrypoint forest-cli ghcr.io/chainsafe/forest:latest --help",
-      "sudo docker run --init -it -v $HOME/Downloads:/downloads ghcr.io/chainsafe/forest:latest --encrypt-keystore false --import-snapshot /downloads/minimal_finality_stateroots_latest.car",
+      "sudo apt-get update",
+      "sudo git clone https://github.com/chainsafe/forest",
       "sudo systemctl daemon-reload",
       "sudo systemctl enable forest.service",
+      "docker run --init -it --detach -v $HOME/Downloads:/downloads ghcr.io/chainsafe/forest:latest --encrypt-keystore false --download-snapshot",
       "sudo systemctl start forest.service",
     ]
     connection {
       type = var.type
       user = var.user
-      private_key = file("~/.ssh/samuel")
+      private_key = file("~/sammy")
       host = self.ipv4_address
       agent = var.agent
     }
@@ -100,11 +85,11 @@ resource "digitalocean_droplet" "forest-samuel" {
 
 resource "digitalocean_volume_attachment" "forest-volume" {
   droplet_id = digitalocean_droplet.forest-samuel.id
-  volume_id  = digitalocean_volume.forest-volume.id
+  volume_id  = digitalocean_volume.forest-volu.id
 }
 
-resource "digitalocean_firewall" "forest" {
-  name = "forest-firewall"
+resource "digitalocean_firewall" "forest-firewall-test" {
+  name = "forest-firewall-test"
 
   inbound_rule {
     protocol = var.protocol
