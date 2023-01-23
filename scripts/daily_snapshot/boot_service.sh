@@ -32,9 +32,13 @@ if [ "$error" -ne "0" ]; then
     exit 1
 fi
 
+docker container rm --force forest-snapshot-upload 2> /dev/null || true
+docker container rm --force watchtower 2> /dev/null || true
+
 # With the access keys defined, let's run the snapshot generator. It requires
 # fuse, SYS_ADMIN, and "apparmor=unconfined" in order to mount s3fs.
 docker run \
+    --name forest-snapshot-upload \
     --device /dev/fuse \
     --cap-add SYS_ADMIN \
     --network host \
