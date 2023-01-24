@@ -65,13 +65,11 @@ resource "digitalocean_droplet" "forest-samuel" {
   provisioner "remote-exec" {
     inline = [
       "sudo apt-get update",
-      "sudo apt-get install -y docker.io",
+      "sudo apt-get install docker.io -y",
       "sudo apt-get update",
-      "sudo git clone https://github.com/chainsafe/forest",
-      "sudo systemctl daemon-reload",
-      "sudo systemctl enable forest.service",
-      "docker run --init -it --detach -v $HOME/Downloads:/downloads ghcr.io/chainsafe/forest:latest --encrypt-keystore false --download-snapshot",
-      "sudo systemctl start forest.service",
+      "systemctl enable forest.service",
+      "docker run -p 1234:1234 --rm --detach ghcr.io/chainsafe/forest:latest --encrypt-keystore false --auto-download-snapshot --chain calibnet",
+      "systemctl start forest.service",
     ]
     connection {
       type = var.type
@@ -88,12 +86,18 @@ resource "digitalocean_volume_attachment" "forest-volume" {
   volume_id  = digitalocean_volume.forest-volu.id
 }
 
-resource "digitalocean_firewall" "forest-firewall-test" {
-  name = "forest-firewall-test"
+resource "digitalocean_firewall" "forest-firewalls-test" {
+  name = "forest-firewalls-test"
 
   inbound_rule {
     protocol = var.protocol
     port_range = "22"
+    source_addresses = var.source_addresses
+  }
+
+  inbound_rule {
+    protocol = var.protocol
+    port_range = "1234"
     source_addresses = var.source_addresses
   }
 
