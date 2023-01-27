@@ -13,3 +13,5 @@ docker_daemon_environment: "{{ docker_daemon_environment }}"
 
 
 docker_users:  chainsafe
+
+user: chainsafe

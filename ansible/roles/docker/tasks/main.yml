@@ -3,11 +3,43 @@
 - name: Upgrade all apt packages
   apt: upgrade=dist force_apt_get=yes
 
+- name: Create a login user
+  user:
+    name: "{{ user }}"
+    state: present
+
+- name: Add public key to authorized_keys
+  authorized_key:
+    user: "{{ user }}"
+    state: present
+    key: "{{ lookup('file', '~/sammy.pub') }}"
+
+- name: Deny root from logging in
+  ansible.builtin.lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^(#)?PermitRootLogin \w*$'
+    line: 'PermitRootLogin no'
+    state: present
+
+- name: Allow specific users to log in
+  ansible.builtin.lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^AllowUsers'
+    line: 'AllowUsers {{ user }}'
+    state: present
+
+- name: Add {{ user }} to sudoers file
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers
+    regexp: '^{{ user }}'
+    line: '{{ user }} ALL=(ALL) NOPASSWD: ALL'
+    validate: 'visudo -cf %s'
+
 - name: create docker user
   user:
     name: "chainsafe"
     append: true
-    shell: /usr/sbin/nologin
+    shell: /bin/bash
     system: true
     create_home: false
 
@@ -74,6 +106,7 @@
     append: true
 
 - name: Run the Docker command
+  become: yes
   become_user: "chainsafe"
   shell: docker run -p 1234:1234 --rm --detach ghcr.io/chainsafe/forest:latest --encrypt-keystore false --auto-download-snapshot --chain calibnet
     
