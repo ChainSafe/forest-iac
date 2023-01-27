@@ -1,0 +1,15 @@
+---
+# defaults file for role/docker
+
+install_docker: "{{ install_docker }}"
+docker_edition: "ce"
+docker_pkg: "docker-{{ docker_edition }}"
+
+docker_apt_ignore_key_error: True
+docker_apt_key: "9DC858229FC7DD38854AE2D88D81803C0EBFCD88"
+
+docker_daemon_options: "{{ docker_daemon_options }}"
+docker_daemon_environment: "{{ docker_daemon_environment }}"
+
+
+docker_users:  chainsafe

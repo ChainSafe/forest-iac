@@ -1,0 +1,6 @@
+---
+- name: install docker and run docker command
+  hosts: droplet
+  become: true
+  roles:
+      - docker

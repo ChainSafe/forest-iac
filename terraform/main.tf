@@ -1,5 +1,5 @@
 terraform {
-  required_version = "~> 1.3.7"
+  required_version = "~> 1.3"
 
   required_providers {
     digitalocean = {
@@ -13,26 +13,9 @@ provider "digitalocean" {
   token = var.digitalocean_token
 }
 
-variable "digitalocean_token" {}
-variable "image" {}
-variable "name" {}
-variable "region" {}
-variable "size" {}
-variable "backups" {}
-variable "type" {}
-variable "user" {}
-variable "agent" {}
-variable "protocol" {}
-variable "source_addresses" {}
-
-resource "digitalocean_ssh_key" "sammy-key" {
-  name       = "sammy-key"
-  public_key = file("~/sammy.pub")
-}
-
-resource "digitalocean_volume" "forest-volu" {
-  region                  = "lon1"
-  name                    = "forest-volu"
+resource "digitalocean_volume" "forest-volum" {
+  region                  = "nyc3"
+  name                    = "forest-volum"
   size                    = 600
   initial_filesystem_type = "ext4"
   description             = "forest storage volume"
@@ -44,46 +27,16 @@ resource "digitalocean_droplet" "forest-samuel" {
   region = var.region
   size   = var.size
   backups = var.backups
-  ssh_keys = [digitalocean_ssh_key.sammy-key.fingerprint]
+  ssh_keys = [var.sam_ssh_key_fingerprint, var.guillaume_ssh_key_fingerprint, var.hubert_ssh_key_fingerprint, var.david_ssh_key_fingerprint]
 
-  lifecycle {
+    lifecycle {
     create_before_destroy = true
-  }
-  provisioner "file" {
-    source = "./forest.conf"
-    destination = "/etc/systemd/system/forest.service"
-
-    connection {
-      type = var.type
-      user = var.user
-      private_key = file("~/sammy")
-      host = self.ipv4_address
-      agent = var.agent
-    }
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "sudo apt-get update",
-      "sudo apt-get install docker.io -y",
-      "sudo apt-get update",
-      "systemctl enable forest.service",
-      "docker run -p 1234:1234 --rm --detach ghcr.io/chainsafe/forest:latest --encrypt-keystore false --auto-download-snapshot --chain calibnet",
-      "systemctl start forest.service",
-    ]
-    connection {
-      type = var.type
-      user = var.user
-      private_key = file("~/sammy")
-      host = self.ipv4_address
-      agent = var.agent
-    }
   }
 }
 
 resource "digitalocean_volume_attachment" "forest-volume" {
   droplet_id = digitalocean_droplet.forest-samuel.id
-  volume_id  = digitalocean_volume.forest-volu.id
+  volume_id  = digitalocean_volume.forest-volum.id
 }
 
 resource "digitalocean_firewall" "forest-firewalls-test" {
@@ -106,6 +59,7 @@ resource "digitalocean_firewall" "forest-firewalls-test" {
     port_range = "80"
     source_addresses = var.source_addresses
   }
+
   droplet_ids = [digitalocean_droplet.forest-samuel.id]
 }
 
