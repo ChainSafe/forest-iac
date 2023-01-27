@@ -2,6 +2,8 @@
 
 ## Architectural Implementation
 
+![Untitled Diagram drawio (8)](https://user-images.githubusercontent.com/47984109/215227510-dac5b8fb-8019-4388-a0e7-d5c432b95d70.png)
+
 The flow goes from Terraform for provisioning of the servers and Anisble to run all neccessary installations including forest.
 
 ## Requiremnts 
