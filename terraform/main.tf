@@ -66,3 +66,12 @@ resource "digitalocean_firewall" "forest-firewalls-test" {
 output "ip" {
   value = digitalocean_droplet.forest-samuel.ipv4_address
 }
+
+resource "local_file" "hosts" {
+  content = templatefile("../../ansible/hosts",
+    {
+      testing   = digitalocean_droplet.forest-samuel.ipv4_address
+    }
+  )
+  filename = "../ansible/hosts"
+}
