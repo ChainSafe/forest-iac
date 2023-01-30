@@ -18,6 +18,11 @@ provider "digitalocean" {
 #   public_key = file("/Users/mac/.ssh/id_rsa.pub")
 # }
 
+# resource "digitalocean_spaces_bucket" "spaces-name" {
+#   name   = "spaces-name"
+#   region = "nyc3"
+# }
+
 resource "digitalocean_volume" "forest-volum" {
   region                  = "nyc3"
   name                    = "forest-volum"

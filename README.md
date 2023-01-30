@@ -32,11 +32,16 @@ The flow goes from Terraform for provisioning of the servers and Anisble to run 
 - RAM: 32GB
 - VCPU: 8
 - Startup Disk Size: 100 GB
-- Expected Total Disk Size: >500 GB
+- Expected Total Disk Size: > 500 GB
 
 N/B: It's worth to note that some of the naming conventions can be changed to suit your deployment needs. 
 
 To test out the implementation, just access the server with appropiate `ssh` details in this manner `ssh -i ~/id_rsa chainsafe@ip_address`.
+
+Also, out of curiosity, to initiate the infrastructure, run the following:
+- Ensure to add all neccessary enviroment variables for AECCESS_ID and SECRET_KEY into the local machine via the `echo` command. This is needed for the backend and state configurations.
+- Run `make apply` in the terraform directory.
+- Run `ansible-playbook forest-docker-run.yaml` in the ansible directory.
 
 ## Collaborators
 - [YOUR NAME HERE] - Feel free to contribute to the codebase by resolving any open issues, refactoring, adding new features, writing test cases or any other way to make the project better and helpful to the community. Feel free to fork and send pull requests.
