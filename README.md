@@ -36,7 +36,7 @@ The flow goes from Terraform for provisioning of the servers and Anisble to run 
 
 N/B: It's worth to note that some of the naming conventions can be changed to suit your deployment needs. 
 
-To test out the implementation, just run `make plan` and `make apply` in the appropiate directory.
+To test out the implementation, just access the server with appropiate `ssh` details in this manner `ssh -i ~/id_rsa chainsafe@ip_address`.
 
 ## Collaborators
 - [YOUR NAME HERE] - Feel free to contribute to the codebase by resolving any open issues, refactoring, adding new features, writing test cases or any other way to make the project better and helpful to the community. Feel free to fork and send pull requests.
