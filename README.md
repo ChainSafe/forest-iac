@@ -28,7 +28,7 @@ This repository contains machine-readable specifications for the auxillilary ser
 
 The flow goes from Terraform for provisioning of the servers and Anisble to run all neccessary installations including forest.
 
-## Requiremnts 
+## Requirements 
 - RAM: 32GB
 - VCPU: 8
 - Startup Disk Size: 100 GB
