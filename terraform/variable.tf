@@ -4,9 +4,9 @@ variable "name" {}
 variable "region" {}
 variable "size" {}
 variable "backups" {}
-variable "type" {}
-variable "user" {}
-variable "agent" {}
+# variable "type" {}
+# variable "user" {}
+# variable "agent" {}
 variable "protocol" {}
 variable "source_addresses" {}
 variable "sam_ssh_key_fingerprint" {}

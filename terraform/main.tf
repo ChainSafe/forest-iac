@@ -13,6 +13,11 @@ provider "digitalocean" {
   token = var.digitalocean_token
 }
 
+# resource "digitalocean_ssh_key" "new-key" {
+#   name       = "new-key"
+#   public_key = file("/Users/mac/.ssh/id_rsa.pub")
+# }
+
 resource "digitalocean_volume" "forest-volum" {
   region                  = "nyc3"
   name                    = "forest-volum"
@@ -60,7 +65,35 @@ resource "digitalocean_firewall" "forest-firewalls-test" {
     source_addresses = var.source_addresses
   }
 
-  droplet_ids = [digitalocean_droplet.forest-samuel.id]
+  outbound_rule {
+    protocol              = "tcp"
+    port_range            = "53"
+    destination_addresses = var.destination_addresses
+  }
+  outbound_rule {
+    protocol              = "udp"
+    port_range            = "53"
+    destination_addresses = var.destination_addresses
+  }
+
+  outbound_rule {
+    protocol              = "icmp"
+    destination_addresses = var.destination_addresses
+  }
+
+  outbound_rule {
+    protocol              = "tcp"
+    port_range            = 80
+    destination_addresses = var.destination_addresses
+  }
+
+  outbound_rule {
+    protocol              = "tcp"
+    port_range            = 443
+    destination_addresses = var.destination_addresses
+  }
+
+droplet_ids = [digitalocean_droplet.forest-samuel.id]
 }
 
 output "ip" {

@@ -21,6 +21,10 @@
     line: 'PermitRootLogin no'
     state: present
 
+- name: Restart SSHD Service 
+  become: true
+  shell: sudo service ssh restart 
+
 - name: Allow specific users to log in
   ansible.builtin.lineinfile:
     dest: /etc/ssh/sshd_config
@@ -37,7 +41,7 @@
 
 - name: create docker user
   user:
-    name: "chainsafe"
+    name: '{{ user }}'
     append: true
     shell: /bin/bash
     system: true
@@ -101,16 +105,16 @@
 
 - name: Add docker users to "docker" group
   user:
-    name: "chainsafe"
+    name: "{{ user }}"
     groups: docker
     append: true
 
 - name: Run the Docker command
   become: yes
-  become_user: "chainsafe"
+  become_user: "{{ user }}"
   shell: docker run -p 1234:1234 --rm --detach ghcr.io/chainsafe/forest:latest --encrypt-keystore false --auto-download-snapshot --chain calibnet
     
-# - name: Ensure app is running
-#   shell: ps aux | grep forest
-#   register: app_status
-# - debug: msg={{app_status.stdout_lines}}
+- name: Ensure app is running
+  shell: ps aux | grep forest
+  register: app_status
+- debug: msg={{app_status.stdout_lines}}
