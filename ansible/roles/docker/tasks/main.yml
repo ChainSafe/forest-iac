@@ -12,7 +12,7 @@
   authorized_key:
     user: "{{ user }}"
     state: present
-    key: "{{ lookup('file', '~/sammy.pub') }}"
+    key: "{{ lookup('file', '~/id_rsa.pub') }}"
 
 - name: Deny root from logging in
   ansible.builtin.lineinfile:

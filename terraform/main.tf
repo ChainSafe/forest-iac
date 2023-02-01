@@ -13,31 +13,31 @@ provider "digitalocean" {
   token = var.digitalocean_token
 }
 
-# resource "digitalocean_ssh_key" "new-key" {
-#   name       = "new-key"
-#   public_key = file("/Users/mac/.ssh/id_rsa.pub")
-# }
+resource "digitalocean_ssh_key" "new-key-name" {
+  name       = "var.keys_name"
+  public_key = file("~/.ssh/id_rsa.pub")
+}
 
-# resource "digitalocean_spaces_bucket" "spaces-name" {
-#   name   = "spaces-name"
-#   region = "nyc3"
-# }
+resource "digitalocean_spaces_bucket" "spaces-name" {
+  name   = var.spaces_name
+  region = var.region
+}
 
-resource "digitalocean_volume" "forest-volum" {
-  region                  = "nyc3"
-  name                    = "forest-volum"
-  size                    = 600
-  initial_filesystem_type = "ext4"
+resource "digitalocean_volume" "forest-volume" {
+  region                  = var.region
+  name                    = var.volume_name
+  size                    = var.volume_size 
+  initial_filesystem_type = var.initial_filesystem_type
   description             = "forest storage volume"
 }
 
-resource "digitalocean_droplet" "forest-samuel" {
+resource "digitalocean_droplet" "forest" {
   image  = var.image
   name   = var.name
   region = var.region
   size   = var.size
   backups = var.backups
-  ssh_keys = [var.sam_ssh_key_fingerprint, var.guillaume_ssh_key_fingerprint, var.hubert_ssh_key_fingerprint, var.david_ssh_key_fingerprint]
+  ssh_keys = [var.new_key_ssh_key_fingerprint]
 
     lifecycle {
     create_before_destroy = true
@@ -45,29 +45,29 @@ resource "digitalocean_droplet" "forest-samuel" {
 }
 
 resource "digitalocean_volume_attachment" "forest-volume" {
-  droplet_id = digitalocean_droplet.forest-samuel.id
-  volume_id  = digitalocean_volume.forest-volum.id
+  droplet_id = digitalocean_droplet.forest.id
+  volume_id  = digitalocean_volume.forest-volume.id
 }
 
 resource "digitalocean_firewall" "forest-firewalls-test" {
-  name = "forest-firewalls-test"
+  name = var.firewall_name
 
   inbound_rule {
-    protocol = var.protocol
-    port_range = "22"
-    source_addresses = var.source_addresses
+    protocol              = "tcp"
+    port_range            = "22"
+    source_addresses      = var.source_addresses
   }
 
   inbound_rule {
-    protocol = var.protocol
-    port_range = "1234"
-    source_addresses = var.source_addresses
+    protocol              = "tcp"
+    port_range            = "1234"
+    source_addresses      = var.source_addresses
   }
 
   inbound_rule {
-    protocol = var.protocol
-    port_range = "80"
-    source_addresses = var.source_addresses
+    protocol              = "tcp"
+    port_range            = "80"
+    source_addresses      = var.source_addresses
   }
 
   outbound_rule {
@@ -88,27 +88,27 @@ resource "digitalocean_firewall" "forest-firewalls-test" {
 
   outbound_rule {
     protocol              = "tcp"
-    port_range            = 80
+    port_range            = "80"
     destination_addresses = var.destination_addresses
   }
 
   outbound_rule {
     protocol              = "tcp"
-    port_range            = 443
+    port_range            = "443"
     destination_addresses = var.destination_addresses
   }
 
-droplet_ids = [digitalocean_droplet.forest-samuel.id]
+droplet_ids = [digitalocean_droplet.forest.id]
 }
 
 output "ip" {
-  value = digitalocean_droplet.forest-samuel.ipv4_address
+  value = digitalocean_droplet.forest.ipv4_address
 }
 
 resource "local_file" "hosts" {
   content = templatefile("../../ansible/hosts",
     {
-      testing   = digitalocean_droplet.forest-samuel.ipv4_address
+      testing   = digitalocean_droplet.forest.ipv4_address
     }
   )
   filename = "../ansible/hosts"
