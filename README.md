@@ -19,3 +19,7 @@ This repository contains machine-readable specifications for the auxillilary ser
 - [ ] Exhaustive RPC testing for Forest docker image.
 - [ ] Sync testing for PRs.
 - [ ] Export testing for PRs.
+
+# 🛠️ Forest Cloud Infrastructure
+
+To run Forest in the cloud with all requirements, refer to the documentation [here](https://github.com/ChainSafe/forest-iac/blob/run-forest-node/forest-node/README.md)
