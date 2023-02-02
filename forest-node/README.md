@@ -5,8 +5,6 @@
 
 ![Forest Cloud Infrastructure ](https://user-images.githubusercontent.com/47984109/216006502-eca661d3-2ef8-4c75-aa7a-1740c25abb44.png)
 
-The flow goes from Terraform for provisioning of the servers and Anisble to run all neccessary installations including forest.
-
 ## Requirements 
 - RAM: 32GB
 - VCPU: 8
