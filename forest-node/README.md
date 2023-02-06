@@ -10,6 +10,7 @@
 - VCPU: 8
 - Startup Disk Size: 200 GB
 - Expected Total Disk Size: > 500 GB
+- Docker-image based VM
 
 N/B: It's worth noting that the naming conventions can be changed to suit your deployment needs especially the names for the resource blocks. In this case; `forest-volume`, `new-key-name`, `spaces-name`, `forest-volume`, `forest`, `forest-firewalls-test`, and `hosts`.
 
