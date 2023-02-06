@@ -1,4 +1,2 @@
 [droplet]
-%{ for ip in testing ~}
-${ip}
-%{ endfor ~} 
+138.68.93.73

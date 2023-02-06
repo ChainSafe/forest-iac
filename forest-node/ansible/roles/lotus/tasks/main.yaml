@@ -1,0 +1,256 @@
+---
+- name: Upgrade all apt packages
+  shell: sudo apt update
+
+- name: Create a login user
+  user:
+    name: "{{ user }}"
+    state: present
+
+- name: Add public key to authorized_keys
+  authorized_key:
+    user: "{{ user }}"
+    state: present
+    key: "{{ lookup('file', '~/sammy.pub') }}"
+
+- name: Deny root from logging in
+  ansible.builtin.lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^(#)?PermitRootLogin \w*$'
+    line: 'PermitRootLogin no'
+    state: present
+
+- name: Restart SSHD 
+  become: true
+  shell: sudo service ssh restart
+
+- name: Allow specific users to log in
+  ansible.builtin.lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^AllowUsers'
+    line: 'AllowUsers {{ user }}'
+    state: present
+
+- name: Add {{ user }} to sudoers file
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers
+    regexp: '^{{ user }}'
+    line: '{{ user }} ALL=(ALL) NOPASSWD: ALL'
+    validate: 'visudo -cf %s'
+
+- name: create {{ user }} user
+  user:
+    name: '{{ user }}'
+    append: true
+    shell: /bin/bash
+    system: true
+    create_home: false
+
+- name: Install packages to allow apt to use repository over HTTPS
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - mesa-opencl-icd
+    - ocl-icd-opencl-dev 
+    
+- name: update all packages 
+  become: true
+  shell: 
+    cmd: sudo apt update    
+    
+- name: Install packages to allow apt to use repository over HTTPS
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items:  
+    - gcc
+    - bzr  
+    - pkg-config
+    - clang
+    - build-essential
+    - hwloc
+    - libhwloc-dev
+    - make
+    - aria2
+
+- name: Install rust
+  ansible.builtin.import_tasks: rust.yml
+
+- name: Install golang
+  package:
+    name: "golang"
+    state: present  
+        
+- name: Set Go environment variables
+  lineinfile:
+    dest: /etc/profile
+    line: 'export PATH=$PATH:/usr/local/go/bin'
+    state: present
+    insertafter: EOF
+        
+- name: Update shell profile
+  shell: source /etc/profile
+  args:
+    executable: /bin/bash    
+
+#- name: clone the releases branch
+#  ansible.builtin.git:
+#    repo: https://github.com/filecoin-project/lotus.git
+#    dest: lotus/
+#    single_branch: yes
+#    version: releases
+
+- name: clone github repo
+  shell: 
+    cmd: git clone https://github.com/filecoin-project/lotus.git
+    chdir: /home/lotus/
+  ignore_errors: true
+
+- name: set git global 
+  become_user: '{{ user }}'
+  shell: 
+    cmd: "git config --global --add safe.directory /home/lotus/lotus"  
+
+- name: checkout repo
+  shell: 
+    cmd: git checkout releases
+    chdir: /home/lotus/lotus    
+
+#- name: join mainnet
+#  become: true
+#  make:
+#    chdir: /home/lotus/lotus
+#    target: clean
+
+#- name: join mainnet
+#  become: true
+#  make:
+#    chdir: /home/lotus/lotus
+#    target: all  
+
+#- name: set lotus environmental variable
+#   become_user: 
+#  become: true
+#  make:
+#    chdir: /home/lotus/lotus
+#    target: install
+
+- name: join mainnet
+  become: true
+  shell: 
+    cmd: sudo make clean all 
+    chdir: /home/lotus/lotus
+  ignore_errors: true
+
+- name: set lotus environmental variable
+  become: true
+  shell: 
+    cmd: sudo make install
+    chdir: /home/lotus/lotus
+  ignore_errors: true
+
+-  name: Ensure Lotus is installed 
+   shell: lotus --version
+   register: app_status
+- debug: msg={{app_status.stdout_lines}}
+
+-  name: Systemd service files
+   shell: 
+    cmd: make install-daemon-service && make install-miner-service
+    chdir: /home/lotus/lotus
+   register: systemd_status
+- debug: msg={{systemd_status.stdout_lines}}
+
+- name: lotus always started and Enabled at boot 
+  systemd:
+    name: lotus-daemon
+    state: started
+    enabled: yes 
+
+- name: create snapshot directory
+  file: 
+     path: /home/lotus/snapshot
+     state: directory
+     owner: "{{ user }}"
+     group: "{{ user_group }}"    
+
+# - name: download snapshot
+#   become: true
+#   become_user: '{{ user }}'
+#   command: aria2c -x5 https://snapshots.mainnet.filops.net/minimal/latest.zst
+#   args:
+#     chdir: /home/lotus/snapshot
+#   register: result
+#   ignore_errors: true
+#   failed_when: result.rc != 0
+#   check_mode: no
+#   tags:
+#     - zstandard   
+
+- name: Uncompress the download snapshot
+  become: true
+  become_user: '{{ user }}'
+  command: zstd -d 2570400_2023_02_03T10_00_00Z.car.zst
+  args:
+    chdir: /home/lotus/snapshot
+  register: result
+  failed_when: result.rc != 0
+  check_mode: no
+  tags:
+    - zstandard
+
+- name: Print decompression output
+  debug:
+    var: result.stdout_lines
+  when: result.rc == 0
+  check_mode: no
+  tags:
+    - zstandard
+
+- name: Import snapshot into Lotus daemon
+  become: true
+  become_user: '{{ user }}'
+  command: lotus daemon --import-snapshot /home/lotus/snapshot/2570400_2023_02_03T10_00_00Z.car --halt-after-import
+  register: result
+  failed_when: result.rc != 0
+  check_mode: no
+  tags:
+    - lotus
+  changed_when: false
+
+- name: Print import output
+  debug:
+    var: result.stdout_lines
+  when: result.rc == 0
+  check_mode: no
+  tags:
+    - lotus
+  changed_when: false
+
+- name: Start Lotus daemon in the background
+  become: true
+  become_user: '{{ user }}'
+  shell: nohup lotus daemon > ~/lotus.log 2>&1 &
+  register: result
+  failed_when: result.rc != 0
+  check_mode: no
+  tags:
+    - lotus
+  changed_when: false
+  no_log: true
+
+- name: Print start output
+  debug:
+    var: result.stdout_lines
+  when: result.rc == 0
+  check_mode: no
+  tags:
+    - lotus
+  changed_when: false
+  no_log: true
+
+-  name: Check syncing status
+   shell: lotus sync wait
+   register: app_status
+- debug: msg={{app_status.stdout_lines}}

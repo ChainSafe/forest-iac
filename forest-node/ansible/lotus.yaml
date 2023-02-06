@@ -1,0 +1,15 @@
+- name: install lotus and set-lotus 
+  hosts: droplet
+  become: yes
+  roles:
+  - lotus
+  environment: 
+    RUSTFLAGS: "-C target-cpu=native -g"
+    FFI_BUILD_FROM_SOURCE: 1
+    FFI_USE_MULTICORE_SDR: 0
+    CGO_CFLAGS_ALLOW: "-D__BLST_PORTABLE__"
+    CGO_CFLAGS: "-D__BLST_PORTABLE__"
+    RUSTFLAGS: "-C target-cpu=native -g"
+    
+   
+

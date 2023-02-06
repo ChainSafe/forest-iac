@@ -1,6 +1,6 @@
 ---
-- name: install docker and run docker command
+- name: install docker and run forest command
   hosts: droplet
   become: true
   roles:
-      - docker
+      - forest

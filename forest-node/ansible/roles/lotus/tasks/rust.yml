@@ -1,0 +1,28 @@
+---
+
+- name: Primary block, running tasks as specified rustup user
+  become: true
+  become_user: "{{ rustup_user }}"
+  block:
+    - name: Gather state to determine necessary tasks
+      ansible.builtin.import_tasks: gather-state.yml
+
+    - name: Create temporary install directory
+      ansible.builtin.tempfile:
+        path: "{{ rustup_user_home }}"
+        state: directory
+        suffix: .install
+      register: temp_install_dir
+      changed_when: false
+
+    - name: Download rustup
+      ansible.builtin.import_tasks: get-rustup.yml
+
+    - name: Apply configuration (shellrc, etc.)
+      ansible.builtin.import_tasks: configure.yml
+
+    - name: Remove temporary install directory
+      ansible.builtin.file:
+        path: "{{ temp_install_dir.path }}"
+        state: absent
+      changed_when: false
