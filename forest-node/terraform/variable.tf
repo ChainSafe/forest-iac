@@ -20,3 +20,8 @@ variable "spaces_endpoint" {}
 variable "bucket_state" {}
 variable "skip_credentials_validation" {}
 variable "skip_metadata_api_check" {}
+variable "description" {}
+variable "firewall_name" {}
+variable "l-name" {}
+variable "l-size" {}
+variable "volume_name_l" {}

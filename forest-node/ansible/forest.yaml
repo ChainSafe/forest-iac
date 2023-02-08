@@ -1,0 +1,6 @@
+---
+- name: run docker command for forest
+  hosts: forest
+  become: true
+  roles:
+      - forest

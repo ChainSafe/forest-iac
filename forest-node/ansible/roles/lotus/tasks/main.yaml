@@ -1,0 +1,81 @@
+---
+# tasks file for role/lotus
+- name: Upgrade all apt packages
+  shell: sudo apt update
+
+- name: Create a login user
+  user:
+    name: "{{ user }}"
+    state: present
+
+- name: Add public key to authorized_keys
+  authorized_key:
+    user: "{{ user }}"
+    state: present
+    key: "{{ lookup('file', '~/sammy.pub') }}"
+
+- name: Allow specific users to log in
+  ansible.builtin.lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^AllowUsers'
+    line: 'AllowUsers {{ user }}'
+    state: present
+
+- name: Restart SSHD 
+  become: true
+  shell: sudo service ssh restart
+
+- name: Add {{ user }} to sudoers file
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers
+    regexp: '^{{ user }}'
+    line: '{{ user }} ALL=(ALL) NOPASSWD: ALL'
+    validate: 'visudo -cf %s'
+
+- name: create docker user
+  user:
+    name: '{{ user }}'
+    append: true
+    shell: /bin/bash
+    system: true
+    create_home: false
+
+- name: update all packages 
+  become: true
+  shell: 
+    cmd: sudo apt update   
+
+- name: Add docker user to "docker" group
+  user:
+    name: "{{ user }}"
+    groups: docker
+    append: true
+
+- name: create the lotus file and set permission 
+  become: true
+  become_user: "{{ user }}"
+  file:
+    path: $HOME/lotus
+    recurse: yes
+    state: directory
+    mode: '0777'
+
+- name: Run Docker container
+  become: true
+  become_user: "{{ user }}"
+  shell: |
+    docker run -d --name lotus \
+    -p 1234:1234 -p 1235:1235 \
+    -e INFRA_LOTUS_DAEMON="true" \
+    -e INFRA_LOTUS_HOME="/home/lotus_user" \
+    -e INFRA_IMPORT_SNAPSHOT="true" \
+    -e SNAPSHOTURL="https://snapshots.mainnet.filops.net/minimal/latest" \
+    -e INFRA_SYNC="true" \
+    --network host \
+    -v $HOME/lotus:/home/lotus_user \
+    glif/lotus:v1.18.0
+
+-  name: Ensure app is running
+   shell: ps aux | grep lotus
+   register: app_status
+- debug: msg={{app_status.stdout_lines}}

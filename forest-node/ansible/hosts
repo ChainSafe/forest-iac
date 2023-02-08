@@ -1,4 +1,5 @@
-[droplet]
-%{ for ip in testing ~}
-${ip}
-%{ endfor ~} 
+[forest]
+46.101.199.173
+
+[lotus]
+164.90.238.69

@@ -1,0 +1,15 @@
+- name: Download file and rename it
+  gather_facts: false
+  hosts: all
+  tasks:
+    - name: Download file
+      shell: aria2c -x5 https://snapshots.mainnet.filops.net/minimal/latest.zst
+      register: result
+
+    - name: Check for downloaded file
+      shell: ls -1 | grep .zst
+      register: zst_files
+
+    - name: Rename the file
+      shell: mv {{ zst_files.stdout.strip() }} desired_file_name.zst
+      when: zst_files.stdout != ''
