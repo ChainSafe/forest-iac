@@ -1,5 +1,9 @@
 [forest]
-46.101.199.173
+%{ for ip in forest ~}
+${ip}
+%{ endfor ~} 
 
 [lotus]
-164.90.238.69
+%{ for ip in lotus ~}
+${ip}
+%{ endfor ~} 

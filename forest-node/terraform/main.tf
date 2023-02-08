@@ -13,11 +13,6 @@ provider "digitalocean" {
   token = var.digitalocean_token
 }
 
-# resource "digitalocean_ssh_key" "new-key-name" {
-#   name       = "var.keys_name"
-#   public_key = file("~/.ssh/id_rsa.pub")
-# }
-
 resource "digitalocean_volume" "forest-volume" {
   region                  = var.region
   name                    = var.volume_name
@@ -40,7 +35,7 @@ resource "digitalocean_droplet" "forest" {
   region = var.region
   size   = var.size
   backups = var.backups
-  ssh_keys = [var.sam_ssh_key_fingerprint, var.guillaume_ssh_key_fingerprint, var.hubert_ssh_key_fingerprint, var.david_ssh_key_fingerprint]
+  ssh_keys = [var.new_key_ssh_key_fingerprint]
 
     lifecycle {
     create_before_destroy = true
@@ -53,7 +48,7 @@ resource "digitalocean_droplet" "lotus" {
   region = var.region
   size   = var.l-size
   backups = var.backups
-  ssh_keys = [var.sam_ssh_key_fingerprint, var.guillaume_ssh_key_fingerprint, var.hubert_ssh_key_fingerprint, var.david_ssh_key_fingerprint]
+  ssh_keys = [var.new_key_ssh_key_fingerprint]
 
     lifecycle {
     create_before_destroy = true
