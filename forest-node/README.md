@@ -25,9 +25,8 @@ In order to implement the infrastructure, run the following:
 - Run `make apply` in the terraform directory to create the infrastructure and update the ansible hosts file with the IP address. 
 - Run `ansible all -m ping` to confirm connection to hosts.  
 - Run `ansible-playbook forest.yaml` in the ansible directory to initialize forest.
-- Run `ansible-playbook lotus.yaml` in the ansible directory to initialize lotus.
 
-Also, be aware that after ansible has configured all services, the servers will only be accessible via `chainsafe` which can be changed in `ansible.cfg` file if required. 
+Also, be aware that after ansible has configured all services, the servers will only be accessible via the `chainsafe` user which can be changed in `ansible.cfg` file if required. 
 
 ## Collaborators
 Feel free to contribute to the codebase by resolving any open issues, refactoring, adding new features, writing test cases, or any other way to make the project better and helpful to the community. Feel free to fork and send pull requests.

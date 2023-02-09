@@ -1,6 +1,0 @@
-- name: install lotus and set-lotus 
-  gather_facts: false
-  hosts: lotus
-  become: true
-  roles:
-  - lotus

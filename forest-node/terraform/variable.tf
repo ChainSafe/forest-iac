@@ -5,10 +5,7 @@ variable "region" {}
 variable "size" {}
 variable "backups" {}
 variable "source_addresses" {}
-variable "sam_ssh_key_fingerprint" {}
-variable "david_ssh_key_fingerprint" {}
-variable "hubert_ssh_key_fingerprint" {}
-variable "guillaume_ssh_key_fingerprint" {}
+variable "new_key_ssh_key_fingerprint" {}
 variable "destination_addresses" {}
 variable "volume_name" {}
 variable "spaces_name" {}
@@ -22,6 +19,3 @@ variable "skip_credentials_validation" {}
 variable "skip_metadata_api_check" {}
 variable "description" {}
 variable "firewall_name" {}
-variable "l-name" {}
-variable "l-size" {}
-variable "volume_name_l" {}

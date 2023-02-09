@@ -2,8 +2,3 @@
 %{ for ip in forest ~}
 ${ip}
 %{ endfor ~} 
-
-[lotus]
-%{ for ip in lotus ~}
-${ip}
-%{ endfor ~} 
