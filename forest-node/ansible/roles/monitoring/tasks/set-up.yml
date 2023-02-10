@@ -1,0 +1,83 @@
+---
+- name: Create prometheus-grafana directory
+  file:
+    path: "/etc/monitoring/prometheus"
+    state: "directory"
+    mode: 0777
+  become: true
+
+- name: copy compose file
+  copy:
+    src: "docker-compose.yml"
+    dest: "/etc/monitoring/"
+
+- name: prometheus alert
+  copy:
+    src: "alert.rules"
+    dest: "/etc/monitoring/prometheus/alert.rules"
+    mode: 0644
+ 
+- name: prometheus configuration file
+  template:
+    src: prometheus/prometheus.yml.j2
+    dest: "/etc/monitoring/prometheus/prometheus.yml"
+    mode: 0755
+  
+- name: Ensure grafana provisioning directory dashboards exists
+  file:
+    path: "/etc/monitoring/grafana/provisioning/dashboards"
+    state: "directory"
+    mode: 0777
+  become: true
+
+- name: Ensure grafana dashboards directory exists
+  file:
+    path: "/etc/monitoring/grafana/dashboards"
+    state: "directory"
+    mode: 0777
+  become: true  
+
+- name: prometheus configuration file
+  template:
+    src: "grafana/dashboards/system-monitoring.json"
+    dest: "/etc/monitoring/grafana/dashboards"
+    mode: 0755  
+
+- name: download node exporter dashboard
+  get_url:
+    url: https://raw.githubusercontent.com/rfrail3/grafana-dashboards/master/prometheus/node-exporter-full.json
+    dest: /etc/monitoring/grafana/provisioning/dashboards
+    mode: 0755
+
+- name: activate dashboard for node exporter
+  template:
+    src: "grafana/dashboards/dashboard-node-exporter.yml.j2"
+    dest: /etc/monitoring/grafana/dashboards/dashboard-node-exporter.yml
+    mode: 0755
+
+- name: Ensure grafana provisioning - dashboards exists
+  file:
+    path: "/etc/monitoring/grafana/datasources"
+    state: "directory"
+    mode: 0777
+  become: true    
+
+- name: Copy grafana datasource
+  template:
+    src: "grafana/datasource/datasource.yml.j2"
+    dest: "/etc/monitoring/grafana/datasources/datasource.yml.j2"
+    mode: 0644  
+
+- name: Ensure alertmanager directory exists
+  file:
+    path: "/etc/monitoring/alertmanager"
+    state: "directory"
+    mode: 0777
+  become: true
+
+- name: Copy alert config
+  copy:
+    src: "alert-manager-config.yml"
+    dest: "/etc/monitoring/alertmanager/config.yml"
+    mode: 0644
+

@@ -1,0 +1,35 @@
+#jinja2: lstrip_blocks: "True"
+rule_files:
+  - "alert.rules"
+
+{{ prometheus_var_config | to_nice_yaml(indent=2) }}
+{% if forest_node_exporter %}
+- job_name: forest_node_exporter
+  scrape_interval: 15s
+  static_configs:
+  - targets:
+{% for server in groups[forest_node_exporter] %}
+    - {{ server }}:9100
+{% endfor %}
+{% endif %}
+
+- job_name: Forest-node
+  scrape_interval: 15s
+  static_configs:
+  - targets:
+{% for server in groups[forest_prometheus_exporter] %}
+    - {{ server }}:6116
+{% endfor %}
+
+- job_name: monitoring_exporter
+  scrape_interval: 15s
+  static_configs:
+  - targets:
+    - 127.0.0.1:9100
+
+alerting:
+  alertmanagers:
+  - scheme: http
+    static_configs:
+    - targets: 
+      - 'alertmanager:9093'
