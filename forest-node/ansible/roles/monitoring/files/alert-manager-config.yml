@@ -1,5 +1,5 @@
 global:
-  slack_api_url: "https://hooks.slack.com/services/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" 
+  slack_api_url: "https://hooks.slack.com/services/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" 
 
 route:
   group_by: ['instance', 'severity']
@@ -20,15 +20,15 @@ route:
 receivers:
 - name: 'alert-team'
   slack_configs:
-  - channel: "#zeitgeist-operation"
+  - channel: "#monitoring-alerts-forest"
     text: "summary: {{ .CommonAnnotations.summary }}\ndescription: {{ .CommonAnnotations.description }}"
 - name: 'critical-notifications'
   slack_configs:
-  - channel: "#zeitgeist-operation"
+  - channel: "#monitoring-alerts-forest"
     text: "Critical alert: {{ .CommonAnnotations.summary }}: {{ .CommonAnnotations.description }}"   
 - name: 'warning-notifications'
   slack_configs:
-  - channel: "#zeitgeist-operation"
+  - channel: "#monitoring-alerts-forest"
     text: "Warning alert: {{ .CommonAnnotations.summary }}: {{ .CommonAnnotations.description }}"     
 
 

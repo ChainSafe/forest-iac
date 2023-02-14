@@ -6,18 +6,18 @@
     mode: 0777
   become: true
 
-- name: copy compose file
+- name: Copy compose file
   copy:
     src: "docker-compose.yml"
     dest: "/etc/monitoring/"
 
-- name: prometheus alert
+- name: Prometheus alert
   copy:
     src: "alert.rules"
     dest: "/etc/monitoring/prometheus/alert.rules"
     mode: 0644
  
-- name: prometheus configuration file
+- name: Copy Prometheus Configuration file
   template:
     src: prometheus/prometheus.yml.j2
     dest: "/etc/monitoring/prometheus/prometheus.yml"
@@ -30,45 +30,38 @@
     mode: 0777
   become: true
 
-- name: Ensure grafana dashboards directory exists
-  file:
-    path: "/etc/monitoring/grafana/dashboards"
-    state: "directory"
-    mode: 0777
-  become: true  
-
-- name: prometheus configuration file
-  template:
-    src: "grafana/dashboards/system-monitoring.json"
-    dest: "/etc/monitoring/grafana/dashboards"
-    mode: 0755  
-
-- name: download node exporter dashboard
+- name: Download node exporter dashboard
   get_url:
     url: https://raw.githubusercontent.com/rfrail3/grafana-dashboards/master/prometheus/node-exporter-full.json
     dest: /etc/monitoring/grafana/provisioning/dashboards
     mode: 0755
 
-- name: activate dashboard for node exporter
-  template:
-    src: "grafana/dashboards/dashboard-node-exporter.yml.j2"
-    dest: /etc/monitoring/grafana/dashboards/dashboard-node-exporter.yml
+- name: Download Forest Dashboard
+  get_url:
+    url: https://raw.githubusercontent.com/segunjkf/forest/main/.maintain/monitoring/grafana/dashboards/forest.json
+    dest: /etc/monitoring/grafana/provisioning/dashboards
     mode: 0755
 
-- name: Ensure grafana provisioning - dashboards exists
+- name: Copy Dashboard Config
+  template:
+    src: "grafana/provisioning/dashboards/dashboard-node-exporter.yml.j2"
+    dest: /etc/monitoring/grafana/provisioning/dashboards/dashboard-node-exporter.yml
+    mode: 0755
+
+- name: Ensure grafana Datasource Directory exists
   file:
-    path: "/etc/monitoring/grafana/datasources"
+    path: "/etc/monitoring/grafana/provisioning/datasources"
     state: "directory"
     mode: 0777
   become: true    
 
-- name: Copy grafana datasource
+- name: Copy Grafana Datasource Config
   template:
-    src: "grafana/datasource/datasource.yml.j2"
-    dest: "/etc/monitoring/grafana/datasources/datasource.yml.j2"
+    src: "grafana/provisioning/datasource/datasource.yml.j2"
+    dest: "/etc/monitoring/grafana/provisioning/datasources/datasource.yml.j2"
     mode: 0644  
 
-- name: Ensure alertmanager directory exists
+- name: Ensure Alertmanager Directory Exists
   file:
     path: "/etc/monitoring/alertmanager"
     state: "directory"

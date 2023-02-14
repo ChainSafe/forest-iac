@@ -1,5 +1,5 @@
 - name: install node-exporter
-  hosts: [forest, monitoring]
+  hosts: [monitoring]
   gather_facts: false
   become: yes
   roles:

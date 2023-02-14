@@ -77,7 +77,6 @@
     cmd: "docker-compose up -d"
     chdir: "/etc/monitoring"    
 
-
 -  name: Ensure app is running
    shell: ps aux | grep mointoring
    register: app_status
