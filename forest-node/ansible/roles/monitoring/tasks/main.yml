@@ -1,5 +1,5 @@
 ---
-# tasks file for role/forest
+#tasks file for role/monitoring
 - name: Upgrade all apt packages
   apt: upgrade=dist force_apt_get=yes
 
@@ -14,16 +14,17 @@
     state: present
     key: "{{ lookup('file', '~/sammy.pub') }}"
 
+
+- name: Restart SSHD 
+  become: true
+  shell: sudo service ssh restart
+
 - name: Allow specific users to log in
   ansible.builtin.lineinfile:
     dest: /etc/ssh/sshd_config
     regexp: '^AllowUsers'
     line: 'AllowUsers {{ user }}'
     state: present
-
-- name: Restart SSHD Service 
-  become: true
-  shell: sudo service ssh restart 
 
 - name: Add {{ user }} to sudoers file
   ansible.builtin.lineinfile:
@@ -40,23 +41,43 @@
     system: true
     create_home: false
 
-- name: update all packages 
-  become: true
-  shell: 
-    cmd: sudo apt update 
-
-- name: Add docker users to "docker" group
+- name: Add user to "docker" group
   user:
-    name: "{{ user }}"
+    name: '{{ user }}'
     groups: docker
     append: true
 
-- name: Run the Docker command
-  become: yes
-  become_user: "{{ user }}"
-  shell: docker run -p 1234:1234 -p 6116:6116 --rm --detach ghcr.io/chainsafe/forest:latest --encrypt-keystore false --auto-download-snapshot --chain calibnet
+- name: Install Docker compose
+  get_url:
+    url: "https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-Linux-x86_64"
+    dest: "{{ docker_compose_path }}"
+    force: True
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0755
     
-- name: Ensure app is running
-  shell: ps aux | grep forest
-  register: app_status
+- include_tasks: set-up.yml
+
+- name: Allow access to Node exporter port  
+  become: true
+  ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+    state: enabled 
+  with_items: 
+    - 9090
+    - 9093
+    - 9100
+    
+- name: Run docker-compose
+  become: True
+  become_user: "{{ user }}"
+  shell:
+    cmd: "docker-compose up -d"
+    chdir: "/etc/monitoring"    
+
+-  name: Ensure app is running
+   shell: ps aux | grep mointoring
+   register: app_status
 - debug: msg={{app_status.stdout_lines}}

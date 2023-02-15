@@ -1,0 +1,26 @@
+---
+# defaults file for role/monitoring
+install_docker_compose: "{{ install_docker_compose }}"
+docker_compose_version: "v2.16.0"
+docker_compose_path: /usr/local/bin/docker-compose
+
+prometheus_retention_time: "365d"
+prometheus_scrape_interval: "30s"
+prometheus_node_exporter: true
+forest_node_exporter: "forest"
+forest_prometheus_exporter: "forest"
+prometheus_env: "production"
+prometheus_var_config:
+  global:
+    scrape_interval: "{{ prometheus_scrape_interval }}"
+    evaluation_interval: 5s
+    external_labels:
+      env: '{{ prometheus_env }}'
+  scrape_configs:
+    - job_name: prometheus
+      scrape_interval: 5m
+      static_configs:
+        - targets: ['{{ inventory_hostname }}:9090']
+
+user: "monitoring"
+user_group: "{{ user }}"

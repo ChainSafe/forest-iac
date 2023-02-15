@@ -1,0 +1,13 @@
+- name: install node-exporter
+  hosts: [monitoring]
+  gather_facts: false
+  become: yes
+  roles:
+  - node-exporter
+
+- name: install Docker-grafana-prometheus
+  gather_facts: false
+  hosts: monitoring
+  become: yes
+  roles:
+  - monitoring

@@ -1,0 +1,76 @@
+---
+- name: Create prometheus-grafana directory
+  file:
+    path: "/etc/monitoring/prometheus"
+    state: "directory"
+    mode: 0777
+  become: true
+
+- name: Copy compose file
+  copy:
+    src: "docker-compose.yml"
+    dest: "/etc/monitoring/"
+
+- name: Prometheus alert
+  copy:
+    src: "alert.rules"
+    dest: "/etc/monitoring/prometheus/alert.rules"
+    mode: 0644
+ 
+- name: Copy Prometheus Configuration file
+  template:
+    src: prometheus/prometheus.yml.j2
+    dest: "/etc/monitoring/prometheus/prometheus.yml"
+    mode: 0755
+  
+- name: Ensure grafana provisioning directory dashboards exists
+  file:
+    path: "/etc/monitoring/grafana/provisioning/dashboards"
+    state: "directory"
+    mode: 0777
+  become: true
+
+- name: Download node exporter dashboard
+  get_url:
+    url: https://raw.githubusercontent.com/rfrail3/grafana-dashboards/master/prometheus/node-exporter-full.json
+    dest: /etc/monitoring/grafana/provisioning/dashboards
+    mode: 0755
+
+- name: Download Forest Dashboard
+  get_url:
+    url: https://raw.githubusercontent.com/segunjkf/forest/main/.maintain/monitoring/grafana/dashboards/forest.json
+    dest: /etc/monitoring/grafana/provisioning/dashboards
+    mode: 0755
+
+- name: Copy Dashboard Config
+  template:
+    src: "grafana/provisioning/dashboards/dashboard-node-exporter.yml.j2"
+    dest: /etc/monitoring/grafana/provisioning/dashboards/dashboard-node-exporter.yml
+    mode: 0755
+
+- name: Ensure grafana Datasource Directory exists
+  file:
+    path: "/etc/monitoring/grafana/provisioning/datasources"
+    state: "directory"
+    mode: 0777
+  become: true    
+
+- name: Copy Grafana Datasource Config
+  template:
+    src: "grafana/provisioning/datasource/datasource.yml.j2"
+    dest: "/etc/monitoring/grafana/provisioning/datasources/datasource.yml.j2"
+    mode: 0644  
+
+- name: Ensure Alertmanager Directory Exists
+  file:
+    path: "/etc/monitoring/alertmanager"
+    state: "directory"
+    mode: 0777
+  become: true
+
+- name: Copy alert config
+  copy:
+    src: "alert-manager-config.yml"
+    dest: "/etc/monitoring/alertmanager/config.yml"
+    mode: 0644
+
