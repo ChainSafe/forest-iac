@@ -19,7 +19,7 @@ To test this implementation, access the server with appropriate `ssh` details in
 
 In order to implement the infrastructure, run the following:
 - Set-up s3cmd 2.x with DigitalOcean Spaces; you can check [here](https://docs.digitalocean.com/products/spaces/reference/s3cmd/) for more details. This will require `ACCESS_TOKEN` and `SECRET_KEY`; it can be auto-generated from the DigitalOcean console through the Applications & API section.   
-- Add all necessary environment variables by running `echo $SPACES_ACCESS_TOKEN` and `echo $SPACES_SECRET_KEY` while using the values generated in the previous step.
+- Add all necessary environment variables by running `export SPACES_ACCESS_TOKEN = "value"` and `export SPACES_SECRET_KEY = "value"`, while using the values generated in the previous step.
 - Create a `*.tfvars` file to use the necessary variable values for terraform running success. Also, be aware that the `keys_name` must be unique. 
 - Run `make plan` in the terraform directory.   
 - Run `make apply` in the terraform directory to create the infrastructure and update the ansible hosts file with the IP address. 
