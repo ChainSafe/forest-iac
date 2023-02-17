@@ -13,14 +13,6 @@ provider "digitalocean" {
   token = var.digitalocean_token
 }
 
-resource "digitalocean_volume" "forest-volume" {
-  region                  = var.region
-  name                    = var.volume_name
-  size                    = var.volume_size 
-  initial_filesystem_type = var.initial_filesystem_type
-  description             = var.description 
-}
-
 resource "digitalocean_droplet" "forest" {
   image  = var.image
   name   = var.name
@@ -32,11 +24,6 @@ resource "digitalocean_droplet" "forest" {
     lifecycle {
     create_before_destroy = true
   }
-}
-
-resource "digitalocean_volume_attachment" "forest-volume" {
-  droplet_id = digitalocean_droplet.forest.id
-  volume_id  = digitalocean_volume.forest-volume.id
 }
 
 resource "digitalocean_firewall" "forest-firewalls-test" {
