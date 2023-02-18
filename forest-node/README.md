@@ -1,7 +1,7 @@
 
 ## Running Forest In DigitalOcean
 
-## Forest IAC Architectue
+## Forest IAC Architecture
 
 ![Forest Cloud Infrastructure ](https://user-images.githubusercontent.com/47984109/219903795-77c306b8-a70b-4f32-8d7d-3c1a39e52186.jpg)
 
