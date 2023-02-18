@@ -39,7 +39,7 @@ Be sure to update the values with preffered names for the each of the empty para
     - Windows: Follow the instructions [here](https://www.s3express.com/download.htm) 
 - After installation then configure `s3cmd` with this command `s3cmd --configure`
 - Confirm `s3cmd` installation with this command `s3cmd --version`
-- Set-up `s3cmd` 2.x with DigitalOcean Spaces; you can check [here](https://docs.digitalocean.com/products/spaces/reference/s3cmd/) for proper details. This will require `ACCESS_TOKEN` and `SECRET_KEY`; it can be auto-generated from the DigitalOcean console through the Applications & API section.   
+- Set-up `s3cmd` 2.x with DigitalOcean Spaces; you can check [here](https://docs.digitalocean.com/products/spaces/reference/s3cmd/) for proper details. This will require `ACCESS_TOKEN` and `SECRET_KEY` and it can be auto-generated from the DigitalOcean console through the Applications & API section.   
 - Generate `digitalocean_api_token` from Digitalocean console; you can check [here](https://docs.digitalocean.com/reference/api/create-personal-access-token/) for more detials. Additionally, the value should be added as a variable in the `terraform.tfvars` file when setting up the terraform directory. 
 - Run `make init` in the terraform directory for initialization and variable confirmation.  
 - Run `make plan` in the terraform directory to view all the resources to be configured.   
