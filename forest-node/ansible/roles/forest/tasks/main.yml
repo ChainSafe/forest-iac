@@ -12,7 +12,7 @@
   authorized_key:
     user: "{{ user }}"
     state: present
-    key: "{{ lookup('file', '~/sammy.pub') }}"
+    key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"    # assuming the name of the public key file is `id_rsa.pub`
 
 - name: Allow specific users to log in
   ansible.builtin.lineinfile:
@@ -54,7 +54,7 @@
 - name: Run the Docker command
   become: yes
   become_user: "{{ user }}"
-  shell: docker run -p 1234:1234 --rm --detach ghcr.io/chainsafe/forest:latest --encrypt-keystore false --auto-download-snapshot --chain calibnet --loki
+  shell: docker run -p 1234:1234 --rm --detach ghcr.io/chainsafe/forest:latest --encrypt-keystore false --auto-download-snapshot --chain calibnet
     
 - name: Ensure app is running
   shell: ps aux | grep forest

@@ -1,6 +1,6 @@
 terraform {
   backend "s3" {
-    bucket = "forest-test-state"
+    bucket = ""
     key = "terraform.tfstate"
     region = "us-west-1"
     endpoint = "nyc3.digitaloceanspaces.com"
