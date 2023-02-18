@@ -16,8 +16,6 @@
 - Install `make`
 - Basic digitalocean knowledge
 
-N/B: It's worth noting that the naming conventions can be changed to suit your deployment needs especially the names for the resource blocks. In this case; `new-key-name`, `spaces-name`, `forest`, `forest-firewalls-test`, and `hosts`.
-
 In order to implement the infrastructure, run the following:
 - Create `ssh-key` and store the fingerprinbt for use in the next step.
 - In order to fully explore the IAC functionalities, it is required to have a `*.tfvars` file. This will be in conjunction with the variables specified in `varaible.tf`. The format for the `terraform.tfvars` file is shown below:
