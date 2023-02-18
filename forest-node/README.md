@@ -3,7 +3,7 @@
 
 ## Forest IAC Architectue
 
-![Forest Cloud Infrastructure ](https://user-images.githubusercontent.com/47984109/216006502-eca661d3-2ef8-4c75-aa7a-1740c25abb44.png)
+![Forest Cloud Infrastructure ](https://user-images.githubusercontent.com/47984109/219903795-77c306b8-a70b-4f32-8d7d-3c1a39e52186.jpg)
 
 ## Requirements  
 - RAM: 32GB
