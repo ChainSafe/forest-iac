@@ -17,7 +17,7 @@
 - Basic digitalocean knowledge
 
 In order to implement the infrastructure, run the following:
-- Create `ssh-key` and store the fingerprinbt for use in the next step.
+- Create `ssh-key` and store the fingerprint for use in the next step.
 - In order to fully explore the IAC functionalities, it is required to have a `*.tfvars` file. This will be in conjunction with the variables specified in `varaible.tf`. The format for the `terraform.tfvars` file is shown below:
     ```
     image = "docker-20-04"
@@ -32,7 +32,7 @@ In order to implement the infrastructure, run the following:
     ```
 Be sure to update the values with preffered names for the each of the empty parameters above. As soon as the file is created and the content added, then the terraform file structure is complete. However, be aware that the `gitignore` file will ignore that file so it does not become public when interacting with the source code repository. 
 - Create a space on Digitalocean with any preferred unique name and add the bucket name in the `backend.tf` file. 
-- Install s3cmd via the following steps:
+- Install s3cmd via the following steps depending on your OS:
     - RedHat: `sudo dnf install s3cmd`
     - Ubuntu: `sudo apt-get install s3cmd`
     - MacOS: `brew install s3cmd`
