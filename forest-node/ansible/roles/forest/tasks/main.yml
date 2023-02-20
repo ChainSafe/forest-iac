@@ -1,8 +1,5 @@
 ---
 # tasks file for role/forest
-- name: Upgrade all apt packages
-  apt: upgrade=dist force_apt_get=yes
-
 - name: Create a login user
   user:
     name: "{{ user }}"
@@ -14,7 +11,7 @@
     state: present
     key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"    # assuming the name of the public key file is `id_rsa.pub`
 
-- name: Allow specific users to log in
+- name: Allow new user to log in
   ansible.builtin.lineinfile:
     dest: /etc/ssh/sshd_config
     regexp: '^AllowUsers'
@@ -40,12 +37,7 @@
     system: true
     create_home: false
 
-- name: update all packages 
-  become: true
-  shell: 
-    cmd: sudo apt update 
-
-- name: Add docker users to "docker" group
+- name: Add new user to "docker" group
   user:
     name: "{{ user }}"
     groups: docker
