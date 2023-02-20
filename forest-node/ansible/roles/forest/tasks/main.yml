@@ -5,11 +5,24 @@
     name: "{{ user }}"
     state: present
 
-- name: Add public key for new user login
-  authorized_key:
-    user: "{{ user }}"
-    state: present
-    key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"    # assuming the name of the public key file is `id_rsa.pub`
+- name: Create .ssh directory for created user
+  become: true
+  file:
+    path: /home/"{{ user }}"/.ssh
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0700    
+
+- name: Copy public key from existing root to new user
+  become: true
+  copy:
+    src: "/root/.ssh/authorized_keys"
+    dest: /home/"{{ user }}"/.ssh/authorized_keys
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    remote_src: yes
+    mode: 0600
 
 - name: Allow new user to log in
   ansible.builtin.lineinfile:
