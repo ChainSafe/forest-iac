@@ -1,6 +1,6 @@
 digitalocean_token = ""
-source_addresses = [""]
-destination_addresses = [""]
+source_addresses = ["0.0.0.0/0", "::/0"]
+destination_addresses = ["0.0.0.0/0", "::/0"]
 region = "fra1"
 backups = "true"
 image = "docker-20-04"
