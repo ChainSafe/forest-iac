@@ -8,7 +8,7 @@
     name: "{{ user }}"
     state: present
 
-- name: Add public key to authorized_keys
+- name: Add public key for new user login
   authorized_key:
     user: "{{ user }}"
     state: present

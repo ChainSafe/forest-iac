@@ -6,8 +6,8 @@
 ![Forest Cloud Infrastructure ](https://user-images.githubusercontent.com/47984109/219903795-77c306b8-a70b-4f32-8d7d-3c1a39e52186.jpg)
 
 ## Requirements  
-- RAM: 32GB
-- VCPU: 8
+- RAM: 16GB
+- VCPU: 2
 - Startup Disk Size: 200 GB
 - Expected Total Disk Size: > 500 GB
 - SSH Key should be created locally using `ssh keygen` and then added into digitalocean console where the fingerprint can be generated and added as a variable while creating the droplet.
