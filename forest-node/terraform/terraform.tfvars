@@ -1,0 +1,10 @@
+digitalocean_token = ""
+source_addresses = [""]
+destination_addresses = [""]
+region = "fra1"
+backups = "true"
+image = "docker-20-04"
+size = "so-4vcpu-32gb"
+name = "forest"
+new_key_ssh_key_fingerprint = ""
+firewall_name = "forest-firewalls-test"
