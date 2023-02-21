@@ -4,3 +4,6 @@
 docker_users:  chainsafe
 
 user: chainsafe
+
+user_dir: /home/chainsafe/.ssh
+user_dir_auth: /home/chainsafe/.ssh/authorized_keys

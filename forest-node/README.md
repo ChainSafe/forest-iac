@@ -11,7 +11,7 @@
 - Startup Disk Size: 200 GB
 - Expected Total Disk Size: > 500 GB
 - SSH Key should be created locally using `ssh keygen` and then added into digitalocean console where the fingerprint can be generated and added as a variable while creating the droplet.
-- Install terraform and ansible.  
+- Install [terraform](https://developer.hashicorp.com/terraform/downloads) and [ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html).  
 - Install `make`
 - Basic digitalocean knowledge
 
@@ -28,7 +28,11 @@ To implement the infrastructure, run the following:
 - Confirm `s3cmd` installation with this command `s3cmd --version`
 - Set-up `s3cmd` 2.x with DigitalOcean Spaces; you can check [here](https://docs.digitalocean.com/products/spaces/reference/s3cmd/) for proper details. This will require `ACCESS_TOKEN` and `SECRET_KEY` and it can be auto-generated from the DigitalOcean console through the Applications & API section.   
 - Generate `digitalocean_api_token` from Digitalocean console; you can check [here](https://docs.digitalocean.com/reference/api/create-personal-access-token/) for more details. Additionally, the value should be added as a variable in the `terraform.tfvars` file when setting up the terraform directory. 
-- Run `make init` in the terraform directory for initialization and variable confirmation.  
+- Add all necessary environment variables by running the following:
+    - `export SPACES_ACCESS_TOKEN="value"`, 
+    - `export SPACES_SECRET_KEY="value"`, 
+    - `export SPACE_BUCKET_NAME="value"`,
+- Run `terraform init` in the terraform directory for initialization and variable confirmation.  
 - Run `make plan` in the terraform directory to view all the resources to be configured.   
 - Run `make apply` in the terraform directory to create the infrastructure and update the ansible hosts file with the right IP address. 
 - Move to the ansible directory and run `ansible all -m ping` to confirm connection to hosts.  
