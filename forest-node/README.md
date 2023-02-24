@@ -35,7 +35,7 @@ To implement the infrastructure, run the following:
 - Setup ssh-agent locally to allow ansible locate the private key by running the following:
     - `eval ssh-agent`
     - `ssh-add <location to ssh key>`
-- Run `terraform init` in the terraform directory for initialization and variable confirmation.  
+- Run `make init` in the terraform directory for initialization and variable confirmation.  
 - Run `make plan` in the terraform directory to view all the resources to be configured.   
 - Run `make apply` in the terraform directory to create the infrastructure and update the ansible hosts file with the right IP address. 
 - Move to the ansible directory and run `ansible all -m ping` to confirm connection to hosts.  
