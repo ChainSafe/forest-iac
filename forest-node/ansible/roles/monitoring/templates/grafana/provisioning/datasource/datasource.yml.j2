@@ -11,13 +11,20 @@ deleteDatasources:
 # whats available in the database
 datasources:
   # <string, required> name of the datasource. Required
-- name: 'Prometheus'
-  type: 'prometheus'
-  access: 'proxy'
-  org_id: 1
-  url: 'http://prometheus:9090'
-  is_default: true
-  version: 1
-  editable: true
+ - name: 'Prometheus'
+   type: 'prometheus'
+   access: 'proxy'
+   org_id: 1
+   url: http://prometheus:9090
+   is_default: true
+   version: 1
+   editable: true
 
-  
+ - name: Loki
+   type: loki
+   access: proxy
+   url: http://loki:3100
+   jsonData:
+    maxLines: 1000
+   editable: true
+

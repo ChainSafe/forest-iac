@@ -1,6 +1,5 @@
 ---
 # tasks file for roles/node-exporter
-
 - name: check in node export is present 
   stat:
     path: "{{ node_exporter_bin }}"
@@ -76,6 +75,3 @@
     port: '9100'
     proto: tcp
     state: enabled 
-
-    
-

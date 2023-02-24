@@ -1,7 +1,7 @@
 ---
-- name: Create prometheus-grafana directory
+- name: Create Prometheus config directory 
   file:
-    path: "/etc/monitoring/prometheus"
+    path: "/etc/observability/prometheus"
     state: "directory"
     mode: 0777
   become: true
@@ -9,23 +9,23 @@
 - name: Copy compose file
   copy:
     src: "docker-compose.yml"
-    dest: "/etc/monitoring/"
+    dest: "/etc/observability/"
 
 - name: Prometheus alert
   copy:
     src: "alert.rules"
-    dest: "/etc/monitoring/prometheus/alert.rules"
+    dest: "/etc/observability/prometheus/alert.rules"
     mode: 0644
  
 - name: Copy Prometheus Configuration file
   template:
     src: prometheus/prometheus.yml.j2
-    dest: "/etc/monitoring/prometheus/prometheus.yml"
+    dest: "/etc/observability/prometheus/prometheus.yml"
     mode: 0755
   
 - name: Ensure grafana provisioning directory dashboards exists
   file:
-    path: "/etc/monitoring/grafana/provisioning/dashboards"
+    path: "/etc/observability/grafana/provisioning/dashboards"
     state: "directory"
     mode: 0777
   become: true
@@ -33,44 +33,64 @@
 - name: Download node exporter dashboard
   get_url:
     url: https://raw.githubusercontent.com/rfrail3/grafana-dashboards/master/prometheus/node-exporter-full.json
-    dest: /etc/monitoring/grafana/provisioning/dashboards
+    dest: /etc/observability/grafana/provisioning/dashboards
     mode: 0755
 
 - name: Download Forest Dashboard
   get_url:
-    url: https://raw.githubusercontent.com/segunjkf/forest/main/.maintain/monitoring/grafana/dashboards/forest.json
-    dest: /etc/monitoring/grafana/provisioning/dashboards
+    url: https://raw.githubusercontent.com/ChainSafe/forest/main/.maintain/monitoring/grafana/dashboards/forest.json
+    dest: /etc/observability/grafana/provisioning/dashboards
     mode: 0755
 
 - name: Copy Dashboard Config
   template:
     src: "grafana/provisioning/dashboards/dashboard-node-exporter.yml.j2"
-    dest: /etc/monitoring/grafana/provisioning/dashboards/dashboard-node-exporter.yml
+    dest: /etc/observability/grafana/provisioning/dashboards/dashboard-node-exporter.yml
     mode: 0755
 
 - name: Ensure grafana Datasource Directory exists
   file:
-    path: "/etc/monitoring/grafana/provisioning/datasources"
+    path: "/etc/observability/grafana/provisioning/datasources"
     state: "directory"
     mode: 0777
   become: true    
 
-- name: Copy Grafana Datasource Config
+- name: Copy Grafana Datasource Configuration
   template:
     src: "grafana/provisioning/datasource/datasource.yml.j2"
-    dest: "/etc/monitoring/grafana/provisioning/datasources/datasource.yml.j2"
+    dest: "/etc/observability/grafana/provisioning/datasources/datasource.yml"
     mode: 0644  
 
 - name: Ensure Alertmanager Directory Exists
   file:
-    path: "/etc/monitoring/alertmanager"
+    path: "/etc/observability/alertmanager"
     state: "directory"
     mode: 0777
   become: true
 
-- name: Copy alert config
-  copy:
-    src: "alert-manager-config.yml"
-    dest: "/etc/monitoring/alertmanager/config.yml"
-    mode: 0644
+# - name: Set-up Alert config
+#   copy:
+#     src: "alertmanagerconfig.yml"
+#     dest: "/etc/observability/alertmanager/config.yml"
+#     mode: 0644
+     
+- name: Set-up AlertManager configuration
+  template:
+    src: "alertmanager/config.yml.j2"
+    dest: "/etc/observability/alertmanager/config.yml"
+    mode: 0644 
 
+- name: Ensure loki Directory Exists
+  file:
+    path: "/etc/observability/loki"
+    state: "directory"
+    mode: 0777
+  become: true
+
+- name: Setup loki configuration
+  template:
+    src: "loki/loki.yml.j2"
+    dest: "/etc/observability/loki/loki.yml"
+    mode: '0644'
+
+  

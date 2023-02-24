@@ -1,5 +1,5 @@
 ---
-#tasks file for role/monitoring
+#tasks file for role/observability
 - name: Upgrade all apt packages
   apt: upgrade=dist force_apt_get=yes
 
@@ -12,7 +12,7 @@
   authorized_key:
     user: "{{ user }}"
     state: present
-    key: "{{ lookup('file', '~/sammy.pub') }}"
+    key: "{{ lookup('file', '/Users/mac/.ssh/id_rsa.pub') }}"
 
 
 - name: Restart SSHD 
@@ -47,37 +47,57 @@
     groups: docker
     append: true
 
-- name: Install Docker compose
-  get_url:
-    url: "https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-Linux-x86_64"
-    dest: "{{ docker_compose_path }}"
-    force: True
-    owner: "{{ user }}"
-    group: "{{ user }}"
-    mode: 0755
-    
+- name: check if docker compose exist
+  stat: 
+    path: "{{ docker_compose_path }}"
+  register: _check_if_compose_exist
+
+- block:
+   - name: if docker-compose exist get version
+     shell: /usr/local/bin/docker-compose version --short
+     when: _check_if_compose_exist.stat.exists == true
+     changed_when: false
+     register: _get_compose_version
+     
+   - name: Install Docker compose
+     get_url:
+        url: "https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-Linux-x86_64"
+        dest: "{{ docker_compose_path }}"
+        force: True
+        owner: "{{ user }}"
+        group: "{{ user }}"
+        mode: 0755
+     when: _check_if_compose_exist.stat.exists == false or not _get_compose_version.stdout == docker_compose_version
+
 - include_tasks: set-up.yml
 
 - name: Allow access to Node exporter port  
   become: true
   ufw:
     rule: allow
-    port: "{{ item }}"
+    port: "9090"
     proto: tcp
     state: enabled 
-  with_items: 
-    - 9090
-    - 9093
-    - 9100
     
 - name: Run docker-compose
   become: True
   become_user: "{{ user }}"
   shell:
     cmd: "docker-compose up -d"
-    chdir: "/etc/monitoring"    
+    chdir: "/etc/observability"    
 
 -  name: Ensure app is running
-   shell: ps aux | grep mointoring
+   shell: ps aux | grep {{ item }}
    register: app_status
-- debug: msg={{app_status.stdout_lines}}
+   with_items: 
+    - prometheus
+    - loki
+    - alertmanager
+    - grafana
+
+- debug:
+    var: app_status
+    verbosity: 2
+- debug:
+    msg: "{{ app_status.results | map(attribute='stdout_lines') | list }}"    
+

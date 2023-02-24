@@ -6,4 +6,5 @@ node_exporter_user: "node-exporter"
 node_exporter_group: "{{ node_exporter_user }}"
 node_exporter_dir_conf: "/etc/node_exporter"
 node_exporter_service_dest: "/etc/systemd/system/node_exporter.service"
-
+user: exporter
+group: "{{ user }}"

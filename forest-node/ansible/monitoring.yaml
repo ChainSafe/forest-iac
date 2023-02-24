@@ -1,5 +1,5 @@
 - name: install node-exporter
-  hosts: [monitoring]
+  hosts: [forest, monitoring]
   gather_facts: false
   become: yes
   roles:
@@ -11,3 +11,6 @@
   become: yes
   roles:
   - monitoring
+  vars:
+    slack_api_url: "https://hooks.slack.com/services/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"
+    channel: "#monitoring-alerts-forest"
