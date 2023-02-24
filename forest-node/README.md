@@ -26,7 +26,14 @@ In order to implement the infrastructure, run the following:
 - Run `ansible all -m ping` to confirm connection to hosts.  
 - Run `ansible-playbook forest.yaml` in the ansible directory to initialize forest.
 
-Also, be aware that after ansible has configured all services, the servers will only be accessible via the `chainsafe` user which can be changed in `ansible.cfg` file if required. 
+## Observability 
+- In the ansible directory, to set-up observability stacks for your forest node, in the `observability.yaml` yaml. Set `slack api url` and slack `channel` to the slack webhook url and channel you obtained from the requirements, and then run `ansible-playbook observability.yaml`.
+
+This will set up observability stack with `Grafana Loki`, `Prometheus`, `Node Exporter` and `Alertmanager`. Once the observability stack is running, you can access your Grafana UI `http://<observability-droplet-ip>:3000` to view the predefined dashboards. Use the default Grafana credentials: `admin/admin`.
+
+- To query the Loki logs, go to the Grafana webapp's `Configuration/Data Sources` section, select Loki, click on Explore, and then run LogQL queries. The logs will also be stored on the `spaces buckets` defined in `terraform.tfvars` for long-term log storage.
+
+Also, be aware that after ansible has configured all services, the servers will only be accessible via the `chainsafe` user which can be changed in `ansible.cfg` file if required. To test this implementation, access the server with appropriate `ssh` details in this format `ssh -i ~/.ssh/id_rsa chainsafe@ip_address`.   
 
 ## Collaborators
 Feel free to contribute to the codebase by resolving any open issues, refactoring, adding new features, writing test cases, or any other way to make the project better and helpful to the community. Feel free to fork and send pull requests.
