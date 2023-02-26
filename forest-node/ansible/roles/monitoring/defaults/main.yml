@@ -34,7 +34,7 @@ loki_config_retention: 336h
 loki_config_period: 168h
 loki_config_http_port: 3100
 
-slack_api_url: "https://hooks.slack.com/services/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"
+slack_api_url: ""
 channel: "monitoring-alerts-forest"
 
 
