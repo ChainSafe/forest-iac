@@ -29,11 +29,10 @@ To implement the infrastructure, run the following:
 - Set-up `s3cmd` 2.x with DigitalOcean Spaces; you can check [here](https://docs.digitalocean.com/products/spaces/reference/s3cmd/) for proper details. This will require `ACCESS_TOKEN` and `SECRET_KEY` and it can be auto-generated from the DigitalOcean console through the Applications & API section.   
 - Generate `digitalocean_api_token` from Digitalocean console; you can check [here](https://docs.digitalocean.com/reference/api/create-personal-access-token/) for more details. Additionally, the value should be added as a variable in the `terraform.tfvars` file when setting up the terraform directory. 
 - Add all necessary environment variables by running the following:
-    - `export SPACES_ACCESS_TOKEN="value"`, 
-    - `export SPACES_SECRET_KEY="value"`, 
-    - `export SPACE_BUCKET_NAME="value"`,
+    - `export AWS_SECRET_ACCESS_KEY="value"`, 
+    - `export AWS_ACCESS_KEY_ID="value"`, 
 - Setup ssh-agent locally to allow ansible locate the private key by running the following:
-    - `eval ssh-agent`
+    - eval `ssh-agent`
     - `ssh-add <location to ssh key>`
 - Run `make init` in the terraform directory for initialization and variable confirmation.  
 - Run `make plan` in the terraform directory to view all the resources to be configured.   
