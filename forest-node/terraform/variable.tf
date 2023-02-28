@@ -7,15 +7,6 @@ variable "backups" {}
 variable "source_addresses" {}
 variable "new_key_ssh_key_fingerprint" {}
 variable "destination_addresses" {}
-variable "volume_name" {}
-variable "spaces_name" {}
-variable "keys_name" {}
-variable "initial_filesystem_type" {}
-variable "volume_size" {}
-variable "backend_region" {}
-variable "spaces_endpoint" {}
-variable "bucket_state" {}
-variable "skip_credentials_validation" {}
-variable "skip_metadata_api_check" {}
-variable "description" {}
 variable "firewall_name" {}
+variable "observability_name" {}
+variable "protocol" {}

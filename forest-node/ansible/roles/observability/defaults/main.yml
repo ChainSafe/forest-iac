@@ -1,10 +1,8 @@
 ---
 # defaults file for role/observability
-install_docker_compose: ""
 docker_compose_version: "v2.16.0"
 docker_compose_path: /usr/local/bin/docker-compose
 
-prometheus_retention_time: "365d"
 prometheus_scrape_interval: "30s"
 prometheus_node_exporter: true
 forest_exporter: "forest"
@@ -24,18 +22,24 @@ prometheus_var_config:
 
 user: "chainsafe"
 user_group: "{{ user }}"
+user_dir: /home/chainsafe/.ssh
+user_dir_auth: /home/chainsafe/.ssh/authorized_keys
 
-endpoint: nyc3.digitaloceanspaces.com
-bucketname: "{{ groups['spaces'][0] }}"
-region: nyc3
-loki_config_directory: /home/observability/loki
-loki_config_auth: true
+spaces_endpoint: nyc3.digitaloceanspaces.com
+spaces_bucket_name: ""
+spaces_region: nyc3
 loki_config_retention: 336h
 loki_config_period: 168h
 loki_config_http_port: 3100
+loki_ingester_chunk_idle_period: 5m
+loki_schema_version: v11
+loki_from_date: 2022-01-01
+spaces_access_token: "{{ lookup('env', 'SPACES_ACCESS_TOKEN') }}"
+spaces_secret_key: "{{ lookup('env', 'SPACES_SECRET_KEY') }}"
+
 
 slack_api_url: ""
-channel: "monitoring-alerts-forest"
+slack_channel: ""
 
 
 

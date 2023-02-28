@@ -12,10 +12,10 @@
 - Expected Total Disk Size: > 500 GB
 - Docker-image based VM
 - SSH Key should be created locally using `ssh keygen` then added into digitalocean console where the fingerprint can be generated and added as a variable while creation the droplet. 
+- Create a slack app needed for the setup by following the instructions [here](https://api.slack.com/apps?new_app=1).
 
-N/B: It's worth noting that the naming conventions can be changed to suit your deployment needs especially the names for the resource blocks. In this case; `forest-volume`, `new-key-name`, `spaces-name`, `forest-volume`, `forest`, `forest-firewalls-test`, and `hosts`.
 
-To test this implementation, access the server with appropriate `ssh` details in this manner `ssh -i ~/.ssh/id_rsa chainsafe@ip_address`. However, if you intend to use another `user` other than `chainsafe`, then this can be switched in the Ansible main playbook. Avoid running Forest as `root`.  
+Also, be aware that after ansible has configured all services, the servers will only be accessible via the `chainsafe` user which can be changed in `ansible.cfg` file if required. To test this implementation, access the server with appropriate `ssh` details in this format `ssh -i ~/.ssh/id_rsa chainsafe@ip_address`. 
 
 In order to implement the infrastructure, run the following:
 - Set-up s3cmd 2.x with DigitalOcean Spaces; you can check [here](https://docs.digitalocean.com/products/spaces/reference/s3cmd/) for more details. This will require `ACCESS_TOKEN` and `SECRET_KEY`; it can be auto-generated from the DigitalOcean console through the Applications & API section.   
@@ -32,9 +32,29 @@ In order to implement the infrastructure, run the following:
 ## Observability 
 - In the ansible directory, to set-up observability stacks for your forest node, in the `observability.yaml` yaml. Set `slack api url` and slack `channel` to the slack webhook url and channel you obtained from the requirements, and then run `ansible-playbook observability.yaml`.
 
-This will set up observability stack with `Grafana Loki`, `Prometheus`, `Node Exporter` and `Alertmanager`. Once the observability stack is running, you can access your Grafana UI `http://<observability-droplet-ip>:3000` to view the predefined dashboards. Use the default Grafana credentials: `admin/admin`.
+To configure Observability which includes `Prometheus`, `alertmanager`, `Loki`, `Node Exporter` and `Grafana`, the following variables are available to be used according to your needs
 
-- To query the Loki logs, go to the Grafana webapp's `Configuration/Data Sources` section, select Loki, click on Explore, and then run LogQL queries. The logs will also be stored on the `spaces buckets` defined in `terraform.tfvars` for long-term log storage.
+| Variable   	                            | Description                                       | Default Value |
+|-------------------------------------------|---------------------------------------------------|---------------|
+| node\_exporter\_version                            | Node Exporter version to be installed                          | 1.1.2        |
+| docker\_compose\_version                             | Docker Compose version to be installed                          | v2.16.0        |
+| prometheus\_retention\_time                                | Premetheus metrics retention time                         | 365 Days     |
+| prometheus\_scrape\_interval                                | How frequently should prometheus scrape metrics                           | 30s          |
+| slack\_api\_url                               | Slack Webhooks url                          | "" [Required]()          |
+| slack\_channel                              | Slack Channel to receive Alert Manager notifications                            | "" [Required]()           |
+| loki\_from\_date                          | When did this database schema version started     | 2022-01-01    |
+| loki\_schema\_version                     | Which database schema version to use              | v11           |
+| spaces\_endpoint                       | Digital Ocean Spaces Endpoint                                        | nyc3.digitaloceanspaces.com         |
+| spaces\_region                          | Spaces Bucket region                                  | nyc3     |
+| spaces\_bucket\_name                          | Digital Ocean s3 compatible s3 Bucket name                                    |   Assigned by terraform as defined in the `terraform.tfvars`          |
+| spaces\_access\_token                    | Spaces Access key Token                                   | "" [Required]()     |
+|  spaces_secret_key     | Spaces Secret Access key                   | "" [Required]()           |
+| loki\_ingester\_chunk\_idle\_period   | Flush the chunk after time idle                      | 5m          |
+
+- In the `observability.yaml` file, define all the values for the `slack_api_url`, `channel`, `spaces_access_token`, `spaces_bucket_name` and `spaces_secret_key` as it is in your setup. 
+- Then, run `ansible-playbook observability.yaml` for ansible to start configuring all the required services. This will set up observability stack with `Grafana Loki`, `Prometheus`, `Node Exporter` and `Alertmanager`. Once the observability stack is running, you can access your Grafana UI `http://<observability-droplet-ip>:3000` to view the predefined dashboards. Use the default Grafana credentials: `admin/admin`.
+
+- To query the Loki logs, go to the Grafana webapp's `Configuration/Data Sources` section, select Loki, click on Explore, and then run LogQL queries. The logs will also be stored on the `spaces buckets` as defined in `terraform.tfvars` for long-term log storage. For more information on `LogQL`, see its [documentation](https://grafana.com/docs/loki/latest/logql/). There are two folders in the space; `fake` and `index` - fake stores the main log data and index stores the metadata of the chunks. 
 
 Also, be aware that after ansible has configured all services, the servers will only be accessible via the `chainsafe` user which can be changed in `ansible.cfg` file if required. To test this implementation, access the server with appropriate `ssh` details in this format `ssh -i ~/.ssh/id_rsa chainsafe@ip_address`.   
 

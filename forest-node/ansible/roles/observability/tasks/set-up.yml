@@ -67,12 +67,6 @@
     state: "directory"
     mode: 0777
   become: true
-
-# - name: Set-up Alert config
-#   copy:
-#     src: "alertmanagerconfig.yml"
-#     dest: "/etc/observability/alertmanager/config.yml"
-#     mode: 0644
      
 - name: Set-up AlertManager configuration
   template:
@@ -88,9 +82,8 @@
   become: true
 
 - name: Setup loki configuration
+  become_user: "{{ user }}"
   template:
     src: "loki/loki.yml.j2"
     dest: "/etc/observability/loki/loki.yml"
-    mode: '0644'
-
-  
+    mode: 0644

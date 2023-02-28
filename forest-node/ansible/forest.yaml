@@ -4,3 +4,9 @@
   become: true
   roles:
       - forest
+
+- name: install node exporter
+  hosts: forest
+  become: true 
+  roles: 
+      - node-exporter

@@ -32,7 +32,7 @@ rule_files:
   {% for server in groups[observability] %}
     - {{ server }}:9100
     labels:
-      instance: observability_droplet
+      instance: observability_node
 {% endfor %}    
   
 alerting:

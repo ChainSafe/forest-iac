@@ -1,5 +1,5 @@
 - name: install node-exporter
-  hosts: [forest, monitoring]
+  hosts: [observability]
   gather_facts: false
   become: yes
   roles:
@@ -7,10 +7,13 @@
 
 - name: install Docker-grafana-prometheus
   gather_facts: false
-  hosts: monitoring
+  hosts: observability
   become: yes
   roles:
-  - monitoring
+  - observability
   vars:
     slack_api_url: ""
-    channel: "#monitoring-alerts-forest"
+    slack_channel: ""
+    spaces_access_token: ""
+    spaces_secret_key: ""
+    spaces_bucket_name: ""

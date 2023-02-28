@@ -21,13 +21,13 @@ route:
 receivers:
 - name: 'alert-team'
   slack_configs:
-  - channel: "#{{ channel }}"
+  - channel: "#{{ slack_channel }}"
     text: "summary: {{ '{{' }} .CommonAnnotations.summary {{ '}}' }}\ndescription: {{ '{{' }} .CommonAnnotations.description {{ '}}' }}"
 - name: 'critical-notifications'
   slack_configs:
-  - channel: "#{{ channel }}"
+  - channel: "#{{ slack_channel }}"
     text: "Critical alert: {{ '{{' }} .CommonAnnotations.summary {{ '}}' }}: {{ '{{' }} .CommonAnnotations.description {{ '}}' }}"   
 - name: 'warning-notifications'
   slack_configs:
-  - channel: "#{{ channel }}"
+  - channel: "#{{ slack_channel }}"
     text: "Warning alert: {{ '{{' }} .CommonAnnotations.summary {{ '}}' }}: {{ '{{' }} .CommonAnnotations.description {{ '}}' }}"

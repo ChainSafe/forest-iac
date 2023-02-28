@@ -1,14 +1,9 @@
 [forest]
 %{ for ip in forest ~}
 ${ip}
-%{ endfor ~} 
+%{ endfor ~}
 
 [observability]
 %{ for ip in observability ~}
 ${ip}
-%{ endfor ~} 
-
-[spaces]
-%{ for space in spaces ~}
-${space}
-%{ endfor ~} 
+%{ endfor ~}

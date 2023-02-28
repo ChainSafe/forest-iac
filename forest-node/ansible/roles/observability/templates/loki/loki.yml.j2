@@ -6,31 +6,30 @@ server:
 
 ingester:
   lifecycler:
+    address: 127.0.0.1
     ring:
       kvstore:
         store: inmemory
       replication_factor: 1
     final_sleep: 0s
-  chunk_idle_period: 5m
+  chunk_idle_period: {{ loki_ingester_chunk_idle_period }}
   chunk_retain_period: 30s
   max_transfer_retries: 0
 
 schema_config:
   configs:
-  - from: 2022-01-01
+  - from: {{ loki_from_date }}
     store: boltdb-shipper
     object_store: s3
-    schema: v11
+    schema: {{ loki_schema_version }}
     index:
       prefix: index_
       period: 24h
 
-storage_config:
-  filesystem:
-    directory: /tmp/loki/chunks  
+storage_config: 
   boltdb_shipper:
     active_index_directory: /tmp/loki/index
-    cache_location: /tmp//loki/index_cache
+    cache_location: /tmp/loki/index_cache
     resync_interval: 5s
     shared_store: s3   
 
@@ -56,11 +55,11 @@ common:
   path_prefix: /loki
   storage:
     s3:
-      endpoint: {{ endpoint }}
-      bucketnames: {{ bucketname }}
-      region: {{ region }}
-      access_key_id: {{ lookup('env', 'SPACES_ACCESS_KEY') }}
-      secret_access_key: {{ lookup('env', '$SPACES_SECRET_KEY') }}
+      endpoint: {{ spaces_endpoint }}
+      bucketnames: {{ spaces_bucket_name}}
+      region: {{ spaces_region }}
+      access_key_id: {{ spaces_access_token }}
+      secret_access_key: {{ spaces_secret_key }}
 
 ruler:
   alertmanager_url: http://alertmanager:9093
