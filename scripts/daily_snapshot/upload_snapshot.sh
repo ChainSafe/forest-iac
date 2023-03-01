@@ -15,7 +15,23 @@ NEWEST_SNAPSHOT=$2
 docker pull ghcr.io/chainsafe/forest:"${FOREST_TAG}"
 
 # Ensure that we can access files with the default Forest image user
-chmod -R +rw "$BASE_FOLDER/s3/$CHAIN_NAME"
+SNAPSHOTS_DIR=$BASE_FOLDER/s3/$CHAIN_NAME
+
+permission=$(stat -c "%a" "$SNAPSHOTS_DIR")
+if ! (($permission & 7)); then
+  echo "The snapshots directory is not accessible by everyone to read and write. Adding necessary permissions"
+  chmod o+rwx $SNAPSHOTS_DIR
+else
+  echo "Snapshots directory permissions OK"
+fi
+
+permission=$(stat -c "%a" "$NEWEST_SNAPSHOT")
+if ! (($permission & 4)); then
+  echo "Snapshot not readable for everyone. Adding necessary permissions."
+  chmod a+r $NEWEST_SNAPSHOT
+else
+  echo "Latest snapshot permissions OK"
+fi
 
 # Sync and export is done in a single container to make sure everything is
 # properly cleaned up.
@@ -26,7 +42,7 @@ forest --encrypt-keystore false --chain $CHAIN_NAME --import-snapshot $NEWEST_SN
 timeout $SYNC_TIMEOUT forest-cli --chain $CHAIN_NAME sync wait || { echo "timed-out on forest-cli sync"; exit 1; }
 cat forest.err forest.out
 forest-cli --chain $CHAIN_NAME snapshot export || { echo "failed to export the snapshot"; exit 1; }
-mv ./forest_snapshot* $BASE_FOLDER/s3/$CHAIN_NAME/
+mv ./forest_snapshot* $SNAPSHOTS_DIR/
 HEREDOC
 )
 
