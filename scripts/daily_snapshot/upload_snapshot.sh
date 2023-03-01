@@ -28,7 +28,7 @@ fi
 permission=$(stat -c "%a" "$NEWEST_SNAPSHOT")
 if ! ((permission & 4)); then
   echo "Snapshot not readable for everyone. Adding necessary permissions."
-  chmod a+r "$NEWEST_SNAPSHOT"
+  chmod o+r "$NEWEST_SNAPSHOT"
 else
   echo "Latest snapshot permissions OK"
 fi
