@@ -1,7 +1,5 @@
 ---
 # defaults file for role/forest
-
-docker_users:  chainsafe
 loki_endpoint: "http://{{ groups['observability'][0] }}:3100/loki/api/v1/push"
 user: chainsafe
 user_dir: /home/chainsafe/.ssh

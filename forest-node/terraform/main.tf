@@ -6,6 +6,10 @@ terraform {
       source  = "digitalocean/digitalocean"
       version = "~> 2.0"
     }
+    local = {
+      source = "hashicorp/local"
+      version = "~> 2.1"
+    }
   }
 }
 
@@ -26,7 +30,7 @@ resource "digitalocean_droplet" "forest" {
   }
 }
 
-resource "digitalocean_droplet" "forest-observability" {
+resource "digitalocean_droplet" "forest_observability" {
   image    = var.image
   name     = var.observability_name
   region   = var.region
@@ -39,15 +43,11 @@ resource "digitalocean_droplet" "forest-observability" {
   }
 }
 
-output "ip" {
-  value = [digitalocean_droplet.forest.ipv4_address, digitalocean_droplet.forest-observability.ipv4_address]
-}
-
 resource "local_file" "hosts" {
   content = templatefile("../ansible/hosts",
     {
-      forest        = digitalocean_droplet.forest.ipv4_address.*
-      observability = digitalocean_droplet.forest-observability.ipv4_address.*
+      forest        = digitalocean_droplet.forest.ipv4_address[*]
+      observability = digitalocean_droplet.forest_observability.ipv4_address[*]
     }
   )
   filename = "../ansible/hosts"

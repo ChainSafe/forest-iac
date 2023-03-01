@@ -1,5 +1,5 @@
- resource "digitalocean_firewall" "forest-firewall" {
-  name = "forest-firewalls"
+ resource "digitalocean_firewall" "forest_firewall" {
+  name = var.firewall_name
 
   inbound_rule {
     protocol         = var.protocol
@@ -16,13 +16,13 @@
   inbound_rule {
     protocol           = var.protocol
     port_range         = "6116"
-    source_droplet_ids = [digitalocean_droplet.forest-observability.id]
+    source_droplet_ids = [digitalocean_droplet.forest_observability.id]
   }
 
   inbound_rule {
     protocol           = var.protocol
     port_range         = "9100"
-    source_droplet_ids = [digitalocean_droplet.forest-observability.id]
+    source_droplet_ids = [digitalocean_droplet.forest_observability.id]
   }
 
   outbound_rule {
@@ -45,7 +45,7 @@
   droplet_ids = [digitalocean_droplet.forest.id]
 }
 
-resource "digitalocean_firewall" "forest-observability-firewall" {
+resource "digitalocean_firewall" "forest_observability_firewall" {
   name = "forest-observability"
 
   inbound_rule {
@@ -75,19 +75,19 @@ resource "digitalocean_firewall" "forest-observability-firewall" {
   outbound_rule {
     protocol              = "tcp"
     port_range            = "all"
-    destination_addresses = ["0.0.0.0/0", "::/0"]
+    destination_addresses = var.destination_addresses
   }
 
   outbound_rule {
     protocol              = "udp"
     port_range            = "53"
-    destination_addresses = ["0.0.0.0/0", "::/0"]
+    destination_addresses = var.destination_addresses
   }
 
   outbound_rule {
     protocol              = "icmp"
-    destination_addresses = ["0.0.0.0/0", "::/0"]
+    destination_addresses = var.destination_addresses
   }
 
-  droplet_ids = [digitalocean_droplet.forest-observability.id]
+  droplet_ids = [digitalocean_droplet.forest_observability.id]
 }
