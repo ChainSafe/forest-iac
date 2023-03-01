@@ -18,17 +18,17 @@ docker pull ghcr.io/chainsafe/forest:"${FOREST_TAG}"
 SNAPSHOTS_DIR=$BASE_FOLDER/s3/$CHAIN_NAME
 
 permission=$(stat -c "%a" "$SNAPSHOTS_DIR")
-if ! (($permission & 7)); then
+if ! ((permission & 7)); then
   echo "The snapshots directory is not accessible by everyone to read and write. Adding necessary permissions"
-  chmod o+rwx $SNAPSHOTS_DIR
+  chmod o+rwx "$SNAPSHOTS_DIR"
 else
   echo "Snapshots directory permissions OK"
 fi
 
 permission=$(stat -c "%a" "$NEWEST_SNAPSHOT")
-if ! (($permission & 4)); then
+if ! ((permission & 4)); then
   echo "Snapshot not readable for everyone. Adding necessary permissions."
-  chmod a+r $NEWEST_SNAPSHOT
+  chmod a+r "$NEWEST_SNAPSHOT"
 else
   echo "Latest snapshot permissions OK"
 fi
