@@ -1,4 +1,5 @@
 FROM fedora:36
+LABEL org.opencontainers.image.source https://github.com/chainsafe/forest-iac
 
 # Install dependencies
 RUN dnf install -y docker docker-compose ruby ruby-devel make gcc s3fs-fuse
