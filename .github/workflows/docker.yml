@@ -35,24 +35,18 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: scripts/
-          load: true
           file: scripts/Dockerfile-snapshot
           tags: |
             ghcr.io/chainsafe/sync-snapshot:latest
           # build on feature branches, push only on main branch
           push: ${{ github.ref == 'refs/heads/main' }}
-      - name: Daily snapshot Image digest
-        run: echo ${{ steps.build-daily-snapshot.outputs.digest }}
       - name: Build sync check image and push to GitHub Container Registry
         id: build-sync-check
         uses: docker/build-push-action@v4
         with:
           context: scripts/
-          load: true
           file: scripts/Dockerfile-sync-check
           tags: |
             ghcr.io/chainsafe/sync-check:latest
           # build on feature branches, push only on main branch
           push: ${{ github.ref == 'refs/heads/main' }}
-      - name: Sync check Image digest
-        run: echo ${{ steps.build-sync-check.outputs.digest }}
