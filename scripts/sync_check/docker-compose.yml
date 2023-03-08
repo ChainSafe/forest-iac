@@ -21,6 +21,7 @@ services:
       - 'mainnet'
       - '--config'
       - ${FOREST_TARGET_SCRIPTS}/sync_check.toml
+      - '--auto-download-snapshot'
     restart: unless-stopped
     labels:
       com.centurylinklabs.watchtower.enable: true
@@ -42,6 +43,7 @@ services:
       - 'calibnet'
       - '--config'
       - ${FOREST_TARGET_SCRIPTS}/sync_check.toml
+      - '--auto-download-snapshot'
     restart: unless-stopped
     labels:
       com.centurylinklabs.watchtower.enable: true
@@ -78,6 +80,8 @@ services:
       - |
         ruby ${FOREST_TARGET_SCRIPTS}/sync_check.rb forest-mainnet &
         ruby ${FOREST_TARGET_SCRIPTS}/sync_check.rb forest-calibnet &
+        wait
+        rm -rf ${FOREST_TARGET_DATA}/snapshots
         sleep infinity
     depends_on:
       - forest_mainnet
