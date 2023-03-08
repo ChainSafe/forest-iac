@@ -72,11 +72,10 @@ output "ip" {
   value = [digitalocean_droplet.forest.ipv4_address]
 }
 
-resource "local_file" "hosts" {
-  content = templatefile("../ansible/hosts",
-    {
-      forest = digitalocean_droplet.forest.ipv4_address.*
-    }
-  )
-  filename = "../ansible/hosts"
+resource "local_file" "inventory" {
+    filename = "../ansible/hosts"
+    content     = <<_EOF
+[forest]
+${digitalocean_droplet.forest.ipv4_address}
+    _EOF
 }

@@ -56,12 +56,33 @@
     groups: docker
     append: true
 
-- name: Run the Docker command
-  become: yes
+- name: Start the Docker container
+  become: true
   become_user: "{{ user }}"
-  shell: docker run -p 1234:1234 --rm --detach ghcr.io/chainsafe/forest:latest --encrypt-keystore false --auto-download-snapshot --chain calibnet 
-    
-- name: Ensure app is running
-  shell: ps aux | grep forest
-  register: app_status
-- debug: msg={{app_status.stdout_lines}}
+  community.general.docker_container:
+    name: forest
+    image: ghcr.io/chainsafe/forest:latest
+    state: started
+    auto_remove: true
+    command: --encrypt-keystore false --auto-download-snapshot --chain calibnet
+    pull: true
+    ports:
+      - "1234:1234"
+  register: container_result
+
+- name: Get infos on container
+  become_user: "{{ user }}"
+  community.docker.docker_container_info:
+    name: forest
+  register: result
+
+- name: Does container exist?
+  become_user: "{{ user }}"
+  ansible.builtin.debug:
+    msg: "The container {{ 'exists' if result.exists else 'does not exist' }}"
+
+- name: Print information about container
+  become_user: "{{ user }}"
+  ansible.builtin.debug:
+    var: result.container
+  when: result.exists
