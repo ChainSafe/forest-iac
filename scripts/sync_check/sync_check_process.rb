@@ -52,13 +52,6 @@ class SyncCheck
     1 - stat.blocks_available.fdiv(stat.blocks)
   end
 
-  # Downloads snapshots from trusted sources.
-  def download_snapshots
-    @logger.info 'Downloading snapshots'
-    run_forest_cli '--chain calibnet snapshot fetch'
-    run_forest_cli '--chain mainnet snapshot fetch'
-  end
-
   # Retrieves path to the relevant snapshot based on the network chosen.
   def snapshot_path(network)
     Dir.glob("#{FOREST_DATA}/snapshots/#{network}/*.car")[0] or raise "Can't find snapshot in #{dir}"
@@ -67,8 +60,8 @@ class SyncCheck
   # Imports the snapshots
   def import_snapshots
     @logger.info 'Importing snapshots'
-    run_forest "--chain calibnet --halt-after-import --import-snapshot #{snapshot_path('calibnet')}"
-    run_forest "--chain mainnet --halt-after-import --import-snapshot #{snapshot_path('mainnet')}"
+    run_forest '--chain calibnet --halt-after-import --auto-download-snapshot'
+    run_forest '--chain mainnet --halt-after-import --auto-download-snapshot'
   end
 
   # Deletes all snapshots to free up memory.
@@ -81,7 +74,6 @@ class SyncCheck
   # Starts docker-compose services. It first downloads and imports the snapshots.
   def start_services
     @logger.info 'Starting services'
-    download_snapshots
     import_snapshots
     delete_snapshots
 
