@@ -17,9 +17,12 @@
 
 To implement the infrastructure, run the following:
 - Create `ssh-key` and store the fingerprint for use in the next step.
-- To fully explore the IAC functionalities, it is required to have a `terraform.tfvars` file. This will be in conjunction with the variables specified in `varaible.tf` and you can fill in all required information based on your custom setup on DigitalOcean.
 - Create a space on DigitalOcean with any preferred unique name and add the bucket name in the `backend.tf` file. 
-- Generate `digitalocean_api_token` from DigitalOcean console; you can check [here](https://docs.digitalocean.com/reference/api/create-personal-access-token/) for more details. Additionally, the value should be added as a variable in the `terraform.tfvars` file when setting up the terraform directory. 
+- Generate `digitalocean_api_token` from DigitalOcean console; you can check [here](https://docs.digitalocean.com/reference/api/create-personal-access-token/) for more details. 
+- Populate the `terraform.tfvars` file with the values of the following 
+    - `digitalocean_token`
+    - `new_key_ssh_key_fingerprint`
+    - `firewall_name`
 - Add all necessary environment variables by running the following:
     - `export AWS_SECRET_ACCESS_KEY="value"`, 
     - `export AWS_ACCESS_KEY_ID="value"`, 
