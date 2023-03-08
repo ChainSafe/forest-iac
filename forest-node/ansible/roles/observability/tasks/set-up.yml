@@ -1,89 +1,98 @@
 ---
-- name: Create Prometheus config directory 
-  file:
+- name: Create Prometheus config directory
+  ansible.builtin.file:
     path: "/etc/observability/prometheus"
     state: "directory"
-    mode: 0777
+    mode: "0777"
   become: true
 
 - name: Copy compose file
-  copy:
+  ansible.builtin.copy:
     src: "docker-compose.yml"
     dest: "/etc/observability/"
+    mode: "0644"
 
 - name: Prometheus alert
-  copy:
+  ansible.builtin.copy:
     src: "alert.rules"
     dest: "/etc/observability/prometheus/alert.rules"
-    mode: 0644
- 
+    mode: "0644"
+
 - name: Copy Prometheus Configuration file
-  template:
+  ansible.builtin.template:
     src: prometheus/prometheus.yml.j2
     dest: "/etc/observability/prometheus/prometheus.yml"
-    mode: 0755
-  
+    mode: "0755"
+
 - name: Ensure grafana provisioning directory dashboards exists
-  file:
+  ansible.builtin.file:
     path: "/etc/observability/grafana/provisioning/dashboards"
     state: "directory"
-    mode: 0777
+    mode: "0777"
   become: true
 
 - name: Download node exporter dashboard
-  get_url:
+  ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/rfrail3/grafana-dashboards/master/prometheus/node-exporter-full.json
     dest: /etc/observability/grafana/provisioning/dashboards
-    mode: 0755
+    mode: "0755"
 
-- name: Download Forest Dashboard
-  get_url:
-    url: https://raw.githubusercontent.com/ChainSafe/forest/main/.maintain/monitoring/grafana/dashboards/forest.json
-    dest: /etc/observability/grafana/provisioning/dashboards
-    mode: 0755
+- name: Copy Forest Dashboard
+  ansible.builtin.template:
+    src: "grafana/provisioning/dashboards/Forest.json.j2"
+    dest: /etc/observability/grafana/provisioning/dashboards/Forest.json
+    mode: "0755"
 
 - name: Copy Dashboard Config
-  template:
+  ansible.builtin.template:
     src: "grafana/provisioning/dashboards/dashboard-node-exporter.yml.j2"
     dest: /etc/observability/grafana/provisioning/dashboards/dashboard-node-exporter.yml
-    mode: 0755
+    mode: "0755"
 
 - name: Ensure grafana Datasource Directory exists
-  file:
+  ansible.builtin.file:
     path: "/etc/observability/grafana/provisioning/datasources"
     state: "directory"
-    mode: 0777
-  become: true    
+    mode: "0777"
+  become: true
 
 - name: Copy Grafana Datasource Configuration
-  template:
+  ansible.builtin.template:
     src: "grafana/provisioning/datasource/datasource.yml.j2"
     dest: "/etc/observability/grafana/provisioning/datasources/datasource.yml"
-    mode: 0644  
+    mode: "0644"
+
+- name: Copy Grafana config
+  ansible.builtin.template:
+    src: "grafana/grafana.ini.j2"
+    dest: "/etc/observability/grafana/grafana.ini"
+    mode: "0644"
+  become: true
+  when: domain_name is defined
 
 - name: Ensure Alertmanager Directory Exists
-  file:
+  ansible.builtin.file:
     path: "/etc/observability/alertmanager"
     state: "directory"
-    mode: 0777
+    mode: "0777"
   become: true
-     
+
 - name: Set-up AlertManager configuration
-  template:
+  ansible.builtin.template:
     src: "alertmanager/config.yml.j2"
     dest: "/etc/observability/alertmanager/config.yml"
-    mode: 0644 
+    mode: "0644"
 
 - name: Ensure loki Directory Exists
-  file:
+  ansible.builtin.file:
     path: "/etc/observability/loki"
     state: "directory"
-    mode: 0777
+    mode: "0777"
   become: true
 
 - name: Setup loki configuration
   become_user: "{{ user }}"
-  template:
+  ansible.builtin.template:
     src: "loki/loki.yml.j2"
     dest: "/etc/observability/loki/loki.yml"
-    mode: 0644
+    mode: "0644"

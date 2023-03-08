@@ -1,0 +1,10 @@
+---
+- name: Set-up Letsencrypt
+  gather_facts: false
+  hosts: observability
+  become: true
+  roles:
+    - letsencrypt
+  vars:
+    letsencrypt_email: 
+    domain_name:

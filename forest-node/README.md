@@ -6,28 +6,37 @@
 ![Forest Cloud Infrastructure ](https://user-images.githubusercontent.com/47984109/216006502-eca661d3-2ef8-4c75-aa7a-1740c25abb44.png)
 
 ## Requirements 
-- RAM: 32GB
-- VCPU: 8
+- RAM: 16GB
+- VCPU: 2
 - Startup Disk Size: 200 GB
 - Expected Total Disk Size: > 500 GB
 - Docker-image based VM
 - SSH Key should be created locally using `ssh keygen` then added into digitalocean console where the fingerprint can be generated and added as a variable while creation the droplet. 
 - Create a slack app needed for the setup by following the instructions [here](https://api.slack.com/apps?new_app=1).
-
+- Install [terraform](https://developer.hashicorp.com/terraform/downloads) and [ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html).  
+- Install `make`
+- Basic DigitalOcean knowledge
 
 Also, be aware that after ansible has configured all services, the servers will only be accessible via the `chainsafe` user which can be changed in `ansible.cfg` file if required. To test this implementation, access the server with appropriate `ssh` details in this format `ssh -i ~/.ssh/id_rsa chainsafe@ip_address`. 
 
 In order to implement the infrastructure, run the following:
-- Set-up s3cmd 2.x with DigitalOcean Spaces; you can check [here](https://docs.digitalocean.com/products/spaces/reference/s3cmd/) for more details. This will require `ACCESS_TOKEN` and `SECRET_KEY`; it can be auto-generated from the DigitalOcean console through the Applications & API section.   
-- Add all necessary environment variables by running `echo $SPACES_ACCESS_TOKEN` and `echo $SPACES_SECRET_KEY` while using the values generated in the previous step.
-- Create a `*.tfvars` file to use the necessary variable values for terraform running success. Also, be aware that the `keys_name` must be unique. 
+- Create `ssh-key` and store the fingerprint for use in the next step.
+- To fully explore the IAC functionalities, it is required to have a `terraform.tfvars` file. This will be in conjunction with the variables specified in `variable.tf` and you can fill in all required information based on your custom setup on Digitalocean. Also, note that the `firewall_name` must be unique.
+- Create a space on Digitalocean with any preferred unique name and add the bucket name in the `backend.tf` file. 
+- Generate `digitalocean_api_token` from Digitalocean console; you can check [here](https://docs.digitalocean.com/reference/api/create-personal-access-token/) for more details. Additionally, the value should be added as a variable in the `terraform.tfvars` file when setting up the terraform directory. 
+- Add all necessary environment variables by running the following:
+    - `export AWS_SECRET_ACCESS_KEY="value"`, 
+    - `export AWS_ACCESS_KEY_ID="value"`, 
 - Setup ssh-agent locally to allow ansible locate the private key by running the following:
-    - `eval ssh-agent`
+    - eval `ssh-agent`
     - `ssh-add <location to ssh key>`
-- Run `make plan` in thr terraform directory.   
-- Run `make apply` in the terraform directory to create the infrastructure and update the ansible hosts file with the IP address. 
-- Run `ansible all -m ping` to confirm connection to hosts.  
-- Run `ansible-playbook forest.yaml` in the ansible directory to initialize forest.
+- Run `terraform init` in the terraform directory for initialization and variable confirmation.  
+- Run `make plan` in the terraform directory to view all the resources to be configured.   
+- Run `make apply` in the terraform directory to create the infrastructure and update the ansible hosts file with the right IP address. 
+- Move to the ansible directory and run `ansible all -m ping` to confirm connection to hosts.  
+- While in the same directory, run `ansible-playbook forest.yaml` in the ansible directory to initialize forest.
+- Also, run `ansible-playbook letsencrypt.yaml` in the ansible directory to install letsencrypt.
+- Also, run `ansible-playbook observability.yaml` in the ansible directory to install observability dependencies like prometheus, node exporter and the rest.
 
 ## Observability 
 - In the ansible directory, to set-up observability stacks for your forest node, in the `observability.yaml` yaml. Set `slack api url` and slack `channel` to the slack webhook url and channel you obtained from the requirements, and then run `ansible-playbook observability.yaml`.
@@ -52,7 +61,7 @@ To configure Observability which includes `Prometheus`, `alertmanager`, `Loki`, 
 | loki\_ingester\_chunk\_idle\_period   | Flush the chunk after time idle                      | 5m          |
 
 - In the `observability.yaml` file, define all the values for the `slack_api_url`, `channel`, `spaces_access_token`, `spaces_bucket_name` and `spaces_secret_key` as it is in your setup. 
-- Then, run `ansible-playbook observability.yaml` for ansible to start configuring all the required services. This will set up observability stack with `Grafana Loki`, `Prometheus`, `Node Exporter` and `Alertmanager`. Once the observability stack is running, you can access your Grafana UI `http://<observability-droplet-ip>:3000` to view the predefined dashboards. Use the default Grafana credentials: `admin/admin`.
+- Then, run `ansible-playbook observability.yaml` for ansible to start configuring all the required services. This will set up observability stack with `Grafana Loki`, `Prometheus`, `Node Exporter` and `Alertmanager`. Once the observability stack is running, you can access your Grafana UI `https://example.com` to view the predefined dashboards. Use the default Grafana credentials: `admin/admin`.
 
 - To query the Loki logs, go to the Grafana webapp's `Configuration/Data Sources` section, select Loki, click on Explore, and then run LogQL queries. The logs will also be stored on the `spaces buckets` as defined in `terraform.tfvars` for long-term log storage. For more information on `LogQL`, see its [documentation](https://grafana.com/docs/loki/latest/logql/). There are two folders in the space; `fake` and `index` - fake stores the main log data and index stores the metadata of the chunks. 
 
