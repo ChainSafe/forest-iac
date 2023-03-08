@@ -9,8 +9,7 @@
 The droplet requirements to run forest-calibnet include: 
 - RAM: 16GB
 - VCPU: 2
-- Startup Disk Size: 200 GB
-- Expected Total Disk Size: > 500 GB
+- Disk Size: 100 GB
 The user local machine requirments include:
 - Install [terraform](https://developer.hashicorp.com/terraform/downloads) and [ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html).  
 - Install `make`
