@@ -10,16 +10,16 @@
 - VCPU: 2
 - Startup Disk Size: 200 GB
 - Expected Total Disk Size: > 500 GB
-- SSH Key should be created locally using `ssh keygen` and then added into digitalocean console where the fingerprint can be generated and added as a variable while creating the droplet.
+- SSH Key should be created locally using `ssh keygen` and then added into DigitalOcean console where the fingerprint can be generated and added as a variable while creating the droplet.
 - Install [terraform](https://developer.hashicorp.com/terraform/downloads) and [ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html).  
 - Install `make`
-- Basic digitalocean knowledge
+- Basic DigitalOcean knowledge
 
 To implement the infrastructure, run the following:
 - Create `ssh-key` and store the fingerprint for use in the next step.
-- To fully explore the IAC functionalities, it is required to have a `terraform.tfvars` file. This will be in conjunction with the variables specified in `varaible.tf` and you can fill in all required information based on your custom setup on Digitalocean.
-- Create a space on Digitalocean with any preferred unique name and add the bucket name in the `backend.tf` file. 
-- Generate `digitalocean_api_token` from Digitalocean console; you can check [here](https://docs.digitalocean.com/reference/api/create-personal-access-token/) for more details. Additionally, the value should be added as a variable in the `terraform.tfvars` file when setting up the terraform directory. 
+- To fully explore the IAC functionalities, it is required to have a `terraform.tfvars` file. This will be in conjunction with the variables specified in `varaible.tf` and you can fill in all required information based on your custom setup on DigitalOcean.
+- Create a space on DigitalOcean with any preferred unique name and add the bucket name in the `backend.tf` file. 
+- Generate `digitalocean_api_token` from DigitalOcean console; you can check [here](https://docs.digitalocean.com/reference/api/create-personal-access-token/) for more details. Additionally, the value should be added as a variable in the `terraform.tfvars` file when setting up the terraform directory. 
 - Add all necessary environment variables by running the following:
     - `export AWS_SECRET_ACCESS_KEY="value"`, 
     - `export AWS_ACCESS_KEY_ID="value"`, 
