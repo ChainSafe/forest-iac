@@ -57,26 +57,9 @@ class SyncCheck
     Dir.glob("#{FOREST_DATA}/snapshots/#{network}/*.car")[0] or raise "Can't find snapshot in #{dir}"
   end
 
-  # Imports the snapshots
-  def import_snapshots
-    @logger.info 'Importing snapshots'
-    run_forest '--chain calibnet --halt-after-import --auto-download-snapshot'
-    run_forest '--chain mainnet --halt-after-import --auto-download-snapshot'
-  end
-
-  # Deletes all snapshots to free up memory.
-  def delete_snapshots
-    @logger.info 'Deleting snapshots'
-    run_forest_cli '--chain calibnet snapshot clean --force'
-    run_forest_cli '--chain mainnet snapshot clean --force'
-  end
-
-  # Starts docker-compose services. It first downloads and imports the snapshots.
+  # Starts docker-compose services.
   def start_services
     @logger.info 'Starting services'
-    import_snapshots
-    delete_snapshots
-
     `docker-compose up --build --force-recreate --detach`
     raise 'Failed to start services' unless $CHILD_STATUS.success?
   end
@@ -116,7 +99,7 @@ class SyncCheck
   def run
     loop do
       begin
-        cleanup unless disk_usage < 0.8
+        cleanup unless disk_usage < 0.9
         start_services unless services_up?
       rescue StandardError => e
         report_error e
