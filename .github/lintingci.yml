@@ -58,3 +58,4 @@ jobs:
       - name: Run TFLint
         working-directory: ./Terraform
         run: tflint -f compact
+        
