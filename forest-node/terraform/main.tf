@@ -27,7 +27,7 @@ resource "digitalocean_droplet" "forest" {
 }
 
 resource "digitalocean_firewall" "forest-firewalls-test" {
-  name = var.firewall_name
+  name = var.name
 
   inbound_rule {
     protocol              = "tcp"

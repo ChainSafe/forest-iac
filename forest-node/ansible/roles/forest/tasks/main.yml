@@ -3,7 +3,7 @@
 - name: Create a login user
   user:
     name: "{{ user }}"
-    state: present 
+    state: present
 
 - name: Create .ssh directory for created user
   become: true
@@ -12,7 +12,7 @@
     state: directory
     owner: "{{ user }}"
     group: "{{ user }}"
-    mode: 0700 
+    mode: 0700
 
 - name: Copy public key from existing root to new user
   become: true
@@ -21,7 +21,7 @@
     dest: "{{ user_dir_auth }}"
     owner: "{{ user }}"
     group: "{{ user }}"
-    remote_src: yes
+    remote_src: true
     mode: 0600
 
 - name: Allow new user to log in
@@ -31,9 +31,9 @@
     line: 'AllowUsers {{ user }}'
     state: present
 
-- name: Restart SSHD Service 
+- name: Restart SSHD Service
   become: true
-  shell: sudo service ssh restart 
+  shell: sudo service ssh restart
 
 - name: Add {{ user }} to sudoers file
   ansible.builtin.lineinfile:
@@ -78,3 +78,4 @@
   ansible.builtin.debug:
     var: result.container
   when: result.exists
+  

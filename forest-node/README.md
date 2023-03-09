@@ -23,6 +23,7 @@ To implement the infrastructure, run the following:
     - `digitalocean_token`
     - `new_key_ssh_key_fingerprint`
     - `firewall_name`
+    - `name`
 - Add all necessary environment variables by running the following:
     - `export AWS_SECRET_ACCESS_KEY="value"`, 
     - `export AWS_ACCESS_KEY_ID="value"`, 
