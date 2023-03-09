@@ -14,7 +14,7 @@ terraform {
 }
 
 provider "digitalocean" {
-  token = var.digitalocean_token
+  token = "${var.DIGITALOCEAN_TOKEN}"
 }
 
 resource "digitalocean_droplet" "forest" {
