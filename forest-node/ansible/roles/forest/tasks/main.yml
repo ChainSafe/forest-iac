@@ -42,14 +42,6 @@
     line: '{{ user }} ALL=(ALL) NOPASSWD: ALL'
     validate: 'visudo -cf %s'
 
-- name: create docker user
-  user:
-    name: '{{ user }}'
-    append: true
-    shell: /bin/bash
-    system: true
-    create_home: false
-
 - name: Add new user to "docker" group
   user:
     name: "{{ user }}"
