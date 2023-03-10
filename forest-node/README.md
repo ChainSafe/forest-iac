@@ -17,7 +17,7 @@ The user local machine requirements include:
 - Basic DigitalOcean knowledge
 
 To implement the infrastructure, run the following:
-- Create `ssh-key` to be added to DigitalOcean list and store the fingerprint for use in the next step; you can check more details [here](https://docs.digitalocean.com/products/droplets/how-to/add-ssh-keys/to-team/)
+- Create `ssh-key` to be added to DigitalOcean list and store the fingerprint for use in the next few steps; you can check more details [here](https://docs.digitalocean.com/products/droplets/how-to/add-ssh-keys/to-team/)
 - Create a space on DigitalOcean with any preferred unique name and add the bucket name and endpoint in the `backend.tf` file.
 - Generate `digitalocean_api_token` from DigitalOcean console; you can check [here](https://docs.digitalocean.com/reference/api/create-personal-access-token/) for more details.
 - Populate the `terraform.tfvars` file with the values of the following
@@ -27,7 +27,9 @@ To implement the infrastructure, run the following:
 - Set all necessary environment variables to the terminal permanently by adding them to a shell profile.
     - `export AWS_SECRET_ACCESS_KEY="value"`,
     - `export AWS_ACCESS_KEY_ID="value"`,
+
 Then save the file and restart the terminal for the changes to take effect.
+
 - Setup ssh-agent locally to allow ansible locate the private key by running the following:
     - eval `ssh-agent`
     - `ssh-add <location to ssh key>`
