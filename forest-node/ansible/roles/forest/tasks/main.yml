@@ -77,8 +77,5 @@
   become_user: "{{ user }}"
   ansible.builtin.debug:
     var: result.container
-  when: result.exists 
-
-
-
+  when: result.exists
   

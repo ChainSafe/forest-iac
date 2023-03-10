@@ -62,7 +62,7 @@ resource "digitalocean_firewall" "forest-firewalls-test" {
     port_range            = "all"
     destination_addresses = var.destination_addresses
   }
-  
+
   outbound_rule {
     protocol              = "udp"
     port_range            = "53"
