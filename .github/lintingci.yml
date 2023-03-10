@@ -6,7 +6,7 @@ on:
       - main
   push:
     branches:
-      - main 
+      - main
 
 jobs:
   Lint_ansible:
@@ -58,6 +58,4 @@ jobs:
       - name: Run TFLint
         working-directory: ./Terraform
         run: tflint -f compact
-
-
         
