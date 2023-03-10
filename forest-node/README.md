@@ -17,7 +17,7 @@ The user local machine requirements include:
 
 To implement the infrastructure, run the following:
 - Create `ssh-key` to be added to DigitalOcean list and store the fingerprint for use in the next step; you can check more details [here](https://docs.digitalocean.com/products/droplets/how-to/add-ssh-keys/to-team/)
-- Create a space on DigitalOcean with any preferred unique name and add the bucket name in the `backend.tf` file.
+- Create a space on DigitalOcean with any preferred unique name and add the bucket name and endpoint in the `backend.tf` file.
 - Generate `digitalocean_api_token` from DigitalOcean console; you can check [here](https://docs.digitalocean.com/reference/api/create-personal-access-token/) for more details.
 - Populate the `terraform.tfvars` file with the values of the following
     - `new_key_ssh_key_fingerprint`
