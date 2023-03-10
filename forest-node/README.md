@@ -23,7 +23,7 @@ To implement the infrastructure, run the following:
     - `new_key_ssh_key_fingerprint`
     - `digitalocean_token`
     - `name`
-- Set all necessary environment variables to the terminal permanently by adding the to a shell profile.
+- Set all necessary environment variables to the terminal permanently by adding them to a shell profile.
     - `export AWS_SECRET_ACCESS_KEY="value"`,
     - `export AWS_ACCESS_KEY_ID="value"`,
 Then save the file and restart the terminal for the changes to take effect.
