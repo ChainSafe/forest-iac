@@ -9,10 +9,3 @@ apply:
 
 destroy:
 	@terraform destroy -var-file="terraform.tfvars"
-<<<<<<< HEAD
-	
-	
-	
-=======
-	
->>>>>>> 3155d71 (sorting trailing new lines)

@@ -10,4 +10,4 @@ backups = "false"
 # This set of variables are unique and must be defined here in order to deploy successfully
 name = ""
 new_key_ssh_key_fingerprint = ""
-firewall_name = ""
+digitalocean_token = ""

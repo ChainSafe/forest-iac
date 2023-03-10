@@ -10,7 +10,7 @@ The droplet requirements to run forest-calibnet include:
 - RAM: 8GB
 - VCPU: 1
 - Disk Size: 100 GB
-The user local machine requirments include:
+The user local machine requirements include:
 - Install [terraform](https://developer.hashicorp.com/terraform/downloads) and [ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html).
 - Install `make`
 - Basic DigitalOcean knowledge
@@ -21,12 +21,11 @@ To implement the infrastructure, run the following:
 - Generate `digitalocean_api_token` from DigitalOcean console; you can check [here](https://docs.digitalocean.com/reference/api/create-personal-access-token/) for more details.
 - Populate the `terraform.tfvars` file with the values of the following
     - `new_key_ssh_key_fingerprint`
-    - `firewall_name`
+    - `digitalocean_token`
     - `name`
 - Set all necessary environment variables to the terminal permanently by adding the to a shell profile.
     - `export AWS_SECRET_ACCESS_KEY="value"`,
     - `export AWS_ACCESS_KEY_ID="value"`,
-    - `export DIGITALOCEAN_TOKEN="value"`
 Then save the file and restart the terminal for the changes to take effect.
 - Setup ssh-agent locally to allow ansible locate the private key by running the following:
     - eval `ssh-agent`
