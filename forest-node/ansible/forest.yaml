@@ -1,0 +1,6 @@
+---
+- name: setup forest
+  hosts: forest
+  become: true
+  roles:
+      - forest

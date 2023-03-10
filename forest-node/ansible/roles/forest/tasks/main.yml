@@ -1,0 +1,80 @@
+---
+# tasks file for role/forest
+- name: Create a login user
+  user:
+    name: "{{ user }}"
+    state: present
+
+- name: Create .ssh directory for created user
+  become: true
+  file:
+    path: "{{ user_dir }}"
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0700
+
+- name: Copy public key from existing root to new user
+  become: true
+  copy:
+    src: "/root/.ssh/authorized_keys"
+    dest: "{{ user_dir_auth }}"
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    remote_src: true
+    mode: 0600
+
+- name: Allow new user to log in
+  ansible.builtin.lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^AllowUsers'
+    line: 'AllowUsers {{ user }}'
+    state: present
+
+- name: Restart SSHD Service
+  become: true
+  shell: sudo service ssh restart
+
+- name: Add {{ user }} to sudoers file
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers
+    regexp: '^{{ user }}'
+    line: '{{ user }} ALL=(ALL) NOPASSWD: ALL'
+    validate: 'visudo -cf %s'
+
+- name: Add new user to "docker" group
+  user:
+    name: "{{ user }}"
+    groups: docker
+    append: true
+
+- name: Start the Docker container
+  become: true
+  become_user: "{{ user }}"
+  community.general.docker_container:
+    name: forest
+    image: ghcr.io/chainsafe/forest:latest
+    state: started
+    auto_remove: true
+    command: --encrypt-keystore false --auto-download-snapshot --chain calibnet
+    pull: true
+    ports:
+      - "1234:1234"
+  register: container_result
+
+- name: Get infos on container
+  become_user: "{{ user }}"
+  community.docker.docker_container_info:
+    name: forest
+  register: result
+
+- name: Does container exist?
+  become_user: "{{ user }}"
+  ansible.builtin.debug:
+    msg: "The container {{ 'exists' if result.exists else 'does not exist' }}"
+
+- name: Print information about container
+  become_user: "{{ user }}"
+  ansible.builtin.debug:
+    var: result.container
+  when: result.exists
