@@ -1,5 +1,5 @@
  resource "digitalocean_firewall" "forest_firewall" {
-  name = var.firewall_name
+  name = var.name
 
   inbound_rule {
     protocol         = var.protocol
@@ -51,6 +51,12 @@ resource "digitalocean_firewall" "forest_observability_firewall" {
   inbound_rule {
     protocol         = var.protocol
     port_range       = "22"
+    source_addresses = var.source_addresses
+  }
+
+  inbound_rule {
+    protocol         = var.protocol
+    port_range       = "3000"
     source_addresses = var.source_addresses
   }
 

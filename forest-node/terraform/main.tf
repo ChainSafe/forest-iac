@@ -37,18 +37,18 @@ resource "digitalocean_droplet" "forest_observability" {
   size     = var.size
   backups  = var.backups
   ssh_keys = [var.new_key_ssh_key_fingerprint]
-  
+
   lifecycle {
     create_before_destroy = true
   }
 }
 
-resource "local_file" "hosts" {
-  content = templatefile("../ansible/hosts",
-    {
-      forest        = digitalocean_droplet.forest.ipv4_address[*]
-      observability = digitalocean_droplet.forest_observability.ipv4_address[*]
-    }
-  )
-  filename = "../ansible/hosts"
+resource "local_file" "inventory" {
+    filename = "../ansible/hosts"
+    content     = <<_EOF
+[forest]
+${digitalocean_droplet.forest.ipv4_address}
+[observability]
+${digitalocean_droplet.forest_observability.ipv4_address}
+    _EOF
 }

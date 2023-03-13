@@ -43,14 +43,6 @@
     line: '{{ user }} ALL=(ALL) NOPASSWD: ALL'
     validate: 'visudo -cf %s'
 
-- name: Create docker user
-  ansible.builtin.user:
-    name: '{{ user }}'
-    append: true
-    shell: /bin/bash
-    system: true
-    create_home: false
-
 - name: Add new user to "docker" group
   ansible.builtin.user:
     name: "{{ user }}"
@@ -64,7 +56,7 @@
     name: forest
     image: ghcr.io/chainsafe/forest:latest
     state: started
-    auto_remove: true
+    restart_policy: always
     command: --encrypt-keystore false --auto-download-snapshot --chain calibnet --loki --loki-endpoint "{{ loki_endpoint }}"
     pull: true
     ports:

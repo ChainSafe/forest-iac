@@ -6,5 +6,5 @@
   roles:
     - letsencrypt
   vars:
-    letsencrypt_email: 
-    domain_name:
+    letsencrypt_email: ""
+    domain_name: ""

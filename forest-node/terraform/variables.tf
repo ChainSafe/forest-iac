@@ -43,11 +43,6 @@ variable "destination_addresses" {
   type        = list(string)
 }
 
-variable "firewall_name" {
-  description = "The name of the firewall"
-  type        = string
-}
-
 variable "observability_name" {
   description = "The name of observability name"
   type        = string
