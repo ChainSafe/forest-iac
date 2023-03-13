@@ -52,7 +52,7 @@
   become: true
   become_user: "{{ user }}"
   community.general.docker_container:
-    name: forest
+    name: Forest
     image: ghcr.io/chainsafe/forest:latest
     state: started
     restart_policy: always
