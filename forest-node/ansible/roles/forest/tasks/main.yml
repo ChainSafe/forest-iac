@@ -1,41 +1,42 @@
 ---
-# tasks file for role/forest
 - name: Create a login user
-  user:
+  ansible.builtin.user:
     name: "{{ user }}"
     state: present
 
 - name: Create .ssh directory for created user
   become: true
-  file:
+  ansible.builtin.file:
     path: "{{ user_dir }}"
     state: directory
     owner: "{{ user }}"
     group: "{{ user }}"
-    mode: 0700
+    mode: "0700"
 
 - name: Copy public key from existing root to new user
   become: true
-  copy:
+  ansible.builtin.copy:
     src: "/root/.ssh/authorized_keys"
     dest: "{{ user_dir_auth }}"
     owner: "{{ user }}"
     group: "{{ user }}"
     remote_src: true
-    mode: 0600
+    mode: "0600"
 
-- name: Allow new user to log in
+- name: Restart SSHD
+  become: true
+  ansible.builtin.service:
+    name: ssh
+    state: restarted
+
+- name: Allow created user to log in
   ansible.builtin.lineinfile:
     dest: /etc/ssh/sshd_config
     regexp: '^AllowUsers'
     line: 'AllowUsers {{ user }}'
     state: present
 
-- name: Restart SSHD Service
-  become: true
-  shell: sudo service ssh restart
-
-- name: Add {{ user }} to sudoers file
+- name: Add user to sudoers file
   ansible.builtin.lineinfile:
     path: /etc/sudoers
     regexp: '^{{ user }}'
@@ -43,7 +44,7 @@
     validate: 'visudo -cf %s'
 
 - name: Add new user to "docker" group
-  user:
+  ansible.builtin.user:
     name: "{{ user }}"
     groups: docker
     append: true
