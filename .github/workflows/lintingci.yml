@@ -28,7 +28,7 @@ jobs:
           ansible-galaxy collection install community.docker
           ansible-galaxy collection install community.general
     - name: Lint code.
-      working-directory: Ansible
+      working-directory: forest-node/ansible
       run: ansible-lint
 
   lint_terraform:
@@ -52,9 +52,9 @@ jobs:
         run: tflint --version
 
       - name: Init TFLint
-        working-directory: ./Terraform
+        working-directory: forest-node/terraform
         run: tflint --init
 
       - name: Run TFLint
-        working-directory: ./Terraform
+        working-directory: forest-node/terraform
         run: tflint -f compact
