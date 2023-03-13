@@ -1,0 +1,24 @@
+name: 'Hadolint Linting'
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  hadolint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install hadolint
+        run: sudo wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v2.7.0/hadolint-Linux-x86_64 && sudo chmod +x /bin/hadolint
+
+      - name: Lint Dockerfiles
+        run: hadolint **/Dockerfile**
+
+      - name: Lint Docker Compose files
+        run: hadolint **/docker-compose**
+
