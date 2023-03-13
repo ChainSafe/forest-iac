@@ -55,7 +55,6 @@
     name: forest
     image: ghcr.io/chainsafe/forest:latest
     state: started
-    auto_remove: true
     command: --encrypt-keystore false --auto-download-snapshot --chain calibnet
     pull: true
     ports:
