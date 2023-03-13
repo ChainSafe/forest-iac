@@ -55,6 +55,7 @@
     name: forest
     image: ghcr.io/chainsafe/forest:latest
     state: started
+    restart_policy: always
     command: --encrypt-keystore false --auto-download-snapshot --chain calibnet
     pull: true
     ports:
