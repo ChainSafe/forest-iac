@@ -17,7 +17,7 @@ provider "digitalocean" {
   token = var.digitalocean_token
 }
 
-resource "digitalocean_droplet" "forest" {
+resource "digitalocean_droplet" "forest_mainnet" {
   image  = var.image
   name   = var.name
   region = var.region
