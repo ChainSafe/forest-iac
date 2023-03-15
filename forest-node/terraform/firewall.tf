@@ -42,11 +42,11 @@
     destination_addresses = ["0.0.0.0/0", "::/0"]
   }
 
-  droplet_ids = [digitalocean_droplet.forest.id]
+  droplet_ids = [digitalocean_droplet.forest_mainnet.id]
 }
 
 resource "digitalocean_firewall" "forest_observability_firewall" {
-  name = "forest-observability"
+  name = var.observability_name
 
   inbound_rule {
     protocol         = var.protocol
@@ -75,7 +75,7 @@ resource "digitalocean_firewall" "forest_observability_firewall" {
   inbound_rule {
     protocol           = var.protocol
     port_range         = "3100"
-    source_droplet_ids = [digitalocean_droplet.forest.id]
+    source_droplet_ids = [digitalocean_droplet.forest_mainnet.id]
   }
 
   outbound_rule {

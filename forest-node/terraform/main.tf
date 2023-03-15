@@ -46,8 +46,8 @@ resource "digitalocean_droplet" "forest_observability" {
 resource "local_file" "inventory" {
     filename = "../ansible/hosts"
     content     = <<_EOF
-[forest]
-${digitalocean_droplet.forest.ipv4_address}
+[forest_mainnet]
+${digitalocean_droplet.forest_mainnet.ipv4_address}
 [observability]
 ${digitalocean_droplet.forest_observability.ipv4_address}
     _EOF
