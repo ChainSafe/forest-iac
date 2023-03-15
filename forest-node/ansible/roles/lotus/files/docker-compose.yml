@@ -1,0 +1,51 @@
+version: "3.8"
+
+volumes:
+  parameters:
+  lotus-repo:
+
+services:
+  lotus:
+    image: filecoin/lotus:stable
+    container_name: lotus
+    volumes:
+      - parameters:/var/tmp/filecoin-proof-parameters
+      - lotus-repo:/var/lib/lotus
+    ports:
+      - 1234:1234
+    environment:
+      - LOTUS_JAEGER_AGENT_HOST=jaeger
+      - LOTUS_JAEGER_AGENT_PORT=6831
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 30s
+    command:
+      - daemon
+  lotus-gateway:
+    image: filecoin/lotus-gateway:stable
+    container_name: lotus-gateway
+    depends_on:
+      - lotus
+    ports:
+      - 1235:1234
+    environment:
+      - FULLNODE_API_INFO=/dns/lotus/tcp/1234/http
+      - LOTUS_JAEGER_AGENT_HOST=jaeger
+      - LOTUS_JAEGER_AGENT_PORT=6831
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 30s
+    command:
+      - run
+
+  jaeger:
+    image: jaegertracing/all-in-one
+    ports:
+      - "6831:6831/udp"
+      - "16686:16686"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 30s

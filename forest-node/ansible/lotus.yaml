@@ -1,0 +1,7 @@
+---
+- name: Set-up lotus
+  gather_facts: false
+  hosts: lotus
+  become: true
+  roles:
+    - lotus

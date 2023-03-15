@@ -1,0 +1,5 @@
+---
+# defaults file for roles/lotus
+user: chainsafe
+user_dir: /home/chainsafe/.ssh
+user_dir_auth: /home/chainsafe/.ssh/authorized_keys
