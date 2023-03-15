@@ -57,7 +57,7 @@
     image: ghcr.io/chainsafe/forest:latest
     state: started
     restart_policy: always
-    command: --encrypt-keystore false --auto-download-snapshot --chain calibnet --loki --loki-endpoint "{{ loki_endpoint }}"
+    command: --encrypt-keystore false --auto-download-snapshot --loki --loki-endpoint "{{ loki_endpoint }}"
     pull: true
     ports:
       - "1234:1234"
