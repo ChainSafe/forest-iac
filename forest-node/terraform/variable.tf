@@ -42,3 +42,13 @@ variable "destination_addresses" {
   description = "List of destination addresses."
   type        = list(string)
 }
+
+variable "observability_name" {
+  description = "The name of observability name"
+  type        = string
+}
+
+variable "protocol" {
+  description = "The protocol to use for the connection."
+  type        = string
+}

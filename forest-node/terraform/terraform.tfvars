@@ -6,8 +6,10 @@ region = "fra1"
 source_addresses = ["0.0.0.0/0", "::/0"]
 destination_addresses = ["0.0.0.0/0", "::/0"]
 backups = "false"
+protocol = "tcp"
 
 # This set of variables are unique and must be defined here in order to deploy successfully
 name = ""
 new_key_ssh_key_fingerprint = ""
 digitalocean_token = ""
+observability_name = ""
