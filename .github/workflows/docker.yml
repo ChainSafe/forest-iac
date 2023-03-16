@@ -31,7 +31,8 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build daily snapshot image and push to GitHub Container Registry
-        uses: docker/build-push-action@v3
+        id: build-daily-snapshot
+        uses: docker/build-push-action@v4
         with:
           context: scripts/
           file: scripts/Dockerfile-snapshot
@@ -39,10 +40,9 @@ jobs:
             ghcr.io/chainsafe/sync-snapshot:latest
           # build on feature branches, push only on main branch
           push: ${{ github.ref == 'refs/heads/main' }}
-      - name: Daily snapshot Image digest
-        run: echo ${{ steps.docker_build.outputs.digest }}
       - name: Build sync check image and push to GitHub Container Registry
-        uses: docker/build-push-action@v3
+        id: build-sync-check
+        uses: docker/build-push-action@v4
         with:
           context: scripts/
           file: scripts/Dockerfile-sync-check
@@ -50,5 +50,3 @@ jobs:
             ghcr.io/chainsafe/sync-check:latest
           # build on feature branches, push only on main branch
           push: ${{ github.ref == 'refs/heads/main' }}
-      - name: Sync check Image digest
-        run: echo ${{ steps.docker_build.outputs.digest }}
