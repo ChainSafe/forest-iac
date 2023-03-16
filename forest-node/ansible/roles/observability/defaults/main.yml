@@ -40,6 +40,3 @@ spaces_secret_key: "{{ lookup('env', 'SPACES_SECRET_KEY') }}"
 
 slack_api_url: ""
 slack_channel: ""
-
-
-

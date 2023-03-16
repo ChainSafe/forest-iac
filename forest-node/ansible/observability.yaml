@@ -1,11 +1,11 @@
-- name: install node-exporter
+- name: Install node-exporter
   hosts: [observability]
   gather_facts: false
   become: yes
   roles:
   - node_exporter
 
-- name: install Docker-grafana-prometheus
+- name: Install Docker-grafana-prometheus
   gather_facts: false
   hosts: observability
   become: yes

@@ -12,7 +12,7 @@
     state: directory
     owner: "{{ user }}"
     group: "{{ user }}"
-    mode: "0700 "
+    mode: "0700"
 
 - name: Copy public key from existing root to new user
   become: true
