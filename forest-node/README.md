@@ -60,6 +60,8 @@ To configure Observability which includes `Prometheus`, `alertmanager`, `Loki`, 
 - In the `observability.yaml` file, define all the values for the `slack_api_url`, `slack_channel`, `spaces_access_token`, `spaces_bucket_name`, `spaces_secret_key` and `domain_name` as it is in your setup.
 - Then, run `ansible-playbook observability.yaml` for ansible to start configuring all the required services. This will set up observability stack with `Grafana Loki`, `Prometheus`, `Node Exporter` and `Alertmanager`. Once the observability stack is running, you can access your Grafana UI `https://example.com` depending on the pre-defined domain name. Use the default Grafana credentials: `admin/admin`.
 
+- While in the same directory, run `ansible-playbook letsencrypt.yaml` in the ansible directory to initialize letsencrypt.
+
 - To query the Loki logs, go to the Grafana webapp's `Configuration/Data Sources` section, select Loki, click on Explore, and then run LogQL queries. The logs will also be stored on the `spaces buckets` as defined in `terraform.tfvars` for long-term log storage. For more information on `LogQL`, see its [documentation](https://grafana.com/docs/loki/latest/logql/). There are two folders in the space; `fake` and `index` - fake stores the main log data and index stores the metadata of the chunks.
 
 ## Collaborators
