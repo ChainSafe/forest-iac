@@ -56,12 +56,6 @@ resource "digitalocean_firewall" "forest_observability_firewall" {
 
   inbound_rule {
     protocol         = var.protocol
-    port_range       = "3000"
-    source_addresses = var.source_addresses
-  }
-
-  inbound_rule {
-    protocol         = var.protocol
     port_range       = "80"
     source_addresses = var.source_addresses
   }
