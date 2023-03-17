@@ -25,7 +25,7 @@ user_group: "{{ user }}"
 user_dir: /home/chainsafe/.ssh
 user_dir_auth: /home/chainsafe/.ssh/authorized_keys
 
-spaces_endpoint: nyc3.digitaloceanspaces.com
+spaces_endpoint: fra1.digitaloceanspaces.com
 spaces_bucket_name: "{{ groups['spaces'][0] }}"
 spaces_region: nyc3
 loki_config_retention: 336h
@@ -40,6 +40,3 @@ spaces_secret_key: "{{ lookup('env', 'SPACES_SECRET_KEY') }}"
 
 slack_api_url: ""
 slack_channel: ""
-
-
-

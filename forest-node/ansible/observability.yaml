@@ -1,16 +1,16 @@
-- name: install node-exporter
+- name: Install node-exporter
   hosts: [observability]
   gather_facts: false
-  become: yes
+  become: true
   roles:
-  - node_exporter
+    - node_exporter
 
-- name: install Docker-grafana-prometheus
+- name: Install Docker-grafana-prometheus
   gather_facts: false
   hosts: observability
-  become: yes
+  become: true
   roles:
-  - observability
+    - observability
   vars:
     slack_api_url: ""
     slack_channel: ""

@@ -17,7 +17,7 @@ provider "digitalocean" {
   token = var.digitalocean_token
 }
 
-resource "digitalocean_droplet" "forest_mainnet" {
+resource "digitalocean_droplet" "forest" {
   image  = var.image
   name   = var.name
   region = var.region
@@ -46,8 +46,8 @@ resource "digitalocean_droplet" "forest_observability" {
 resource "local_file" "inventory" {
     filename = "../ansible/hosts"
     content     = <<_EOF
-[forest_mainnet]
-${digitalocean_droplet.forest_mainnet.ipv4_address}
+[forest]
+${digitalocean_droplet.forest.ipv4_address}
 [observability]
 ${digitalocean_droplet.forest_observability.ipv4_address}
     _EOF
