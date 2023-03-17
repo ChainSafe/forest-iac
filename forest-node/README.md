@@ -41,7 +41,7 @@ Then save the file and restart the terminal for the changes to take effect.
 
 ## Observability
 
-To configure Observability which includes `Prometheus`, `alertmanager`, `Loki`, `Node Exporter` and `Grafana`, the following variables are available to be used according to your needs
+To configure Observability which includes `Prometheus`, `alertmanager`, `Loki`, `Node Exporter` and `Grafana`, the following variables are available to be used according to your needs and should be filled in the `observability.,yaml` file.
 
 | Variable   	                            | Description                                       | Default Value |
 |-------------------------------------------|---------------------------------------------------|---------------|
@@ -60,7 +60,6 @@ To configure Observability which includes `Prometheus`, `alertmanager`, `Loki`, 
 |  spaces_secret_key     | Spaces Secret Access key                   | "" [Required]()           |
 | loki\_ingester\_chunk\_idle\_period   | Flush the chunk after time idle                      | 5m          |
 
-- In the `observability.yaml` file, define all the values for the `slack_api_url`, `slack_channel`, `spaces_access_token`, `spaces_bucket_name`, `spaces_secret_key` and `domain_name` as it is in your setup.
 - Then, run `ansible-playbook observability.yaml` for ansible to start configuring all the required services. This will set up observability stack with `Grafana Loki`, `Prometheus`, `Node Exporter` and `Alertmanager`. Once the observability stack is running, you can access your Grafana UI `https://example.com` depending on the pre-defined domain name. Use the default Grafana credentials: `admin/admin`.
 
 - While in the same directory, run `ansible-playbook letsencrypt.yaml` in the ansible directory to initialize letsencrypt.
