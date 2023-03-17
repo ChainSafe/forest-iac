@@ -49,7 +49,7 @@
     groups: docker
     append: true
 
-- name: Start the Docker container
+- name: Start the docker container
   become: true
   become_user: "{{ user }}"
   community.general.docker_container:

@@ -16,7 +16,7 @@
     state: present
     update_cache: true
 
-- name: Allow Nginx Full
+- name: Allow nginx full
   become: true
   community.general.ufw:
     rule: allow

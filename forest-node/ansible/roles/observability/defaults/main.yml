@@ -37,6 +37,5 @@ loki_from_date: 2022-01-01
 spaces_access_token: "{{ lookup('env', 'SPACES_ACCESS_TOKEN') }}"
 spaces_secret_key: "{{ lookup('env', 'SPACES_SECRET_KEY') }}"
 
-
 slack_api_url: ""
 slack_channel: ""

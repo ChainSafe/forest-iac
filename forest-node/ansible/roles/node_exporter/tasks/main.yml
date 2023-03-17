@@ -72,7 +72,7 @@
         state: started
         enabled: true
 
-- name: Allow access to Node Exporter port
+- name: Allow access to node exporter port
   become: true
   community.general.ufw:
     rule: allow
