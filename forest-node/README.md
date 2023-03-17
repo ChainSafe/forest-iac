@@ -41,7 +41,7 @@ Then save the file and restart the terminal for the changes to take effect.
 
 ## Observability
 
-To configure Observability which includes `Prometheus`, `alertmanager`, `Loki`, `Node Exporter` and `Grafana`, the following variables are available to be used according to your needs and should be filled in the `observability.,yaml` file.
+To configure Observability which includes `Prometheus`, `alertmanager`, `Loki`, `Node Exporter` and `Grafana`, the following variables are available to be used according to your needs and should be filled in the `observability.yaml` file.
 
 | Variable   	                            | Description                                       | Default Value |
 |-------------------------------------------|---------------------------------------------------|---------------|
