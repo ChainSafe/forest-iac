@@ -67,9 +67,6 @@ jobs:
 
       - name: Setup terraform
         uses: hashicorp/setup-terraform@v1
-        with:
-           path: ~/.tflint.d/plugins
-           key: tflint-${{ hashFiles('.tflint.hcl') }}
 
       - name: Show version
         run: terraform --version
