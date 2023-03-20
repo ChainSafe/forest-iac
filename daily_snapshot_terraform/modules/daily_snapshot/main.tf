@@ -21,6 +21,9 @@ data "external" "sources_zip" {
 
 data "local_file" "sources" {
   filename = "${path.module}/sources.zip"
+  depends_on = [
+    data.external.sources_zip
+  ]
 }
 
 // Note: The init.sh file is also included in the sources.zip such that the hash
