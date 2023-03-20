@@ -7,7 +7,7 @@ terraform {
       version = "~> 2.0"
     }
     local = {
-      source = "hashicorp/local"
+      source  = "hashicorp/local"
       version = "~> 2.1"
     }
   }
@@ -18,14 +18,14 @@ provider "digitalocean" {
 }
 
 resource "digitalocean_droplet" "forest" {
-  image  = var.image
-  name   = var.name
-  region = var.region
-  size   = var.size
-  backups = var.backups
+  image    = var.image
+  name     = var.name
+  region   = var.region
+  size     = var.size
+  backups  = var.backups
   ssh_keys = [var.new_key_ssh_key_fingerprint]
 
-    lifecycle {
+  lifecycle {
     create_before_destroy = true
   }
 }
@@ -34,27 +34,27 @@ resource "digitalocean_firewall" "forest-firewalls-test" {
   name = var.name
 
   inbound_rule {
-    protocol              = "tcp"
-    port_range            = "22"
-    source_addresses      = var.source_addresses
+    protocol         = "tcp"
+    port_range       = "22"
+    source_addresses = var.source_addresses
   }
 
   inbound_rule {
-    protocol              = "tcp"
-    port_range            = "1234"
-    source_addresses      = var.source_addresses
+    protocol         = "tcp"
+    port_range       = "1234"
+    source_addresses = var.source_addresses
   }
 
   inbound_rule {
-    protocol              = "tcp"
-    port_range            = "80"
-    source_addresses      = var.source_addresses
+    protocol         = "tcp"
+    port_range       = "80"
+    source_addresses = var.source_addresses
   }
 
   inbound_rule {
-    protocol              = "udp"
-    port_range            = "53"
-    source_addresses      = var.source_addresses
+    protocol         = "udp"
+    port_range       = "53"
+    source_addresses = var.source_addresses
   }
 
   outbound_rule {
@@ -69,7 +69,7 @@ resource "digitalocean_firewall" "forest-firewalls-test" {
     destination_addresses = var.destination_addresses
   }
 
-droplet_ids = [digitalocean_droplet.forest.id]
+  droplet_ids = [digitalocean_droplet.forest.id]
 }
 
 output "ip" {
@@ -77,8 +77,8 @@ output "ip" {
 }
 
 resource "local_file" "inventory" {
-    filename = "../ansible/hosts"
-    content     = <<_EOF
+  filename = "../ansible/hosts"
+  content  = <<_EOF
 [forest]
 ${digitalocean_droplet.forest.ipv4_address}
     _EOF
