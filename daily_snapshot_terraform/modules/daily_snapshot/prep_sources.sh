@@ -2,10 +2,9 @@
 
 # Copy local source files in a folder together with ruby_common and create a zip archive.
 
-cd $1
+cd "$1" || exit
 cp -r ../../../scripts/ruby_common service/
 
-(cd service; zip -r -X ../sources.zip * \
-    %1>/dev/null %2>/dev/null)
+(cd service && zip -r -X ../sources.zip .)
 rm -fr service/ruby_common
 echo "{ \"path\": \"$1/sources.zip\" }"
