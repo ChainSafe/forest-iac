@@ -26,7 +26,7 @@ data "local_file" "sources" {
 // Note: The init.sh file is also included in the sources.zip such that the hash
 // of the archive captures the entire state of the machine.
 data "local_file" "init" {
-  filename = "${path.module}/init.sh"
+  filename = "${path.module}/service/init.sh"
 }
 
 resource "digitalocean_droplet" "forest" {
