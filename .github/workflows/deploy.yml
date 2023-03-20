@@ -44,8 +44,6 @@ jobs:
       - name: Update Pull Request
         uses: mshick/add-pr-comment@v2
         if: github.event_name == 'pull_request'
-        env:
-          PLAN: "${{ steps.plan.outputs.stdout }}"
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           with:
@@ -56,7 +54,7 @@ jobs:
 
             <details><summary>Show Plan</summary>
 
-            ${process.env.PLAN}
+            ${{ steps.plan.outputs.stdout }}
 
             </details>
       
