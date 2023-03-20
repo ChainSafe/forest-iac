@@ -1,4 +1,4 @@
-name: Deploy services if and when necessary
+name: Deploy
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy-daily-snapshot-calibnet:
-    name: Deploy snapshot service (calibnet)
+    name: snapshot service (calibnet)
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
