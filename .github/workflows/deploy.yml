@@ -27,16 +27,13 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
 
-      - name: env test
-        run: echo $AWS_ACCESS_KEY_ID
-
       - name: Terraform Init
         id: init
         run: terraform init
       
       - name: Terraform Validate
         id: validate
-        run: terraform validate -no-color -var="digitalocean_token=$DO_TOKEN"
+        run: terraform validate -no-color
       
       - name: Terraform Plan
         id: plan
