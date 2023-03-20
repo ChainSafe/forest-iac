@@ -42,3 +42,18 @@ variable "destination_addresses" {
   description = "List of destination addresses."
   type        = list(string)
 }
+
+variable "hubert_key_ssh_key_fingerprint" {
+  description = "the ssh key fingerprint for digitalocean"
+  type        = string
+}
+
+variable "david_key_ssh_key_fingerprint" {
+  description = "the ssh key fingerprint for digitalocean"
+  type        = string
+}
+
+variable "guillame_key_ssh_key_fingerprint" {
+  description = "the ssh key fingerprint for digitalocean"
+  type        = string
+}

@@ -1,0 +1,7 @@
+---
+- name: Set-up lotus Calibnet
+  gather_facts: false
+  hosts: lotus
+  become: true
+  roles:
+    - lotus_calib
