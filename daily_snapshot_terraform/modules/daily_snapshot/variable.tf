@@ -30,11 +30,6 @@ variable "region" {
   default     = "fra1"
 }
 
-variable "backups" {
-  description = "A boolean flag indicating whether to enable backups"
-  type        = string
-  default     = false
-}
 
 variable "source_addresses" {
   description = "List of source addresses."

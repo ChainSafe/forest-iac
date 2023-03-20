@@ -37,7 +37,6 @@ resource "digitalocean_droplet" "forest" {
   # Re-initialize resource if this hash changes:
   user_data = data.local_file.sources.content_sha256
   tags   = ["iac"]
-  backups = var.backups
   ssh_keys = [var.new_key_ssh_key_fingerprint]
 
   connection {
