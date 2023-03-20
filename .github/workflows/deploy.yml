@@ -54,7 +54,9 @@ jobs:
 
             <details><summary>Show Plan</summary>
 
+            ```
             ${{ steps.plan.outputs.stdout }}
+            ```
 
             </details>
       
