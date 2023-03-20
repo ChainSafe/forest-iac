@@ -114,10 +114,7 @@ resource "digitalocean_firewall" "forest-firewalls-test" {
   droplet_ids = [digitalocean_droplet.forest.id]
 }
 
+# This ip address may be used in the future by monitoring software
 output "ip" {
   value = [digitalocean_droplet.forest.ipv4_address]
-}
-
-output "files" {
-  value = ""
 }
