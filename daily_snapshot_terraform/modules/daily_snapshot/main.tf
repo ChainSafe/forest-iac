@@ -36,8 +36,8 @@ resource "digitalocean_droplet" "forest" {
   size   = var.size
   # Re-initialize resource if this hash changes:
   user_data = data.local_file.sources.content_sha256
-  tags   = ["iac"]
-  ssh_keys = [var.new_key_ssh_key_fingerprint]
+  tags      = ["iac"]
+  ssh_keys  = [var.new_key_ssh_key_fingerprint]
 
   connection {
     host = self.ipv4_address
@@ -68,35 +68,35 @@ data "digitalocean_project" "forest_project" {
 }
 
 resource "digitalocean_project_resources" "connect_forest_project" {
-  project = data.digitalocean_project.forest_project.id
-  resources = [ digitalocean_droplet.forest.urn ]
+  project   = data.digitalocean_project.forest_project.id
+  resources = [digitalocean_droplet.forest.urn]
 }
 
 resource "digitalocean_firewall" "forest-firewalls-test" {
   name = var.name
 
   inbound_rule {
-    protocol              = "tcp"
-    port_range            = "22"
-    source_addresses      = var.source_addresses
+    protocol         = "tcp"
+    port_range       = "22"
+    source_addresses = var.source_addresses
   }
 
   inbound_rule {
-    protocol              = "tcp"
-    port_range            = "1234"
-    source_addresses      = var.source_addresses
+    protocol         = "tcp"
+    port_range       = "1234"
+    source_addresses = var.source_addresses
   }
 
   inbound_rule {
-    protocol              = "tcp"
-    port_range            = "80"
-    source_addresses      = var.source_addresses
+    protocol         = "tcp"
+    port_range       = "80"
+    source_addresses = var.source_addresses
   }
 
   inbound_rule {
-    protocol              = "udp"
-    port_range            = "53"
-    source_addresses      = var.source_addresses
+    protocol         = "udp"
+    port_range       = "53"
+    source_addresses = var.source_addresses
   }
 
   outbound_rule {
@@ -111,7 +111,7 @@ resource "digitalocean_firewall" "forest-firewalls-test" {
     destination_addresses = var.destination_addresses
   }
 
-droplet_ids = [digitalocean_droplet.forest.id]
+  droplet_ids = [digitalocean_droplet.forest.id]
 }
 
 output "ip" {
