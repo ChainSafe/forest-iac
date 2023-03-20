@@ -23,10 +23,7 @@ module "daily_snapshot" {
   digitalocean_token          = var.digitalocean_token
 }
 
+# This ip address may be used in the future by monitoring software
 output "ip" {
   value = [module.daily_snapshot.ip]
-}
-
-output "files" {
-  value = [module.daily_snapshot.files]
 }
