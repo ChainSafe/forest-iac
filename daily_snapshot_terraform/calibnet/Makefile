@@ -2,10 +2,9 @@ init:
 	@terraform init
 
 plan:
-	@terraform plan -var-file="terraform.tfvars"
-
+	@terraform plan -var="digitalocean_token=$DIGITALOCEAN_TOKEN"
 apply:
-	@terraform apply -var-file="terraform.tfvars" --auto-approve
+	@terraform apply --auto-approve -var="digitalocean_token=$DIGITALOCEAN_TOKEN"
 
 destroy:
-	@terraform destroy -var-file="terraform.tfvars"
+	@terraform destroy -var="digitalocean_token=$DIGITALOCEAN_TOKEN"
