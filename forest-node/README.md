@@ -18,12 +18,13 @@ The user local machine requirements include:
 
 In order to implement the infrastructure, run the following:
 - Create `ssh-key` to be added to DigitalOcean list and store the fingerprint for use in the next few steps; you can check more details [here](https://docs.digitalocean.com/products/droplets/how-to/add-ssh-keys/to-team/)
-- Create a space on DigitalOcean with any preferred unique name and add the bucket name and endpoint in the `backend.tf` file.
+- Create a space on DigitalOcean with any preferred unique name then add the bucket name and endpoint in the `backend.tf` file.
 - Generate `digitalocean_api_token` from DigitalOcean console; you can check [here](https://docs.digitalocean.com/reference/api/create-personal-access-token/) for more details.
 - Populate the `terraform.tfvars` file with the values of the following
     - `new_key_ssh_key_fingerprint`
     - `digitalocean_token`
     - `name`
+    - `observability_name`
 - Set all necessary environment variables to the terminal permanently by adding them to a shell profile.
     - `export AWS_SECRET_ACCESS_KEY="value"`,
     - `export AWS_ACCESS_KEY_ID="value"`,
@@ -40,6 +41,12 @@ Then save the file and restart the terminal for the changes to take effect.
 - While in the same directory, run `ansible-playbook forest.yaml` in the ansible directory to initialize forest.
 
 ## Observability
+
+## Requirements
+The droplet requirements to run observability for forest-calibnet include:
+- RAM: 8GB
+- VCPU: 1
+- Disk Size: >100 GB
 
 To configure Observability which includes `Prometheus`, `alertmanager`, `Loki`, `Node Exporter` and `Grafana`, the following variables are available to be used according to your needs and should be filled in the `observability.yaml` file.
 
@@ -60,11 +67,13 @@ To configure Observability which includes `Prometheus`, `alertmanager`, `Loki`, 
 |  spaces_secret_key     | Spaces Secret Access key                   | "" [Required]()           |
 | loki\_ingester\_chunk\_idle\_period   | Flush the chunk after time idle                      | 5m          |
 
-- Then, run `ansible-playbook observability.yaml` for ansible to start configuring all the required services. This will set up observability stack with `Grafana Loki`, `Prometheus`, `Node Exporter` and `Alertmanager`. Once the observability stack is running, you can access your Grafana UI `https://example.com` depending on the pre-defined domain name. Use the default Grafana credentials: `admin/admin`.
+- In the ansible directory, run `ansible-playbook observability.yaml` for ansible to start configuring all the required services which include `Grafana Loki`, `Prometheus`, `Node Exporter` and `Alertmanager`.
 
-- While in the same directory, run `ansible-playbook letsencrypt.yaml` in the ansible directory to initialize letsencrypt.
+- Run `ansible-playbook letsencrypt.yaml` in the ansible directory to initialize letsencrypt.
 
-- To query the Loki logs, go to the Grafana webapp's `Configuration/Data Sources` section, select Loki, click on Explore, and then run LogQL queries. The logs will also be stored on the `spaces buckets` as defined in `terraform.tfvars` for long-term log storage. For more information on `LogQL`, see its [documentation](https://grafana.com/docs/loki/latest/logql/). There are two folders in the space; `fake` and `index` - fake stores the main log data and index stores the metadata of the chunks.
+- Once the observability stack is up, you can access your Grafana UI here `https://example.com` depending on the pre-defined domain name. Use the default Grafana credentials: `admin:admin`.
+
+- To query the Loki logs, go to the Grafana webapp's `Configuration/Data Sources` section, select Loki, click explore, and then run LogQL queries. The logs will also be stored on the `spaces buckets` as defined in `terraform.tfvars` for long-term log storage. For more information on `LogQL`, see its documentation [here](https://grafana.com/docs/loki/latest/logql/). There are two folders in the space; `fake` and `index`, while fake stores the main log data and index stores the metadata of the chunks.
 
 Also, be aware that after ansible has configured all services, the servers will only be accessible via the `chainsafe` user which can be changed in `ansible.cfg` file if required. To test this implementation, access the server with appropriate `ssh` details in this format `ssh -i ~/.ssh/id_rsa chainsafe@ip_address`.
 

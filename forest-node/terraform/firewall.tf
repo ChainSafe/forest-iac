@@ -73,7 +73,7 @@ resource "digitalocean_firewall" "forest_observability_firewall" {
   }
 
   outbound_rule {
-    protocol              = "tcp"
+    protocol              = var.protocol
     port_range            = "all"
     destination_addresses = var.destination_addresses
   }
