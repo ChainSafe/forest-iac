@@ -1,9 +1,24 @@
-variable "digitalocean_token" {
+variable "do_token" {
   description = "Token for authentication."
   type        = string
 }
 
-variable "new_key_ssh_key_fingerprint" {
+variable "ssh_fingerprint" {
   description = "the ssh key fingerprint for digitalocean"
+  type        = string
+}
+
+variable "AWS_ACCESS_KEY_ID" {
+  description = "S3 access key id"
+  type        = string
+}
+
+variable "AWS_SECRET_ACCESS_KEY" {
+  description = "S3 private access key"
+  type        = string
+}
+
+variable "slack_token" {
+  description = "slack access token"
   type        = string
 }

@@ -18,10 +18,35 @@ variable "new_key_ssh_key_fingerprint" {
   type        = string
 }
 
+variable "slack_channel" {
+  description = "slack channel name for notifications"
+  type        = string
+}
+
+variable "slack_token" {
+  description = "slack access token"
+  type        = string
+}
+
+variable "AWS_ACCESS_KEY_ID" {
+  description = "S3 access key id"
+  type        = string
+}
+
+variable "AWS_SECRET_ACCESS_KEY" {
+  description = "S3 private access key"
+  type        = string
+}
+
+variable "chain" {
+  description = "Chain name (calibnet or mainnet)"
+  type        = string
+}
+
 variable "image" {
   description = "The ID of the AMI to use for the Droplet"
   type        = string
-  default     = "docker-20-04"
+  default     = "fedora-36-x64"
 }
 
 variable "region" {
@@ -30,6 +55,11 @@ variable "region" {
   default     = "fra1"
 }
 
+variable "project" {
+  description = "DigitalOcean project used as parent for the created droplet"
+  type        = string
+  default     = "Forest-DEV" # Alternative: "Default"
+}
 
 variable "source_addresses" {
   description = "List of source addresses."

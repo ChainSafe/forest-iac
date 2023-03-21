@@ -20,10 +20,7 @@ data "external" "sources_zip" {
 }
 
 data "local_file" "sources" {
-  filename = "${path.module}/sources.zip"
-  depends_on = [
-    data.external.sources_zip
-  ]
+  filename = data.external.sources_zip.result.path
 }
 
 // Note: The init.sh file is also included in the sources.zip such that the hash
@@ -58,16 +55,25 @@ resource "digitalocean_droplet" "forest" {
     destination = "/root/init.sh"
   }
 
+  # WARNING: Changing these commands will _not_ trigger a re-deployment. If you
+  # edit these commands, you'll have to re-deploy manually.
   provisioner "remote-exec" {
     inline = [
       "cd /root/",
-      "nohup sh ./init.sh"
+      # Set required environment variables
+      "export AWS_ACCESS_KEY_ID=${var.AWS_ACCESS_KEY_ID}",
+      "export AWS_SECRET_ACCESS_KEY=${var.AWS_SECRET_ACCESS_KEY}",
+      "export SLACK_API_TOKEN=${var.slack_token}",
+      "export SLACK_NOTIF_CHANNEL=${var.slack_channel}",
+      # Run init script in the background
+      "nohup sh ./init.sh ${var.chain} &",
+      "sleep 10s",
     ]
   }
 }
 
 data "digitalocean_project" "forest_project" {
-  name = "Forest-DEV"
+  name = var.project
 }
 
 resource "digitalocean_project_resources" "connect_forest_project" {

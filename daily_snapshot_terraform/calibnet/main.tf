@@ -8,7 +8,9 @@ terraform {
     # This region does not have to be shared by the droplet.
     endpoint = "https://fra1.digitaloceanspaces.com"
 
-    # For reasons, Terraform cannot validate DO credentials.
+    # Credentially can be validated through the Security Token Service (STS).
+    # Unfortunately, DigitalOcean does not support STS so we have to skip the
+    # validation.
     skip_credentials_validation = "true"
   }
 }
@@ -17,10 +19,16 @@ module "daily_snapshot" {
   source = "../modules/daily_snapshot"
 
   name = "test-forest-snapshot-calibnet"
+  chain = "calibnet"
   size = "s-4vcpu-8gb"
 
-  new_key_ssh_key_fingerprint = var.new_key_ssh_key_fingerprint
-  digitalocean_token          = var.digitalocean_token
+  slack_channel = "#forest-notifications"
+
+  slack_token                 = var.slack_token
+  AWS_ACCESS_KEY_ID           = var.AWS_ACCESS_KEY_ID
+  AWS_SECRET_ACCESS_KEY       = var.AWS_SECRET_ACCESS_KEY
+  new_key_ssh_key_fingerprint = var.ssh_fingerprint
+  digitalocean_token          = var.do_token
 }
 
 # This ip address may be used in the future by monitoring software
