@@ -69,7 +69,7 @@ resource "digitalocean_firewall" "forest_observability_firewall" {
   inbound_rule {
     protocol           = var.protocol
     port_range         = "3100"
-    source_droplet_ids = [digitalocean_droplet.forest_mainnet.id]
+    source_droplet_ids = [digitalocean_droplet.forest.id]
   }
 
   outbound_rule {

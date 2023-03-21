@@ -59,6 +59,9 @@
     restart_policy: always
     command: --encrypt-keystore false --auto-download-snapshot --loki --loki-endpoint "{{ loki_endpoint }}"
     pull: true
+    volumes:
+      - /etc/forest/config.toml:/home/forest/config.toml
+      - /mnt/{{ volume_name }}/forest:/home/forest/data
     ports:
       - "1234:1234"
       - "6116:6116"
