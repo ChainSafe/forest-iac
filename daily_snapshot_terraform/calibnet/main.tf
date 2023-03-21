@@ -18,9 +18,9 @@ terraform {
 module "daily_snapshot" {
   source = "../modules/daily_snapshot"
 
-  name = "test-forest-snapshot-calibnet"
+  name  = "test-forest-snapshot-calibnet"
   chain = "calibnet"
-  size = "s-4vcpu-8gb"
+  size  = "s-4vcpu-8gb"
 
   slack_channel = "#forest-notifications"
 
