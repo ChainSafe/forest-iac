@@ -25,4 +25,4 @@ s3fs forest-snapshots "$S3_FOLDER" \
     -o allow_other
 
 # Export and upload snapshot
-ruby daily_snapshot.rb $1
+ruby daily_snapshot.rb "$1"
