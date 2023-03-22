@@ -3,7 +3,7 @@
 
 ## Forest IAC Architectue
 
-![Forest Cloud Infrastructure ](https://user-images.githubusercontent.com/47984109/216006502-eca661d3-2ef8-4c75-aa7a-1740c25abb44.png)
+![Forest Diagram With Monitoring](https://user-images.githubusercontent.com/47984109/226943527-c7c0a053-8ba6-4d9f-9392-8d68cfbfca3e.png)
 
 ## Requirements
 The droplet requirements to run forest-calibnet include:
@@ -58,11 +58,11 @@ To configure Observability which includes `Prometheus`, `alertmanager`, `Loki`, 
 | prometheus\_scrape\_interval                                | How frequently should prometheus scrape metrics                           | 30s          |
 | slack\_api\_url                               | Slack Webhooks url                          | "" [Required]()          |
 | slack\_channel                              | Slack Channel to receive Alert Manager notifications                            | "" [Required]()           |
-| loki\_from\_date                          | When did this database schema version started     | 2022-01-01    |
+| loki\_from\_date                          | The start of the database schema version   | 2022-01-01    |
 | loki\_schema\_version                     | Which database schema version to use              | v11           |
 | spaces\_endpoint                       | Digital Ocean Spaces Endpoint                                        | nyc3.digitaloceanspaces.com         |
 | spaces\_region                          | Spaces Bucket region                                  | nyc3     |
-| spaces\_bucket\_name                          | Digital Ocean s3 compatible s3 Bucket name                                    |   Assigned by terraform as defined in the `terraform.tfvars`          |
+| spaces\_bucket\_name                          | Digital Ocean s3 compatible s3 Bucket name                                    |   "" [Required]()          |
 | spaces\_access\_token                    | Spaces Access key Token                                   | "" [Required]()     |
 |  spaces_secret_key     | Spaces Secret Access key                   | "" [Required]()           |
 | loki\_ingester\_chunk\_idle\_period   | Flush the chunk after time idle                      | 5m          |
@@ -73,7 +73,7 @@ To configure Observability which includes `Prometheus`, `alertmanager`, `Loki`, 
 
 - Once the observability stack is up, you can access your Grafana UI here `https://example.com` depending on the pre-defined domain name. Use the default Grafana credentials: `admin:admin`.
 
-- To query the Loki logs, go to the Grafana webapp's `Configuration/Data Sources` section, select Loki, click explore, and then run LogQL queries. The logs will also be stored on the `spaces buckets` as defined in `terraform.tfvars` for long-term log storage. For more information on `LogQL`, see its documentation [here](https://grafana.com/docs/loki/latest/logql/). There are two folders in the space; `fake` and `index`, while fake stores the main log data and index stores the metadata of the chunks.
+- To query the Loki logs, go to the Grafana webapp's `Configuration/Data Sources` section, select Loki, click explore, and then run LogQL queries. For more information on `LogQL`, see its documentation [here](https://grafana.com/docs/loki/latest/logql/). There are two folders in the space; `fake` and `index`, while fake stores the main log data and index stores the metadata of the chunks.
 
 Also, be aware that after ansible has configured all services, the servers will only be accessible via the `chainsafe` user which can be changed in `ansible.cfg` file if required. To test this implementation, access the server with appropriate `ssh` details in this format `ssh -i ~/.ssh/id_rsa chainsafe@ip_address`.
 

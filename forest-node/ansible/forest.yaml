@@ -1,12 +1,8 @@
 ---
-- name: Setup forest
+- name: Setup-Forest
+  gather_facts: false
   hosts: forest
   become: true
   roles:
-      - forest
-
-- name: Install node exporter
-  hosts: forest
-  become: true
-  roles:
-      - node_exporter
+    - forest
+    - node_exporter

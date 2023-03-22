@@ -22,7 +22,7 @@ groups:
       description: "The {{ $labels.instance }} has experienced a high level of CPU utilization, with a load average of {{ $value }} for the last 30 seconds. This may indicate an issue with the performance of the host, and requires investigation."
 
   - alert: low_memory_availability
-    expr: (sum(node_memory_MemTotal_bytes) - sum(node_memory_MemFree_bytes + node_memory_Buffers_bytes + node_memory_Cached_bytes) ) / sum(node_memory_MemTotal_bytes) * 100 > 70
+    expr: (sum(node_memory_MemTotal_bytes) - sum(node_memory_MemFree_bytes + node_memory_Buffers_bytes + node_memory_Cached_bytes) ) / sum(node_memory_MemTotal_bytes) * 100 > 90
     for: 30s
     labels:
       severity: warning
@@ -31,7 +31,7 @@ groups:
       description: "The {{ $labels.instance }} has experienced a low level of available memory, with utilization at {{ $value }}% for the last 30 seconds. This may indicate an issue with the memory management on the host, and requires investigation."
 
   - alert: high_disk_space_utilization
-    expr: (node_filesystem_size_bytes{mountpoint="/"} - node_filesystem_free_bytes{mountpoint="/"}) / node_filesystem_size_bytes{mountpoint="/"} * 100 > 70
+    expr: (node_filesystem_size_bytes{mountpoint="/"} - node_filesystem_free_bytes{mountpoint="/"}) / node_filesystem_size_bytes{mountpoint="/"} * 100 > 90
     for: 30s
     labels:
       severity: warning
