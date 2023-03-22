@@ -58,3 +58,18 @@ jobs:
       - name: Run TFLint
         working-directory: forest-node/terraform
         run: tflint -f compact
+
+  fmt_terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Setup terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Show version
+        run: terraform --version
+
+      - name: Check formatting
+        run: terraform fmt -check -diff -recursive
