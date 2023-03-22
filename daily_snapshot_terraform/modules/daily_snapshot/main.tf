@@ -1,3 +1,9 @@
+# This terraform script executes the following steps:
+#  - Zip the ruby and shell script files (the hash of this zip file is used to
+#    determine when to re-deploy the service)
+#  - Boot a new droplet
+#  - Copy over the zip file
+#  - Run the init.sh script in the background
 
 terraform {
   required_version = "~> 1.3"
@@ -45,11 +51,14 @@ resource "digitalocean_droplet" "forest" {
     type = "ssh"
   }
 
+  # Push the sources.zip file to the newly booted droplet
   provisioner "file" {
     source      = data.local_file.sources.filename
     destination = "/root/sources.zip"
   }
 
+  # Push the init script separately because the droplet doesn't have unzip
+  # installed yet.
   provisioner "file" {
     source      = data.local_file.init.filename
     destination = "/root/init.sh"
@@ -67,6 +76,7 @@ resource "digitalocean_droplet" "forest" {
       "export SLACK_NOTIF_CHANNEL=${var.slack_channel}",
       # Run init script in the background
       "nohup sh ./init.sh ${var.chain} &",
+      # Exiting without a sleep sometimes kills the script :-/
       "sleep 10s",
     ]
   }
@@ -76,6 +86,8 @@ data "digitalocean_project" "forest_project" {
   name = var.project
 }
 
+# Connect the droplet to the forest project (otherwise it ends up in
+# "ChainBridge" which is the default project)
 resource "digitalocean_project_resources" "connect_forest_project" {
   project   = data.digitalocean_project.forest_project.id
   resources = [digitalocean_droplet.forest.urn]
