@@ -7,7 +7,7 @@ terraform {
       version = "~> 2.0"
     }
     local = {
-      source = "hashicorp/local"
+      source  = "hashicorp/local"
       version = "~> 2.1"
     }
   }
@@ -18,11 +18,11 @@ provider "digitalocean" {
 }
 
 resource "digitalocean_droplet" "forest" {
-  image  = var.image
-  name   = var.name
-  region = var.region
-  size   = var.size
-  backups = var.backups
+  image    = var.image
+  name     = var.name
+  region   = var.region
+  size     = var.size
+  backups  = var.backups
   ssh_keys = [var.new_key_ssh_key_fingerprint]
 
   lifecycle {
@@ -44,8 +44,8 @@ resource "digitalocean_droplet" "forest_observability" {
 }
 
 resource "local_file" "inventory" {
-    filename = "../ansible/hosts"
-    content     = <<_EOF
+  filename = "../ansible/hosts"
+  content  = <<_EOF
 [forest]
 ${digitalocean_droplet.forest.ipv4_address}
 [observability]

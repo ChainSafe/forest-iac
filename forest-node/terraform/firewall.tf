@@ -1,4 +1,4 @@
- resource "digitalocean_firewall" "forest_firewall" {
+resource "digitalocean_firewall" "forest_firewall" {
   name = var.name
 
   inbound_rule {
