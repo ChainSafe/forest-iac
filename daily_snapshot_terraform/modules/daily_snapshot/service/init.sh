@@ -20,9 +20,9 @@ S3_FOLDER=$BASE_FOLDER/s3
 ## Setup s3
 mkdir --parents "$S3_FOLDER"
 
-s3fs forest-snapshots "$S3_FOLDER" \
+s3fs "$SNAPSHOT_BUCKET" "$S3_FOLDER" \
     -o default_acl=public-read \
-    -o url=https://fra1.digitaloceanspaces.com/ \
+    -o url="$SNAPSHOT_ENDPOINT" \
     -o allow_other
 
 # Export and upload snapshot

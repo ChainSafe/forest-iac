@@ -43,6 +43,18 @@ variable "chain" {
   type        = string
 }
 
+variable "snapshot_bucket" {
+  description = "S3 bucket containing the snapshots"
+  type        = string
+  default     = "forest-snapshots"
+}
+
+variable "snapshot_endpoint" {
+  description = "S3 endpoint for the snapshots"
+  type        = string
+  default     = "https://fra1.digitaloceanspaces.com/"
+}
+
 variable "image" {
   description = "The ID of the AMI to use for the Droplet"
   type        = string

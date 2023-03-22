@@ -24,10 +24,12 @@ module "daily_snapshot" {
   source = "../modules/daily_snapshot"
 
   # Configure service:
-  name          = "forest-snapshot-calibnet" # droplet name
-  chain         = "calibnet"                 # chain to export
-  size          = "s-4vcpu-8gb"              # droplet size
-  slack_channel = "#forest-notifications"    # slack channel for notifications
+  name              = "forest-snapshot-calibnet" # droplet name
+  chain             = "calibnet"                 # chain to export
+  size              = "s-4vcpu-8gb"              # droplet size
+  slack_channel     = "#forest-notifications"    # slack channel for notifications
+  snapshot_bucket   = "forest-snapshots"
+  snapshot_endpoint = "https://fra1.digitaloceanspaces.com/"
 
   # Variable passthrough:
   slack_token           = var.slack_token

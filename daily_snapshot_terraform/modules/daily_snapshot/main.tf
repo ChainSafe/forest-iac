@@ -74,6 +74,8 @@ resource "digitalocean_droplet" "forest" {
       "export AWS_SECRET_ACCESS_KEY=${var.AWS_SECRET_ACCESS_KEY}",
       "export SLACK_API_TOKEN=${var.slack_token}",
       "export SLACK_NOTIF_CHANNEL=${var.slack_channel}",
+      "export SNAPSHOT_BUCKET=${var.snapshot_bucket}",
+      "export SNAPSHOT_ENDPOINT=${var.snapshot_endpoint}",
       # Run init script in the background
       "nohup sh ./init.sh ${var.chain} &",
       # Exiting without a sleep sometimes kills the script :-/
