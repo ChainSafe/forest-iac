@@ -1,7 +1,5 @@
 #!/bin/bash
 
-echo "script is running" >> msg.txt
-
 dnf install -y docker docker-compose ruby ruby-devel make gcc s3fs-fuse unzip
 gem install docker-api slack-ruby-client activesupport
 
