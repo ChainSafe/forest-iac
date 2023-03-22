@@ -38,18 +38,19 @@ fi
 COMMANDS=$(cat << HEREDOC
 echo "Chain: $CHAIN_NAME"
 echo "Snapshot: $NEWEST_SNAPSHOT"
-forest --encrypt-keystore false --chain $CHAIN_NAME --import-snapshot $NEWEST_SNAPSHOT --detach || { echo "failed starting forest daemon"; exit 1; }
+forest --encrypt-keystore false --chain $CHAIN_NAME --import-snapshot /snapshot.car --detach || { echo "failed starting forest daemon"; exit 1; }
 timeout $SYNC_TIMEOUT forest-cli --chain $CHAIN_NAME sync wait || { echo "timed-out on forest-cli sync"; exit 1; }
 cat forest.err forest.out
 forest-cli --chain $CHAIN_NAME snapshot export || { echo "failed to export the snapshot"; exit 1; }
-mv ./forest_snapshot* $SNAPSHOTS_DIR/
+mv ./forest_snapshot* /snapshots/
 HEREDOC
 )
 
 docker run \
   --name forest-snapshot-upload-node \
   --rm \
-  -v "$BASE_FOLDER":"$BASE_FOLDER":rshared \
+  -v "$NEWEST_SNAPSHOT":"/snapshot.car" \
+  -v "$SNAPSHOTS_DIR:/snapshots":rshared \
   --entrypoint /bin/bash \
   ghcr.io/chainsafe/forest:"${FOREST_TAG}" \
   -c "$COMMANDS"

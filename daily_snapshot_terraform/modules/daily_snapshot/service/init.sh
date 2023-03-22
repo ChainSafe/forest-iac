@@ -5,9 +5,12 @@ echo "script is running" >> msg.txt
 dnf install -y docker docker-compose ruby ruby-devel make gcc s3fs-fuse unzip
 gem install docker-api slack-ruby-client activesupport
 
+systemctl start docker
+
 unzip -o sources.zip
 
 export BASE_FOLDER=/root/
+export FOREST_TAG=latest
 
 S3_FOLDER=$BASE_FOLDER/s3
 
