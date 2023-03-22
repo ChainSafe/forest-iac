@@ -93,7 +93,7 @@ resource "digitalocean_project_resources" "connect_forest_project" {
   resources = [digitalocean_droplet.forest.urn]
 }
 
-resource "digitalocean_firewall" "forest-firewalls-test" {
+resource "digitalocean_firewall" "forest-firewall" {
   name = var.name
 
   inbound_rule {
