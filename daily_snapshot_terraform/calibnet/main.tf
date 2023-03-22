@@ -1,5 +1,7 @@
 terraform {
   backend "s3" {
+    # Note: This is the bucket for the internal terraform state. This bucket is
+    # completely independent from the bucket that contains snapshots.
     bucket = "forest-iac"
     # This key uniquely identifies the service. To create a new service (instead
     # of modifying this one), use a new key. Unfortunately, variables may not be
