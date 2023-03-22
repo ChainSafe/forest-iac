@@ -48,6 +48,11 @@ export AWS_SECRET_ACCESS_KEY=
 Forest tokens can be found on 1password. The SSH fingerprint needs to be
 registered with Digital Ocean.
 
+To prepare terraform for other commands:
+```bash
+terraform init
+```
+
 To inspect a new deployment plan (it'll tell you which servers will be removed,
 added, etc):
 ```bash
