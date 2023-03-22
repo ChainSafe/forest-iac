@@ -31,10 +31,13 @@ you don't set these variables):
 ## Required environment variables
 
 ```bash
+# Personal access token: https://cloud.digitalocean.com/account/api/tokens
 export TF_VAR_do_token=
+# Slack access token: https://api.slack.com/apps
 export TF_VAR_slack_token=
+# Fingerprint of SSH key registered with DigitalOcean: https://cloud.digitalocean.com/account/security
 export TF_VAR_ssh_fingerprint=
-# S3 access keys used by the snapshot service
+# S3 access keys used by the snapshot service. Can be generated here: https://cloud.digitalocean.com/account/api/spaces
 export TF_VAR_AWS_ACCESS_KEY_ID=
 export TF_VAR_AWS_SECRET_ACCESS_KEY=
 # S3 access keys used by terraform, use the same values as above
