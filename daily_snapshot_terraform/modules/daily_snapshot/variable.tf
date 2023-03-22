@@ -13,7 +13,7 @@ variable "size" {
   type        = string
 }
 
-variable "new_key_ssh_key_fingerprint" {
+variable "ssh_fingerprint" {
   description = "the ssh key fingerprint for digitalocean"
   type        = string
 }
