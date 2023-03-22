@@ -50,7 +50,7 @@ registered with Digital Ocean.
 
 To prepare terraform for other commands:
 ```bash
-terraform init
+$ terraform init
 ```
 
 To inspect a new deployment plan (it'll tell you which servers will be removed,
