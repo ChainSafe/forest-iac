@@ -24,7 +24,9 @@ the secrets. In this case, you have to trigger the workflow manually.
 
 # Manual deployments
 
-To manually deploy the service (useful for testing and debugging), you first need to set the following environment variables (you will be prompted later if you don't set these variables):
+To manually deploy the service (useful for testing and debugging), you first
+need to set the following environment variables (you will be prompted later if
+you don't set these variables):
 
 ## Required environment variables
 
@@ -40,9 +42,11 @@ export AWS_ACCESS_KEY_ID=
 export AWS_SECRET_ACCESS_KEY=
 ```
 
-Forest tokens can be found on 1password. The SSH fingerprint needs to be registered with Digital Ocean.
+Forest tokens can be found on 1password. The SSH fingerprint needs to be
+registered with Digital Ocean.
 
-To inspect a new deployment plan (it'll tell you which servers will be removed, added, etc):
+To inspect a new deployment plan (it'll tell you which servers will be removed,
+added, etc):
 ```bash
 $ terraform plan
 ```
