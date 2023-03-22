@@ -4,7 +4,7 @@ terraform {
     # This key uniquely identifies the service. To create a new service (instead
     # of modifying this one), use a new key. Unfortunately, variables may not be
     # used here.
-    key    = "daily_snapshot_calibnet.tfstate"
+    key = "daily_snapshot_calibnet.tfstate"
 
     # This value is completely unused by DO but _must_ be a known AWS region.
     region = "us-west-1"
@@ -20,19 +20,21 @@ terraform {
 }
 
 module "daily_snapshot" {
+  # Import the daily_snapshot module
   source = "../modules/daily_snapshot"
 
-  name  = "forest-snapshot-calibnet"
-  chain = "calibnet"
-  size  = "s-4vcpu-8gb"
+  # Configure service:
+  name          = "forest-snapshot-calibnet" # droplet name
+  chain         = "calibnet"                 # chain to export
+  size          = "s-4vcpu-8gb"              # droplet size
+  slack_channel = "#forest-notifications"    # slack channel for notifications
 
-  slack_channel = "#forest-notifications"
-
-  slack_token                 = var.slack_token
-  AWS_ACCESS_KEY_ID           = var.AWS_ACCESS_KEY_ID
-  AWS_SECRET_ACCESS_KEY       = var.AWS_SECRET_ACCESS_KEY
-  ssh_fingerprint = var.ssh_fingerprint
-  digitalocean_token          = var.do_token
+  # Variable passthrough:
+  slack_token           = var.slack_token
+  AWS_ACCESS_KEY_ID     = var.AWS_ACCESS_KEY_ID
+  AWS_SECRET_ACCESS_KEY = var.AWS_SECRET_ACCESS_KEY
+  ssh_fingerprint       = var.ssh_fingerprint
+  digitalocean_token    = var.do_token
 }
 
 # This ip address may be used in the future by monitoring software
