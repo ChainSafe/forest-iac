@@ -1,7 +1,7 @@
 
 ## Running Forest In DigitalOcean
 
-## Forest IAC Architectue
+## Forest IAC Architecture
 
 ![Forest Diagram With Monitoring](https://user-images.githubusercontent.com/47984109/226943527-c7c0a053-8ba6-4d9f-9392-8d68cfbfca3e.png)
 
