@@ -12,9 +12,9 @@
   roles:
     - observability
   vars:
-    slack_api_url:        ""
-    slack_channel:        ""
-    spaces_access_token:  ""
-    spaces_secret_key:    ""
-    spaces_bucket_name:   ""
-    domain_name:          ""
+    slack_api_url: ""
+    slack_channel: ""
+    spaces_access_token: ""
+    spaces_secret_key: ""
+    spaces_bucket_name: ""
+    domain_name: ""
