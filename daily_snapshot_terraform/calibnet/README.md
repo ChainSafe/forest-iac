@@ -31,7 +31,7 @@ you don't set these variables):
 ## Required environment variables
 
 ```bash
-# Personal access token: https://cloud.digitalocean.com/account/api/tokens
+# DigitalOcean personal access token: https://cloud.digitalocean.com/account/api/tokens
 export TF_VAR_do_token=
 # Slack access token: https://api.slack.com/apps
 export TF_VAR_slack_token=
