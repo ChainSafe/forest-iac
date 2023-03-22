@@ -54,7 +54,7 @@ $ terraform init
 ```
 
 To inspect a new deployment plan (it'll tell you which servers will be removed,
-added, etc):
+added, etc.):
 ```bash
 $ terraform plan
 ```
