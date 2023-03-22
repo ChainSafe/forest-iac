@@ -1,7 +1,11 @@
 terraform {
   backend "s3" {
     bucket = "forest-iac"
+    # This key uniquely identifies the service. To create a new service (instead
+    # of modifying this one), use a new key. Unfortunately, variables may not be
+    # used here.
     key    = "daily_snapshot_calibnet.tfstate"
+
     # This value is completely unused by DO but _must_ be a known AWS region.
     region = "us-west-1"
     # The S3 region is determined by the endpoint. fra1 = Frankfurt.
