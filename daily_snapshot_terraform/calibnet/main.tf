@@ -18,7 +18,7 @@ terraform {
 module "daily_snapshot" {
   source = "../modules/daily_snapshot"
 
-  name  = "test-forest-snapshot-calibnet"
+  name  = "forest-snapshot-calibnet"
   chain = "calibnet"
   size  = "s-4vcpu-8gb"
 
