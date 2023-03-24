@@ -4,4 +4,4 @@ loki_endpoint: "http://{{ groups['observability'][0] }}:3100/loki/api/v1/push"
 user: chainsafe
 user_dir: /home/chainsafe/.ssh
 user_dir_auth: /home/chainsafe/.ssh/authorized_keys
-volume_name: ""
+forest_config: /home/forest/config.toml

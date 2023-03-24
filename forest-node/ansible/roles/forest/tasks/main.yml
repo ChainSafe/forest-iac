@@ -49,6 +49,27 @@
     groups: docker
     append: true
 
+- name: Ensure forest config directory exists
+  ansible.builtin.file:
+    path: "/etc/forest"
+    state: "directory"
+    mode: "0777"
+  become: true
+
+- name: Copy forest Data Config
+  ansible.builtin.template:
+    src: config.toml.j2
+    dest: "/etc/forest/config.toml"
+    mode: "0755"
+
+- name: Change ownership of volume directory
+  become: true
+  ansible.builtin.file:
+    path: /mnt/{{ volume_name }}/forest
+    owner: 1000
+    group: 1000
+    recurse: true
+
 - name: Start the Docker container
   become: true
   become_user: "{{ user }}"
@@ -57,7 +78,7 @@
     image: ghcr.io/chainsafe/forest:latest
     state: started
     restart_policy: always
-    command: --encrypt-keystore false --auto-download-snapshot --loki --loki-endpoint "{{ loki_endpoint }}"
+    command: --config {{ forest_config }} --encrypt-keystore false --auto-download-snapshot --loki --loki-endpoint "{{ loki_endpoint }}"
     pull: true
     volumes:
       - /etc/forest/config.toml:/home/forest/config.toml

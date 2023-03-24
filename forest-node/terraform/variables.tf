@@ -52,3 +52,13 @@ variable "protocol" {
   description = "The protocol to use for the connection."
   type        = string
 }
+
+variable "volume_size" {
+  description = "The size of the droplet additional volume"
+  type        = string
+}
+
+variable "initial_filesystem_type" {
+  description = "The filesystem type of the volume"
+  type        = string
+}
