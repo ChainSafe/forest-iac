@@ -37,11 +37,12 @@ function update_metrics() {
 }
 
 # Checks if an error occurred and is visible in the metrics.
-# Arg: name of the error metric
+# Arg 1: name of the error metric
+# Arg 2: maximum number of occurrences for the assertion to pass (0 for strictly not pass)
 function assert_error() {
   errors="$(get_metric_value "$1")"
-  if [ -n "$errors" ]; then
-    echo "❌ $1: $errors"
+  if [[ "$errors" -gt "$2" ]]; then
+    echo "❌ $1: $errors (max: $2)"
     ret=$RET_SYNC_ERROR
   fi
 }
@@ -59,7 +60,7 @@ do
   timeout=$((timeout-1))
 done
 
-if [ $timeout -le 0 ]; then
+if [ "$timeout" -le 0 ]; then
   echo "❌ Timed out on sync wait"
   exit "$RET_SYNC_TIMEOUT"
 fi
@@ -89,10 +90,10 @@ else
 fi
 
 # Assert there are no sync errors
-assert_error "network_head_evaluation_errors"
-assert_error "bootstrap_errors"
-assert_error "follow_network_interruptions"
-assert_error "follow_network_errors"
+assert_error "network_head_evaluation_errors" 0
+assert_error "bootstrap_errors" 2
+assert_error "follow_network_interruptions" 0
+assert_error "follow_network_errors" 0
 
 if [ "$ret" -ne "$RET_SYNC_ERROR" ]; then
   echo "✅ No sync errors"
