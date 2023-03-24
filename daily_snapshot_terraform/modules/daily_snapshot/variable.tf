@@ -13,11 +13,6 @@ variable "size" {
   type        = string
 }
 
-variable "ssh_fingerprint" {
-  description = "the ssh key fingerprint for digitalocean"
-  type        = string
-}
-
 variable "slack_channel" {
   description = "slack channel name for notifications"
   type        = string

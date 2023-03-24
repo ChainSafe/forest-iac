@@ -35,8 +35,6 @@ you don't set these variables):
 export TF_VAR_do_token=
 # Slack access token: https://api.slack.com/apps
 export TF_VAR_slack_token=
-# Fingerprint of SSH key registered with DigitalOcean: https://cloud.digitalocean.com/account/security
-export TF_VAR_ssh_fingerprint=
 # S3 access keys used by the snapshot service. Can be generated here: https://cloud.digitalocean.com/account/api/spaces
 export TF_VAR_AWS_ACCESS_KEY_ID=
 export TF_VAR_AWS_SECRET_ACCESS_KEY=
@@ -45,8 +43,10 @@ export AWS_ACCESS_KEY_ID=
 export AWS_SECRET_ACCESS_KEY=
 ```
 
-Forest tokens can be found on 1password. The SSH fingerprint needs to be
-registered with Digital Ocean.
+Forest tokens can be found on 1password.
+
+You also need to register your public key with Digital Ocean. This can be done
+here: https://cloud.digitalocean.com/account/security
 
 To prepare terraform for other commands:
 ```bash

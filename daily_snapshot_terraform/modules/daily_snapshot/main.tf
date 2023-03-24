@@ -35,6 +35,13 @@ data "local_file" "init" {
   filename = "${path.module}/service/init.sh"
 }
 
+data "digitalocean_ssh_keys" "keys" {
+  sort {
+    key       = "name"
+    direction = "asc"
+  }
+}
+
 resource "digitalocean_droplet" "forest" {
   image  = var.image
   name   = var.name
@@ -43,7 +50,7 @@ resource "digitalocean_droplet" "forest" {
   # Re-initialize resource if this hash changes:
   user_data = data.local_file.sources.content_sha256
   tags      = ["iac"]
-  ssh_keys  = [var.ssh_fingerprint]
+  ssh_keys  = data.digitalocean_ssh_keys.keys.ssh_keys.*.fingerprint
 
   connection {
     host = self.ipv4_address

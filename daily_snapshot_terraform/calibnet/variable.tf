@@ -3,11 +3,6 @@ variable "do_token" {
   type        = string
 }
 
-variable "ssh_fingerprint" {
-  description = "the ssh key fingerprint for digitalocean"
-  type        = string
-}
-
 variable "AWS_ACCESS_KEY_ID" {
   description = "S3 access key id"
   type        = string
