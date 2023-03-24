@@ -17,13 +17,6 @@ provider "digitalocean" {
   token = var.digitalocean_token
 }
 
-resource "digitalocean_volume" "forest_volume" {
-  region                  = var.region
-  name                    = var.name
-  size                    = var.volume_size
-  initial_filesystem_type = var.initial_filesystem_type
-}
-
 resource "digitalocean_droplet" "forest" {
   image    = var.image
   name     = var.name
@@ -37,22 +30,50 @@ resource "digitalocean_droplet" "forest" {
   }
 }
 
-resource "digitalocean_volume_attachment" "forest_volume" {
-  droplet_id              = digitalocean_droplet.forest.id
-  volume_id               = digitalocean_volume.forest_volume.id
+resource "digitalocean_firewall" "forest-firewalls-test" {
+  name = var.name
+
+  inbound_rule {
+    protocol         = "tcp"
+    port_range       = "22"
+    source_addresses = var.source_addresses
+  }
+
+  inbound_rule {
+    protocol         = "tcp"
+    port_range       = "1234"
+    source_addresses = var.source_addresses
+  }
+
+  inbound_rule {
+    protocol         = "tcp"
+    port_range       = "80"
+    source_addresses = var.source_addresses
+  }
+
+  inbound_rule {
+    protocol         = "udp"
+    port_range       = "53"
+    source_addresses = var.source_addresses
+  }
+
+  outbound_rule {
+    protocol              = "tcp"
+    port_range            = "all"
+    destination_addresses = var.destination_addresses
+  }
+
+  outbound_rule {
+    protocol              = "udp"
+    port_range            = "53"
+    destination_addresses = var.destination_addresses
+  }
+
+  droplet_ids = [digitalocean_droplet.forest.id]
 }
 
-resource "digitalocean_droplet" "forest_observability" {
-  image    = var.image
-  name     = var.observability_name
-  region   = var.region
-  size     = var.size
-  backups  = var.backups
-  ssh_keys = [var.new_key_ssh_key_fingerprint]
-
-  lifecycle {
-    create_before_destroy = true
-  }
+output "ip" {
+  value = [digitalocean_droplet.forest.ipv4_address]
 }
 
 resource "local_file" "inventory" {
@@ -60,7 +81,5 @@ resource "local_file" "inventory" {
   content  = <<_EOF
 [forest]
 ${digitalocean_droplet.forest.ipv4_address}
-[observability]
-${digitalocean_droplet.forest_observability.ipv4_address}
     _EOF
 }

@@ -1,10 +1,6 @@
 ---
-- name: Setup-Forest
-  gather_facts: false
+- name: Setup Forest
   hosts: forest
   become: true
   roles:
-    - forest
-    - node_exporter
-  vars:
-    volume_name: ""
+      - forest
