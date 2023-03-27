@@ -31,3 +31,4 @@ receivers:
   slack_configs:
   - channel: "#{{ slack_channel }}"
     text: "Warning alert: {{ '{{' }} .CommonAnnotations.summary {{ '}}' }}: {{ '{{' }} .CommonAnnotations.description {{ '}}' }}"
+   
