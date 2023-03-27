@@ -1,0 +1,8 @@
+---
+- name: Setup-Forest
+  gather_facts: false
+  hosts: forest
+  become: true
+  roles:
+    - forest_calib
+    - node_exporter

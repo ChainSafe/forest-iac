@@ -1,4 +1,0 @@
----
-letsencrypt_email: "" 
-domain_name: ""
-domain_ip: "{{ groups['observability'][0] }}"

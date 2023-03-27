@@ -1,5 +1,0 @@
----
-# defaults file for role/forest
-user: chainsafe
-user_dir: /home/chainsafe/.ssh
-user_dir_auth: /home/chainsafe/.ssh/authorized_keys
