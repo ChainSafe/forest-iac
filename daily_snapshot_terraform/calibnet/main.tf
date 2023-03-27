@@ -37,7 +37,6 @@ module "daily_snapshot" {
   slack_token           = var.slack_token
   AWS_ACCESS_KEY_ID     = var.AWS_ACCESS_KEY_ID
   AWS_SECRET_ACCESS_KEY = var.AWS_SECRET_ACCESS_KEY
-  ssh_fingerprint       = var.ssh_fingerprint
   digitalocean_token    = var.do_token
 }
 
