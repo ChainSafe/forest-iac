@@ -21,12 +21,12 @@ provider "digitalocean" {
 }
 
 // Ugly hack because 'archive_file' cannot mix files and folders.
-data "external" "sources_zip" {
+data "external" "sources_tar" {
   program = ["sh", "${path.module}/prep_sources.sh", "${path.module}"]
 }
 
 data "local_file" "sources" {
-  filename = data.external.sources_zip.result.path
+  filename = data.external.sources_tar.result.path
 }
 
 // Note: The init.sh file is also included in the sources.zip such that the hash
@@ -58,17 +58,10 @@ resource "digitalocean_droplet" "forest" {
     type = "ssh"
   }
 
-  # Push the sources.zip file to the newly booted droplet
+  # Push the sources.tar file to the newly booted droplet
   provisioner "file" {
     source      = data.local_file.sources.filename
-    destination = "/root/sources.zip"
-  }
-
-  # Push the init script separately because the droplet doesn't have unzip
-  # installed yet.
-  provisioner "file" {
-    source      = data.local_file.init.filename
-    destination = "/root/init.sh"
+    destination = "/root/sources.tar"
   }
 
   # WARNING: Changing these commands will _not_ trigger a re-deployment. If you
@@ -76,6 +69,7 @@ resource "digitalocean_droplet" "forest" {
   provisioner "remote-exec" {
     inline = [
       "cd /root/",
+      "tar xf sources.tar",
       # Set required environment variables
       "export AWS_ACCESS_KEY_ID=${var.AWS_ACCESS_KEY_ID}",
       "export AWS_SECRET_ACCESS_KEY=${var.AWS_SECRET_ACCESS_KEY}",
