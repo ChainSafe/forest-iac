@@ -4,8 +4,8 @@ terraform {
   required_version = ">= 1.3"
 
   backend "s3" {
-    bucket                      = "forest-test-spaces"
-    key                         = "calibnet-terraform.tfstate"
+    bucket                      = "forest-test-state"
+    key                         = "terraform.tfstate"
     region                      = "us-west-1"
     endpoint                    = "nyc3.digitaloceanspaces.com/"
     skip_credentials_validation = true
@@ -20,8 +20,6 @@ module "calibnet" {
   name               = var.name
   region             = var.region
   backups            = var.backups
-  # ssh_keys = 
-
   image              = var.image
   size               = var.size
   observability_name = var.observability_name

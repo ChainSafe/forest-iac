@@ -42,3 +42,13 @@ variable "digitalocean_token" {
   description = "Token for authentication."
   type        = string
 }
+
+variable "new_key_ssh_key_fingerprint" {
+  description = "The fingerprint of the new key"
+  type        = string
+}
+
+variable "destination_addresses" {
+  description = "address for the firewall reference"
+  type = string
+}

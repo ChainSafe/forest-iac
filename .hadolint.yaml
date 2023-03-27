@@ -1,7 +1,0 @@
-failure-threshold: info
-override:
- error:
-   - DL3006
- info:
-   - DL3045
-strict-labels: true

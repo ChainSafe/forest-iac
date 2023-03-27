@@ -2,10 +2,10 @@ terraform {
   required_version = "~> 1.3"
 
   backend "s3" {
-    bucket                      = "forest-test-spaces"
-    key                         = "mainnet-terraform.tfstate"
+    bucket                      = "forest-mainnet-state"
+    key                         = "terraform.tfstate"
     region                      = "us-west-1"
-    endpoint                    = "nyc3.digitaloceanspaces.com/"
+    endpoint                    = "fra1.digitaloceanspaces.com"
     skip_credentials_validation = true
     skip_metadata_api_check     = true
   }
@@ -18,8 +18,6 @@ module "mainnet" {
   name               = var.name
   region             = var.region
   backups            = var.backups
-  # ssh_keys = 
-
   image                   = var.image
   size                    = var.size
   observability_name      = var.observability_name
@@ -29,4 +27,3 @@ module "mainnet" {
   volume_size             = var.volume_size
   attach_volume           = true
 }
-

@@ -17,18 +17,13 @@ provider "digitalocean" {
   token = var.digitalocean_token
 }
 
-resource "digitalocean_ssh_key" "new_key" {
-  name       = "new-key"
-  public_key = file("~/.ssh/segun.pub")
-}
-
 resource "digitalocean_droplet" "forest" {
   image    = var.image
   name     = var.name
   region   = var.region
   size     = var.size
   backups  = var.backups
-  ssh_keys = [digitalocean_ssh_key.new_key.fingerprint]
+  ssh_keys = [var.new_key_ssh_key_fingerprint]
 
   lifecycle {
     create_before_destroy = true
@@ -41,7 +36,7 @@ resource "digitalocean_droplet" "forest_observability" {
   region   = var.region
   size     = var.size
   backups  = var.backups
-  ssh_keys = [digitalocean_ssh_key.new_key.fingerprint]
+  ssh_keys = [var.new_key_ssh_key_fingerprint]
 
   lifecycle {
     create_before_destroy = true
