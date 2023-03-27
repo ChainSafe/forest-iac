@@ -22,6 +22,8 @@ services:
       - '--config'
       - ${FOREST_TARGET_SCRIPTS}/sync_check.toml
       - '--auto-download-snapshot'
+    environment:
+      FOREST_GC_TRIGGER_FACTOR: "1.4"
     restart: unless-stopped
     labels:
       com.centurylinklabs.watchtower.enable: true
@@ -44,6 +46,8 @@ services:
       - '--config'
       - ${FOREST_TARGET_SCRIPTS}/sync_check.toml
       - '--auto-download-snapshot'
+    environment:
+      FOREST_GC_TRIGGER_FACTOR: "1.2"
     restart: unless-stopped
     labels:
       com.centurylinklabs.watchtower.enable: true
