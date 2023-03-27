@@ -1,11 +1,9 @@
 #!/bin/bash
 
-dnf install -y docker docker-compose ruby ruby-devel make gcc s3fs-fuse unzip
+dnf install -y docker docker-compose ruby ruby-devel make gcc s3fs-fuse
 gem install docker-api slack-ruby-client activesupport
 
 systemctl start docker
-
-unzip -o sources.zip
 
 export BASE_FOLDER=/root/
 export FOREST_TAG=latest
