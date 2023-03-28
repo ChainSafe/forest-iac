@@ -71,7 +71,7 @@ jobs:
             ```
 
             </details>
-        edit-mode: replace
+          edit-mode: replace
 
       - name: Delete comment
         uses: detomarco/delete-comment@v1
