@@ -49,18 +49,20 @@
     groups: docker
     append: true
 
-- name: Start the Docker container
+- name: Start the docker container
   become: true
   become_user: "{{ user }}"
   community.general.docker_container:
-    name: Forest
+    name: forest
     image: ghcr.io/chainsafe/forest:latest
     state: started
     restart_policy: always
-    command: --encrypt-keystore false --auto-download-snapshot --chain calibnet
+    command: --encrypt-keystore false --auto-download-snapshot --chain calibnet --loki --loki-endpoint "{{ loki_endpoint }}"
     pull: true
     ports:
       - "1234:1234"
+      - "6116:6116"
+      - "3100:3100"
   register: container_result
 
 - name: Get infos on container

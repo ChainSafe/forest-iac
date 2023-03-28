@@ -1,5 +1,6 @@
 ---
 # defaults file for role/forest
+loki_endpoint: "http://{{ groups['observability'][0] }}:3100/loki/api/v1/push"
 user: chainsafe
 user_dir: /home/chainsafe/.ssh
 user_dir_auth: /home/chainsafe/.ssh/authorized_keys
