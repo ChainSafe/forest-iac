@@ -10,19 +10,18 @@ RUN dnf -y install \
     ruby-devel \
     make \
     gcc \
-    s3fs-fuse \
     && dnf clean all
 
 # Gem install dependencies
 RUN gem install \
     docker-api \
     slack-ruby-client \
-    activesupport
+    sys-filesystem
 
 # Set a working directory and copy files
-WORKDIR /usr/src/app
+WORKDIR /chainsafe
 COPY ruby_common ruby_common
-COPY daily_snapshot/*.rb daily_snapshot/upload_snapshot.sh daily_snapshot/run_service.sh ./
+COPY sync_check/* ./
 
 # Use shell form of ENTRYPOINT
 ENTRYPOINT ["/bin/bash", "run_service.sh"]

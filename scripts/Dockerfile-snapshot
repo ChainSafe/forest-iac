@@ -1,6 +1,6 @@
 FROM fedora:36
 
-LABEL org.opencontainers.image.source="https://github.com/chainsafe/forest-iac"
+LABEL org.opencontainers.image.source https://github.com/chainsafe/forest-iac
 
 # Install dependencies
 RUN dnf install -y \
@@ -13,16 +13,16 @@ RUN dnf install -y \
     s3fs-fuse \
     && dnf clean all
 
-# Pin gem versions and install
+# Gem install dependencies
 RUN gem install \
-    docker-api:1.34.2 \
-    slack-ruby-client:0.15.0 \
-    activesupport:6.1.4
+    docker-api \
+    slack-ruby-client \
+    activesupport
 
 # Set working directory and copy files
-WORKDIR /usr/src/app
-COPY ruby_common /app/ruby_common
-COPY daily_snapshot/*.rb daily_snapshot/upload_snapshot.sh daily_snapshot/run_service.sh /app/
+WORKDIR /chainsafe
+COPY ruby_common ruby_common
+COPY daily_snapshot/*.rb daily_snapshot/upload_snapshot.sh daily_snapshot/run_service.sh ./
 
 # Use shell form of ENTRYPOINT
 ENTRYPOINT ["/bin/bash", "run_service.sh"]
