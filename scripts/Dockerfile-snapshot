@@ -20,7 +20,7 @@ RUN gem install \
     activesupport:6.1.4
 
 # Set working directory and copy files
-WORKDIR /app
+WORKDIR /usr/src/app
 COPY ruby_common /app/ruby_common
 COPY daily_snapshot/*.rb daily_snapshot/upload_snapshot.sh daily_snapshot/run_service.sh /app/
 
