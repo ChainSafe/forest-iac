@@ -1,4 +1,5 @@
 #!/bin/bash
+# blah
 
 dnf install -y docker docker-compose ruby ruby-devel make gcc s3fs-fuse
 gem install docker-api slack-ruby-client activesupport
