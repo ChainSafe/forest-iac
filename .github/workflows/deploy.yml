@@ -62,7 +62,7 @@ jobs:
           comment-id: ${{ steps.fc.outputs.comment-id }}
           issue-number: ${{ github.event.pull_request.number }}
           body: |
-            ### Snapshot Service Plan: ${{ steps.plan.outcome }}*
+            ### Snapshot Service Plan: ${{ steps.plan.outcome }}
 
             <details><summary>Show Plan</summary>
 
