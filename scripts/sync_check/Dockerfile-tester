@@ -1,6 +1,14 @@
 FROM fedora:36
 
-RUN dnf install -y docker ruby ruby-devel make gcc
+RUN dnf install -y \
+    docker \
+    ruby \
+    ruby-devel \
+    make \
+    gcc \
+    && dnf clean all
 
 # Install required Ruby packages
-RUN gem install docker-api slack-ruby-client
+RUN gem install \
+    docker-api \
+    slack-ruby-client
