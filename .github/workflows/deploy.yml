@@ -55,6 +55,7 @@ jobs:
           comment-author: 'github-actions[bot]'
           body-regex: "^### Snapshot Service Plan"
 
+      # If the new deployment plan contains changes, post it in a comment.
       - name: Create or update comment
         uses: peter-evans/create-or-update-comment@v2
         if: github.event_name == 'pull_request' && !contains(steps.plan.outputs.stdout, 'No changes. Your infrastructure matches the configuration.')
@@ -73,6 +74,7 @@ jobs:
             </details>
           edit-mode: replace
 
+      # If the new deployment plan contains no changes, delete the last posted plan.
       - name: Delete comment
         uses: detomarco/delete-comments@v1.0.4
         if: github.event_name == 'pull_request' && contains(steps.plan.outputs.stdout, 'No changes. Your infrastructure matches the configuration.')
