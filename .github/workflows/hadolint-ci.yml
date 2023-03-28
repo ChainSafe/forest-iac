@@ -9,8 +9,15 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
-    container: hadolint/hadolint:latest-debian
     steps:
     - uses: actions/checkout@v2
-    - name: hadolint
-      run: hadolint **/*Dockerfile*
+
+    - uses: hadolint/hadolint-action@v3.1.0
+      with:
+        dockerfile: "Dockerfile*"
+        recursive: true
+        # Ignore https://github.com/hadolint/hadolint/wiki/DL3041
+        # Ignore https://github.com/hadolint/hadolint/wiki/DL3028
+        # Ignore https://github.com/hadolint/hadolint/wiki/DL3050
+
+        ignore: DL3041,DL3050,DL3028

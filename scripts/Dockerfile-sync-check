@@ -1,12 +1,28 @@
 FROM fedora:36
+
 LABEL org.opencontainers.image.source https://github.com/chainsafe/forest-iac
 
 # Install dependencies
-RUN dnf install -y docker docker-compose ruby ruby-devel make gcc
-RUN gem install docker-api slack-ruby-client sys-filesystem
+RUN dnf -y install \
+    docker \
+    docker-compose \
+    ruby \
+    ruby-devel \
+    make \
+    gcc \
+    s3fs-fuse \
+    && dnf clean all
 
-WORKDIR /chainsafe
+# Gem install dependencies
+RUN gem install \
+    docker-api \
+    slack-ruby-client \
+    activesupport
 
+# Set a working directory and copy files
+WORKDIR /app
 COPY ruby_common ruby_common
-COPY sync_check/* ./
+COPY daily_snapshot/*.rb daily_snapshot/upload_snapshot.sh daily_snapshot/run_service.sh ./
+
+# Use shell form of ENTRYPOINT
 ENTRYPOINT ["/bin/bash", "run_service.sh"]
