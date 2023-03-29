@@ -30,16 +30,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build daily snapshot image and push to GitHub Container Registry
-        id: build-daily-snapshot
-        uses: docker/build-push-action@v4
-        with:
-          context: scripts/
-          file: scripts/Dockerfile-snapshot
-          tags: |
-            ghcr.io/chainsafe/sync-snapshot:latest
-          # build on feature branches, push only on main branch
-          push: ${{ github.ref == 'refs/heads/main' }}
       - name: Build sync check image and push to GitHub Container Registry
         id: build-sync-check
         uses: docker/build-push-action@v4
