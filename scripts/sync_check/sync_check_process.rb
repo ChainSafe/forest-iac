@@ -99,6 +99,7 @@ class SyncCheck
   def run
     loop do
       begin
+        `docker image prune -f`
         cleanup unless disk_usage < 0.95
         start_services unless services_up?
       rescue StandardError => e
