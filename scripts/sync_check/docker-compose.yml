@@ -22,6 +22,8 @@ services:
       - '--config'
       - ${FOREST_TARGET_SCRIPTS}/sync_check.toml
       - '--auto-download-snapshot'
+      - '--save-token'
+      - '/tmp/admin_token'
     environment:
       FOREST_GC_TRIGGER_FACTOR: "1.4"
     restart: unless-stopped
@@ -46,6 +48,8 @@ services:
       - '--config'
       - ${FOREST_TARGET_SCRIPTS}/sync_check.toml
       - '--auto-download-snapshot'
+      - '--save-token'
+      - '/tmp/admin_token'
     environment:
       FOREST_GC_TRIGGER_FACTOR: "1.2"
     restart: unless-stopped
