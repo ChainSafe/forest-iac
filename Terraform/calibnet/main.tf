@@ -14,17 +14,17 @@ terraform {
 module "calibnet" {
   source = "../modules/forest_node"
 
-  digitalocean_token = var.digitalocean_token
-  name               = var.name
-  region             = var.region
-  backups            = var.backups
-  image              = var.image
-  size               = var.size
-  observability_name = var.observability_name
-  protocol           = var.protocol
-  source_addresses   = var.source_addresses
-  attach_volume      = false
-  ssh_key            = var.ssh_key
+  digitalocean_token    = var.digitalocean_token
+  name                  = var.name
+  region                = var.region
+  backups               = var.backups
+  image                 = var.image
+  size                  = var.size
+  observability_name    = var.observability_name
+  protocol              = var.protocol
+  source_addresses      = var.source_addresses
+  attach_volume         = false
+  ssh_key               = var.ssh_key
   destination_addresses = var.destination_addresses
-  enviroment         = var.enviroment
+  enviroment            = var.enviroment
 }

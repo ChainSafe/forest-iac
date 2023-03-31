@@ -9,7 +9,7 @@ protocol              = "tcp"
 enviroment            = "calibnet"
 
 # This set of variables are unique and must be defined here in order to deploy successfully
-name                        = ""
-ssh_key                     = ""
-digitalocean_token          = ""
-observability_name          = ""
+name               = ""
+ssh_key            = ""
+digitalocean_token = ""
+observability_name = ""

@@ -17,6 +17,9 @@ rm -rf "${FOREST_TARGET_DATA:?}"/*
 rm -rf "${FOREST_TARGET_SCRIPTS:?}"/*
 rm -rf "${FOREST_TARGET_RUBY_COMMON:?}"/*
 
+# We need it to access the DATA_DIR regardless of the user.
+chmod 0777 "${FOREST_TARGET_DATA:?}"
+
 # Copy all relevant scripts
 cp -R /chainsafe/* "$FOREST_TARGET_SCRIPTS"
 cp -R /chainsafe/ruby_common/* "$FOREST_TARGET_RUBY_COMMON"

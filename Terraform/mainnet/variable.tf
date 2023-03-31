@@ -50,7 +50,7 @@ variable "volume_size" {
 
 variable "initial_filesystem_type" {
   description = "The type of filesystem to create on the new volume."
-  #type        = string
+  type        = string
 }
 
 variable "ssh_key" {

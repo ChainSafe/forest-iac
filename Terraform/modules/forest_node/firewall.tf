@@ -28,18 +28,18 @@ resource "digitalocean_firewall" "forest_firewall" {
   outbound_rule {
     protocol              = var.protocol
     port_range            = "all"
-    destination_addresses = ["0.0.0.0/0", "::/0"]
+    destination_addresses = var.destination_addresses
   }
 
   outbound_rule {
     protocol              = "udp"
     port_range            = "53"
-    destination_addresses = ["0.0.0.0/0", "::/0"]
+    destination_addresses = var.destination_addresses
   }
 
   outbound_rule {
     protocol              = "icmp"
-    destination_addresses = ["0.0.0.0/0", "::/0"]
+    destination_addresses = var.destination_addresses
   }
 
   droplet_ids = [digitalocean_droplet.forest.id]
@@ -77,18 +77,18 @@ resource "digitalocean_firewall" "forest_observability_firewall" {
   outbound_rule {
     protocol              = var.protocol
     port_range            = "all"
-    destination_addresses = ["0.0.0.0/0", "::/0"]
+    destination_addresses = var.destination_addresses
   }
 
   outbound_rule {
     protocol              = "udp"
     port_range            = "53"
-    destination_addresses = ["0.0.0.0/0", "::/0"]
+    destination_addresses = var.destination_addresses
   }
 
   outbound_rule {
     protocol              = "icmp"
-    destination_addresses = ["0.0.0.0/0", "::/0"]
+    destination_addresses = var.destination_addresses
   }
 
   droplet_ids = [digitalocean_droplet.forest_observability.id]
