@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout the code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Set up Python 3.
       uses: actions/setup-python@v4
@@ -52,10 +52,12 @@ jobs:
         run: tflint --version
 
       - name: Init TFLint
+        working-directory: forest-node/terraform
         run: tflint --init
 
       - name: Run TFLint
-        run: tflint -f compact --recursive
+        working-directory: forest-node/terraform
+        run: tflint -f compact
 
   fmt_terraform:
     runs-on: ubuntu-latest

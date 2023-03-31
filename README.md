@@ -22,4 +22,4 @@ This repository contains machine-readable specifications for the auxillilary ser
 
 # 🛠️ Forest Cloud Infrastructure
 
-To run Forest in the cloud with all requirements, refer to the documentation below:
+To run Forest in the cloud with all requirements, refer to the documentation [here](https://github.com/ChainSafe/forest-iac/blob/main/forest-node/README.md)
