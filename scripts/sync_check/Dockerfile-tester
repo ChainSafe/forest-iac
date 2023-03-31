@@ -1,6 +1,5 @@
 FROM fedora:36
 
-# Install dependencies
 RUN dnf install -y \
     docker \
     ruby \
@@ -9,7 +8,8 @@ RUN dnf install -y \
     gcc \
     && dnf clean all
 
-# Install required Ruby packages
-RUN gem install \
-    docker-api \
-    slack-ruby-client
+WORKDIR /chainsafe
+
+COPY Gemfile Gemfile.lock ./
+
+RUN gem install bundler:2.3.4 && bundle install

@@ -2,7 +2,6 @@ FROM fedora:36
 
 LABEL org.opencontainers.image.source https://github.com/chainsafe/forest-iac
 
-# Install dependencies
 RUN dnf -y install \
     docker \
     docker-compose \
@@ -12,16 +11,13 @@ RUN dnf -y install \
     gcc \
     && dnf clean all
 
-# Gem install dependencies
-RUN gem install \
-    docker-api \
-    slack-ruby-client \
-    sys-filesystem
-
-# Set a working directory and copy files
 WORKDIR /chainsafe
+
+COPY Gemfile Gemfile.lock ./
+
+RUN gem install bundler:2.3.4 && bundle install
+
 COPY ruby_common ruby_common
 COPY sync_check/* ./
 
-# Use shell form of ENTRYPOINT
 ENTRYPOINT ["/bin/bash", "run_service.sh"]
