@@ -60,12 +60,22 @@ variable "attach_volume" {
   type        = bool
 }
 
-variable "new_key_ssh_key_fingerprint" {
+variable "ssh_key" {
   description = "The fingerprint of the new key"
   type        = string
 }
 
 variable "destination_addresses" {
   description = "address for the firewall reference"
-  type = string
+  type        = list(string)
+}
+
+variable "enviroment" {
+  description = "The environment tag to apply to resources."
+  type        = string
+}
+
+variable "volume_name" {
+  description = "The name assigned to the volume in the cloud"
+  type        = string
 }

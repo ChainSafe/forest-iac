@@ -23,11 +23,13 @@ resource "digitalocean_droplet" "forest" {
   region   = var.region
   size     = var.size
   backups  = var.backups
-  ssh_keys = [var.new_key_ssh_key_fingerprint]
+  ssh_keys = [var.ssh_key]
 
   lifecycle {
     create_before_destroy = true
   }
+
+  tags = [var.enviroment]
 }
 
 resource "digitalocean_droplet" "forest_observability" {
@@ -36,20 +38,24 @@ resource "digitalocean_droplet" "forest_observability" {
   region   = var.region
   size     = var.size
   backups  = var.backups
-  ssh_keys = [var.new_key_ssh_key_fingerprint]
+  ssh_keys = [var.ssh_key]
 
   lifecycle {
     create_before_destroy = true
   }
+
+  tags = [var.enviroment]
 }
 
 resource "digitalocean_volume" "forest_volume" {
   count = var.attach_volume ? 1 : 0
 
   region                  = var.region
-  name                    = var.name
+  name                    = var.volume_name
   size                    = var.volume_size
   initial_filesystem_type = var.initial_filesystem_type
+
+  tags = [var.enviroment]
 }
 
 resource "digitalocean_volume_attachment" "forest_volume" {
@@ -60,7 +66,7 @@ resource "digitalocean_volume_attachment" "forest_volume" {
 }
 
 resource "local_file" "inventory" {
-  filename = "../../ansible/hosts"
+  filename = "../../ansible/hosts_${var.enviroment}"
   content  = <<_EOF
 [forest]
 ${digitalocean_droplet.forest.ipv4_address}

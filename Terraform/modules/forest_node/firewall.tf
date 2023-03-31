@@ -43,6 +43,8 @@ resource "digitalocean_firewall" "forest_firewall" {
   }
 
   droplet_ids = [digitalocean_droplet.forest.id]
+
+  tags = [var.enviroment]
 }
 
 resource "digitalocean_firewall" "forest_observability_firewall" {
@@ -90,4 +92,6 @@ resource "digitalocean_firewall" "forest_observability_firewall" {
   }
 
   droplet_ids = [digitalocean_droplet.forest_observability.id]
+
+  tags = [var.enviroment]
 }

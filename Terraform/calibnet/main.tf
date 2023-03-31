@@ -1,5 +1,3 @@
-
-
 terraform {
   required_version = ">= 1.3"
 
@@ -7,7 +5,7 @@ terraform {
     bucket                      = "forest-test-state"
     key                         = "terraform.tfstate"
     region                      = "us-west-1"
-    endpoint                    = "nyc3.digitaloceanspaces.com/"
+    endpoint                    = "nyc3.digitaloceanspaces.com"
     skip_credentials_validation = true
     skip_metadata_api_check     = true
   }
@@ -26,4 +24,7 @@ module "calibnet" {
   protocol           = var.protocol
   source_addresses   = var.source_addresses
   attach_volume      = false
+  ssh_key            = var.ssh_key
+  destination_addresses = var.destination_addresses
+  enviroment         = var.enviroment
 }

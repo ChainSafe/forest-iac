@@ -52,3 +52,23 @@ variable "initial_filesystem_type" {
   description = "The type of filesystem to create on the new volume."
   #type        = string
 }
+
+variable "ssh_key" {
+  description = "The fingerprint of the new key"
+  type        = string
+}
+
+variable "destination_addresses" {
+  description = "address for the firewall reference"
+  type        = list(string)
+}
+
+variable "enviroment" {
+  description = "The environment tag to apply to resources"
+  type        = string
+}
+
+variable "volume_name" {
+  description = "The name assigned to the volume in the cloud"
+  type        = string
+}

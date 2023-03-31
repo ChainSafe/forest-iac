@@ -43,12 +43,17 @@ variable "digitalocean_token" {
   type        = string
 }
 
-variable "new_key_ssh_key_fingerprint" {
+variable "ssh_key" {
   description = "The fingerprint of the new key"
   type        = string
 }
 
 variable "destination_addresses" {
   description = "address for the firewall reference"
-  type = string
+  type        = list(string)
+}
+
+variable "enviroment" {
+  description = "The environment tag to apply to resources."
+  type        = string
 }

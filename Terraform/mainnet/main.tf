@@ -26,4 +26,8 @@ module "mainnet" {
   initial_filesystem_type = var.initial_filesystem_type
   volume_size             = var.volume_size
   attach_volume           = true
+  ssh_key               = var.ssh_key
+  destination_addresses = var.destination_addresses
+  enviroment              = var.enviroment
+  volume_name             = var.volume_name
 }

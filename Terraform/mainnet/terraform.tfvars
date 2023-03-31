@@ -9,9 +9,11 @@ backups               = "false"
 protocol              = "tcp"
 volume_size           = "1000"
 initial_filesystem_type = "ext4"
+enviroment              = "mainnet"
 
 # This set of variables are unique and must be defined here in order to deploy successfully
 name                        = ""
-new_key_ssh_key_fingerprint = ""
+ssh_key                     = ""
 digitalocean_token          = ""
 observability_name          = ""
+volume_name                 = ""
