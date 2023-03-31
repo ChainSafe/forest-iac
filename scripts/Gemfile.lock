@@ -34,7 +34,6 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  did_you_mean (~> 1.4, >= 1.4.2)
   docker-api (>= 2.2.0)
   slack-ruby-client (>= 2.1.0)
   sys-filesystem (>= 1.4.3)

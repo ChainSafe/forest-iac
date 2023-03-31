@@ -16,6 +16,3 @@ jobs:
       with:
         dockerfile: "Dockerfile*"
         recursive: true
-        # https://github.com/hadolint/hadolint/wiki/DL3041
-        # https://github.com/hadolint/hadolint/wiki/DL3050
-        ignore: DL3041,DL3050
