@@ -26,7 +26,7 @@
 - name: Set-up Exporter
   block:
     - name: If node_exporter exists, get version
-      ansible.builtin.shell: "cat /etc/system/system/node_exporter.service | grep Version | sed s/'.*Version '//g"
+      ansible.builtin.shell: "set -o pipefail && cat /etc/system/system/node_exporter.service | grep Version | sed s/'.*Version '//g"
       when: _check_node_exporter_present.stat.exists
       changed_when: false
       register: _get_node_exporter_version
