@@ -30,14 +30,22 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Docker Meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ghcr.io/chainsafe/sync-check
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value={{date 'YYYY-MM-DD'}}-{{sha}}
+
       - name: Build sync check image and push to GitHub Container Registry
         id: build-sync-check
         uses: docker/build-push-action@v4
         with:
           context: scripts/
           file: scripts/Dockerfile-sync-check
-          tags: |
-            ghcr.io/chainsafe/sync-check:latest
+          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           # build on feature branches, push only on main branch
-          push: ${{ github.ref == 'refs/heads/main' }}
+          push: ${{ github.ref == 'refs/heads/main'}}

@@ -1,5 +1,4 @@
 FROM fedora:36
-LABEL org.opencontainers.image.source https://github.com/chainsafe/forest-iac
 
 RUN dnf -y install dnf-plugins-core-4.3.1 && \
     dnf config-manager \
