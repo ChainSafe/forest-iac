@@ -76,7 +76,7 @@ Then save the file and restart the terminal for the changes to take effect.
 ## Observability
 
 ### Requirements
-The droplet requirements to run observability for forest-calibnet include:
+The droplet requirements to run observability for forest include:
 - RAM: 8GB
 - VCPU: 1
 - Disk Size: >100 GB
