@@ -7,7 +7,6 @@ source_addresses        = ["0.0.0.0/0", "::/0"]
 destination_addresses   = ["0.0.0.0/0", "::/0"]
 backups                 = "false"
 protocol                = "tcp"
-volume_size             = "1000"
 initial_filesystem_type = "ext4"
 enviroment              = "mainnet"
 
@@ -17,3 +16,4 @@ ssh_key            = ""
 digitalocean_token = ""
 observability_name = ""
 volume_name        = ""
+volume_size        = ""

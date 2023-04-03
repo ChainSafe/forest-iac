@@ -33,12 +33,11 @@ rule_files:
     - {{ server }}:9100
     labels:
       instance: observability_node
-{% endfor %}    
-  
+{% endfor %}
+
 alerting:
   alertmanagers:
   - scheme: http
     static_configs:
-    - targets: 
+    - targets:
       - 'alertmanager:9093'
-    

@@ -1,3 +1,8 @@
+ping_calib:
+	@ansible -i hosts_calibnet -m ping_calib
+
+ping_main:
+	@ansible -i hosts_mainnet -m ping_calib
 
 forest_calib:
 	@ansible-playbook -i hosts_calibnet forest-calib.yaml

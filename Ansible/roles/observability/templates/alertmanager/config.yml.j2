@@ -8,9 +8,9 @@ route:
   group_interval: 5m
   repeat_interval: 3h
   routes:
-  - match: 
+  - match:
       severity: warning
-    receiver: 'warning-notifications'  
+    receiver: 'warning-notifications'
   - match:
       severity: critical
     receiver: 'critical-notifications'
@@ -26,7 +26,7 @@ receivers:
 - name: 'critical-notifications'
   slack_configs:
   - channel: "#{{ slack_channel }}"
-    text: "Critical alert: {{ '{{' }} .CommonAnnotations.summary {{ '}}' }}: {{ '{{' }} .CommonAnnotations.description {{ '}}' }}"   
+    text: "Critical alert: {{ '{{' }} .CommonAnnotations.summary {{ '}}' }}: {{ '{{' }} .CommonAnnotations.description {{ '}}' }}"
 - name: 'warning-notifications'
   slack_configs:
   - channel: "#{{ slack_channel }}"

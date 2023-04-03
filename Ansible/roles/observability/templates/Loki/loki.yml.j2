@@ -26,12 +26,12 @@ schema_config:
       prefix: index_
       period: 24h
 
-storage_config: 
+storage_config:
   boltdb_shipper:
     active_index_directory: /tmp/loki/index
     cache_location: /tmp/loki/index_cache
     resync_interval: 5s
-    shared_store: s3   
+    shared_store: s3
 
 compactor:
   compaction_interval: 5m
@@ -49,7 +49,7 @@ chunk_store_config:
 
 table_manager:
   retention_deletes_enabled: true
-  retention_period: {{ loki_config_retention }} 
+  retention_period: {{ loki_config_retention }}
 
 common:
   path_prefix: /loki
@@ -63,4 +63,3 @@ common:
 
 ruler:
   alertmanager_url: http://alertmanager:9093
-
