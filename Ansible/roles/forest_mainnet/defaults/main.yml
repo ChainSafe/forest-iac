@@ -1,7 +1,0 @@
----
-# defaults file for roles/forest_mainnet
-user: chainsafe
-loki_endpoint: "http://{{ groups['observability'][0] }}:3100/loki/api/v1/push"
-user_dir: /home/chainsafe/.ssh
-user_dir_auth: /home/chainsafe/.ssh/authorized_keys
-forest_config: /home/forest/config.toml
