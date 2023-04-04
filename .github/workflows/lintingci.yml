@@ -28,7 +28,7 @@ jobs:
           ansible-galaxy collection install community.docker
           ansible-galaxy collection install community.general
     - name: Lint code.
-      working-directory: Ansible
+      working-directory: ansible
       run: ansible-lint
 
   lint_terraform:

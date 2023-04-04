@@ -1,0 +1,39 @@
+---
+# defaults file for role/observability
+docker_compose_version: "v2.16.0"
+docker_compose_path: /usr/local/bin/docker-compose
+
+prometheus_scrape_interval: "30s"
+prometheus_node_exporter: true
+forest_exporter: "forest"
+observability: "observability"
+prometheus_env: "observability"
+prometheus_var_config:
+  global:
+    scrape_interval: "{{ prometheus_scrape_interval }}"
+    evaluation_interval: 5s
+    external_labels:
+      env: '{{ prometheus_env }}'
+  scrape_configs:
+    - job_name: prometheus
+      scrape_interval: 5m
+      static_configs:
+        - targets: ['localhost:9090']
+user: "chainsafe"
+user_group: "{{ user }}"
+user_dir: /home/chainsafe/.ssh
+user_dir_auth: /home/chainsafe/.ssh/authorized_keys
+
+loki_config_retention: 336h
+loki_config_period: 168h
+loki_config_http_port: 3100
+loki_ingester_chunk_idle_period: 5m
+loki_schema_version: v11
+loki_from_date: 2022-01-01
+spaces_access_token: ""
+spaces_secret_key: ""
+domain_name: ""
+slack_api_url: ""
+slack_channel: ""
+spaces_endpoint: ""
+spaces_region: ""
