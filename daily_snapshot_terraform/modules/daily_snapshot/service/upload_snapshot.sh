@@ -36,9 +36,13 @@ fi
 # Sync and export is done in a single container to make sure everything is
 # properly cleaned up.
 COMMANDS=$(cat << HEREDOC
+echo "[client]" > config.toml
+echo 'data_dir = "/home/forest/forest_db"' >> config.toml
+
 echo "Chain: $CHAIN_NAME"
 echo "Snapshot: $NEWEST_SNAPSHOT"
-forest --encrypt-keystore false --chain $CHAIN_NAME --import-snapshot /snapshot.car --detach || { echo "failed starting forest daemon"; exit 1; }
+forest-cli --config config.toml --chain $CHAIN_NAME db clean --force || { echo "failed starting forest daemon"; exit 1; }
+forest --config config.toml --encrypt-keystore false --chain $CHAIN_NAME --import-snapshot /snapshot.car --detach || { echo "failed starting forest daemon"; exit 1; }
 timeout $SYNC_TIMEOUT forest-cli --chain $CHAIN_NAME sync wait || { echo "timed-out on forest-cli sync"; exit 1; }
 cat forest.err forest.out
 forest-cli --chain $CHAIN_NAME snapshot export || { echo "failed to export the snapshot"; exit 1; }
@@ -51,6 +55,7 @@ docker run \
   --rm \
   -v "$NEWEST_SNAPSHOT":"/snapshot.car" \
   -v "$SNAPSHOTS_DIR:/snapshots":rshared \
+  -v "$BASE_FOLDER/forest_db:/home/forest/forest_db":z \
   --entrypoint /bin/bash \
   ghcr.io/chainsafe/forest:"${FOREST_TAG}" \
   -c "$COMMANDS"

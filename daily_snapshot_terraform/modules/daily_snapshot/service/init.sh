@@ -23,5 +23,10 @@ s3fs "$SNAPSHOT_BUCKET" "$S3_FOLDER" \
     -o url="$SNAPSHOT_ENDPOINT" \
     -o allow_other
 
+## Setup volume
+mkdir forest_db
+mount -o defaults,nofail,discard,noatime /dev/disk/by-id/scsi-0DO_Volume_snapshot-gen-storage forest_db
+
 # Export and upload snapshot
-ruby daily_snapshot.rb "$1"
+nohup ruby daily_snapshot.rb calibnet > calibnet_log.txt
+nohup ruby daily_snapshot.rb mainnet > mainnet_log.txt

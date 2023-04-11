@@ -42,6 +42,14 @@ data "digitalocean_ssh_keys" "keys" {
   }
 }
 
+resource "digitalocean_volume" "forest_storage" {
+  region                  = "fra1"
+  name                    = "snapshot-gen-storage"
+  size                    = 400
+  initial_filesystem_type = "ext4"
+  description             = "DB storage for snapshot generation"
+}
+
 resource "digitalocean_droplet" "forest" {
   image  = var.image
   name   = var.name
@@ -83,6 +91,11 @@ resource "digitalocean_droplet" "forest" {
       "sleep 10s",
     ]
   }
+}
+
+resource "digitalocean_volume_attachment" "attach_forest_storage" {
+  droplet_id = digitalocean_droplet.forest.id
+  volume_id  = digitalocean_volume.forest_storage.id
 }
 
 data "digitalocean_project" "forest_project" {
