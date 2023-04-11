@@ -1,5 +1,5 @@
 packages:
-    - name: latest-snapshot
+    - name: snapshots
       actions:
-        - name: link
+        - name: latest
           runtime: nodejs:default
