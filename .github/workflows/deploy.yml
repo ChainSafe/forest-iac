@@ -77,7 +77,7 @@ jobs:
 
       # If the new deployment plan contains no changes, delete the last posted plan.
       - name: Delete comment
-        uses: detomarco/delete-comments@v1.0.4
+        uses: detomarco/delete-comments@v1.0.11
         if: github.event_name == 'pull_request' && contains(steps.plan.outputs.stdout, 'No changes. Your infrastructure matches the configuration.')
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
