@@ -93,8 +93,8 @@ To configure Observability which includes `Prometheus`, `alertmanager`, `Loki`, 
 | slack\_channel                              | Slack Channel to Receive Alert Manager Notifications                            | "" [Required]()           |
 | loki\_from\_date                          | The Start of The Database Schema Version   | 2022-01-01    |
 | loki\_schema\_version                     | Which Database Schema Version to use              | v11           |
-| spaces\_endpoint                       | Digital Ocean Spaces Endpoint                                        | nyc3.digitaloceanspaces.com         |
-| spaces\_region                          | Spaces Bucket Region                                  | nyc3     |
+| spaces\_endpoint                       | Digital Ocean Spaces Endpoint                                        | fra1.digitaloceanspaces.com         |
+| spaces\_region                          | Spaces Bucket Region                                  | fra1     |
 | spaces\_bucket\_name                          | Digital Ocean S3 Compatible Spaces Name                                    |   "" [Required]()          |
 | spaces\_access\_token                    | Spaces Access key Token                                   | "" [Required]()     |
 |  spaces_secret_key     | Spaces Secret Access key                   | "" [Required]()           |

@@ -17,13 +17,28 @@ provider "digitalocean" {
   token = var.digitalocean_token
 }
 
+data "digitalocean_ssh_keys" "keys" {
+  sort {
+    key       = "name"
+    direction = "asc"
+  }
+}
+
+data "digitalocean_project" "forest_project" {
+  name = var.project
+}
+
+resource "digitalocean_project_resources" "connect_forest_project" {
+  project   = data.digitalocean_project.forest_project.id
+  resources = [digitalocean_droplet.forest.urn, digitalocean_droplet.forest_observability.urn]
+}
+
 resource "digitalocean_droplet" "forest" {
   image    = var.image
   name     = var.name
   region   = var.region
   size     = var.size
-  backups  = var.backups
-  ssh_keys = [var.ssh_key]
+  ssh_keys = data.digitalocean_ssh_keys.keys.ssh_keys.*.fingerprint
 
   lifecycle {
     create_before_destroy = true
@@ -37,8 +52,7 @@ resource "digitalocean_droplet" "forest_observability" {
   name     = var.observability_name
   region   = var.region
   size     = var.size
-  backups  = var.backups
-  ssh_keys = [var.ssh_key]
+  ssh_keys = data.digitalocean_ssh_keys.keys.ssh_keys.*.fingerprint
 
   lifecycle {
     create_before_destroy = true

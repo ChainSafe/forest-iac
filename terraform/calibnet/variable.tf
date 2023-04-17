@@ -23,11 +23,6 @@ variable "size" {
   type        = string
 }
 
-variable "backups" {
-  description = "A boolean flag indicating whether to enable backups"
-  type        = string
-}
-
 variable "protocol" {
   description = "The protocol to use for the connection."
   type        = string
@@ -43,11 +38,6 @@ variable "digitalocean_token" {
   type        = string
 }
 
-variable "ssh_key" {
-  description = "The fingerprint of the new key"
-  type        = string
-}
-
 variable "destination_addresses" {
   description = "address for the firewall reference"
   type        = list(string)
@@ -55,5 +45,10 @@ variable "destination_addresses" {
 
 variable "enviroment" {
   description = "The environment tag to apply to resources."
+  type        = string
+}
+
+variable "project" {
+  description = "The name assigned to the project in the cloud"
   type        = string
 }

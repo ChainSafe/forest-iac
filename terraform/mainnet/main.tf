@@ -2,8 +2,8 @@ terraform {
   required_version = "~> 1.3"
 
   backend "s3" {
-    bucket                      = "forest-mainnet-state"
-    key                         = "terraform.tfstate"
+    bucket                      = ""
+    key                         = "forest_mainnet/terraform.tfstate"
     region                      = "us-west-1"
     endpoint                    = "fra1.digitaloceanspaces.com"
     skip_credentials_validation = true
@@ -17,7 +17,6 @@ module "mainnet" {
   digitalocean_token      = var.digitalocean_token
   name                    = var.name
   region                  = var.region
-  backups                 = var.backups
   image                   = var.image
   size                    = var.size
   observability_name      = var.observability_name
@@ -26,8 +25,8 @@ module "mainnet" {
   initial_filesystem_type = var.initial_filesystem_type
   volume_size             = var.volume_size
   attach_volume           = true
-  ssh_key                 = var.ssh_key
   destination_addresses   = var.destination_addresses
   enviroment              = var.enviroment
   volume_name             = var.volume_name
+  project                 = var.project
 }

@@ -1,0 +1,159 @@
+name: Deploy Forest Mainnet Infrastructure
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+   pull-requests: write
+
+jobs:
+  deploy-forest-mainnet-infrastruture:
+    name: Deploy Forest Mainbnet Infrastructure
+    runs-on: ubuntu-latest
+    permissions: write-all
+    env:
+      TF_VAR_digitalocean_token: ${{ secrets.DO_TOKEN }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      TF_VAR_VOLUME_NAME: "forest_mainnet_volume"
+      TF_VAR_NAME: "forest-mainnet-iac"
+      TF_VAR_OBSERVABILITY_NAME: "forest-mainnet-observability"
+      TF_VAR_PROJECT: "Forest-DEV"
+      TF_VAR_VOLUME_SIZE: "1000"
+    defaults:
+      run:
+        shell: bash
+        working-directory: terraform/mainnet
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v2
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Validate
+        run: terraform validate -no-color
+
+      - name: Terraform Plan
+        id: plan
+        if: github.event_name == 'pull_request'
+        run: terraform plan -no-color -input=false
+        continue-on-error: true
+
+      - name: Find Comment
+        uses: peter-evans/find-comment@v2
+        if: github.event_name == 'pull_request'
+        id: fc
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-regex: "^### Forest Mainnet Infrastruture  Plan"
+
+      - name: Create or update comment
+        uses: peter-evans/create-or-update-comment@v2
+        if: github.event_name == 'pull_request' && !contains(steps.plan.outputs.stdout, 'No changes. Your infrastructure matches the configuration.')
+        with:
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            ### Forest Mainnet Infrastruture  Plan: ${{ steps.plan.outcome }}
+
+            <details><summary>Show Plan</summary>
+
+            ```
+            ${{ steps.plan.outputs.stdout }}
+            ```
+
+            </details>
+          edit-mode: replace
+
+      - name: Delete comment
+        uses: detomarco/delete-comments@v1.0.4
+        if: github.event_name == 'pull_request' && contains(steps.plan.outputs.stdout, 'No changes. Your infrastructure matches the configuration.')
+        with:
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+
+      - name: Terraform Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -auto-approve -input=false
+
+      - name: Upload Calibnet Host File As Artifacts
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: actions/upload-artifact@v2
+        with:
+          name: hosts_calibnet
+          path: ansible/hosts_mainnet
+
+  configure-ansible-forest-infrstature:
+    name: Configure Ansible Forest Infrastructure
+    runs-on: ubuntu-latest
+    needs: deploy-forest-mainnet-infrastruture
+    defaults:
+      run:
+        shell: bash
+        working-directory: ansible
+    env:
+      ANSIBLE_CONFIG: Ansible.cfg
+      TF_VAR_digitalocean_token: ${{ secrets.DO_TOKEN }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      SLACK_API_URL: ${{ secrets.SLACK_TOKEN }}
+      DOMAIN_NAME: "forest-mainnet.chainsafe.io"
+      SPACES_BUCKET_NAME: "forest-iac"
+      SPACES_ENDPOINT: "fra1.digitaloceanspaces.com"
+      LETSENCRYPT_EMAIL: "samuel@chainsafe.io"
+      SLACK_CHANNEL: "forest-mainnet-monitoring"
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+
+      - name: Download Forest Mainnet Host File
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        id: download
+        uses: actions/download-artifact@v2
+        with:
+          name: hosts_calibnet
+          path: ansible/
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install Ansible
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible==7.4.0
+
+      - name: Configure ssh-agent
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Run Ansible To Install Forest-Mainnet
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: ansible-playbook -i hosts_mainnet --user chainsafe forest-mainnet.yaml
+
+      - name: Configure Observability For Forest-Mainnet Node
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: ansible-playbook -i hosts_mainnet --user chainsafe observability.yaml
+
+      - name: Configure HTTPS For Forest-Mainnet Grafana Custom Domain
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: ansible-playbook -i hosts_mainnet --user chainsafe letsencrypt.yaml

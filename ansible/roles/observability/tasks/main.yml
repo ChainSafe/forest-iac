@@ -43,14 +43,6 @@
     line: '{{ user }} ALL=(ALL) NOPASSWD: ALL'
     validate: 'visudo -cf %s'
 
-- name: Create docker user
-  ansible.builtin.user:
-    name: '{{ user }}'
-    append: true
-    shell: /bin/bash
-    system: true
-    create_home: false
-
 - name: Add user to "docker" group
   ansible.builtin.user:
     name: '{{ user }}'
