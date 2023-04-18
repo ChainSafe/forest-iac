@@ -81,6 +81,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Download Forest Calibnet Host File
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         id: download
         uses: actions/download-artifact@v2
         with:
