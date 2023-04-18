@@ -15,7 +15,7 @@
   vars:
     spaces_endpoint: ""
     spaces_region: ""
-    slack_api_url: ""
+    slack_token: ""
     slack_channel: ""
     spaces_access_token: ""
     spaces_secret_key: ""

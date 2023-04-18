@@ -9,23 +9,22 @@ on:
       - main
   workflow_dispatch:
 
-permissions:
-   pull-requests: write
-
 jobs:
   deploy-forest-mainnet-infrastruture:
-    name: Deploy Forest Mainbnet Infrastructure
+    name: Deploy Forest Mainnet Infrastructure
     runs-on: ubuntu-latest
-    permissions: write-all
+    permissions:
+       pull-requests: write
     env:
       TF_VAR_digitalocean_token: ${{ secrets.DO_TOKEN }}
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      TF_VAR_VOLUME_NAME: "forest_mainnet_volume"
-      TF_VAR_NAME: "forest-mainnet-iac"
-      TF_VAR_OBSERVABILITY_NAME: "forest-mainnet-observability"
-      TF_VAR_PROJECT: "Forest-DEV"
-      TF_VAR_VOLUME_SIZE: "1000"
+      TF_VAR_volume_name: "forest_mainnet_volume"
+      TF_VAR_bucket: "forest-mainnet-loki-logs"
+      TF_VAR_name: "forest-mainnet-iac"
+      TF_VAR_observability_name: "forest-mainnet-observability"
+      TF_VAR_project: "Forest-DEV"
+      TF_VAR_volume_size: "1000"
     defaults:
       run:
         shell: bash
@@ -98,7 +97,7 @@ jobs:
           name: hosts_calibnet
           path: ansible/hosts_mainnet
 
-  configure-ansible-forest-infrstature:
+  configure-ansible-forest-infrstructure:
     name: Configure Ansible Forest Infrastructure
     runs-on: ubuntu-latest
     needs: deploy-forest-mainnet-infrastruture
@@ -108,15 +107,16 @@ jobs:
         working-directory: ansible
     env:
       ANSIBLE_CONFIG: Ansible.cfg
-      TF_VAR_digitalocean_token: ${{ secrets.DO_TOKEN }}
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      SLACK_API_URL: ${{ secrets.SLACK_TOKEN }}
+      SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+      SPACES_REGION: "fra1"
       DOMAIN_NAME: "forest-mainnet.chainsafe.io"
-      SPACES_BUCKET_NAME: "forest-iac"
+      SPACES_BUCKET_NAME: "forest-mainnet-loki-logs"
       SPACES_ENDPOINT: "fra1.digitaloceanspaces.com"
       LETSENCRYPT_EMAIL: "samuel@chainsafe.io"
       SLACK_CHANNEL: "forest-mainnet-monitoring"
+      VOLUME_NAME: "forest_mainnet_volume"
 
     steps:
       - name: Checkout source code

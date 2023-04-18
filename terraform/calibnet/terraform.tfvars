@@ -8,7 +8,7 @@ protocol              = "tcp"
 enviroment            = "calibnet"
 
 # This set of variables are unique and must be defined here in order to deploy successfully
-name                        = ""
-digitalocean_token          = ""
-observability_name          = ""
-project                     = ""
+# name                        = ""
+# digitalocean_token          = ""
+# observability_name          = ""
+# project                     = ""
