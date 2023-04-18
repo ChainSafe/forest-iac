@@ -2,7 +2,7 @@ terraform {
   required_version = "~> 1.3"
 
   backend "s3" {
-    bucket                      = ""
+    bucket                      = "forest-iac"
     key                         = "forest_mainnet/terraform.tfstate"
     region                      = "us-west-1"
     endpoint                    = "fra1.digitaloceanspaces.com"
