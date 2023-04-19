@@ -41,7 +41,7 @@ To implement the infrastructure, run the following:
 - Create an `ssh-key` to be added to the DigitalOcean list and store the fingerprint for use in the next few steps; you can check more details [here](https://docs.digitalocean.com/products/droplets/how-to/add-ssh-keys/to-team/)
 - Create a space on DigitalOcean with any preferred unique name then add the bucket name and endpoint in the `backend.tf` file.
 - Generate `digitalocean_api_token` from DigitalOcean console; you can check [here](https://docs.digitalocean.com/reference/api/create-personal-access-token/) for more details.
-- Populate the `terraform.tfvars` file with the values of the following
+- If you need to run this locally, uncomment the variables below in the `terraform.tfvars` file and populate with the required values
     - `new_key_ssh_key_fingerprint`
     - `digitalocean_token`
     - `name`
@@ -50,7 +50,7 @@ To implement the infrastructure, run the following:
     - `Volume_name`
 
 ```
-📑  The variables volume_size and volume_name can only be configured if you plan to run Forest Mainnet Infrastructure.
+📑  The variables volume_size and volume_name can only be configured if you plan to run the Forest Mainnet Infrastructure.
 ```
 
 - Set all necessary environment variables to the terminal permanently by adding them to a shell profile.
@@ -89,7 +89,7 @@ To configure Observability which includes `Prometheus`, `alertmanager`, `Loki`, 
 | docker\_compose\_version                             | Docker Compose Version to be Installed                          | v2.16.0        |
 | prometheus\_retention\_time                                | Premetheus Metrics Retention time                         | 365 Days     |
 | prometheus\_scrape\_interval                                | How Frequently Should Prometheus Scrape metrics                           | 30s          |
-| slack\_api\_url                               | Slack Webhooks Url                          | "" [Required]()          |
+| slack\_token                               | Slack Token                          | "" [Required]()          |
 | slack\_channel                              | Slack Channel to Receive Alert Manager Notifications                            | "" [Required]()           |
 | loki\_from\_date                          | The Start of The Database Schema Version   | 2022-01-01    |
 | loki\_schema\_version                     | Which Database Schema Version to use              | v11           |
