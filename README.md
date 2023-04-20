@@ -42,13 +42,12 @@ To implement the infrastructure, run the following:
 - Create a space on DigitalOcean with any preferred unique name then add the bucket name and endpoint in the `backend.tf` file.
 - Generate `digitalocean_api_token` from DigitalOcean console; you can check [here](https://docs.digitalocean.com/reference/api/create-personal-access-token/) for more details.
 - If you need to run this locally, uncomment the variables below in the `terraform.tfvars` file and populate with the required values
-    - `new_key_ssh_key_fingerprint`
     - `digitalocean_token`
     - `name`
     - `observability_name`
     - `volume_size`
     - `Volume_name`
-
+    - `project`
 ```
 📑  The variables volume_size and volume_name can only be configured if you plan to run the Forest Mainnet Infrastructure.
 ```
@@ -63,15 +62,15 @@ Then save the file and restart the terminal for the changes to take effect.
     - eval `ssh-agent`
     - `ssh-add <location to ssh key>`
 
-- Navigate to the terraform directory and run `make init_calib` for calibnet or `make init_main` for mainnet to initialize and confirm variables.
+- Navigate to the terraform directory and run `make init_calib` for calibnet and `make init_main` for mainnet to initialize and confirm variables.
 
-- To view all the resources that will be configured, run `make plan_calib` for calibnet or `make plan_main` for mainnet in the terraform directory.
+- To view all the resources that will be configured, run `make plan_calib` for calibnet and `make plan_main` for mainnet still in the same terraform directory.
 
-- To create the infrastructure, run `make apply_calib` for calibnet or `make apply_main` for mainnet in the terraform directory.
+- To create the infrastructure, run `make apply_calib` for calibnet and `make apply_main` for mainnet in the terraform directory.
 
-- Navigate to the ansible directory and run the command `make ping_calibnet` for calibnet or `make ping_main` for mainnet to verify the connection to the hosts.
+- Navigate to the ansible directory and run `make ping_calibnet` for calibnet and `make ping_main` for mainnet to verify the connection to the host servers.
 
-- While in the ansible directory, run `make forest_calib` to initialize forest calibnet or `make forest_main` for forest mainnet.
+- While still in the ansible directory, run `make forest_calib` to initialize forest calibnet and `make forest_main` for forest mainnet.
 
 ## Observability
 
@@ -105,7 +104,7 @@ To configure Observability which includes `Prometheus`, `alertmanager`, `Loki`, 
 
 - In the ansible directory, run `make observ_calib` for calibnet or `make observ_main` for mainnet to start configuring the required services, including `Grafana Loki`, `Prometheus`, `Node Exporter`, and `Alertmanager`.
 
-- Before initializing HTTPS with Let's Encrypt, ensure that you have mapped the Observability Droplet IP to your custom domain. Once you have completed this step, run  `make lets_calib` for Calibnet or `make lets_main` for Mainnet in the ansible directory.
+- Before initializing HTTPS with Let's Encrypt, ensure that you have mapped the Observability Droplet IP to your custom domain. Once you have completed this step, run  `make lets_calib` for Calibnet and `make lets_main` for Mainnet in the ansible directory.
 
 - Once the observability stack is up, you can access your Grafana UI here `https://example.com` depending on the pre-defined domain name. Use the default Grafana credentials: `admin:admin`.
 
