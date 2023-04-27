@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# If Forest hasn't synced to the network after 90 minutes, something has gone wrong.
-SYNC_TIMEOUT=90m
+# If Forest hasn't synced to the network after 8 hours, something has gone wrong.
+SYNC_TIMEOUT=8h
 
 if [[ $# != 2 ]]; then
   echo "Usage: bash $0 CHAIN_NAME SNAPSHOT_PATH"
@@ -14,48 +14,36 @@ NEWEST_SNAPSHOT=$2
 # Make sure we have the most recent Forest image
 docker pull ghcr.io/chainsafe/forest:"${FOREST_TAG}"
 
-# Ensure that we can access files with the default Forest image user
-SNAPSHOTS_DIR=$BASE_FOLDER/s3/$CHAIN_NAME
-
-permission=$(stat -c "%a" "$SNAPSHOTS_DIR")
-if ! ((permission & 7)); then
-  echo "The snapshots directory is not accessible by everyone to read and write. Adding necessary permissions"
-  chmod o+rwx "$SNAPSHOTS_DIR"
-else
-  echo "Snapshots directory permissions OK"
-fi
-
-permission=$(stat -c "%a" "$NEWEST_SNAPSHOT")
-if ! ((permission & 4)); then
-  echo "Snapshot not readable for everyone. Adding necessary permissions."
-  chmod o+r "$NEWEST_SNAPSHOT"
-else
-  echo "Latest snapshot permissions OK"
-fi
-
 # Sync and export is done in a single container to make sure everything is
 # properly cleaned up.
 COMMANDS=$(cat << HEREDOC
 echo "[client]" > config.toml
 echo 'data_dir = "/home/forest/forest_db"' >> config.toml
+echo 'encrypt_keystore = false' >> config.toml
 
 echo "Chain: $CHAIN_NAME"
 echo "Snapshot: $NEWEST_SNAPSHOT"
-forest-cli --config config.toml --chain $CHAIN_NAME db clean --force || { echo "failed starting forest daemon"; exit 1; }
-forest --config config.toml --encrypt-keystore false --chain $CHAIN_NAME --import-snapshot /snapshot.car --detach || { echo "failed starting forest daemon"; exit 1; }
+forest-cli --config config.toml --chain $CHAIN_NAME db clean --force || { echo "failed cleaning database"; exit 1; }
+forest --config config.toml --chain $CHAIN_NAME --import-snapshot $NEWEST_SNAPSHOT --halt-after-import
+forest --config config.toml --chain $CHAIN_NAME --detach || { echo "failed starting forest daemon"; exit 1; }
 timeout $SYNC_TIMEOUT forest-cli --chain $CHAIN_NAME sync wait || { echo "timed-out on forest-cli sync"; exit 1; }
 cat forest.err forest.out
-forest-cli --chain $CHAIN_NAME snapshot export || { echo "failed to export the snapshot"; exit 1; }
-mv ./forest_snapshot* /snapshots/
+forest-cli --chain $CHAIN_NAME snapshot export -o forest_db/ || { echo "failed to export the snapshot"; exit 1; }
 HEREDOC
 )
 
 docker run \
-  --name forest-snapshot-upload-node \
+  --name forest-snapshot-upload-node-"$CHAIN_NAME" \
   --rm \
-  -v "$NEWEST_SNAPSHOT":"/snapshot.car" \
-  -v "$SNAPSHOTS_DIR:/snapshots":rshared \
   -v "$BASE_FOLDER/forest_db:/home/forest/forest_db":z \
   --entrypoint /bin/bash \
   ghcr.io/chainsafe/forest:"${FOREST_TAG}" \
-  -c "$COMMANDS"
+  -c "$COMMANDS" || exit 1
+s3cmd --acl-public put "$BASE_FOLDER/forest_db/forest_snapshot_$CHAIN_NAME"* s3://"$SNAPSHOT_BUCKET"/"$CHAIN_NAME"/ || exit 1
+rm "$BASE_FOLDER/forest_db/forest_snapshot_$CHAIN_NAME"*
+
+# 1105 - 13:51
+# 1090 - 13:54
+# 1013 - 14:14
+# 966 - 14:27
+
