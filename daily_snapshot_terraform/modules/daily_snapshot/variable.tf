@@ -33,11 +33,6 @@ variable "AWS_SECRET_ACCESS_KEY" {
   type        = string
 }
 
-variable "chain" {
-  description = "Chain name (calibnet or mainnet)"
-  type        = string
-}
-
 variable "snapshot_bucket" {
   description = "S3 bucket containing the snapshots"
   type        = string

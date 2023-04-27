@@ -27,9 +27,8 @@ module "daily_snapshot" {
 
   # Configure service:
   name              = "forest-snapshot-tmp-testing" # droplet name
-  chain             = "calibnet"                 # chain to export
-  size              = "so-2vcpu-16gb"             # droplet size
-  slack_channel     = "#forest-notifications"    # slack channel for notifications
+  size              = "so-2vcpu-16gb"               # droplet size
+  slack_channel     = "#forest-notifications"       # slack channel for notifications
   snapshot_bucket   = "forest-snapshots"
   snapshot_endpoint = "fra1.digitaloceanspaces.com"
 

@@ -79,16 +79,16 @@ resource "digitalocean_droplet" "forest" {
       "cd /root/",
       "tar xf sources.tar",
       # Set required environment variables
-      "export AWS_ACCESS_KEY_ID=${var.AWS_ACCESS_KEY_ID}",
-      "export AWS_SECRET_ACCESS_KEY=${var.AWS_SECRET_ACCESS_KEY}",
-      "export SLACK_API_TOKEN=${var.slack_token}",
-      "export SLACK_NOTIF_CHANNEL=${var.slack_channel}",
-      "export SNAPSHOT_BUCKET=${var.snapshot_bucket}",
-      "export SNAPSHOT_ENDPOINT=${var.snapshot_endpoint}",
-      # Run init script in the background
-      "nohup sh ./init.sh ${var.chain} &",
-      # Exiting without a sleep sometimes kills the script :-/
-      "sleep 10s",
+      "echo 'export AWS_ACCESS_KEY_ID=\"${var.AWS_ACCESS_KEY_ID}\"' >> .bashrc",
+      "echo 'export AWS_SECRET_ACCESS_KEY=\"${var.AWS_SECRET_ACCESS_KEY}\"' >> .bashrc",
+      "echo 'export SLACK_API_TOKEN=\"${var.slack_token}\"' >> .bashrc",
+      "echo 'export SLACK_NOTIF_CHANNEL=\"${var.slack_channel}\"' >> .bashrc",
+      "echo 'export SNAPSHOT_BUCKET=\"${var.snapshot_bucket}\"' >> .bashrc",
+      "echo 'export SNAPSHOT_ENDPOINT=\"${var.snapshot_endpoint}\"' >> .bashrc",
+      "echo 'export BASE_FOLDER=\"/root\"' >> .bashrc",
+      "echo 'export FOREST_TAG=\"latest\"' >> .bashrc",
+      "source ~/.bashrc",
+      "./init.sh"
     ]
   }
 }

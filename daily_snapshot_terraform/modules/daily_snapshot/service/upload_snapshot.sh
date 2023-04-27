@@ -17,12 +17,14 @@ docker pull ghcr.io/chainsafe/forest:"${FOREST_TAG}"
 # Sync and export is done in a single container to make sure everything is
 # properly cleaned up.
 COMMANDS=$(cat << HEREDOC
+set -o xtrace
 echo "[client]" > config.toml
 echo 'data_dir = "/home/forest/forest_db"' >> config.toml
 echo 'encrypt_keystore = false' >> config.toml
 
 echo "Chain: $CHAIN_NAME"
 echo "Snapshot: $NEWEST_SNAPSHOT"
+forest --version
 forest-cli --config config.toml --chain $CHAIN_NAME db clean --force || { echo "failed cleaning database"; exit 1; }
 forest --config config.toml --chain $CHAIN_NAME --import-snapshot $NEWEST_SNAPSHOT --halt-after-import
 forest --config config.toml --chain $CHAIN_NAME --detach || { echo "failed starting forest daemon"; exit 1; }
