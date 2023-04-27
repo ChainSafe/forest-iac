@@ -88,7 +88,9 @@ resource "digitalocean_droplet" "forest" {
       "echo 'export BASE_FOLDER=\"/root\"' >> .bashrc",
       "echo 'export FOREST_TAG=\"latest\"' >> .bashrc",
       "source ~/.bashrc",
-      "./init.sh"
+      "nohup sh ./init.sh > init_log.txt &",
+      # Exiting without a sleep sometimes kills the script :-/
+      "sleep 10s",
     ]
   }
 }

@@ -33,28 +33,23 @@ all_snapshots = list_snapshots(CHAIN_NAME, BUCKET, ENDPOINT)
 if !all_snapshots.empty?
   latest = all_snapshots[0]
 
-  # Check if the date of the most recent snapshot is today
-  if Time.new.to_date == latest.date
-    # We already have a snapshot for today. Do nothing.
-    puts "No snapshot required for #{CHAIN_NAME}"
-  else
-    puts "New snapshot required. Booting from epoch: #{latest.height}"
+  # Sync and export snapshot
+  snapshot_uploaded = system("bash upload_snapshot.sh #{CHAIN_NAME} #{latest.url} > #{LOG_EXPORT} 2>&1")
 
-    # Sync and export snapshot
-    snapshot_uploaded = system("bash upload_snapshot.sh #{CHAIN_NAME} #{latest.url} > #{LOG_EXPORT} 2>&1")
-
-    if snapshot_uploaded
+  if snapshot_uploaded
+    # If this is the first new snapshot of the day, send a victory message to slack
+    if Time.new.to_date == latest.date
       client.post_message "✅ Snapshot uploaded for #{CHAIN_NAME}. 🌲🌳🌲🌳🌲"
-    else
-      client.post_message "⛔ Snapshot failed for #{CHAIN_NAME}. 🔥🌲🔥 "
     end
-
-    # attach the log file and print the contents to STDOUT
-    client.attach_files(LOG_EXPORT)
-    puts "Snapshot export log:\n#{File.read(LOG_EXPORT)}"
-
-    # Prune snapshots
-    # pruned = prune_snapshots(SNAPSHOTS_DIR)
-    # client.attach_comment("Pruned snapshots: `#{pruned.join(', ')}`") unless pruned.empty?
+  else
+    client.post_message "⛔ Snapshot failed for #{CHAIN_NAME}. 🔥🌲🔥 "
   end
+
+  # attach the log file and print the contents to STDOUT
+  client.attach_files(LOG_EXPORT)
+  puts "Snapshot export log:\n#{File.read(LOG_EXPORT)}"
+
+  # Prune snapshots
+  # pruned = prune_snapshots(SNAPSHOTS_DIR)
+  # client.attach_comment("Pruned snapshots: `#{pruned.join(', ')}`") unless pruned.empty?
 end
