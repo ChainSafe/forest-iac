@@ -58,6 +58,13 @@ def prune_snapshots(snapshots)
 
   # iterate over each entry and try to add it to the buckets, newest first.
   snapshots
-     .reject  { |f| day_unique_bucket.add? f and buckets.any? { |bucket| bucket.add? f } }
-     .each    { |f| f.delete }
+    # ignore the first snapshot to keep a buffer of two recent snapshots.
+    # this makes it less likely that we delete a snapshot that is being downloaded.
+    .drop(1)
+    # reject if the date is unique
+    .reject  { |f| day_unique_bucket.add? f }
+    # reject if snapshot fits in a bucket
+    .reject  { |f| buckets.any? { |bucket| bucket.add? f } }
+    # delete all snapshots that weren't rejected or dropped
+    .each    { |f| f.delete }
 end
