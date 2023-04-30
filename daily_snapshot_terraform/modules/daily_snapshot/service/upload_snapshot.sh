@@ -41,9 +41,3 @@ docker run \
   -c "$COMMANDS" || exit 1
 s3cmd --acl-public put "$BASE_FOLDER/forest_db/forest_snapshot_$CHAIN_NAME"* s3://"$SNAPSHOT_BUCKET"/"$CHAIN_NAME"/ || exit 1
 rm "$BASE_FOLDER/forest_db/forest_snapshot_$CHAIN_NAME"*
-
-# 1105 - 13:51
-# 1090 - 13:54
-# 1013 - 14:14
-# 966 - 14:27
-
