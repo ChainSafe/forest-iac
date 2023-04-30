@@ -86,7 +86,7 @@ resource "digitalocean_droplet" "forest" {
       "echo 'export SNAPSHOT_BUCKET=\"${var.snapshot_bucket}\"' >> .bashrc",
       "echo 'export SNAPSHOT_ENDPOINT=\"${var.snapshot_endpoint}\"' >> .bashrc",
       "echo 'export BASE_FOLDER=\"/root\"' >> .bashrc",
-      "echo 'export FOREST_TAG=\"latest\"' >> .bashrc",
+      "echo 'export FOREST_TAG=\"edge\"' >> .bashrc",
       "source ~/.bashrc",
       "nohup sh ./init.sh > init_log.txt &",
       # Exiting without a sleep sometimes kills the script :-/
