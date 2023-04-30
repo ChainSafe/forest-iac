@@ -1,0 +1,4 @@
+#!/bin/bash
+cd $BASE_FOLDER
+source /root/.bashrc
+flock -n /tmp/calibnet.lock -c "ruby daily_snapshot.rb calibnet > calibnet_log.txt 2>&1"

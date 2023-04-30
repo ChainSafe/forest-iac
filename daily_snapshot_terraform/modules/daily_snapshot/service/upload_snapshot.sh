@@ -23,7 +23,7 @@ echo 'encrypt_keystore = false' >> config.toml
 
 echo "Chain: $CHAIN_NAME"
 echo "Snapshot: $NEWEST_SNAPSHOT"
-forest-cli --config config.toml --chain $CHAIN_NAME db clean --force || { echo "failed cleaning database"; exit 1; }
+forest-cli --config config.toml --chain $CHAIN_NAME db clean --force
 forest --config config.toml --chain $CHAIN_NAME --import-snapshot $NEWEST_SNAPSHOT --halt-after-import
 forest --config config.toml --chain $CHAIN_NAME --detach || { echo "failed starting forest daemon"; exit 1; }
 timeout $SYNC_TIMEOUT forest-cli --chain $CHAIN_NAME sync wait || { echo "timed-out on forest-cli sync"; exit 1; }
