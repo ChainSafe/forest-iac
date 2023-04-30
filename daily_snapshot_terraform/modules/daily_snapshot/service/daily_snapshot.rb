@@ -48,8 +48,5 @@ if !all_snapshots.empty?
   end
 
   puts "Snapshot export log:\n#{File.read(LOG_EXPORT)}"
-
-  # Prune snapshots
-  pruned = prune_snapshots(list_snapshots(CHAIN_NAME, BUCKET, ENDPOINT))
-  client.attach_comment("Pruned snapshots: `#{pruned.map{|snapshot| snapshot.file_name}.join(', ')}`") unless pruned.empty?
+  prune_snapshots(list_snapshots(CHAIN_NAME, BUCKET, ENDPOINT))
 end
