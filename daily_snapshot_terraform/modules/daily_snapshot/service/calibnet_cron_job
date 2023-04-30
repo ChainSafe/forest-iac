@@ -1,4 +1,5 @@
 #!/bin/bash
-cd $BASE_FOLDER
-source /root/.bashrc
+cd "$BASE_FOLDER" || exit
+# shellcheck source=/dev/null
+source .bashrc
 flock -n /tmp/calibnet.lock -c "ruby daily_snapshot.rb calibnet > calibnet_log.txt 2>&1"
