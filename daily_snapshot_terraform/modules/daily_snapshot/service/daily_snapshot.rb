@@ -36,8 +36,12 @@ if !all_snapshots.empty?
   # Sync and export snapshot
   snapshot_uploaded = system("bash upload_snapshot.sh #{CHAIN_NAME} #{latest.url} > #{LOG_EXPORT} 2>&1")
 
+  # Update our list of snapshots
+  all_snapshots = list_snapshots(CHAIN_NAME, BUCKET, ENDPOINT)
+
   if snapshot_uploaded
     # If this is the first new snapshot of the day, send a victory message to slack
+    latest = all_snapshots[0]
     if Time.new.to_date != latest.date
       client.post_message "✅ Snapshot uploaded for #{CHAIN_NAME}. 🌲🌳🌲🌳🌲"
     end
@@ -48,5 +52,5 @@ if !all_snapshots.empty?
   end
 
   puts "Snapshot export log:\n#{File.read(LOG_EXPORT)}"
-  prune_snapshots(list_snapshots(CHAIN_NAME, BUCKET, ENDPOINT))
+  prune_snapshots(all_snapshots)
 end
