@@ -24,7 +24,7 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: daily_snapshot_terraform/calibnet/
+        working-directory: daily_snapshot_terraform/
 
     steps:
       - name: Checkout
