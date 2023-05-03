@@ -58,7 +58,7 @@ jobs:
 
       # If the new deployment plan contains changes, post it in a comment.
       - name: Create or update comment
-        uses: peter-evans/create-or-update-comment@v2
+        uses: peter-evans/create-or-update-comment@v3
         if: github.event_name == 'pull_request' && !contains(steps.plan.outputs.stdout, 'No changes. Your infrastructure matches the configuration.')
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
@@ -88,7 +88,7 @@ jobs:
 
       - name: Configure ssh-agent
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        uses: webfactory/ssh-agent@v0.7.0
+        uses: webfactory/ssh-agent@v0.8.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
