@@ -60,6 +60,8 @@ resource "digitalocean_droplet" "forest" {
   tags      = ["iac"]
   ssh_keys  = data.digitalocean_ssh_keys.keys.ssh_keys.*.fingerprint
 
+  graceful_shutdown = false
+
   connection {
     host = self.ipv4_address
     user = "root"
