@@ -31,7 +31,7 @@ client = SlackClient.new CHANNEL, SLACK_TOKEN
 # Find the snapshot with the most recent modification date
 all_snapshots = list_snapshots(CHAIN_NAME, BUCKET, ENDPOINT)
 unless all_snapshots.empty?
-  latest = all_snapshots[0]
+  latest = all_snapshots.first
 
   # Sync and export snapshot
   snapshot_uploaded = system("bash upload_snapshot.sh #{CHAIN_NAME} #{latest.url} > #{LOG_EXPORT} 2>&1")
@@ -41,7 +41,7 @@ unless all_snapshots.empty?
 
   if snapshot_uploaded
     # If this is the first new snapshot of the day, send a victory message to slack
-    latest = all_snapshots[0]
+    latest = all_snapshots.first
     if Time.new.to_date != latest.date
       client.post_message "✅ Snapshot uploaded for #{CHAIN_NAME}. 🌲🌳🌲🌳🌲"
     end
