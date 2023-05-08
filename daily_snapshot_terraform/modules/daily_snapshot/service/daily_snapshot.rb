@@ -30,7 +30,7 @@ client = SlackClient.new CHANNEL, SLACK_TOKEN
 
 # Find the snapshot with the most recent modification date
 all_snapshots = list_snapshots(CHAIN_NAME, BUCKET, ENDPOINT)
-if !all_snapshots.empty?
+unless all_snapshots.empty?
   latest = all_snapshots[0]
 
   # Sync and export snapshot
