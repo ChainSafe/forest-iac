@@ -41,7 +41,7 @@ unless all_snapshots.empty?
 
   if snapshot_uploaded
     # If this is the first new snapshot of the day, send a victory message to slack
-    if all_snapshots[0].date != all_snapshots[1].date
+    unless all_snapshots[0].date == all_snapshots[1].date
       client.post_message "✅ Snapshot uploaded for #{CHAIN_NAME}. 🌲🌳🌲🌳🌲"
     end
   else
