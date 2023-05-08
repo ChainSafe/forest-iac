@@ -64,5 +64,5 @@ def prune_snapshots(snapshots)
     # keep snapshots (ie reject) if they fit in a bucket while also having a unique date
     .reject  { |f| day_unique_bucket.add? f and buckets.any? { |bucket| bucket.add? f } }
     # delete all snapshots that weren't rejected or dropped
-    .each    { |f| f.delete }
+    .each(&:delete)
 end
