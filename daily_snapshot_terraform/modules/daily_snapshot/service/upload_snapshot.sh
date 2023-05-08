@@ -42,9 +42,9 @@ docker run \
   -c "$COMMANDS" || exit 1
 
 # Compress with zstd and add to checksum file
-zstd "$BASE_FOLDER/forest_db/forest_snapshot_$CHAIN_NAME"*.car
+cd "$BASE_FOLDER/forest_db/" && zstd "forest_snapshot_$CHAIN_NAME"*.car
 echo "" >> "$BASE_FOLDER/forest_db/forest_snapshot_$CHAIN_NAME"*.sha256sum
-sha256sum "$BASE_FOLDER/forest_db/forest_snapshot_$CHAIN_NAME"*.car.zst >> "$BASE_FOLDER/forest_db/forest_snapshot_$CHAIN_NAME"*.sha256sum
+cd "$BASE_FOLDER/forest_db/" && (sha256sum "forest_snapshot_$CHAIN_NAME"*.car.zst >> "forest_snapshot_$CHAIN_NAME"*.sha256sum)
 
 # Upload snapshot to s3
 s3cmd --acl-public put "$BASE_FOLDER/forest_db/forest_snapshot_$CHAIN_NAME"* s3://"$SNAPSHOT_BUCKET"/"$CHAIN_NAME"/ || exit 1
