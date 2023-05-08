@@ -24,7 +24,7 @@ def list_snapshots(chain_name = 'calibnet', bucket = 'forest-snapshots', endpoin
       file.match(snapshot_format) { |m| 
         url = "https://#{bucket}.#{endpoint}/#{chain_name}/#{file}"
         url_s3 = "s3://#{bucket}/#{chain_name}/#{file}"
-        snapshot = Snapshot.new m[:network], m[:date].to_date, Integer(m[:height]), m[:compressed], file, url_s3, url
+        snapshot = Snapshot.new m[:network], m[:date].to_date, m[:height].to_i, m[:compressed], file, url_s3, url
         snapshot_list << snapshot
       }
     }

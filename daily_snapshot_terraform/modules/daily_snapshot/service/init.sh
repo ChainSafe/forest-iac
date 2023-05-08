@@ -23,5 +23,4 @@ mount -o defaults,nofail,discard,noatime /dev/disk/by-id/scsi-0DO_Volume_snapsho
 chmod 777 forest_db
 
 # Setup cron jobs
-cp calibnet_cron_job /etc/cron.hourly/
-cp mainnet_cron_job /etc/cron.hourly/
+cp calibnet_cron_job mainnet_cron_job /etc/cron.hourly/
