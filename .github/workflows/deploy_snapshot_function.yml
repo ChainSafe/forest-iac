@@ -3,11 +3,10 @@ name: Deploy
 on:
   pull_request:
     branches: [main]
-    paths: ["snapshot_function/**"]
+    # paths: ["snapshot_function/**"]
   push:
-    branches:
-      - main
-    paths: ["snapshot_function/**"]
+    branches: [main]
+    # paths: ["snapshot_function/**"]
   workflow_dispatch:
 
 jobs:
