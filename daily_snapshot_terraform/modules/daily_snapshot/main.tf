@@ -42,6 +42,14 @@ data "digitalocean_ssh_keys" "keys" {
   }
 }
 
+resource "digitalocean_volume" "forest_storage" {
+  region                  = "fra1"
+  name                    = "snapshot-gen-storage"
+  size                    = 400
+  initial_filesystem_type = "ext4"
+  description             = "DB storage for snapshot generation"
+}
+
 resource "digitalocean_droplet" "forest" {
   image  = var.image
   name   = var.name
@@ -51,6 +59,8 @@ resource "digitalocean_droplet" "forest" {
   user_data = data.local_file.sources.content_sha256
   tags      = ["iac"]
   ssh_keys  = data.digitalocean_ssh_keys.keys.ssh_keys.*.fingerprint
+
+  graceful_shutdown = false
 
   connection {
     host = self.ipv4_address
@@ -71,18 +81,26 @@ resource "digitalocean_droplet" "forest" {
       "cd /root/",
       "tar xf sources.tar",
       # Set required environment variables
-      "export AWS_ACCESS_KEY_ID=${var.AWS_ACCESS_KEY_ID}",
-      "export AWS_SECRET_ACCESS_KEY=${var.AWS_SECRET_ACCESS_KEY}",
-      "export SLACK_API_TOKEN=${var.slack_token}",
-      "export SLACK_NOTIF_CHANNEL=${var.slack_channel}",
-      "export SNAPSHOT_BUCKET=${var.snapshot_bucket}",
-      "export SNAPSHOT_ENDPOINT=${var.snapshot_endpoint}",
-      # Run init script in the background
-      "nohup sh ./init.sh ${var.chain} &",
+      "echo 'export AWS_ACCESS_KEY_ID=\"${var.AWS_ACCESS_KEY_ID}\"' >> .forest_env",
+      "echo 'export AWS_SECRET_ACCESS_KEY=\"${var.AWS_SECRET_ACCESS_KEY}\"' >> .forest_env",
+      "echo 'export SLACK_API_TOKEN=\"${var.slack_token}\"' >> .forest_env",
+      "echo 'export SLACK_NOTIF_CHANNEL=\"${var.slack_channel}\"' >> .forest_env",
+      "echo 'export SNAPSHOT_BUCKET=\"${var.snapshot_bucket}\"' >> .forest_env",
+      "echo 'export SNAPSHOT_ENDPOINT=\"${var.snapshot_endpoint}\"' >> .forest_env",
+      "echo 'export BASE_FOLDER=\"/root\"' >> .forest_env",
+      "echo 'export FOREST_TAG=\"edge\"' >> .forest_env",
+      "echo 'source .forest_env' >> .bashrc",
+      "source ~/.forest_env",
+      "nohup sh ./init.sh > init_log.txt &",
       # Exiting without a sleep sometimes kills the script :-/
       "sleep 10s",
     ]
   }
+}
+
+resource "digitalocean_volume_attachment" "attach_forest_storage" {
+  droplet_id = digitalocean_droplet.forest.id
+  volume_id  = digitalocean_volume.forest_storage.id
 }
 
 data "digitalocean_project" "forest_project" {
