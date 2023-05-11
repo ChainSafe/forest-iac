@@ -26,8 +26,8 @@ jobs:
 
       - name: Install doctl
         uses: digitalocean/action-doctl@v2
-          with:
-            token: ${{ secrets.DO_TOKEN }}
+        with:
+          token: ${{ secrets.DO_TOKEN }}
 
       - name: Configure serverless
         run: |
@@ -36,4 +36,4 @@ jobs:
 
       - name: Deploy function
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: doctl serverless deploy
+        run: doctl serverless deploy .
