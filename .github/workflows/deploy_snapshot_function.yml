@@ -1,4 +1,4 @@
-name: Deploy Snapshot Service
+name: Deploy
 
 on:
   pull_request:
@@ -11,8 +11,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy-daily-snapshot-calibnet:
-    name: snapshot service (calibnet)
+  deploy-snapshot-link:
+    name: snapshot link
     runs-on: ubuntu-latest
     env:
       TF_VAR_do_token: ${{ secrets.DO_TOKEN }}
