@@ -1,0 +1,40 @@
+name: Deploy Snapshot Service
+
+on:
+  pull_request:
+    branches: [main]
+    paths: ["snapshot_function/**"]
+  push:
+    branches:
+      - main
+    paths: ["snapshot_function/**"]
+  workflow_dispatch:
+
+jobs:
+  deploy-daily-snapshot-calibnet:
+    name: snapshot service (calibnet)
+    runs-on: ubuntu-latest
+    env:
+      TF_VAR_do_token: ${{ secrets.DO_TOKEN }}
+    defaults:
+      run:
+        shell: bash
+        working-directory: snapshot_function
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+          with:
+            token: ${{ secrets.DO_TOKEN }}
+
+      - name: Configure serverless
+        run: |
+          doctl serverless install
+          doctl serverless connect
+
+      - name: Deploy function
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: doctl serverless deploy
