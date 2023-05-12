@@ -3,10 +3,10 @@ name: Deploy
 on:
   pull_request:
     branches: [main]
-    # paths: ["snapshot_function/**"]
+    paths: ["snapshot_function/**"]
   push:
     branches: [main]
-    # paths: ["snapshot_function/**"]
+    paths: ["snapshot_function/**"]
   workflow_dispatch:
 
 jobs:
@@ -35,5 +35,5 @@ jobs:
           doctl serverless connect
 
       - name: Deploy function
-        # if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: doctl serverless deploy .
