@@ -32,7 +32,7 @@ class Snapshot
   end
 
   def to_s
-    "#{network}/#{height}/#{url}"
+    "#{@network}/#{@height}/#{@url}"
   end
 
   # Deletes the snapshot from S3 - the full snapshot,
