@@ -6,5 +6,5 @@
   roles:
     - letsencrypt
   vars:
-    letsencrypt_email: ""
+    letsencrypt_email: "samuel@chainsafe.io"
     domain_name: ""

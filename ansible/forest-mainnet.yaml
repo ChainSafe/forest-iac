@@ -7,4 +7,4 @@
     - forest_mainnet
     - node_exporter
   vars:
-    volume_name: ""
+    volume_name: "forest_mainnet_volume"

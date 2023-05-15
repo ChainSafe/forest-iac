@@ -13,11 +13,11 @@
   roles:
     - observability
   vars:
-    spaces_endpoint: ""
-    spaces_region: ""
-    slack_token: ""
+    spaces_endpoint: "fra1.digitaloceanspaces.com"
+    spaces_region: "us-west-1"
+    spaces_bucket_name: ""
     slack_channel: ""
     spaces_access_token: ""
     spaces_secret_key: ""
-    spaces_bucket_name: ""
+    slack_token: ""
     domain_name: ""

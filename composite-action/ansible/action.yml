@@ -1,0 +1,102 @@
+name: Configure Forest Infrastructure on DigitalOcean with Ansible
+
+description: |
+  This Ansible action is used to configure Forest to either the mainnet or calibnet environment.
+
+inputs:
+  environment:
+    description: 'The environment to deploy the infrastructure to (either "mainnet" or "calibnet")'
+    required: true
+  digitalocean_token:
+    description: 'The DigitalOcean access token to use for deploying the infrastructure'
+    required: true
+  aws_access_key_id:
+    description: 'The AWS access key ID to use for configuring Ansible'
+    required: true
+  aws_secret_access_key:
+    description: 'The AWS secret access key to use for configuring Ansible'
+    required: true
+  ssh-private-key:
+    description: 'The SSH private key to use for configuring Ansible'
+    required: true
+  slack_token:
+    description: 'The Slack API URL to use for sending deployment notifications'
+    required: true
+  domain_name:
+    description: 'The domain name to use for configuring HTTPS (required for mainnet environment)'
+    required: true
+  spaces_bucket_name:
+    description: 'The DigitalOcean Spaces bucket name to use for storing LetsEncrypt certificates (required for mainnet environment)'
+    required: true
+  letsencrypt_email:
+    description: 'The email address to use for LetsEncrypt certificate renewal'
+    required: true
+  slack_channel:
+    description: 'The Slack channel to use for sending deployment notifications'
+    required: true
+  volume_name:
+    description: 'The name of the  volume to use for storing the blockchain data (required for mainnet environment)'
+    required: true
+  working_directory:
+    description: 'The ansible working Directory'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Download Forest ${{ inputs.environment }} Host File
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      id: download
+      uses: actions/download-artifact@v2
+      with:
+        name: hosts_${{ inputs.environment }}
+        path: Ansible/
+
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Set-up Action
+      shell: bash
+      run: |
+        python -m pip install --upgrade pip
+        pip install ansible==7.4.0
+
+    - name: Configure ssh-agent
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      uses: webfactory/ssh-agent@v0.7.0
+      with:
+        ssh-private-key: ${{ inputs.ssh-private-key }}
+
+    - name: Run Ansible To Install Forest-${{ inputs.environment }}
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: ansible-playbook -i hosts_${{ inputs.environment }} --user chainsafe forest-${{ inputs.environment }}.yaml
+      shell: bash
+      working-directory: ${{ inputs.working_directory }}
+      env:
+        ANSIBLE_CONFIG: Ansible.cfg
+        VOLUME_NAME: ${{ inputs.volume_name }}
+
+    - name: Configure Observability For Forest-${{ inputs.environment }} Node
+      shell: bash
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      working-directory: ${{ inputs.working_directory }}
+      run: ansible-playbook -i hosts_${{ inputs.environment }} --user chainsafe observability.yaml
+      env:
+        ANSIBLE_CONFIG: Ansible.cfg
+        DOMAIN_NAME: ${{ inputs.domain_name }}
+        SLACK_CHANNEL: ${{ inputs.slack_channel }}
+        SPACES_BUCKET_NAME: ${{ inputs.spaces_bucket_name }}
+        VOLUME_NAME: ${{ inputs.volume_name }}
+        AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
+        AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
+
+    - name: Configure HTTPS For Forest-${{ inputs.environment }} Grafana Custom Domain
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      working-directory: ${{ inputs.working_directory }}
+      shell: bash
+      run: ansible-playbook -i hosts_${{ inputs.environment }} --user chainsafe letsencrypt.yaml
+      env:
+        ANSIBLE_CONFIG: Ansible.cfg
+        DOMAIN_NAME: ${{ inputs.domain_name }}

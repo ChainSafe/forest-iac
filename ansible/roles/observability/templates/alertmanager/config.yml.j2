@@ -1,4 +1,3 @@
-
 global:
   slack_api_url: https://slack.com/api/chat.postMessage
   http_config:
@@ -24,11 +23,13 @@ receivers:
   slack_configs:
   - channel: "#{{ slack_channel }}"
     text: "summary: {{ '{{' }} .CommonAnnotations.summary {{ '}}' }}: {{ '{{' }} .CommonAnnotations.description {{ '}}' }}"
-- name: 'critical-notifications'
-  slack_configs:
-  - channel: "#{{ slack_channel }}"
-    text: "Critical alert: {{ '{{' }} .CommonAnnotations.summary {{ '}}' }}: {{ '{{' }} .CommonAnnotations.description {{ '}}' }}"
+
 - name: 'warning-notifications'
   slack_configs:
   - channel: "#{{ slack_channel }}"
     text: "Warning alert: {{ '{{' }} .CommonAnnotations.summary {{ '}}' }}: {{ '{{' }} .CommonAnnotations.description {{ '}}' }}"
+
+- name: 'critical-notifications'
+  slack_configs:
+  - channel: "#{{ slack_channel }}"
+    text: "Critical alert: {{ '{{' }} .CommonAnnotations.summary {{ '}}' }}: {{ '{{' }} .CommonAnnotations.description {{ '}}' }}"

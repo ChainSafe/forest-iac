@@ -8,11 +8,10 @@ destination_addresses   = ["0.0.0.0/0", "::/0"]
 protocol                = "tcp"
 initial_filesystem_type = "ext4"
 enviroment              = "mainnet"
-
+project                 = "Forest-DEV"
+volume_size             = "2000"
+volume_name             = "forest-mainnet-volume"
+name                    = "forest-mainnet-iac"
+observability_name      = "forest-mainnet-observability"
 # This set of variables are unique and must be defined here in order to deploy successfully
-# name               = ""
 # digitalocean_token = ""
-# observability_name = ""
-# volume_name        = ""
-# volume_size        = ""
-# project            = ""

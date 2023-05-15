@@ -82,7 +82,7 @@
     pull: true
     restart_policy: always
     volumes:
-      - /etc/forest/config.toml:/home/forest/config.toml
+      - /etc/forest/config.toml:{{ forest_config }}
       - /mnt/{{ volume_name }}/forest:/home/forest/data
     ports:
       - "1234:1234"

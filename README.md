@@ -43,11 +43,6 @@ To implement the infrastructure, run the following:
 - Generate `digitalocean_api_token` from DigitalOcean console; you can check [here](https://docs.digitalocean.com/reference/api/create-personal-access-token/) for more details.
 - If you need to run this locally, uncomment the variables below in the `terraform.tfvars` file and populate with the required values
     - `digitalocean_token`
-    - `name`
-    - `observability_name`
-    - `volume_size`
-    - `Volume_name`
-    - `project`
 ```
 📑  The variables volume_size and volume_name can only be configured if you plan to run the Forest Mainnet Infrastructure.
 ```
