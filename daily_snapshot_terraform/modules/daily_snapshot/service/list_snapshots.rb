@@ -31,6 +31,10 @@ class Snapshot
     @url = url
   end
 
+  def to_s
+    "#{network}/#{height}/#{url}"
+  end
+
   # Deletes the snapshot from S3 - the full snapshot,
   # the checksum and the compressed version.
   def delete
