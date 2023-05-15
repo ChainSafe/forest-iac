@@ -19,14 +19,14 @@ async function main(args) {
     const body = await response.text();
 
     const parser = new XMLParser();
-    let jObj = parser.parse(body);
+    let s3_listing = parser.parse(body);
 
     const re = /([^_]+?)_snapshot_([^_]+?)_(\d{4}-\d{2}-\d{2})_height_(\d+).car(.zst)?$/;
 
     var snapshots = [];
 
-    for (var i = 0; i < jObj.ListBucketResult.Contents.length; i++) {
-        const key = jObj.ListBucketResult.Contents[i].Key;
+    for (var i = 0; i < s3_listing.ListBucketResult.Contents.length; i++) {
+        const key = s3_listing.ListBucketResult.Contents[i].Key;
         const myArray = key.match(re);
         if (myArray) {
             let snapshot = { "key": key, "provider": myArray[1], "network": myArray[2], "date": myArray[3], "epoch": parseInt(myArray[4]), "compressed": myArray[5] === '.zst' };
