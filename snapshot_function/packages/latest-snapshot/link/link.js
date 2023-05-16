@@ -1,14 +1,14 @@
-const fetch = require('node-fetch');
-const { XMLParser, XMLBuilder, XMLValidator } = require("fast-xml-parser");
+import fetch from 'node-fetch';
+import { XMLParser } from 'fast-xml-parser';
 
-const region = 'fra1'
-const bucket = 'forest-snapshots'
+const region = 'fra1';
+const bucket = 'forest-snapshots';
 
 const base_url = 'https://' + region + '.digitaloceanspaces.com/' + bucket;
 
 // "calibnet/forest_snapshot_calibnet_2022-11-30_height_81393.car"
 
-async function main(args) {
+export async function main(args) {
     // default to compressed snapshots unless we're told otherwise
     let compressed = !(args.compressed === 'false' || args.compressed === 'no' || args.compressed === '0');
 
