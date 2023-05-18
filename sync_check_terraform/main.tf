@@ -51,6 +51,15 @@ provider "digitalocean" {
   token = var.do_token
 }
 
+// Ugly hack because 'archive_file' cannot mix files and folders.
+data "external" "sources_tar" {
+  program = ["sh", "${path.module}/prep_sources.sh", "${path.module}"]
+}
+
+data "local_file" "sources" {
+  filename = data.external.sources_tar.result.path
+}
+
 data "digitalocean_ssh_keys" "keys" {
   sort {
     key       = "name"
@@ -84,10 +93,39 @@ resource "digitalocean_droplet" "forest" {
     type = "ssh"
   }
 
+  # Push the sources.tar file to the newly booted droplet
+  provisioner "file" {
+    source      = data.local_file.sources.filename
+    destination = "/root/sources.tar"
+  }
+
   provisioner "remote-exec" {
     inline = [
-      "cd /root/",
-      "echo 'this script will run when droplet is created' > init.txt",
+      "tar xf sources.tar",
+      "dnf install -y dnf-plugins-core",
+      "dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo",
+      "dnf install -y docker-ce docker-ce-cli containerd.io",
+      "dnf install -y docker-buildx-plugin docker-compose-plugin docker-compose",
+      "dnf install -y ruby",
+      "dnf install -y ruby-devel",
+      "dnf install -y gcc make",
+      "dnf clean all",
+      "gem install slack-ruby-client",
+      "gem install sys-filesystem",
+      "cp dot-env-template .env",
+      "export FOREST_TAG=edge",
+      "export FOREST_TARGET_DATA=/volumes/forest_data",
+      "export FOREST_TARGET_SCRIPTS=/volumes/sync_check",
+      "export FOREST_TARGET_RUBY_COMMON=/volumes/ruby_common",
+      "export FOREST_SLACK_API_TOKEN=xoxb-160325419412-3252853891664-9piCTjuoo7wJNH3ucKzwM7fT",
+      "export FOREST_SLACK_NOTIF_CHANNEL=#forest-notifications",
+      "sudo systemctl start docker",
+      "docker volume create --name=forest-data",
+      "docker volume create --name=sync-check",
+      "docker volume create --name=ruby-common",
+      "nohup /bin/bash ./run_service.sh > run_service_log.txt &",
+      # Exiting without a sleep sometimes kills the script :-/
+      "sleep 10s",
     ]
   }
 }
