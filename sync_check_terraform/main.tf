@@ -22,8 +22,8 @@ terraform {
 }
 
 locals {
-  name                  = "forest-sync-check"     # droplet name
-  size                  = "so-2vcpu-16gb"         # droplet size
+  name                  = "forest-sync-check" # droplet name
+  size                  = "so-2vcpu-16gb"     # droplet size
   image                 = "fedora-36-x64"
   slack_channel         = "#forest-notifications" # slack channel for notifications
   region                = "fra1"
