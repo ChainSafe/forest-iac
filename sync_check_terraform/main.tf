@@ -117,7 +117,6 @@ resource "digitalocean_droplet" "forest" {
       "export FOREST_TARGET_DATA=/volumes/forest_data",
       "export FOREST_TARGET_SCRIPTS=/volumes/sync_check",
       "export FOREST_TARGET_RUBY_COMMON=/volumes/ruby_common",
-      "export FOREST_SLACK_API_TOKEN=xoxb-160325419412-3252853891664-9piCTjuoo7wJNH3ucKzwM7fT",
       "export FOREST_SLACK_NOTIF_CHANNEL=#forest-notifications",
       "sudo systemctl start docker",
       "docker volume create --name=forest-data",
