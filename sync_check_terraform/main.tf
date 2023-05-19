@@ -67,14 +67,6 @@ data "digitalocean_ssh_keys" "keys" {
   }
 }
 
-# resource "digitalocean_volume" "forest_storage" {
-#   region                  = local.region
-#   name                    = "sync-check-storage"
-#   size                    = 400
-#   initial_filesystem_type = "ext4"
-#   description             = "DB storage"
-# }
-
 resource "digitalocean_droplet" "forest" {
   image  = local.image
   name   = local.name
