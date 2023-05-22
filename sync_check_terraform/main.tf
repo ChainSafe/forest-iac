@@ -121,11 +121,6 @@ resource "digitalocean_droplet" "forest" {
   }
 }
 
-# resource "digitalocean_volume_attachment" "attach_forest_storage" {
-#   droplet_id = digitalocean_droplet.forest.id
-#   volume_id  = digitalocean_volume.forest_storage.id
-# }
-
 data "digitalocean_project" "forest_project" {
   name = local.project
 }
