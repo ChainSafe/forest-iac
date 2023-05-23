@@ -52,15 +52,15 @@
 - name: Check if docker compose exist
   ansible.builtin.stat:
     path: "{{ docker_compose_path }}"
-  register: _check_if_compose_exist
+  register: observability_compose_binary
 
 - name: Check if docker-compose exists and get its version
   block:
     - name: Get docker-compose version
       ansible.builtin.command:
         cmd: /usr/local/bin/docker-compose version --short
-      when: _check_if_compose_exist.stat.exists
-      register: _get_compose_version
+      when: observability_compose_binary.stat.exists
+      register: observability_compose_version
       changed_when: false
 
     - name: Install Docker compose
@@ -71,7 +71,7 @@
         owner: "{{ user }}"
         group: "{{ user }}"
         mode: "0755"
-      when: not _check_if_compose_exist.stat.exists or _get_compose_version.stdout != docker_compose_version
+      when: not observability_compose_binary.stat.exists or observability_compose_version.stdout != docker_compose_version
 
 - name: Set-up observability stacks
   ansible.builtin.include_tasks: set-up.yml
@@ -82,16 +82,16 @@
   ansible.builtin.command:
     cmd: "docker-compose up --build --force-recreate -d"
     chdir: "/etc/observability"
-  register: output
-  changed_when: output.stdout.find("Creating") != -1
+  register: observability_compose_run
+  changed_when: observability_compose_run.stdout.find("Creating") != -1
 
-- name: Debug output variable
+- name: Debug observability_compose_run variable
   ansible.builtin.debug:
-    var: output
+    var: observability_compose_run
 
 - name: Ensure Containers are running
   ansible.builtin.command: /bin/bash -c "set -o pipefail; ps aux | grep {{ item }} || true"
-  register: app_status
+  register: observability_app_status
   with_items:
     - prometheus
     - loki
@@ -101,4 +101,4 @@
 
 - name: Display Containers status
   ansible.builtin.debug:
-    msg: "{{ app_status.results | map(attribute='stdout_lines') | list }}"
+    msg: "{{ observability_app_status.results | map(attribute='stdout_lines') | list }}"
