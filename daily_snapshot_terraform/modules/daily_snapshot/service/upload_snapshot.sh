@@ -2,6 +2,7 @@
 
 # If Forest hasn't synced to the network after 8 hours, something has gone wrong.
 SYNC_TIMEOUT=8h
+DOCKER_TIMEOUT=24h
 
 if [[ $# != 2 ]]; then
   echo "Usage: bash $0 CHAIN_NAME SNAPSHOT_PATH"
@@ -33,7 +34,7 @@ HEREDOC
 )
 
 # Run forest and generate a snapshot in forest_db/
-docker run \
+timeout $DOCKER_TIMEOUT docker run \
   --name forest-snapshot-upload-node-"$CHAIN_NAME" \
   --rm \
   -v "$BASE_FOLDER/forest_db:/home/forest/forest_db":z \
