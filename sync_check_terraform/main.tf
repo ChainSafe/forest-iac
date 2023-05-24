@@ -60,6 +60,12 @@ data "local_file" "sources" {
   filename = data.external.sources_tar.result.path
 }
 
+// Note: The init.sh file is also included in the sources.zip such that the hash
+// of the archive captures the entire state of the machine.
+data "local_file" "init" {
+  filename = "${path.module}/service/init.sh"
+}
+
 data "digitalocean_ssh_keys" "keys" {
   sort {
     key       = "name"
@@ -73,7 +79,7 @@ resource "digitalocean_droplet" "forest" {
   region = local.region
   size   = local.size
   # Re-initialize resource if this hash changes:
-  user_data = "some-hash-value"
+  user_data = data.local_file.sources.content_sha256
   tags      = ["iac"]
   ssh_keys  = data.digitalocean_ssh_keys.keys.ssh_keys.*.fingerprint
 
@@ -94,26 +100,16 @@ resource "digitalocean_droplet" "forest" {
   provisioner "remote-exec" {
     inline = [
       "tar xf sources.tar",
-      "dnf install -y dnf-plugins-core",
-      "dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo",
-      "dnf install -y docker-ce docker-ce-cli containerd.io",
-      "dnf install -y docker-buildx-plugin docker-compose-plugin docker-compose",
-      "dnf install -y ruby",
-      "dnf install -y ruby-devel",
-      "dnf install -y gcc make",
-      "dnf clean all",
-      "gem install slack-ruby-client",
-      "gem install sys-filesystem",
-      "export FOREST_TAG=edge",
-      "export FOREST_TARGET_DATA=/volumes/forest_data",
-      "export FOREST_TARGET_SCRIPTS=/volumes/sync_check",
-      "export FOREST_TARGET_RUBY_COMMON=/volumes/ruby_common",
-      "export FOREST_SLACK_API_TOKEN=${var.slack_token}",
-      "export FOREST_SLACK_NOTIF_CHANNEL=#forest-notifications",
-      "sudo systemctl start docker",
-      "docker volume create --name=forest-data",
-      "docker volume create --name=sync-check",
-      "docker volume create --name=ruby-common",
+      # Set required environment variables
+      "echo 'export FOREST_TAG=edge' >> .forest_env",
+      "echo 'export FOREST_TARGET_DATA=/volumes/forest_data' >> .forest_env",
+      "echo 'export FOREST_TARGET_SCRIPTS=/volumes/sync_check' >> .forest_env",
+      "echo 'export FOREST_TARGET_RUBY_COMMON=/volumes/ruby_common' >> .forest_env",
+      "echo 'export FOREST_SLACK_API_TOKEN=\"${var.slack_token}\"' >> .forest_env",
+      "echo 'export FOREST_SLACK_NOTIF_CHANNEL=\"${local.slack_channel}\"' >> .forest_env",
+      "echo 'source .forest_env' >> .bashrc",
+      "source ~/.forest_env",
+      "/bin/bash ./init.sh > init_log.txt",
       "nohup /bin/bash ./run_service.sh > run_service_log.txt &",
       # Exiting without a sleep sometimes kills the script :-/
       "sleep 10s",
@@ -173,7 +169,6 @@ resource "digitalocean_firewall" "forest-firewall" {
 
   droplet_ids = [digitalocean_droplet.forest.id]
 }
-
 
 # This ip address may be used in the future by monitoring software
 output "ip" {
