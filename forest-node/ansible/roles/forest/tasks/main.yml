@@ -63,21 +63,21 @@
       - "1234:1234"
       - "6116:6116"
       - "3100:3100"
-  register: container_result
+  register: forest_container_result
 
 - name: Get infos on container
   become_user: "{{ user }}"
   community.docker.docker_container_info:
     name: forest
-  register: result
+  register: forest_result
 
 - name: Does container exist?
   become_user: "{{ user }}"
   ansible.builtin.debug:
-    msg: "The container {{ 'exists' if result.exists else 'does not exist' }}"
+    msg: "The container {{ 'exists' if forest_result.exists else 'does not exist' }}"
 
 - name: Print information about container
   become_user: "{{ user }}"
   ansible.builtin.debug:
-    var: result.container
-  when: result.exists
+    var: forest_result.container
+  when: forest_result.exists

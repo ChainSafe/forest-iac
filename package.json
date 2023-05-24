@@ -1,0 +1,13 @@
+{
+  "name": "root",
+  "private": true,
+  "devDependencies": {
+    "prettier": "^2.8.4",
+    "eslint": "^8.34.0"
+  },
+  "scripts": {
+    "js-fmt": "prettier --write '**/*.js'",
+    "js-check": "prettier --check '**/*.js'",
+    "lint": "eslint  '**/*.js'"
+  }
+}
