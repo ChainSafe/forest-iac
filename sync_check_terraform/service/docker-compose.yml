@@ -94,6 +94,7 @@ services:
     depends_on:
       - forest_mainnet
       - forest_calibnet
+    restart: unless-stopped
     labels:
       com.centurylinklabs.watchtower.enable: true
       com.centurylinklabs.watchtower.depends-on: "forest-mainnet,forest-calibnet"

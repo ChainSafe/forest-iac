@@ -1,0 +1,10 @@
+[Unit]
+Description=Restart docker service
+
+[Service]
+ExecStart=/bin/bash /root/restart.sh
+WorkingDirectory=/root
+Restart=always
+
+[Install]
+WantedBy=default.target
