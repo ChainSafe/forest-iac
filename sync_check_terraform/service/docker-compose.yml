@@ -27,6 +27,8 @@ services:
     environment:
       FOREST_GC_TRIGGER_FACTOR: "1.4"
     restart: unless-stopped
+    labels:
+      com.centurylinklabs.watchtower.enable: true
   forest_calibnet:
     image: ghcr.io/chainsafe/forest:${FOREST_TAG}
     hostname: forest-calibnet
@@ -51,6 +53,8 @@ services:
     environment:
       FOREST_GC_TRIGGER_FACTOR: "1.2"
     restart: unless-stopped
+    labels:
+      com.centurylinklabs.watchtower.enable: true
   # Probe container to validate Forest syncing. Needs to be on the same network.
   forest_tester:
     build:
@@ -90,6 +94,9 @@ services:
     depends_on:
       - forest_mainnet
       - forest_calibnet
+    labels:
+      com.centurylinklabs.watchtower.enable: true
+      com.centurylinklabs.watchtower.depends-on: "forest-mainnet,forest-calibnet"
 
 volumes:
   forest-data:
