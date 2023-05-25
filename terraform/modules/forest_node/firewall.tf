@@ -2,31 +2,31 @@ resource "digitalocean_firewall" "forest_firewall" {
   name = var.name
 
   inbound_rule {
-    protocol         = var.protocol
+    protocol         = "tcp"
     port_range       = "22"
     source_addresses = var.source_addresses
   }
 
   inbound_rule {
-    protocol         = var.protocol
+    protocol         = "tcp"
     port_range       = "1234"
     source_addresses = var.source_addresses
   }
 
   inbound_rule {
-    protocol           = var.protocol
+    protocol           = "tcp"
     port_range         = "6116"
     source_droplet_ids = [digitalocean_droplet.forest_observability.id]
   }
 
   inbound_rule {
-    protocol           = var.protocol
+    protocol           = "tcp"
     port_range         = "9100"
     source_droplet_ids = [digitalocean_droplet.forest_observability.id]
   }
 
   outbound_rule {
-    protocol              = var.protocol
+    protocol              = "tcp"
     port_range            = "all"
     destination_addresses = var.destination_addresses
   }
@@ -51,31 +51,31 @@ resource "digitalocean_firewall" "forest_observability_firewall" {
   name = var.observability_name
 
   inbound_rule {
-    protocol         = var.protocol
+    protocol         = "tcp"
     port_range       = "22"
     source_addresses = var.source_addresses
   }
 
   inbound_rule {
-    protocol         = var.protocol
+    protocol         = "tcp"
     port_range       = "80"
     source_addresses = var.source_addresses
   }
 
   inbound_rule {
-    protocol         = var.protocol
+    protocol         = "tcp"
     port_range       = "443"
     source_addresses = var.source_addresses
   }
 
   inbound_rule {
-    protocol           = var.protocol
+    protocol           = "tcp"
     port_range         = "3100"
     source_droplet_ids = [digitalocean_droplet.forest.id]
   }
 
   outbound_rule {
-    protocol              = var.protocol
+    protocol              = "tcp"
     port_range            = "all"
     destination_addresses = var.destination_addresses
   }
