@@ -1,9 +1,10 @@
 # Overview
 
-This folder contains the necessary configurations and instructions to set up and 
-automatically start the Forest Sync-Check service on a DigitalOcean droplet. 
-The service will run a sync check on both calibnet and mainnet and 
-will also notify the Forest Slack notification channel.
+This folder includes an executable file that facilitates the setup and 
+automatic initiation of the Forest Sync-Check service on a DigitalOcean droplet. 
+The service is designed to perform sync checks on both the calibnet and mainnet networks. 
+Additionally, it sends notifications to the Forest Slack notification channel and 
+the sync check service is configured to restart automatically upon droplet reboot.
 
 # Workflow
 
@@ -11,12 +12,8 @@ Changing any of the settings (such as the size of the droplet or the operating
 system) will automatically re-deploy the service. The same is true for changing
 any of the scripts.
 
-To propose new changes, start by opening a PR. This will trigger a new
-deployment plan to be pasted in the PR comments. Once the PR is merged, the
-deployment plan is executed.
-
 The workflow has access to all the required secrets (DO token, slack token, S3
-credentials, etc) and none of them have to be provided when creating a new PR.
+credentials) and none of them have to be provided when creating a new PR.
 However, the deployment workflow is not triggered automatically if you change
 the secrets. In this case, you have to trigger the workflow manually.
 
