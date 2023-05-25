@@ -63,46 +63,6 @@ Then save the file and restart the terminal for the changes to take effect.
 
 - To create the infrastructure, run `make apply_calib` for calibnet and `make apply_main` for mainnet in the terraform directory.
 
-## Observability
-
-### Requirements
-The droplet requirements to run observability for forest include:
-- RAM: 8GB
-- VCPU: 1
-- Disk Size: >100 GB
-
-To configure Observability which includes `Prometheus`, `alertmanager`, `Loki`, `Node Exporter`, `Grafana` and `HTTPS` the following variables are available to be used according to your needs and should be filled in the `observability.yaml` and `letsencrypt.yaml` file.
-
-| Variable   	                            | Description                                       | Default Value |
-|-------------------------------------------|---------------------------------------------------|---------------|
-| node\_exporter\_version                            | Node Exporter version to be Installed                          | 1.1.2        |
-| docker\_compose\_version                             | Docker Compose Version to be Installed                          | v2.16.0        |
-| prometheus\_retention\_time                                | Premetheus Metrics Retention time                         | 365 Days     |
-| prometheus\_scrape\_interval                                | How Frequently Should Prometheus Scrape metrics                           | 30s          |
-| slack\_token                               | Slack Token                          | "" [Required]()          |
-| slack\_channel                              | Slack Channel to Receive Alert Manager Notifications                            | "" [Required]()           |
-| loki\_from\_date                          | The Start of The Database Schema Version   | 2022-01-01    |
-| loki\_schema\_version                     | Which Database Schema Version to use              | v11           |
-| spaces\_endpoint                       | Digital Ocean Spaces Endpoint                                        | fra1.digitaloceanspaces.com         |
-| spaces\_region                          | Spaces Bucket Region                                  | fra1     |
-| spaces\_bucket\_name                          | Digital Ocean S3 Compatible Spaces Name                                    |   "" [Required]()          |
-| spaces\_access\_token                    | Spaces Access key Token                                   | "" [Required]()     |
-|  spaces_secret_key     | Spaces Secret Access key                   | "" [Required]()           |
-| loki\_ingester\_chunk\_idle\_period   | Flush the chunk after time idle                      | 5m          |
-| volume_name   |  Digital Ocean Volume Name For Mainnet Data                     | "" [Required, when running Mainnet]()         |
-| domain_name   |    Custom Domain Name for the Grafana Endpoint                   | "" [Required]()         |
-| letsencrypt_email   |   Email to be Used when Request for HTTPS certificate                   | "" [Required In the Lets Encrypt Yaml]()         |
-
-- In the ansible directory, run `make observ_calib` for calibnet or `make observ_main` for mainnet to start configuring the required services, including `Grafana Loki`, `Prometheus`, `Node Exporter`, and `Alertmanager`.
-
-- Before initializing HTTPS with Let's Encrypt, ensure that you have mapped the Observability Droplet IP to your custom domain. Once you have completed this step, run  `make lets_calib` for Calibnet and `make lets_main` for Mainnet in the ansible directory.
-
-- Once the observability stack is up, you can access your Grafana UI here `https://example.com` depending on the pre-defined domain name. Use the default Grafana credentials: `admin:admin`.
-
-- To query the Loki logs, go to the Grafana webapp's `Configuration/Data Sources` section, select Loki, click explore, and then run LogQL queries. For more information on `LogQL`, see its documentation [here](https://grafana.com/docs/loki/latest/logql/). There are two folders in the space; `fake` and `index`, while fake stores the main log data and index store the metadata of the chunks.
-
-Also, be aware that after ansible has configured all services, the servers will only be accessible via the `chainsafe` user which can be changed in `ansible.cfg` file if required. To test this implementation, access the server with appropriate `ssh` details in this format `ssh -i ~/.ssh/id_rsa chainsafe@ip_address`.
-
 ## Collaborators
 Feel free to contribute to the codebase by resolving any open issues, refactoring, adding new features, writing test cases, or any other way to make the project better and helpful to the community. Feel free to fork and send pull requests.
 

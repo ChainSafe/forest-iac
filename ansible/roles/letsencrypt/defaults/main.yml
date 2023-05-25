@@ -1,4 +1,0 @@
----
-letsencrypt_email: "{{ lookup('env', 'LETSENCRYPT_EMAIL') }}"
-domain_name: "{{ lookup('env', 'DOMAIN_NAME') }}"
-domain_ip: "{{ groups['observability'][0] }}"

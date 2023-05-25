@@ -8,11 +8,6 @@ variable "name" {
   type        = string
 }
 
-variable "observability_name" {
-  description = "The name of the observability Droplet"
-  type        = string
-}
-
 variable "region" {
   description = "The region where resources will be created"
   type        = string

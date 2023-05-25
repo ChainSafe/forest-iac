@@ -19,7 +19,6 @@ module "calibnet" {
   region                = var.region
   image                 = var.image
   size                  = var.size
-  observability_name    = var.observability_name
   source_addresses      = var.source_addresses
   attach_volume         = false
   destination_addresses = var.destination_addresses

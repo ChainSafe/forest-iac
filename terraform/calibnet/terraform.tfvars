@@ -5,7 +5,6 @@ region                = "fra1"
 source_addresses      = ["0.0.0.0/0", "::/0"]
 destination_addresses = ["0.0.0.0/0", "::/0"]
 enviroment            = "calibnet"
-observability_name    = "forest-calibnet-observability"
 project               = "Forest-DEV"
 name                  = "forest"
 
