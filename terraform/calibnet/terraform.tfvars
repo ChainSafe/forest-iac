@@ -4,7 +4,6 @@ image                 = "docker-20-04"
 region                = "fra1"
 source_addresses      = ["0.0.0.0/0", "::/0"]
 destination_addresses = ["0.0.0.0/0", "::/0"]
-protocol              = "tcp"
 enviroment            = "calibnet"
 observability_name    = "forest-calibnet-observability"
 project               = "Forest-DEV"

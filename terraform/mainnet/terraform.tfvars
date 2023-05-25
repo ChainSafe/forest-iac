@@ -5,7 +5,6 @@ image                   = "docker-20-04"
 region                  = "fra1"
 source_addresses        = ["0.0.0.0/0", "::/0"]
 destination_addresses   = ["0.0.0.0/0", "::/0"]
-protocol                = "tcp"
 initial_filesystem_type = "ext4"
 enviroment              = "mainnet"
 project                 = "Forest-DEV"
