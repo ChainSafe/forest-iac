@@ -45,6 +45,12 @@ variable "snapshot_endpoint" {
   default     = "https://fra1.digitaloceanspaces.com/"
 }
 
+variable "forest_tag" {
+  description = "Image tag for the Forest container"
+  type        = string
+  default     = "latest"
+}
+
 variable "image" {
   description = "The ID of the AMI to use for the Droplet"
   type        = string

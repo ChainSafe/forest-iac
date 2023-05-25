@@ -50,13 +50,33 @@ resource "digitalocean_volume" "forest_storage" {
   description             = "DB storage for snapshot generation"
 }
 
+locals {
+  init_commands = ["cd /root/",
+    "tar xf sources.tar",
+    # Set required environment variables
+    "echo 'export AWS_ACCESS_KEY_ID=\"${var.AWS_ACCESS_KEY_ID}\"' >> .forest_env",
+    "echo 'export AWS_SECRET_ACCESS_KEY=\"${var.AWS_SECRET_ACCESS_KEY}\"' >> .forest_env",
+    "echo 'export SLACK_API_TOKEN=\"${var.slack_token}\"' >> .forest_env",
+    "echo 'export SLACK_NOTIF_CHANNEL=\"${var.slack_channel}\"' >> .forest_env",
+    "echo 'export SNAPSHOT_BUCKET=\"${var.snapshot_bucket}\"' >> .forest_env",
+    "echo 'export SNAPSHOT_ENDPOINT=\"${var.snapshot_endpoint}\"' >> .forest_env",
+    "echo 'export BASE_FOLDER=\"/root\"' >> .forest_env",
+    "echo 'export FOREST_TAG=\"${var.forest_tag}\"' >> .forest_env",
+    "echo 'source .forest_env' >> .bashrc",
+    "source ~/.forest_env",
+    "nohup sh ./init.sh > init_log.txt &",
+    # Exiting without a sleep sometimes kills the script :-/
+    "sleep 10s"
+  ]
+}
+
 resource "digitalocean_droplet" "forest" {
   image  = var.image
   name   = var.name
   region = var.region
   size   = var.size
   # Re-initialize resource if this hash changes:
-  user_data = data.local_file.sources.content_sha256
+  user_data = join("-", [data.local_file.sources.content_sha256, sha256(join("", local.init_commands))])
   tags      = ["iac"]
   ssh_keys  = data.digitalocean_ssh_keys.keys.ssh_keys.*.fingerprint
 
@@ -74,27 +94,8 @@ resource "digitalocean_droplet" "forest" {
     destination = "/root/sources.tar"
   }
 
-  # WARNING: Changing these commands will _not_ trigger a re-deployment. If you
-  # edit these commands, you'll have to re-deploy manually.
   provisioner "remote-exec" {
-    inline = [
-      "cd /root/",
-      "tar xf sources.tar",
-      # Set required environment variables
-      "echo 'export AWS_ACCESS_KEY_ID=\"${var.AWS_ACCESS_KEY_ID}\"' >> .forest_env",
-      "echo 'export AWS_SECRET_ACCESS_KEY=\"${var.AWS_SECRET_ACCESS_KEY}\"' >> .forest_env",
-      "echo 'export SLACK_API_TOKEN=\"${var.slack_token}\"' >> .forest_env",
-      "echo 'export SLACK_NOTIF_CHANNEL=\"${var.slack_channel}\"' >> .forest_env",
-      "echo 'export SNAPSHOT_BUCKET=\"${var.snapshot_bucket}\"' >> .forest_env",
-      "echo 'export SNAPSHOT_ENDPOINT=\"${var.snapshot_endpoint}\"' >> .forest_env",
-      "echo 'export BASE_FOLDER=\"/root\"' >> .forest_env",
-      "echo 'export FOREST_TAG=\"edge\"' >> .forest_env",
-      "echo 'source .forest_env' >> .bashrc",
-      "source ~/.forest_env",
-      "nohup sh ./init.sh > init_log.txt &",
-      # Exiting without a sleep sometimes kills the script :-/
-      "sleep 10s",
-    ]
+    inline = local.init_commands
   }
 }
 

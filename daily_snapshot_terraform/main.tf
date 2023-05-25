@@ -31,6 +31,7 @@ module "daily_snapshot" {
   slack_channel     = "#forest-notifications" # slack channel for notifications
   snapshot_bucket   = "forest-snapshots"
   snapshot_endpoint = "fra1.digitaloceanspaces.com"
+  forest_tag        = "latest"
 
   # Variable passthrough:
   slack_token           = var.slack_token
