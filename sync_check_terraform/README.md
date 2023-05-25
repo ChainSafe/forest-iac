@@ -12,6 +12,9 @@ Changing any of the settings (such as the size of the droplet or the operating
 system) will automatically re-deploy the service. The same is true for changing
 any of the scripts.
 
+The sync check is configured using `restart unless-stopped` docker flag, 
+which restart automatically upon droplet reboot.
+
 The workflow has access to all the required secrets (DO token, slack token, S3
 credentials) and none of them have to be provided when creating a new PR.
 However, the deployment workflow is not triggered automatically if you change
