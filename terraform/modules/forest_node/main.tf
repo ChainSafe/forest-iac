@@ -41,11 +41,11 @@ resource "digitalocean_droplet" "forest" {
   ssh_keys = data.digitalocean_ssh_keys.keys.ssh_keys.*.fingerprint
 
   user_data = templatefile("${path.module}/user-data.tpl", {
-    NEW_USER = var.name
-    USER_DIR = "/home/${var.name}/.ssh"
+    NEW_USER      = var.name
+    USER_DIR      = "/home/${var.name}/.ssh"
     USER_DIR_AUTH = "/home/${var.name}/.ssh/authorized_keys"
     LOKI_ENDPOINT = "http://${digitalocean_droplet.forest_observability.ipv4_address}:3100/loki/api/v1/push"
-    VOLUME_NAME = var.attach_volume ? replace(var.volume_name, "-", "_") : ""
+    VOLUME_NAME   = var.attach_volume ? replace(var.volume_name, "-", "_") : ""
   })
 
   tags = [var.enviroment]
