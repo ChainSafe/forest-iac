@@ -27,4 +27,5 @@ module "mainnet" {
   enviroment              = var.enviroment
   volume_name             = var.volume_name
   project                 = var.project
+  fw_name                 = var.fw_name
 }

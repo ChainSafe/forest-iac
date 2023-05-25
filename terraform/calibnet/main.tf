@@ -24,4 +24,5 @@ module "calibnet" {
   destination_addresses = var.destination_addresses
   enviroment            = var.enviroment
   project               = var.project
+  fw_name               = var.fw_name
 }

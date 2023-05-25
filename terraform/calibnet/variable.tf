@@ -42,3 +42,8 @@ variable "project" {
   description = "The name assigned to the project in the cloud"
   type        = string
 }
+
+variable "fw_name" {
+  description = "The name assigned to the volume in the cloud"
+  type        = string
+}

@@ -30,7 +30,7 @@ data "digitalocean_project" "forest_project" {
 
 resource "digitalocean_project_resources" "connect_forest_project" {
   project   = data.digitalocean_project.forest_project.id
-  resources = [digitalocean_droplet.forest.urn, digitalocean_droplet.forest_observability.urn]
+  resources = [digitalocean_droplet.forest.urn]
 }
 
 resource "digitalocean_droplet" "forest" {

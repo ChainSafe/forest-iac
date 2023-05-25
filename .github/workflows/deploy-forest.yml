@@ -20,7 +20,7 @@ jobs:
         # Using Custom Composite action in ./composite-action/terraform folder
       - name:
         uses: ./composite-action/terraform
-        with:
+        with: Composite Action for Mainnet
           digitalocean_token: ${{ secrets.DO_TOKEN }}
           aws_access_key_id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -35,7 +35,7 @@ jobs:
       - name: Checkout the code
         uses: actions/checkout@v3
         # Using Custom Composite action in ./composite-action/terraform folder
-      - name:
+      - name: Composite Action for Calibnet
         uses: ./composite-action/terraform
         with:
           digitalocean_token: ${{ secrets.DO_TOKEN }}

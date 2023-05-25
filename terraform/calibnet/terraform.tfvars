@@ -7,6 +7,7 @@ destination_addresses = ["0.0.0.0/0", "::/0"]
 enviroment            = "calibnet"
 project               = "Forest-DEV"
 name                  = "forest"
+fw_name               = "forest-calibnet-fw"
 
 # This set of variables are unique and must be defined here in order to deploy successfully
 # digitalocean_token    = ""
