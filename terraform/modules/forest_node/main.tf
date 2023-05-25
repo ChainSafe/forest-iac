@@ -42,7 +42,7 @@ resource "digitalocean_droplet" "forest" {
 
   user_data = templatefile("${path.module}/user-data.tpl",
   {
-    NEW_USER = "${var.name}"
+    NEW_USER    = "${var.name}"
     VOLUME_NAME = "${var.attach_volume}" ? replace(var.volume_name, "-", "_") : ""
   })
 
