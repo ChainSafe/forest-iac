@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  Lint_ansible:
+  lint_ansible:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout the code
@@ -27,8 +27,8 @@ jobs:
       run: |
           ansible-galaxy collection install community.docker
           ansible-galaxy collection install community.general
-    - name: Lint code.
-      working-directory: ansible
+    - name: Lint code
+      working-directory: forest-node/ansible
       run: ansible-lint
 
   lint_terraform:

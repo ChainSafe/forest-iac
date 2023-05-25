@@ -42,7 +42,7 @@
 - name: Check if the url file exist
   ansible.builtin.stat:
     path: /etc/nginx/sites-enabled/http
-  register: http_file_exist
+  register: letsencrypt_http_file_exist
   changed_when: false
 
 - name: Install nginx url for certbot requests
@@ -50,7 +50,7 @@
     src: templates/nginx-http.j2
     dest: /etc/nginx/sites-enabled/http
     mode: "0755"
-  when: not http_file_exist.stat.exists
+  when: not letsencrypt_http_file_exist.stat.exists
 
 - name: Reload nginx to activate certbot endpoints
   ansible.builtin.service:

@@ -3,7 +3,7 @@
 - name: Check if node_exporter is present
   ansible.builtin.stat:
     path: "{{ node_exporter_bin }}"
-  register: _check_node_exporter_present
+  register: node_exporter_binary
   changed_when: false
 
 - name: Create a user for node_exporter
@@ -33,7 +33,7 @@
         executable: /bin/bash
       when: _check_node_exporter_present.stat.exists
       changed_when: false
-      register: _get_node_exporter_version
+      register: node_exporter_service_version
 
     - name: Set node_exporter_version fact
       ansible.builtin.set_fact:
@@ -46,7 +46,7 @@
         dest: "/tmp/"
         remote_src: true
         validate_certs: false
-      when: not _check_node_exporter_present.stat.exists or not _get_node_exporter_version.stdout == node_exporter_version
+      when: not node_exporter_binary.stat.exists or not node_exporter_service_version.stdout == node_exporter_version
 
     - name: Move the binary to the node_exporter destination
       ansible.builtin.copy:
@@ -56,7 +56,7 @@
         group: "{{ node_exporter_group }}"
         mode: "0755"
         remote_src: true
-      when: not _check_node_exporter_present.stat.exists or not _get_node_exporter_version.stdout == node_exporter_version
+      when: not node_exporter_binary.stat.exists or not node_exporter_service_version.stdout == node_exporter_version
 
     - name: Clean up
       ansible.builtin.file:

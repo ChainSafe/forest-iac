@@ -91,3 +91,4 @@ build-iPhoneSimulator/
 # .rubocop-https?--*
 
 .DS_Store
+node_modules/
