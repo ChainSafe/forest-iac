@@ -63,10 +63,6 @@ Then save the file and restart the terminal for the changes to take effect.
 
 - To create the infrastructure, run `make apply_calib` for calibnet and `make apply_main` for mainnet in the terraform directory.
 
-- Navigate to the ansible directory and run `make ping_calibnet` for calibnet and `make ping_main` for mainnet to verify the connection to the host servers.
-
-- While still in the ansible directory, run `make forest_calib` to initialize forest calibnet and `make forest_main` for forest mainnet.
-
 ## Observability
 
 ### Requirements

@@ -11,7 +11,7 @@ enviroment              = "mainnet"
 project                 = "Forest-DEV"
 volume_size             = "2000"
 volume_name             = "forest-mainnet-volume"
-name                    = "forest-mainnet-iac"
+name                    = "forest"
 observability_name      = "forest-mainnet-observability"
 # This set of variables are unique and must be defined here in order to deploy successfully
 # digitalocean_token = ""

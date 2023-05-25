@@ -50,7 +50,7 @@ runs:
       uses: actions/download-artifact@v2
       with:
         name: hosts_${{ inputs.environment }}
-        path: Ansible/
+        path: ansible/
 
     - name: Setup Python
       uses: actions/setup-python@v2
@@ -69,20 +69,11 @@ runs:
       with:
         ssh-private-key: ${{ inputs.ssh-private-key }}
 
-    - name: Run Ansible To Install Forest-${{ inputs.environment }}
-      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      run: ansible-playbook -i hosts_${{ inputs.environment }} --user chainsafe forest-${{ inputs.environment }}.yaml
-      shell: bash
-      working-directory: ${{ inputs.working_directory }}
-      env:
-        ANSIBLE_CONFIG: Ansible.cfg
-        VOLUME_NAME: ${{ inputs.volume_name }}
-
     - name: Configure Observability For Forest-${{ inputs.environment }} Node
       shell: bash
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       working-directory: ${{ inputs.working_directory }}
-      run: ansible-playbook -i hosts_${{ inputs.environment }} --user chainsafe observability.yaml
+      run: ansible-playbook -i hosts_${{ inputs.environment }} --user forest observability.yaml
       env:
         ANSIBLE_CONFIG: Ansible.cfg
         DOMAIN_NAME: ${{ inputs.domain_name }}
@@ -96,7 +87,7 @@ runs:
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       working-directory: ${{ inputs.working_directory }}
       shell: bash
-      run: ansible-playbook -i hosts_${{ inputs.environment }} --user chainsafe letsencrypt.yaml
+      run: ansible-playbook -i hosts_${{ inputs.environment }} --user forest letsencrypt.yaml
       env:
         ANSIBLE_CONFIG: Ansible.cfg
         DOMAIN_NAME: ${{ inputs.domain_name }}

@@ -1,6 +1,6 @@
 ---
 - name: Set-up Node-exporter
-  hosts: [observability]
+  hosts: all
   gather_facts: false
   become: true
   roles:

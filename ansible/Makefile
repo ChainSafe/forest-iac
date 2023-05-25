@@ -4,12 +4,6 @@ ping_calib:
 ping_main:
 	@ansible -i hosts_mainnet -m ping_calib
 
-forest_calib:
-	@ansible-playbook -i hosts_calibnet forest-calib.yaml
-
-forest_main:
-	@ansible-playbook -i hosts_mainnet forest-mainnet.yaml
-
 observ_calib:
 	@ansible-playbook -i hosts_calibnet observability.yaml
 

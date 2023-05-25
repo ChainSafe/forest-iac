@@ -19,10 +19,10 @@ prometheus_var_config:
       scrape_interval: 5m
       static_configs:
         - targets: ['localhost:9090']
-user: "chainsafe"
+user: "forest"
 user_group: "{{ user }}"
-user_dir: /home/chainsafe/.ssh
-user_dir_auth: /home/chainsafe/.ssh/authorized_keys
+user_dir: /home/forest/.ssh
+user_dir_auth: /home/forest/.ssh/authorized_keys
 
 loki_config_retention: 336h
 loki_config_period: 168h

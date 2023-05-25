@@ -8,7 +8,7 @@ protocol              = "tcp"
 enviroment            = "calibnet"
 observability_name    = "forest-calibnet-observability"
 project               = "Forest-DEV"
-name                  = "forest-calibnet-iac"
+name                  = "forest"
 
-#This set of variables are unique and must be defined here in order to deploy successfully
+# This set of variables are unique and must be defined here in order to deploy successfully
 # digitalocean_token    = ""
