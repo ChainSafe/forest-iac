@@ -23,11 +23,6 @@ variable "size" {
   type        = string
 }
 
-variable "protocol" {
-  description = "The protocol to use for the connection."
-  type        = string
-}
-
 variable "source_addresses" {
   description = "List of source addresses."
   type        = list(string)
