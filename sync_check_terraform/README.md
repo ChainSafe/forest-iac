@@ -1,6 +1,6 @@
 # Overview
 
-This folder includes an executable file that facilitates the setup and 
+This folder includes an executable description that facilitates the setup and 
 automatic initiation of the Forest Sync-Check service on a DigitalOcean droplet. 
 The service is designed to perform sync checks on both the calibnet and mainnet networks. 
 Additionally, it sends notifications to the Forest Slack notification channel and 
