@@ -20,7 +20,6 @@ module "mainnet" {
   image                   = var.image
   size                    = var.size
   observability_name      = var.observability_name
-  protocol                = "tcp"
   source_addresses        = var.source_addresses
   initial_filesystem_type = var.initial_filesystem_type
   volume_size             = var.volume_size
