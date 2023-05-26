@@ -24,7 +24,7 @@ jobs:
         # Using Custom Composite action in ./composite-action/terraform folder
       - name: Composite Action for Mainnet
         uses: ./composite-action/terraform
-        with: Composite Action for Mainnet
+        with: 
           digitalocean_token: ${{ secrets.DO_TOKEN }}
           aws_access_key_id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
