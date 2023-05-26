@@ -40,7 +40,7 @@ resource "digitalocean_droplet" "forest" {
   size     = var.size
   ssh_keys = data.digitalocean_ssh_keys.keys.ssh_keys.*.fingerprint
 
-  user_data = templatefile("${path.module}/user-data.tpl",
+  user_data = templatefile("${path.module}/user-data.sh",
     {
       NEW_USER    = "${var.name}"
       VOLUME_NAME = "${var.attach_volume}" ? replace(var.volume_name, "-", "_") : ""
