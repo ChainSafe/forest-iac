@@ -2,21 +2,16 @@
 
 set -euxo pipefail
 
-NEW_USER="sam"
-
-VOLUME_NAME="forest_mainnet_volume"
-
 # Create a login user
-useradd -m "${NEW_USER}"
+useradd --create-home -- "${NEW_USER}"
 
 # Create .ssh directory for created user
 mkdir --parents -- "/home/${NEW_USER}/.ssh"
 chown "${NEW_USER}:${NEW_USER}" "/home/${NEW_USER}/.ssh"
 chmod 0700 "/home/${NEW_USER}/.ssh"
 
-# Check if authorized_keys file exists
+# Check if authorized_keys file exists and copy it from root to new user
 if [ -f "/root/.ssh/authorized_keys" ]; then
-  : Copy public key from existing root to new user
   cp /root/.ssh/authorized_keys "/home/${NEW_USER}/.ssh/authorized_keys"
   chown "${NEW_USER}:${NEW_USER}" "/home/${NEW_USER}/.ssh/authorized_keys"
   chmod 0600 "/home/${NEW_USER}/.ssh/authorized_keys"
@@ -28,9 +23,8 @@ echo "AllowUsers ${NEW_USER}" >> /etc/ssh/sshd_config
 # Restart SSHD
 systemctl restart sshd
 
-# Add user to sudoers file # We pipe to visudo to check syntax
+# Add user to sudoers file. We pipe to visudo to check syntax
 echo "${NEW_USER} ALL=(ALL) NOPASSWD: ALL" | (EDITOR="tee --append" visudo)
-
 
 # Add new user to "docker" group
 usermod --append --groups docker "${NEW_USER}"
@@ -61,7 +55,7 @@ EOF
 
   su - "${NEW_USER}" -c "docker run -d --name forest \
     -v /etc/${NEW_USER}/config.toml:/home/${NEW_USER}/config.toml \
-    -v /mnt/$VOLUME_NAME:/home/${NEW_USER}/data \
+    -v /mnt/${VOLUME_NAME}:/home/${NEW_USER}/data \
     -p 1234:1234 \
     --restart always \
     ghcr.io/chainsafe/forest:latest \
