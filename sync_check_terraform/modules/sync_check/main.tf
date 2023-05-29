@@ -56,8 +56,7 @@ locals {
     "source ~/.forest_env",
     "/bin/bash ./init.sh > init_log.txt",
     "nohup /bin/bash ./run_service.sh > run_service_log.txt &",
-    "cp ./restart.service /etc/systemd/system/",
-    "systemctl enable restart.service",
+    "systemctl enable docker",
     # Exiting without a sleep sometimes kills the script :-/
     "sleep 10s",
   ]
