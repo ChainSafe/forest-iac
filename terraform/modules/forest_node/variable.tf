@@ -67,6 +67,6 @@ variable "project" {
 }
 
 variable "fw_name" {
-  description = "The name assigned to the volume in the cloud"
+  description = "The name assigned to the firewall in the cloud"
   type        = string
 }

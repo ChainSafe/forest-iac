@@ -1,9 +1,9 @@
 #!/bin/bash
 
-NEW_USER ="forest"
-VOLUME_NAME ="forest_mainnet_volume"
-CHAIN ="mainnet"
-DISK_ID_VOLUME_NAME = "forest-mainnet-volume"
+NEW_USER="forest"
+VOLUME_NAME="forest_mainnet_volume"
+CHAIN="mainnet"
+DISK_ID_VOLUME_NAME="forest-mainnet-volume"
 
 set -euxo pipefail
 
