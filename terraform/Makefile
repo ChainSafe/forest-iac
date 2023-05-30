@@ -7,14 +7,14 @@ TF_CALIB_DIR = calibnet
 .DEFAULT_GOAL := help
 
 help:
-	@echo "Usage: make [target]"
+    @echo "Usage: make [target]"
 	@echo ""
-	@echo "Targets:"
-	@echo "  init_calib or init_main      	Initialize Terraform for either mainnet or calibnet"
-	@echo "  plan_calib or plan_main     	Generate and show an execution plan for either mainnet or calibnet"
-	@echo "  apply_main or apply_calib  	Apply the changes for either mainnet or calibnet"
-	@echo "  destroy_main or destroy_calib  Destroy the Terraform-managed infrastructure for either mainnet or calibnet"
-	@echo "  help      						Shows this help message"
+    @echo "Targets:"
+    @echo "  init_calib or init_main        Initialize Terraform for either mainnet or calibnet"
+    @echo "  plan_calib or plan_main        Generate and show an execution plan for either mainnet or calibnet"
+    @echo "  apply_main or apply_calib      Apply the changes for either mainnet or calibnet"
+    @echo "  destroy_main or destroy_calib  Destroy the Terraform-managed infrastructure for either mainnet or calibnet"
+    @echo "  help                           Shows this help message"
 
 init_calib:
 	@cd $(TF_CALIB_DIR) && $(TF) init

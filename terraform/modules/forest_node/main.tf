@@ -42,8 +42,14 @@ resource "digitalocean_droplet" "forest" {
 
   user_data = templatefile("${path.module}/user-data.sh",
     {
-      NEW_USER    = "${var.name}"
-      VOLUME_NAME = "${var.attach_volume}" ? replace(var.volume_name, "-", "_") : ""
+      NEW_USER = "${var.name}"
+      # In the filesystem on the droplet, certain special characters, including "-",
+      # are not allowed in device identifiers for block storage volumes.
+      # Therefore, any "-" characters in the volume name are replaced with "_" when forming the device ID.
+      VOLUME_NAME         = "${var.attach_volume}" ? replace(var.volume_name, "-", "_") : ""
+      CHAIN               = "${var.enviroment}"
+      DISK_ID_VOLUME_NAME = "${var.attach_volume}" ? var.volume_name : ""
+
   })
 
   tags = [var.enviroment]

@@ -1,5 +1,10 @@
 #!/bin/bash
 
+NEW_USER ="forest"
+VOLUME_NAME ="forest_mainnet_volume"
+CHAIN ="mainnet"
+DISK_ID_VOLUME_NAME = "forest-mainnet-volume"
+
 set -euxo pipefail
 
 # Create a login user
@@ -29,9 +34,10 @@ echo "${NEW_USER} ALL=(ALL) NOPASSWD: ALL" | (EDITOR="tee --append" visudo)
 # Add new user to "docker" group
 usermod --append --groups docker "${NEW_USER}"
 
-# check if the volume name is defined
-# If the volume name is defined, start the Forest Mainnet Docker container with volume
-if [ -n "${VOLUME_NAME}" ]; then
+
+# Run forest based on the defined chain parameter. Mainnet or Calibnet
+# If the chain parameter is set to Mainnet run Forest mainnet
+if [ "${CHAIN}" = "mainnet" ]; then
 
   # set-up forest volume for mainnet container
   mkdir --parents -- /mnt/"${VOLUME_NAME}"
@@ -39,7 +45,7 @@ if [ -n "${VOLUME_NAME}" ]; then
   # discard: notify the volume to free blocks (useful for SSDs)
   # defaults: default mount options, including rw
   # noatime: don't preserve file access times
-  mount --options discard,defaults,noatime /dev/disk/by-id/scsi-0DO_Volume_forest-mainnet-volume /mnt/"${VOLUME_NAME}"
+  mount --options discard,defaults,noatime /dev/disk/by-id/scsi-0DO_Volume_"${DISK_ID_VOLUME_NAME}" /mnt/"${VOLUME_NAME}"
 
   # Change ownership of volume directory to the created user
   chown -R "${NEW_USER}":"${NEW_USER}" /mnt/"${VOLUME_NAME}"
@@ -61,15 +67,16 @@ EOF
     ghcr.io/chainsafe/forest:latest \
     --config /home/${NEW_USER}/config.toml \
     --encrypt-keystore false \
-    --auto-download-snapshot"
+    --auto-download-snapshot \
+    --chain ${CHAIN}"
 
 else
-  # If the volume name is not defined, start the Forest Calibnet Docker container
+  # Run forest calibnet if the chain parameter is set to calibnet
   su - "${NEW_USER}" -c "docker run -d --name forest \
     -p 1234:1234 \
     --restart always \
     ghcr.io/chainsafe/forest:latest \
     --encrypt-keystore false \
     --auto-download-snapshot \
-    --chain calibnet"
+    --chain ${CHAIN}"
 fi
