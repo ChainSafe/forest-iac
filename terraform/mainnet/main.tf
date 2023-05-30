@@ -24,7 +24,7 @@ module "mainnet" {
   volume_size             = var.volume_size
   attach_volume           = true
   destination_addresses   = var.destination_addresses
-  enviroment              = var.enviroment
+  chain                   = var.chain
   volume_name             = var.volume_name
   project                 = var.project
   fw_name                 = var.fw_name

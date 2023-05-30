@@ -32,5 +32,5 @@ resource "digitalocean_firewall" "forest_firewall" {
 
   droplet_ids = [digitalocean_droplet.forest.id]
 
-  tags = [var.enviroment]
+  tags = [var.chain]
 }

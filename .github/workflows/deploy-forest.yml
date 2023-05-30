@@ -24,12 +24,12 @@ jobs:
         # Using Custom Composite action in ./composite-action/terraform folder
       - name: Composite Action for Mainnet
         uses: ./composite-action/terraform
-        with: 
+        with:
           digitalocean_token: ${{ secrets.DO_TOKEN }}
           aws_access_key_id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           working_directory: terraform/mainnet
-          environment: mainnet
+          chain: mainnet
 
   deploy-forest-calibnet-infrastruture-with-terraform:
     name: Deploy Forest Terraform Calibnet Infrastructure
@@ -46,4 +46,4 @@ jobs:
           aws_access_key_id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           working_directory: terraform/calibnet
-          environment: calibnet
+          chain: calibnet

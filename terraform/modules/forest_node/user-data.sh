@@ -1,10 +1,5 @@
 #!/bin/bash
 
-NEW_USER="forest"
-VOLUME_NAME="forest_mainnet_volume"
-CHAIN="mainnet"
-DISK_ID_VOLUME_NAME="forest-mainnet-volume"
-
 set -euxo pipefail
 
 # Create a login user
@@ -42,10 +37,13 @@ if [ "${CHAIN}" = "mainnet" ]; then
   # set-up forest volume for mainnet container
   mkdir --parents -- /mnt/"${VOLUME_NAME}"
 
-  # discard: notify the volume to free blocks (useful for SSDs)
-  # defaults: default mount options, including rw
-  # noatime: don't preserve file access times
-  mount --options discard,defaults,noatime /dev/disk/by-id/scsi-0DO_Volume_"${DISK_ID_VOLUME_NAME}" /mnt/"${VOLUME_NAME}"
+  # Check if the directory is a mountpoint, and only tries to mount the volume if it isn't.
+  if ! mountpoint -q /mnt/"${VOLUME_NAME}"; then
+    # discard: notify the volume to free blocks (useful for SSDs)
+    # defaults: default mount options, including rw
+    # noatime: don't preserve file access times
+    mount --options discard,defaults,noatime /dev/disk/by-id/scsi-0DO_Volume_"${DISK_ID_VOLUME_NAME}" /mnt/"${VOLUME_NAME}"
+  fi
 
   # Change ownership of volume directory to the created user
   chown -R "${NEW_USER}":"${NEW_USER}" /mnt/"${VOLUME_NAME}"

@@ -47,12 +47,12 @@ resource "digitalocean_droplet" "forest" {
       # are not allowed in device identifiers for block storage volumes.
       # Therefore, any "-" characters in the volume name are replaced with "_" when forming the device ID.
       VOLUME_NAME         = "${var.attach_volume}" ? replace(var.volume_name, "-", "_") : ""
-      CHAIN               = "${var.enviroment}"
+      CHAIN               = "${var.chain}"
       DISK_ID_VOLUME_NAME = "${var.attach_volume}" ? var.volume_name : ""
 
   })
 
-  tags = [var.enviroment]
+  tags = [var.chain]
 }
 
 
@@ -64,7 +64,7 @@ resource "digitalocean_volume" "forest_volume" {
   size                    = var.volume_size
   initial_filesystem_type = var.initial_filesystem_type
 
-  tags = [var.enviroment]
+  tags = [var.chain]
 }
 
 resource "digitalocean_volume_attachment" "forest_volume" {

@@ -22,7 +22,7 @@ module "calibnet" {
   source_addresses      = var.source_addresses
   attach_volume         = false
   destination_addresses = var.destination_addresses
-  enviroment            = var.enviroment
+  chain                 = var.chain
   project               = var.project
   fw_name               = var.fw_name
 }

@@ -43,8 +43,8 @@ variable "destination_addresses" {
   type        = list(string)
 }
 
-variable "enviroment" {
-  description = "The environment tag to apply to resources"
+variable "chain" {
+  description = "The chain tag to apply to resources"
   type        = string
 }
 
