@@ -18,6 +18,7 @@ RUN dnf install -y \
 
 WORKDIR /chainsafe
 
-COPY . .
+COPY Gemfile Gemfile.lock health_check.sh sync_check.rb sync_check.toml ./
+COPY ruby_common ruby_common
 
 RUN gem install bundler && bundle install
