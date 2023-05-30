@@ -30,26 +30,23 @@ echo "${NEW_USER} ALL=(ALL) NOPASSWD: ALL" | (EDITOR="tee --append" visudo)
 usermod --append --groups docker "${NEW_USER}"
 
 
-# Run forest based on the defined chain parameter. Mainnet or Calibnet
-# If the chain parameter is set to Mainnet run Forest mainnet
-if [ "${CHAIN}" = "mainnet" ]; then
+# Check if the volume name is defined
+# If the volume name is defined, start the Forest Docker container with volume
+if [ -n "${VOLUME_NAME}" ]; then
 
-  # set-up forest volume for mainnet container
-  mkdir --parents -- /mnt/"${VOLUME_NAME}"
+  # set-up forest volume for Forest container
+  mkdir --parents -- "/home/${NEW_USER}/forest_data"
 
-  # Check if the directory is a mountpoint, and only tries to mount the volume if it isn't.
-  if ! mountpoint -q /mnt/"${VOLUME_NAME}"; then
-    # discard: notify the volume to free blocks (useful for SSDs)
-    # defaults: default mount options, including rw
-    # noatime: don't preserve file access times
-    mount --options discard,defaults,noatime /dev/disk/by-id/scsi-0DO_Volume_"${DISK_ID_VOLUME_NAME}" /mnt/"${VOLUME_NAME}"
-  fi
+  # discard: notify the volume to free blocks (useful for SSDs)
+  # defaults: default mount options, including rw
+  # noatime: don't preserve file access times
+  mount --options discard,defaults,noatime /dev/disk/by-id/scsi-0DO_Volume_"${DISK_ID_VOLUME_NAME}" "/home/${NEW_USER}/forest_data"
 
   # Change ownership of volume directory to the created user
-  chown -R "${NEW_USER}":"${NEW_USER}" /mnt/"${VOLUME_NAME}"
+  chown -R "${NEW_USER}":"${NEW_USER}" "/home/${NEW_USER}/forest_data"
 
   # Make sure /etc/${NEW_USER} config directory exists and set the required permmission
-  mkdir --parents -- /etc/"${NEW_USER}" && chmod 0777 /etc/"${NEW_USER}"
+  mkdir --parents -- /etc/"${NEW_USER}" && chmod 777 /etc/"${NEW_USER}"
 
   # Create the config.toml file
   cat << EOF > /etc/"${NEW_USER}"/config.toml
@@ -59,7 +56,7 @@ EOF
 
   su - "${NEW_USER}" -c "docker run -d --name forest \
     -v /etc/${NEW_USER}/config.toml:/home/${NEW_USER}/config.toml \
-    -v /mnt/${VOLUME_NAME}:/home/${NEW_USER}/data \
+    -v /home/${NEW_USER}/forest_data:/home/${NEW_USER}/data \
     -p 1234:1234 \
     --restart always \
     ghcr.io/chainsafe/forest:latest \
@@ -69,7 +66,7 @@ EOF
     --chain ${CHAIN}"
 
 else
-  # Run forest calibnet if the chain parameter is set to calibnet
+  # If a volume name was not provided, run the Forest Mainnet or Calibnet Docker container without a volume.
   su - "${NEW_USER}" -c "docker run -d --name forest \
     -p 1234:1234 \
     --restart always \

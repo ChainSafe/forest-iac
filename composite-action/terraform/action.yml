@@ -104,10 +104,3 @@ runs:
         TF_VAR_digitalocean_token: ${{ inputs.digitalocean_token }}
         AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
-
-    - name: Upload Generated Ansible Host File as Artifact
-      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      uses: actions/upload-artifact@v2
-      with:
-          name: hosts_calibnet
-          path: ansible/hosts_${{ inputs.chain }}
