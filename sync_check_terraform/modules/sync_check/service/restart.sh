@@ -1,8 +1,7 @@
 #!/bin/bash
 
 # Set env variable
-# shellcheck source=~/.forest_env
-source ~/.forest_env
+source "$HOME/.bashrc"
 
 # Start Sync Check Service:
 /bin/bash ./run_service.sh
