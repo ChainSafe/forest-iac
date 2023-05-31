@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 set -euxo pipefail
 
 # Create a login user
@@ -51,24 +52,18 @@ if [ -n "${VOLUME_NAME}" ]; then
 data_dir = "/home/${NEW_USER}/forest_data/data"
 EOF
 
-  su - "${NEW_USER}" -c "docker run -d --name forest \
-    -v /home/${NEW_USER}/forest_data:/home/${NEW_USER}/data \
-    -p 1234:1234 \
-    --restart always \
-    ghcr.io/chainsafe/forest:latest \
-    --config /home/${NEW_USER}/data/config.toml \
-    --encrypt-keystore false \
-    --auto-download-snapshot \
-    --chain ${CHAIN}"
+  VOLUME_OPTION="-v /home/${NEW_USER}/forest_data:/home/${NEW_USER}/data"
+  CONFIG_OPTION="--config /home/${NEW_USER}/data/config.toml"
 
-else
-
-  # If a volume name was not provided, run the Forest Mainnet or Calibnet Docker container without a volume.
-  su - "${NEW_USER}" -c "docker run -d --name forest \
-    -p 1234:1234 \
-    --restart always \
-    ghcr.io/chainsafe/forest:latest \
-    --encrypt-keystore false \
-    --auto-download-snapshot \
-    --chain ${CHAIN}"
 fi
+
+# Run the Forest Docker container
+su - "${NEW_USER}" -c "docker run -d --name forest \
+  $${VOLUME_OPTION:+$VOLUME_OPTION} \
+  -p 1234:1234 \
+  --restart always \
+  ghcr.io/chainsafe/forest:latest \
+  --encrypt-keystore false \
+  --auto-download-snapshot \
+  --chain ${CHAIN} \
+  $${CONFIG_OPTION:+$CONFIG_OPTION}"
