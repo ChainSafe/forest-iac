@@ -52,11 +52,10 @@ locals {
     "echo 'export FOREST_TARGET_RUBY_COMMON=/volumes/ruby_common' >> .forest_env",
     "echo 'export FOREST_SLACK_API_TOKEN=\"${var.slack_token}\"' >> .forest_env",
     "echo 'export FOREST_SLACK_NOTIF_CHANNEL=\"${var.slack_channel}\"' >> .forest_env",
-    "echo 'source .forest_env' >> .bashrc",
-    "source ~/.forest_env",
     "/bin/bash ./init.sh > init_log.txt",
-    "nohup /bin/bash ./run_service.sh > run_service_log.txt &",
     "systemctl enable docker",
+    "cp ./restart.service /etc/systemd/system/",
+    "systemctl enable restart.service",
     # Exiting without a sleep sometimes kills the script :-/
     "sleep 10s",
   ]
