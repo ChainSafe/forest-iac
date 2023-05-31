@@ -2,8 +2,6 @@
 
 set -e
 
-source ~/.forest_env
-
 # Check if an environment variable is set. If it isn't, set error=1.
 check_env () {
     A="                            ";

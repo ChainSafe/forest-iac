@@ -52,6 +52,7 @@ locals {
     "echo 'export FOREST_TARGET_RUBY_COMMON=/volumes/ruby_common' >> .forest_env",
     "echo 'export FOREST_SLACK_API_TOKEN=\"${var.slack_token}\"' >> .forest_env",
     "echo 'export FOREST_SLACK_NOTIF_CHANNEL=\"${var.slack_channel}\"' >> .forest_env",
+    "source ~/.forest_env",
     "/bin/bash ./init.sh > init_log.txt",
     "systemctl enable docker",
     "cp ./restart.service /etc/systemd/system/",
