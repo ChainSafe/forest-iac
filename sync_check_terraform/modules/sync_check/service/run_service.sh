@@ -42,6 +42,11 @@ docker container rm --force forest-calibnet 2> /dev/null || true
 docker container rm --force forest-mainnet 2> /dev/null || true
 docker container rm --force forest-tester 2> /dev/null || true
 
+# Clean volumes
+rm -rf /var/lib/docker/volumes/forest-data/_data/*
+rm -rf /var/lib/docker/volumes/sync-check/_data/*
+rm -rf /var/lib/docker/volumes/ruby-common/_data/*
+
 ## Ensure watchtower is running
 docker stop watchtower 2> /dev/null || true
 docker wait watchtower 2> /dev/null || true

@@ -2,7 +2,7 @@
 Description=Restart sync check service
 
 [Service]
-ExecStart=/bin/bash /root/restart.sh
+ExecStart=/bin/bash -c "source ~/.bashrc && /bin/bash /root/restart.sh"
 WorkingDirectory=/root
 
 [Install]
