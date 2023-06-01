@@ -20,22 +20,22 @@ init_calib:
 	@cd $(TF_CALIB_DIR) && $(TF) init
 
 plan_calib:
-	@cd $(TF_CALIB_DIR) && $(TF) plan --var-file="terraform.tfvars"
+	@cd $(TF_CALIB_DIR) && $(TF) plan
 
 apply_calib:
-	@cd $(TF_CALIB_DIR) && $(TF) apply --var-file="terraform.tfvars" --auto-approve
+	@cd $(TF_CALIB_DIR) && $(TF) apply --auto-approve
 
 destroy_calib:
-	@cd $(TF_CALIB_DIR) && $(TF) destroy  --var-file="terraform.tfvars"
+	@cd $(TF_CALIB_DIR) && $(TF) destroy
 
 init_main:
 	@cd $(TF_MAIN_DIR) && $(TF) init
 
 plan_main:
-	@cd $(TF_MAIN_DIR) && $(TF) plan -var-file="terraform.tfvars"
+	@cd $(TF_MAIN_DIR) && $(TF) plan
 
 apply_main:
-	@cd $(TF_MAIN_DIR) && $(TF) apply -var-file="terraform.tfvars" --auto-approve
+	@cd $(TF_MAIN_DIR) && $(TF) apply --auto-approve
 
 destroy_main:
-	@cd $(TF_MAIN_DIR) && $(TF) destroy  --var-file="terraform.tfvars"
+	@cd $(TF_MAIN_DIR) && $(TF) destroy
