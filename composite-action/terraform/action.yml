@@ -1,0 +1,106 @@
+name: Deploy Forest Infrastructure on DigitalOcean
+
+description: |
+  This action deploys the Forest infrastructure to either the mainnet or calibnet
+  chain using Terraform.
+
+inputs:
+  chain:
+    description: 'The terraform plan for the the chain infrastructure to be deployed (either "mainnet" or "calibnet")'
+    required: true
+  digitalocean_token:
+    description: 'The DigitalOcean access token to use for deploying the infrastructure'
+    required: true
+  aws_access_key_id:
+    description: 'The AWS access key ID to use for configuring Ansible'
+    required: true
+  aws_secret_access_key:
+    description: 'The AWS secret access key to use for configuring Ansible'
+    required: true
+  volume_name:
+    description: 'The name of the  volume to use for storing the blockchain data (required for mainnet chain)'
+    required: true
+  working_directory:
+    description: 'The working Directory'
+    required: true
+
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+
+    - name: Terraform Init
+      run: terraform init
+      shell: bash
+      working-directory: ${{ inputs.working_directory }}
+      env:
+        AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
+        AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
+
+    - name: Terraform Validate
+      shell: bash
+      run: terraform validate -no-color
+      working-directory: ${{ inputs.working_directory }}
+
+    - name: Terraform Plan
+      shell: bash
+      if: github.event_name == 'pull_request'
+      id: plan
+      run: terraform plan -no-color -input=false
+      continue-on-error: true
+      working-directory: ${{ inputs.working_directory }}
+      env:
+        TF_VAR_digitalocean_token: ${{ inputs.digitalocean_token }}
+        AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
+        AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
+
+    - name: Find Comment
+      if: github.event_name == 'pull_request'
+      uses: peter-evans/find-comment@v2
+      id: fc
+      with:
+        issue-number: ${{ github.event.pull_request.number }}
+        comment-author: 'github-actions[bot]'
+        body-regex: "^### Forest ${{ inputs.chain }} Infrastructure Plan"
+
+
+    - name: Create or Update Comment
+      if: github.event_name == 'pull_request' && !contains(steps.plan.outputs.stdout, 'No changes. Your infrastructure matches the configuration.')
+      uses: peter-evans/create-or-update-comment@v2
+      with:
+        comment-id: ${{ steps.fc.outputs.comment-id }}
+        issue-number: ${{ github.event.pull_request.number }}
+        body: |
+          ### Forest ${{ inputs.chain }} Infrastructure Plan: ${{ steps.plan.outcome }}
+
+          <details><summary>Show Plan</summary>
+
+          ```
+          ${{ steps.plan.outputs.stdout }}
+          ```
+
+          </details>
+        edit-mode: replace
+
+    - name: Delete Comment
+      uses: detomarco/delete-comments@v1.0.4
+      if: github.event_name == 'pull_request' && contains(steps.plan.outputs.stdout, 'No changes. Your infrastructure matches the configuration.')
+      with:
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+
+    - name: Terraform Plan Status
+      shell: bash
+      if: steps.plan.outcome == 'failure'
+      run: exit 1
+
+    - name: Terraform Apply
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: terraform apply -auto-approve -input=false
+      shell: bash
+      working-directory: ${{ inputs.working_directory }}
+      env:
+        TF_VAR_digitalocean_token: ${{ inputs.digitalocean_token }}
+        AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
+        AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
