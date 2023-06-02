@@ -19,7 +19,7 @@ chmod 0700 "/home/${NEW_USER}/.ssh"
 
 # Inherit authorized_keys from root, if they exist, to allow the same key-based access for the new user.
 if [ -f "/root/.ssh/authorized_keys" ]; then
-  : Allowing those with root ssh keys to log in as ${NEW_USER}
+  : Allowing those with root ssh keys to log in as "${NEW_USER}"
   cp /root/.ssh/authorized_keys "/home/${NEW_USER}/.ssh/authorized_keys"
   chown "${NEW_USER}:${NEW_USER}" "/home/${NEW_USER}/.ssh/authorized_keys"
   chmod 0600 "/home/${NEW_USER}/.ssh/authorized_keys"
@@ -56,14 +56,14 @@ sudo --user="${NEW_USER}" -- \
   docker run \
   --detach \
   --name=forest \
-  --volume=/home/${NEW_USER}/forest_data:/home/${NEW_USER}/data \
+  --volume=/home/"${NEW_USER}"/forest_data:/home/"${NEW_USER}"/data \
   --publish=1234:1234 \
   --restart=always \
   ghcr.io/chainsafe/forest:latest \
-  --config=/home/${NEW_USER}/data/config.toml \
+  --config=/home/"${NEW_USER}"/data/config.toml \
   --auto-download-snapshot \
   --encrypt-keystore false \
-  --chain=${CHAIN}
+  --chain="${CHAIN}"
 
 # Run the Watchtower Docker container.
 # It monitors running Docker containers and watches for changes to the images that those containers were originally started from.
