@@ -26,13 +26,13 @@ This repository contains machine-readable specifications for the auxillilary ser
 
 ## Overview
 
-This folder contains a Terraform script that provides an executable description of the droplet setup needed for running the Mainnet or Calibnet chains on DigitalOcean. The script automates several steps, including:
+The Terraform folder contains a Terraform script that provides an executable description of the droplet setup needed for running the Mainnet or Calibnet chains on DigitalOcean. The script automates several steps, including:
 
-- Booting up a New Droplet: It initializes a new droplet with specified parameters such as image, name, region, and size.
+- Booting up a New Droplet: It initialises a new droplet with specified parameters such as image, name, region, and size.
 
-- Volume Attachment (optional): The script can optionally attach a storage volume to the droplet if the user specifies so (attach_volume variable set to true). This feature primarily runs for the Mainnet but can also be applied to the Calibnet if set to true. To ensure compliance with device identifier restrictions on DigitalOcean, any "-" characters in the volume name are replaced with "_" by default.
+- Volume Attachment (optional): The script can optionally attach a storage volume to the droplet if the user specifies so (attach_volume variable set to true). This feature primarily runs on the Mainnet but can also be applied to the Calibnet if set to true. To ensure compliance with device identifier restrictions on DigitalOcean, any "-" characters in the volume name are automatically replaced with "_" when mounting the volume on the droplet.
 
-- Running Initialization Script: During the droplet's initialization, the user-data.sh script is executed. This script is templated by the Terraform engine, allowing it to insert variables dynamically as defined in the terraform.tfvars file. The script handles critical tasks such as creating a new user, setting up SSH for the new user, restricting SSH access, and managing Docker-related setups. It's specifically designed to run the Mainnet or Calibnet chain based on the specifications in the Terraform script, and it also initializes Watchtower to keep the Forest images up to date.
+- Running Initialisation Script: The `user-data.sh` is executed during the droplet's initialisation. This script is templated by the Terraform engine, allowing it to dynamically insert variables defined in the `terraform.tfvars` file. The script handles several vital tasks, such as creating a new user, setting up SSH for the new user, restricting SSH access, and managing Docker-related setups. It's specifically designed to run the Mainnet or Calibnet chain based on the specifications in the Terraform script when running it, and it also initialises Watchtower to keep the Forest images up to date.
 
 ## Requirements
 The droplet requirements to run Forest Mainnet or Calibnet chain include:
@@ -52,17 +52,18 @@ To implement the infrastructure, run the following:
 
 - Generate `digitalocean_api_token` from DigitalOcean console; you can check [here](https://docs.digitalocean.com/reference/api/create-personal-access-token/) for more details.
 
-- Fill out the `terraform.tfvars` file located in the Terraform Mainnet or Calibnet directory with the values for the following variables:
+- If you need to run this locally, you first need to set the following environment variables (you will be prompted later if you don't put these variables):
 
-    - `digitalocean_token`
-
-- Set all necessary environment variables to the terminal permanently by adding them to a shell profile.
-    - `export AWS_SECRET_ACCESS_KEY="value"`,
-    - `export AWS_ACCESS_KEY_ID="value"`,
-
+```bash
+# DigitalOcean personal access token
+export TF_VAR_digitalocean_token=<digitalocean_api_token>
+# S3 access keys used by terraform. Can be generated here: https://cloud.digitalocean.com/account/api/spaces
+export AWS_ACCESS_KEY_ID=
+export AWS_SECRET_ACCESS_KEY=
+```
 Then save the file and restart the terminal for the changes to take effect.
 
-- Navigate to the terraform directory and run `make init_calib` for calibnet or `make init_main` for mainnet to initialize and confirm variables.
+- Navigate to the terraform directory and run `make init_calib` for calibnet or `make init_main` for mainnet to initialise and confirm variables.
 
 - To view all the resources that will be configured, run `make plan_calib` for calibnet or `make plan_main` for mainnet in the terraform directory.
 
@@ -72,4 +73,4 @@ Then save the file and restart the terminal for the changes to take effect.
 Feel free to contribute to the codebase by resolving any open issues, refactoring, adding new features, writing test cases, or any other way to make the project better and helpful to the community. Feel free to fork and send pull requests.
 
 ## Questions
-Feel free to contact the team by creating an issue or raising a discussion [here](https://github.com/ChainSafe/forest/discussions) for more details on interacting with the infrastructure if needed while in deployment.
+Feel free to contact the team by creating an issue or raising a discussion [here](https://github.com/ChainSafe/forest/discussions) for more details on interacting with the infrastructure if the need arises during deployment.

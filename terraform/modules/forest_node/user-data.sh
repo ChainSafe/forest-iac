@@ -46,15 +46,14 @@ fi
 chown --recursive "${NEW_USER}":"${NEW_USER}" "/home/${NEW_USER}/forest_data"
 
 # Create the config.toml file in the forest_data directory.
-cat << EOF > "/home/forest/forest_data/config.toml"
+cat << EOF > "/home/${NEW_USER}/forest_data/config.toml"
 [client]
 data_dir = "/home/${NEW_USER}/forest_data/data"
 EOF
 
 # Run the Forest Docker container as the created user.
 sudo --user="${NEW_USER}" -- \
-  docker \
-  run \
+  docker run \
   --detach \
   --name=forest \
   --volume=/home/${NEW_USER}/forest_data:/home/${NEW_USER}/data \
@@ -62,17 +61,19 @@ sudo --user="${NEW_USER}" -- \
   --restart=always \
   ghcr.io/chainsafe/forest:latest \
   --config=/home/${NEW_USER}/data/config.toml \
-  --encrypt-keystore=false \
   --auto-download-snapshot \
+  --encrypt-keystore false \
   --chain=${CHAIN}
 
 # Run the Watchtower Docker container.
 # It monitors running Docker containers and watches for changes to the images that those containers were originally started from.
 # If Watchtower detects that an image has changed, it will automatically restart the container using the new image.
-docker run \
-    --detach \
-    --restart unless-stopped \
-    -v /var/run/docker.sock:/var/run/docker.sock \
-    --name watchtower \
-    containrrr/watchtower \
-    --label-enable --include-stopped --revive-stopped --stop-timeout 120s --interval 600"
+# Run the Watchtower Docker container.
+sudo --user="${NEW_USER}" -- \
+  docker run \
+  --detach \
+  --name=watchtower \
+  --volume=/var/run/docker.sock:/var/run/docker.sock \
+  --restart=unless-stopped \
+  containrrr/watchtower \
+  --label-enable --include-stopped --revive-stopped --stop-timeout 120s --interval 600
