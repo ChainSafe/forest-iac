@@ -9,28 +9,6 @@ on:
       - main
 
 jobs:
-  lint_ansible:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout the code
-      uses: actions/checkout@v3
-
-    - name: Set up Python 3.
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.x'
-
-    - name: Install test dependencies.
-      run: pip3 install ansible-lint
-
-    - name: Install Ansible-galaxy Collection
-      run: |
-          ansible-galaxy collection install community.docker
-          ansible-galaxy collection install community.general
-    - name: Lint code
-      working-directory: forest-node/ansible
-      run: ansible-lint
-
   lint_terraform:
     runs-on: ubuntu-latest
     steps:
@@ -52,11 +30,9 @@ jobs:
         run: tflint --version
 
       - name: Init TFLint
-        working-directory: forest-node/terraform
         run: tflint --init
 
       - name: Run TFLint
-        working-directory: forest-node/terraform
         run: tflint -f compact
 
   fmt_terraform:
