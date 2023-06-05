@@ -60,9 +60,7 @@ jobs:
       # If the new deployment plan contains changes, post it in a comment.
       - name: Create or update comment
         uses: peter-evans/create-or-update-comment@v3
-        if: github.event_name == 'pull_request' && !contains(
-          steps.plan.outputs.stdout, 'No changes.
-          Your infrastructure matches the configuration.')
+        if: github.event_name == 'pull_request' && !contains(steps.plan.outputs.stdout, 'No changes. Your infrastructure matches the configuration.')
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
           issue-number: ${{ github.event.pull_request.number }}
@@ -82,9 +80,7 @@ jobs:
       # delete the last posted plan.
       - name: Delete comment
         uses: detomarco/delete-comments@v1.0.11
-        if: github.event_name == 'pull_request' && contains(
-          steps.plan.outputs.stdout, 'No changes.
-          Your infrastructure matches the configuration.')
+        if: github.event_name == 'pull_request' && !contains(steps.plan.outputs.stdout, 'No changes. Your infrastructure matches the configuration.')
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
 
