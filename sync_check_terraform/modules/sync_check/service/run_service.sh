@@ -1,38 +1,5 @@
 #!/bin/bash -euxo pipefail
 
-set -e
-
-# Check if an environment variable is set. If it isn't, set error=1.
-check_env () {
-    A="                            ";
-    echo -n "${A:0:-${#1}} $1: "
-    if [[ -z "${!1}" ]]; then
-        echo "❌"
-        error=1
-    else
-        echo "✅"
-    fi
-}
-
-# Check that the environment variables in the .env file have been defined.
-check_env "FOREST_SLACK_API_TOKEN"
-check_env "FOREST_SLACK_NOTIF_CHANNEL"
-check_env "FOREST_TAG"
-check_env "FOREST_TARGET_SCRIPTS"
-check_env "FOREST_TARGET_DATA"
-check_env "FOREST_TARGET_RUBY_COMMON"
-
-if [ "$error" -ne "0" ]; then
-    echo "Please set the required environment variables and try again."
-    echo "FOREST_SLACK_API_TOKEN=$FOREST_SLACK_API_TOKEN"
-    echo "FOREST_SLACK_NOTIF_CHANNEL=$FOREST_SLACK_NOTIF_CHANNEL"
-    echo "FOREST_TAG=$FOREST_TAG"
-    echo "FOREST_TARGET_SCRIPTS=$FOREST_TARGET_SCRIPTS"
-    echo "FOREST_TARGET_DATA=$FOREST_TARGET_DATA"
-    echo "FOREST_TARGET_RUBY_COMMON=$FOREST_TARGET_RUBY_COMMON"
-    exit 1
-fi
-
 ## Start docker daemon
 systemctl start docker
 
