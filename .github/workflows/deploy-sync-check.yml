@@ -1,11 +1,14 @@
+---
 name: Deploy Sync Check Service
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    types: [opened, synchronize, draft]
   workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
 
 jobs:
   sync-check:
@@ -38,7 +41,7 @@ jobs:
       - name: Terraform Validate
         id: validate
         run: terraform validate -no-color
-      
+
       - name: Terraform Plan
         id: plan
         if: github.event_name == 'pull_request'
@@ -57,7 +60,9 @@ jobs:
       # If the new deployment plan contains changes, post it in a comment.
       - name: Create or update comment
         uses: peter-evans/create-or-update-comment@v3
-        if: github.event_name == 'pull_request' && !contains(steps.plan.outputs.stdout, 'No changes. Your infrastructure matches the configuration.')
+        if: github.event_name == 'pull_request' && !contains(
+          steps.plan.outputs.stdout, 'No changes.
+          Your infrastructure matches the configuration.')
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
           issue-number: ${{ github.event.pull_request.number }}
@@ -73,10 +78,13 @@ jobs:
             </details>
           edit-mode: replace
 
-      # If the new deployment plan contains no changes, delete the last posted plan.
+      # If the new deployment plan contains no changes,
+      # delete the last posted plan.
       - name: Delete comment
         uses: detomarco/delete-comments@v1.0.11
-        if: github.event_name == 'pull_request' && contains(steps.plan.outputs.stdout, 'No changes. Your infrastructure matches the configuration.')
+        if: github.event_name == 'pull_request' && contains(
+          steps.plan.outputs.stdout, 'No changes.
+          Your infrastructure matches the configuration.')
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
 
