@@ -1,10 +1,10 @@
 name: Deploy Sync Check Service
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
   pull_request:
-  workflow_dispatch:
 
 jobs:
   sync-check:
@@ -50,7 +50,6 @@ jobs:
           issue-number: ${{ github.event.pull_request.number }}
           comment-author: 'github-actions[bot]'
           body-regex: "^### Forest ${{ inputs.chain }} Sync Check Plan"
-
 
       - name: Create or Update Comment
         if: github.event_name == 'pull_request' && !contains(steps.plan.outputs.stdout, 'No changes. Your infrastructure matches the configuration.')
