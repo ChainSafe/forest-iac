@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -euxo pipefail
 
 # Copy local source files in a folder together with ruby_common and create a zip archive.
 

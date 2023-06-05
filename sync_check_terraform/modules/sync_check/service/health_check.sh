@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash -euxo pipefail
 
 # Script to check health status of a running node.
 # The only prerequisite here is that the `forest` process is running.
