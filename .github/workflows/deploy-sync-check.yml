@@ -1,15 +1,17 @@
 name: Deploy Sync Check Service
 
 on:
-  workflow_dispatch:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
 
 jobs:
   sync-check:
     name: sync check service
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     env:
       TF_VAR_do_token: ${{ secrets.DO_TOKEN }}
       TF_VAR_slack_token: ${{ secrets.SLACK_TOKEN }}
@@ -43,22 +45,23 @@ jobs:
         continue-on-error: true
 
       - name: Find Comment
-        if: github.event_name == 'pull_request'
         uses: peter-evans/find-comment@v2
+        if: github.event_name == 'pull_request'
         id: fc
         with:
           issue-number: ${{ github.event.pull_request.number }}
           comment-author: 'github-actions[bot]'
-          body-regex: "^### Forest ${{ inputs.chain }} Sync Check Plan"
+          body-regex: "^### Sync Check Service Plan"
 
-      - name: Create or Update Comment
+      # If the new deployment plan contains changes, post it in a comment.
+      - name: Create or update comment
+        uses: peter-evans/create-or-update-comment@v3
         if: github.event_name == 'pull_request' && !contains(steps.plan.outputs.stdout, 'No changes. Your infrastructure matches the configuration.')
-        uses: peter-evans/create-or-update-comment@v2
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
           issue-number: ${{ github.event.pull_request.number }}
           body: |
-            ### Forest ${{ inputs.chain }} Sync Check Plan: ${{ steps.plan.outcome }}
+            ### Sync Check Service Plan: ${{ steps.plan.outcome }}
 
             <details><summary>Show Plan</summary>
 
@@ -69,14 +72,14 @@ jobs:
             </details>
           edit-mode: replace
 
-      - name: Delete Comment
-        uses: detomarco/delete-comments@v1.0.4
+      # If the new deployment plan contains no changes, delete the last posted plan.
+      - name: Delete comment
+        uses: detomarco/delete-comments@v1.0.11
         if: github.event_name == 'pull_request' && contains(steps.plan.outputs.stdout, 'No changes. Your infrastructure matches the configuration.')
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
 
       - name: Terraform Plan Status
-        shell: bash
         if: steps.plan.outcome == 'failure'
         run: exit 1
 
