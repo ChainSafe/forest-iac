@@ -1,4 +1,5 @@
 #!/bin/bash
+# This script resets everything and executes the sync check process
 
 # Enable strict error handling, command tracing, and pipefail
 set -euxo pipefail
