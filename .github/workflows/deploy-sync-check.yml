@@ -74,7 +74,7 @@ jobs:
         uses: detomarco/delete-comments@v1.0.4
         if: github.event_name == 'pull_request' && contains(steps.plan.outputs.stdout, 'No changes. Your infrastructure matches the configuration.')
         with:
-            comment-id: ${{ steps.fc.outputs.comment-id }}
+          comment-id: ${{ steps.fc.outputs.comment-id }}
 
       - name: Terraform Plan Status
         shell: bash
