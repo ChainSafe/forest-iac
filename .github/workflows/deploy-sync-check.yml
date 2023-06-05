@@ -37,16 +37,10 @@ jobs:
         run: terraform validate -no-color
       
       - name: Terraform Plan
-        shell: bash
-        if: github.event_name == 'pull_request'
         id: plan
+        if: github.event_name == 'pull_request'
         run: terraform plan -no-color -input=false
         continue-on-error: true
-        working-directory: ${{ inputs.working_directory }}
-        env:
-          TF_VAR_digitalocean_token: ${{ inputs.digitalocean_token }}
-          AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
-          AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
 
       - name: Find Comment
         if: github.event_name == 'pull_request'
