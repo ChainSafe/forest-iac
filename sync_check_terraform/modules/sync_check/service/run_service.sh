@@ -1,4 +1,7 @@
-#!/bin/bash -euxo pipefail
+#!/bin/bash
+
+# Enable strict error handling, command tracing, and pipefail
+set -euxo pipefail
 
 ## Start docker daemon
 systemctl start docker

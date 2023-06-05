@@ -1,4 +1,7 @@
-#!/bin/bash -euxo pipefail
+#!/bin/bash
+
+# Enable strict error handling, command tracing, and pipefail
+set -euxo pipefail
 
 # Copy local source files in a folder together with ruby_common and create a zip archive.
 
