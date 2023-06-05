@@ -22,8 +22,6 @@ This repository contains machine-readable specifications for the auxillilary ser
 
 # 🛠️ Forest Cloud Infrastructure In DigitalOcean
 
-## Forest IAC Architecture
-
 ## Overview
 
 The Terraform folder contains a Terraform script that provides an executable description of the droplet setup needed for running the Mainnet or Calibnet chains on DigitalOcean. The script automates several steps, including:
