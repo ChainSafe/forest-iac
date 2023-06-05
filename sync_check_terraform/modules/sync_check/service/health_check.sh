@@ -53,6 +53,8 @@ function assert_error() {
 ##### Actual script
 
 # Wait for Forest to start syncing
+# Excluding `tipset_start` from the unbound variable check
+set +u
 timeout="$HEALTH_CHECK_SYNC_TIMEOUT_SECONDS"
 echo "⏳ Waiting for Forest to start syncing (up to $timeout seconds)..."
 until [ -n "$tipset_start" ] || [ "$timeout" -le 0 ]
@@ -62,6 +64,8 @@ do
   sleep 1
   timeout=$((timeout-1))
 done
+# Re-enabling the unbound variable check
+set -u
 
 if [ "$timeout" -le 0 ]; then
   echo "❌ Timed out on sync wait"
