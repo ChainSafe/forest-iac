@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Enable strict error handling, command tracing, and pipefail
-set -euxo pipefail
+set -eux
 
 # Script to check health status of a running node.
 # The only prerequisite here is that the `forest` process is running.
