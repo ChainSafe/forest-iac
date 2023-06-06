@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Enable strict error handling and command tracing
-set -eux
+set -ex
 
 # Copy local source files in a folder together with ruby_common and create a zip archive.
 

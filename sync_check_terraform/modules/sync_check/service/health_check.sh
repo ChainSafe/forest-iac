@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Enable strict error handling, command tracing, and pipefail
-set -eux
-
 # Script to check health status of a running node.
 # The only prerequisite here is that the `forest` process is running.
 # The script will wait till metrics endpoint becomes available.

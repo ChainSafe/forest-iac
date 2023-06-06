@@ -26,9 +26,9 @@ module "sync_check" {
   source = "./modules/sync_check"
 
   # Configure service:
-  name          = "forest-sync-check"     # droplet name
-  size          = "so-2vcpu-16gb"         # droplet size
-  slack_channel = "#forest-notifications" # slack channel for notifications
+  name          = "forest-sync-check" # droplet name
+  size          = "so-2vcpu-16gb"     # droplet size
+  slack_channel = "#forest-dump"      # slack channel for notifications
 
   # Variable passthrough:
   slack_token           = var.slack_token
