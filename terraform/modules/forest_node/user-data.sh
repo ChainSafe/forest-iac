@@ -39,6 +39,10 @@ mkdir --parents -- "/home/${NEW_USER}/forest_data"
 
 # If a volume name is defined, mount the volume to the forest_data directory.
 if [ -n "${VOLUME_NAME}" ]; then
+  # discard: notify the volume to free blocks (useful for SSDs)
+  # defaults: default mount options, including rw
+  # noatime: don't preserve file access times
+  : mounting volume at the forest_data directory
   mount --options discard,defaults,noatime /dev/disk/by-id/scsi-0DO_Volume_"${DISK_ID_VOLUME_NAME}" "/home/${NEW_USER}/forest_data"
 fi
 
@@ -68,7 +72,6 @@ sudo --user="${NEW_USER}" -- \
 # Run the Watchtower Docker container.
 # It monitors running Docker containers and watches for changes to the images that those containers were originally started from.
 # If Watchtower detects that an image has changed, it will automatically restart the container using the new image.
-# Run the Watchtower Docker container.
 sudo --user="${NEW_USER}" -- \
   docker run \
   --detach \
