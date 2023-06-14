@@ -83,7 +83,7 @@ services:
       - SCRIPTS_DIR=${FOREST_TARGET_SCRIPTS}
       - SLACK_API_TOKEN=${FOREST_SLACK_API_TOKEN}
       - SLACK_NOTIF_CHANNEL=${FOREST_SLACK_NOTIF_CHANNEL}
-    entrypoint: [ "/bin/bash", "-c" ]
+    entrypoint: ["/bin/bash", "-c"]
     command:
       - |
         ruby ${FOREST_TARGET_SCRIPTS}/sync_check.rb forest-mainnet &
@@ -94,6 +94,7 @@ services:
     depends_on:
       - forest_mainnet
       - forest_calibnet
+    restart: unless-stopped
     labels:
       com.centurylinklabs.watchtower.enable: true
       com.centurylinklabs.watchtower.depends-on: "forest-mainnet,forest-calibnet"
@@ -112,4 +113,3 @@ volumes:
 networks:
   mainnet:
   calibnet:
-
