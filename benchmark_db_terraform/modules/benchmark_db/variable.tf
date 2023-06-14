@@ -33,14 +33,14 @@ variable "AWS_SECRET_ACCESS_KEY" {
   type        = string
 }
 
-variable "snapshot_bucket" {
-  description = "S3 bucket containing the snapshots"
+variable "benchmark_bucket" {
+  description = "S3 bucket containing the benchmark results"
   type        = string
   default     = "forest-snapshots"
 }
 
-variable "snapshot_endpoint" {
-  description = "S3 endpoint for the snapshots"
+variable "benchmark_endpoint" {
+  description = "S3 endpoint for the benchmark results"
   type        = string
   default     = "https://fra1.digitaloceanspaces.com/"
 }
@@ -48,7 +48,7 @@ variable "snapshot_endpoint" {
 variable "forest_tag" {
   description = "Image tag for the Forest container"
   type        = string
-  default     = "latest"
+  default     = "edge"
 }
 
 variable "image" {
