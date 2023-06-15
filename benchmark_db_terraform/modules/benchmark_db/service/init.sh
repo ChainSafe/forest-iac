@@ -10,16 +10,5 @@ dnf install -y git bzr jq pkgconfig mesa-libOpenCL mesa-libOpenCL-devel opencl-h
 dnf clean all
 gem install slack-ruby-client sys-filesystem bundler concurrent-ruby deep_merge tomlrb toml-rb csv fileutils logger open3 optparse set tmpdir
 
-## Configure s3cmd
-s3cmd --dump-config \
-    --host="$BENCHMARK_ENDPOINT" \
-    --host-bucket="%(bucket)s.$BENCHMARK_ENDPOINT" \
-    --access_key="$AWS_ACCESS_KEY_ID" \
-    --secret_key="$AWS_SECRET_ACCESS_KEY" \
-    --multipart-chunk-size-mb=4096 > ~/.s3cfg
-
-## Run benchmark
-ruby bench.rb --chain calibnet --tempdir ./benchmark --daily
-
-## Upload benchmark result to s3
-s3cmd --acl-public put "/root/results_*.csv" s3://"$BENCHMARK_BUCKET"/benchmark-results/ || exit 1
+## Start benchmark
+ruby run_benchmark.rb
