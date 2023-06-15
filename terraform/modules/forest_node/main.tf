@@ -19,7 +19,7 @@ terraform {
 }
 
 provider "digitalocean" {
-  token = var.digitalocean_token
+  token = var.do_token
 }
 
 data "digitalocean_ssh_keys" "keys" {
@@ -77,4 +77,12 @@ resource "digitalocean_volume_attachment" "forest_volume" {
 
   droplet_id = digitalocean_droplet.forest.id
   volume_id  = digitalocean_volume.forest_volume[count.index].id
+}
+
+resource "local_file" "inventory" {
+  filename = "../../ansible/hosts"
+  content  = <<_EOF
+[${var.name}]
+${digitalocean_droplet.forest.ipv4_address} ansible_user=${var.name}
+    _EOF
 }

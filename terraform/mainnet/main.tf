@@ -14,7 +14,7 @@ terraform {
 module "mainnet" {
   source = "../modules/forest_node"
 
-  digitalocean_token      = var.digitalocean_token
+  do_token                = var.do_token
   name                    = var.name
   region                  = var.region
   image                   = var.image

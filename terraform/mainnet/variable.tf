@@ -23,7 +23,7 @@ variable "source_addresses" {
   type        = list(string)
 }
 
-variable "digitalocean_token" {
+variable "do_token" {
   description = "Token for authentication."
   type        = string
 }

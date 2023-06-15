@@ -1,0 +1,3 @@
+# Install external roles from Ansible Galaxy.
+- name: newrelic.newrelic_install
+  version: v0.5.2

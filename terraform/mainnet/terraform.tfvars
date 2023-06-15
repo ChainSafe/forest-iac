@@ -13,4 +13,4 @@ volume_name             = "forest-mainnet-volume"
 name                    = "forest"
 fw_name                 = "forest-mainnet-fw"
 # This set of variables are unique and must be defined here in order to deploy successfully
-# digitalocean_token = ""
+# do_token = ""

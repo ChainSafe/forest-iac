@@ -1,0 +1,13 @@
+---
+- name: Install New Relic infrastructure and logs
+  hosts: all
+  roles:
+    - role: newrelic.newrelic_install
+  vars:
+    targets:
+      - infrastructure
+      - logs 
+  environment:
+    NEW_RELIC_API_KEY: "{{ lookup('env', 'NEW_RELIC_API_KEY') }}"
+    NEW_RELIC_ACCOUNT_ID: "3942575"
+    NEW_RELIC_REGION: EU
