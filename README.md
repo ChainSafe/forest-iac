@@ -54,7 +54,7 @@ To implement the infrastructure, run the following:
 
 ```bash
 # DigitalOcean personal access token
-export TF_VAR_digitalocean_token=<digitalocean_api_token>
+export TF_VAR_do_token=<digitalocean_api_token>
 # S3 access keys used by terraform. Can be generated here: https://cloud.digitalocean.com/account/api/spaces
 export AWS_ACCESS_KEY_ID=
 export AWS_SECRET_ACCESS_KEY=
