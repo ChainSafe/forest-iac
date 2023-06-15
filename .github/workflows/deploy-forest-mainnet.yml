@@ -5,13 +5,13 @@ on:
     branches:
       - main
     paths:
-      - 'Terraform/**'
+      - 'terraform/**'
       - 'ansible/**'
   push:
     branches:
       - main
     paths:
-      - 'Terraform/**'
+      - 'terraform/**'
       - 'ansible/**'
   workflow_dispatch:
 
