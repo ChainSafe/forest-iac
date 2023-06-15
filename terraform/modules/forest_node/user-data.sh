@@ -32,7 +32,7 @@ echo "AllowUsers ${NEW_USER}" >> /etc/ssh/sshd_config
 systemctl restart sshd
 
 # Enable passwordless sudo for the new user. This allows the user to run sudo commands without being prompted for a password.
-echo "${NEW_USER} ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/${NEW_USER}
+echo "${NEW_USER} ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/"${NEW_USER}"
 
 # Add new user to "sudo" and "docker" group so they can run docker commands and have general admin rights.
 usermod --append --groups docker "${NEW_USER}"
