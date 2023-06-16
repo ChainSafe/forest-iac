@@ -107,11 +107,3 @@ resource "digitalocean_project_resources" "connect_forest_project" {
 output "ip" {
   value = [digitalocean_droplet.forest.ipv4_address]
 }
-
-resource "local_file" "inventory" {
-  filename = "../../ansible/hosts"
-  content  = <<_EOF
-[${var.name}]
-${digitalocean_droplet.forest.ipv4_address}
-    _EOF
-}
