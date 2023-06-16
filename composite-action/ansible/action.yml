@@ -16,7 +16,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Download Forest ${{ inputs.chain }} Host File
+    - name: Download Ansible Host File
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       id: download
       uses: actions/download-artifact@v2
