@@ -1,4 +1,4 @@
-name: Deploy Forest Calibnet Infrastructure
+name: Deploy
 
 on:
   pull_request:
@@ -17,7 +17,7 @@ on:
 
 jobs:
   deploy-forest-calibnet-infrastruture-with-terraform:
-    name: Deploy Forest Terraform calibnet Infrastructure
+    name: Forest Calibnet
     runs-on: ubuntu-latest
     permissions: write-all
     steps:

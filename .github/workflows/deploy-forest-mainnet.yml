@@ -1,4 +1,4 @@
-name: Deploy Forest Mainnet Infrastructure
+name: Deploy
 
 on:
   pull_request:
@@ -17,7 +17,7 @@ on:
 
 jobs:
   deploy-forest-mainnet-infrastruture-with-terraform:
-    name: Deploy Forest Terraform Mainnet Infrastructure
+    name: Forest Mainnet
     runs-on: ubuntu-latest
     permissions: write-all
     steps:
