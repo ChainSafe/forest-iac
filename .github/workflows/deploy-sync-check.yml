@@ -1,5 +1,5 @@
 ---
-name: Deploy
+name: Sync Check Service
 
 on:
   workflow_dispatch:
