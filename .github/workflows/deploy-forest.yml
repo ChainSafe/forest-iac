@@ -29,7 +29,7 @@ jobs:
           aws_access_key_id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           working_directory: terraform/mainnet
-          chain: mainnet
+          environment: mainnet
 
   deploy-forest-calibnet-infrastruture-with-terraform:
     name: Deploy Forest Terraform Calibnet Infrastructure
@@ -46,4 +46,4 @@ jobs:
           aws_access_key_id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           working_directory: terraform/calibnet
-          chain: calibnet
+          environment: calibnet
