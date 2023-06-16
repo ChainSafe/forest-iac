@@ -29,4 +29,20 @@ jobs:
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
           slack_token: ${{ secrets.SLACK_TOKEN }}
           working_directory: sync_check_terraform/
-          environment: Sync Check Service
+          chain: Sync Check Service
+
+  setup-newrelic-agent-using-ansible:
+    name: Set-up New Relic Agent on Forest Sync Check Infrastructure with Ansible
+    runs-on: ubuntu-latest
+    needs: sync-check
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v3
+
+    # Using Custom Composite action in ./composite-action/ansible folder
+      - name: Composite Action for Infrastruture Droplets with Ansible
+        uses: ./composite-action/ansible
+        with:
+          working_directory: ansible
+          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          new_relic_api_key: ${{ secrets.NEW_RELIC_API_KEY }}

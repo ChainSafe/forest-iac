@@ -34,3 +34,19 @@ jobs:
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
           working_directory: terraform/mainnet
           environment: mainnet
+
+  setup-newrelic-agent-using-ansible:
+    name: Set-up New Relic Agent on Forest Mainnet Infrastructure with Ansible
+    runs-on: ubuntu-latest
+    needs: deploy-forest-mainnet-infrastruture-with-terraform
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v3
+
+    # Using Custom Composite action in ./composite-action/ansible folder
+      - name: Composite Action for Infrastruture Droplets with ansible
+        uses: ./composite-action/ansible
+        with:
+          working_directory: ansible
+          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          new_relic_api_key: ${{ secrets.NEW_RELIC_API_KEY }}
