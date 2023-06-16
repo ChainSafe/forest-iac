@@ -1,12 +1,11 @@
 name: Custom Composite action to deploy terraform resources
 
 description: |
-  This action deploys the Forest services to either the mainnet or calibnet
-  environment using Terraform.
+  This action deploys the Forest infarstructure with Terraform
 
 inputs:
-  chain:
-    description: 'The terraform plan for the the chain infrastructure to be deployed'
+  enviroment:
+    description: 'The terraform plan for the the environment infrastructure to be deployed'
     required: true
   do_token:
     description: 'The DigitalOcean access token to use for deploying the infrastructure'
@@ -23,7 +22,7 @@ inputs:
   ssh_private_key:
     description: 'The SSH private key to use for connecting to Droplets via SSH'
   slack_token:
-    description: ''
+    description: 'The slack token secret used to connect the Infrastructure to Slack'
 
 runs:
   using: "composite"
@@ -131,10 +130,3 @@ runs:
       run: |
         terraform destroy -auto-approve -input=false
         terraform apply -auto-approve -input=false
-
-    - name: Upload Generated Ansible Hosts File as Artifact
-      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      uses: actions/upload-artifact@v2
-      with:
-          name: hosts
-          path: ansible/hosts
