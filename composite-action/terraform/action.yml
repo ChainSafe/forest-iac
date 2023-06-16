@@ -1,29 +1,28 @@
-name: Deploy Forest Infrastructure on DigitalOcean
+name: Custom Composite action to deploy terraform resources
 
 description: |
-  This action deploys the Forest infrastructure to either the mainnet or calibnet
-  chain using Terraform.
+  This action deploys the Forest infarstructure with Terraform
 
 inputs:
-  chain:
-    description: 'The terraform plan for the the chain infrastructure to be deployed (either "mainnet" or "calibnet")'
+  enviroment:
+    description: 'The terraform plan for the the environment infrastructure to be deployed'
     required: true
-  digitalocean_token:
+  do_token:
     description: 'The DigitalOcean access token to use for deploying the infrastructure'
     required: true
   aws_access_key_id:
-    description: 'The AWS access key ID to use for configuring Ansible'
+    description: 'S3 access keys id used by terraform and service like sync check, Deploy Snapshot Service etc'
     required: true
   aws_secret_access_key:
-    description: 'The AWS secret access key to use for configuring Ansible'
-    required: true
-  volume_name:
-    description: 'The name of the  volume to use for storing the blockchain data (required for mainnet chain)'
+    description: 'S3 secret access keys used by terraform and service like sync check, Deploy Snapshot Service etc'
     required: true
   working_directory:
     description: 'The working Directory'
     required: true
-
+  ssh_private_key:
+    description: 'The SSH private key to use for connecting to Droplets via SSH'
+  slack_token:
+    description: 'The slack token secret used to connect the Infrastructure to Slack'
 
 runs:
   using: "composite"
@@ -52,9 +51,12 @@ runs:
       continue-on-error: true
       working-directory: ${{ inputs.working_directory }}
       env:
-        TF_VAR_digitalocean_token: ${{ inputs.digitalocean_token }}
+        TF_VAR_do_token: ${{ inputs.do_token }}
+        TF_VAR_AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
+        TF_VAR_AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
         AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
+        TF_VAR_slack_token: ${{ inputs.slack_token}}
 
     - name: Find Comment
       if: github.event_name == 'pull_request'
@@ -63,7 +65,7 @@ runs:
       with:
         issue-number: ${{ github.event.pull_request.number }}
         comment-author: 'github-actions[bot]'
-        body-regex: "^### Forest ${{ inputs.chain }} Infrastructure Plan"
+        body-regex: "^### Forest ${{ inputs.environment }} Infrastructure Plan"
 
 
     - name: Create or Update Comment
@@ -73,7 +75,7 @@ runs:
         comment-id: ${{ steps.fc.outputs.comment-id }}
         issue-number: ${{ github.event.pull_request.number }}
         body: |
-          ### Forest ${{ inputs.chain }} Infrastructure Plan: ${{ steps.plan.outcome }}
+          ### Forest ${{ inputs.environment }} Infrastructure Plan: ${{ steps.plan.outcome }}
 
           <details><summary>Show Plan</summary>
 
@@ -95,12 +97,36 @@ runs:
       if: steps.plan.outcome == 'failure'
       run: exit 1
 
+    - name: Configure ssh-agent
+      if: github.ref == 'refs/heads/main' && ( github.event_name == 'push' || github.event_name == 'workflow_dispatch' )
+      uses: webfactory/ssh-agent@v0.8.0
+      with:
+        ssh-private-key: ${{ inputs.ssh-private-key }}
+
     - name: Terraform Apply
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       run: terraform apply -auto-approve -input=false
       shell: bash
       working-directory: ${{ inputs.working_directory }}
       env:
-        TF_VAR_digitalocean_token: ${{ inputs.digitalocean_token }}
+        TF_VAR_do_token: ${{ inputs.do_token }}
+        TF_VAR_AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
+        TF_VAR_AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
         AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
+        TF_VAR_slack_token: ${{ inputs.slack_token}}
+
+    - name: Terraform Force Apply
+      if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
+      shell: bash
+      working-directory: ${{ inputs.working_directory }}
+      env:
+        TF_VAR_do_token: ${{ inputs.d0_token }}
+        TF_VAR_AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
+        TF_VAR_AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
+        AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
+        AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
+        TF_VAR_slack_token: ${{ inputs.slack_token}}
+      run: |
+        terraform destroy -auto-approve -input=false
+        terraform apply -auto-approve -input=false
