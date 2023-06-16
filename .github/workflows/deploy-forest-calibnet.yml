@@ -1,25 +1,30 @@
----
-name: Deploy Sync Check Service
+name: Deploy Forest Calibnet Infrastructure
 
 on:
-  workflow_dispatch:
   pull_request:
     branches:
       - main
+    paths:
+      - 'terraform/**'
+      - 'ansible/**'
   push:
     branches:
       - main
+    paths:
+      - 'terraform/**'
+      - 'ansible/**'
+  workflow_dispatch:
 
 jobs:
-  sync-check:
-    name: sync check service
+  deploy-forest-calibnet-infrastruture-with-terraform:
+    name: Deploy Forest Terraform calibnet Infrastructure
     runs-on: ubuntu-latest
     permissions: write-all
     steps:
       - name: Checkout the code
         uses: actions/checkout@v3
 
-       # Using Custom Composite action in ./composite-action/terraform folder
+    # Using Custom Composite action in ./composite-action/terraform folder
       - name: Composite Action for Deploying Terraform Resources
         uses: ./composite-action/terraform
         with:
@@ -27,6 +32,5 @@ jobs:
           aws_access_key_id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
-          slack_token: ${{ secrets.SLACK_TOKEN }}
-          working_directory: sync_check_terraform/
-          environment: Sync Check Service
+          working_directory: terraform/calibnet
+          environment: calibnet
