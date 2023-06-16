@@ -1,28 +1,29 @@
-name: Custom Composite action to deploy terraform resources
+name: Deploy Forest Infrastructure on DigitalOcean
 
 description: |
-  This action deploys the Forest infarstructure with Terraform
+  This action deploys the Forest infrastructure to either the mainnet or calibnet
+  chain using Terraform.
 
 inputs:
   chain:
-    description: 'The terraform plan for the the chain infrastructure to be deployed'
+    description: 'The terraform plan for the the chain infrastructure to be deployed (either "mainnet" or "calibnet")'
     required: true
-  do_token:
+  digitalocean_token:
     description: 'The DigitalOcean access token to use for deploying the infrastructure'
     required: true
   aws_access_key_id:
-    description: 'S3 access keys id used by terraform and service like sync check, Deploy Snapshot Service etc'
+    description: 'The AWS access key ID to use for configuring Ansible'
     required: true
   aws_secret_access_key:
-    description: 'S3 secret access keys used by terraform and service like sync check, Deploy Snapshot Service etc'
+    description: 'The AWS secret access key to use for configuring Ansible'
+    required: true
+  volume_name:
+    description: 'The name of the  volume to use for storing the blockchain data (required for mainnet chain)'
     required: true
   working_directory:
     description: 'The working Directory'
     required: true
-  ssh_private_key:
-    description: 'The SSH private key to use for connecting to Droplets via SSH'
-  slack_token:
-    description: 'The slack token secret used to connect the Infrastructure to Slack'
+
 
 runs:
   using: "composite"
@@ -51,12 +52,9 @@ runs:
       continue-on-error: true
       working-directory: ${{ inputs.working_directory }}
       env:
-        TF_VAR_do_token: ${{ inputs.do_token }}
-        TF_VAR_AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
-        TF_VAR_AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
+        TF_VAR_digitalocean_token: ${{ inputs.digitalocean_token }}
         AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
-        TF_VAR_slack_token: ${{ inputs.slack_token}}
 
     - name: Find Comment
       if: github.event_name == 'pull_request'
@@ -97,43 +95,12 @@ runs:
       if: steps.plan.outcome == 'failure'
       run: exit 1
 
-    - name: Configure ssh-agent
-      if: github.ref == 'refs/heads/main' && ( github.event_name == 'push' || github.event_name == 'workflow_dispatch' )
-      uses: webfactory/ssh-agent@v0.8.0
-      with:
-        ssh-private-key: ${{ inputs.ssh-private-key }}
-
     - name: Terraform Apply
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       run: terraform apply -auto-approve -input=false
       shell: bash
       working-directory: ${{ inputs.working_directory }}
       env:
-        TF_VAR_do_token: ${{ inputs.do_token }}
-        TF_VAR_AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
-        TF_VAR_AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
+        TF_VAR_digitalocean_token: ${{ inputs.digitalocean_token }}
         AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
-        TF_VAR_slack_token: ${{ inputs.slack_token}}
-
-    - name: Terraform Force Apply
-      if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
-      shell: bash
-      working-directory: ${{ inputs.working_directory }}
-      env:
-        TF_VAR_do_token: ${{ inputs.d0_token }}
-        TF_VAR_AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
-        TF_VAR_AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
-        AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
-        AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
-        TF_VAR_slack_token: ${{ inputs.slack_token}}
-      run: |
-        terraform destroy -auto-approve -input=false
-        terraform apply -auto-approve -input=false
-
-    - name: Upload Generated Ansible Hosts File as Artifact
-      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      uses: actions/upload-artifact@v2
-      with:
-          name: hosts
-          path: Ansible/hosts
