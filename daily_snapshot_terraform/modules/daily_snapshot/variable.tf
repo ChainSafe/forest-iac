@@ -48,7 +48,7 @@ variable "snapshot_endpoint" {
 variable "forest_tag" {
   description = "Image tag for the Forest container"
   type        = string
-  default     = "latest"
+  default     = "edge"
 }
 
 variable "image" {
