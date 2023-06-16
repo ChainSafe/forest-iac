@@ -1,4 +1,4 @@
-name: Deploy
+name: Forest Mainnet
 
 on:
   pull_request:
