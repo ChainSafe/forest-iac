@@ -43,7 +43,7 @@ runs:
 
     - name: Install Ansible Playbook Requirement
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      run: ansible-galaxy install -r ansiblerequirements.yml
+      run: ansible-galaxy install -r ansible/requirements.yml
       shell: bash
 
     - name: Run Ansible To Install and Set-Up  New-Relic Agent
