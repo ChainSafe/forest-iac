@@ -121,7 +121,7 @@ runs:
       shell: bash
       working-directory: ${{ inputs.working_directory }}
       env:
-        TF_VAR_do_token: ${{ inputs.d0_token }}
+        TF_VAR_do_token: ${{ inputs.do_token }}
         TF_VAR_AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
         TF_VAR_AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
         AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
