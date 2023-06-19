@@ -39,7 +39,7 @@ runs:
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       uses: webfactory/ssh-agent@v0.7.0
       with:
-        ssh-private-key: ${{ inputs.ssh-private-key }}   
+        ssh-private-key: ${{ inputs.ssh_private_key }}   
 
     - name: Install Ansible Playbook Requirement
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
