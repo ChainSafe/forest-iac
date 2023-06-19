@@ -4,7 +4,7 @@ description: |
   This action deploys the Forest infarstructure with Terraform
 
 inputs:
-  enviroment:
+  environment:
     description: 'The terraform plan for the the environment infrastructure to be deployed'
     required: true
   do_token:
@@ -130,3 +130,10 @@ runs:
       run: |
         terraform destroy -auto-approve -input=false
         terraform apply -auto-approve -input=false
+        
+    - name: Upload Generated Ansible Hosts File as Artifact
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      uses: actions/upload-artifact@v2
+      with:
+          name: hosts
+          path: ansible/hosts   
