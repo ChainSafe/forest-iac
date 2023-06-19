@@ -4,7 +4,7 @@ description: |
   This action deploys the Forest infarstructure with Terraform
 
 inputs:
-  enviroment:
+  environment:
     description: 'The terraform plan for the the environment infrastructure to be deployed'
     required: true
   do_token:
