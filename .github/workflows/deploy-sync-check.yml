@@ -1,5 +1,5 @@
 ---
-name: Deploy Sync Check Service
+name: Sync Check Service
 
 on:
   workflow_dispatch:
@@ -12,7 +12,7 @@ on:
 
 jobs:
   sync-check:
-    name: sync check service
+    name: Sync Check Service
     runs-on: ubuntu-latest
     permissions: write-all
     steps:
@@ -29,7 +29,7 @@ jobs:
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
           slack_token: ${{ secrets.SLACK_TOKEN }}
           working_directory: sync_check_terraform/
-          chain: Sync Check Service
+          environment: Sync Check Service
 
   setup-newrelic-agent-using-ansible:
     name: Set-up New Relic Agent on Forest Sync Check Infrastructure with Ansible

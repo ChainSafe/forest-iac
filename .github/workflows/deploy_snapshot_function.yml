@@ -11,7 +11,7 @@ on:
 
 jobs:
   deploy-snapshot-link:
-    name: snapshot link
+    name: Snapshot Service
     runs-on: ubuntu-latest
     env:
       TF_VAR_do_token: ${{ secrets.DO_TOKEN }}

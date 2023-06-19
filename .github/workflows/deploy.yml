@@ -1,4 +1,4 @@
-name: Deploy Snapshot Service and Set-up New Relic Agent
+name: snapshot service (calibnet)
 
 
 on:
@@ -26,7 +26,7 @@ jobs:
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
           slack_token: ${{ secrets.SLACK_TOKEN }}
           working_directory: daily_snapshot_terraform
-          chain: Snapshot Service
+          environment: Snapshot Service
 
   setup-newrelic-agent-using-ansible:
     name: Set-up New Relic Agent on Forest Snapshot Service Infrastructure with Ansible
