@@ -36,11 +36,12 @@ custom_attributes:
 display_name: "$NAME"
 EOF
 
-# Adding the  New Relic infrastructure monitoring agent repository
+# Add the New Relic infrastructure monitoring agent repository to the system's list of yum repos.
+# The resulting file (/etc/yum.repos.d/newrelic-infra.repo) is used by yum to locate the New Relic packages.
 sudo curl -o /etc/yum.repos.d/newrelic-infra.repo https://download.newrelic.com/infrastructure_agent/linux/yum/el/9/x86_64/newrelic-infra.repo
 
-# Refresh the the new relic repository
+# Refreshes the New Relic repository. This step ensures that yum is aware of the latest versions of available packages.
 sudo yum -q makecache -y --disablerepo='*' --enablerepo='newrelic-infra'
 
-# Install the new relic infrastructure agent
+# Installs the New Relic infrastructure agent. This package provides the monitoring functionality needed.
 sudo yum install newrelic-infra -y
