@@ -90,8 +90,8 @@ sudo --user="${NEW_USER}" -- \
 # Set-up  New Relic Agent For logs collection and Infrastruture Metrics
 sudo --user="${NEW_USER}" -- \
   bash -c "curl -Ls https://download.newrelic.com/install/newrelic-cli/scripts/install.sh | bash && \
-  sudo NEW_RELIC_API_KEY="${NEW_RELIC_API_KEY}" \
-       NEW_RELIC_ACCOUNT_ID="${NEW_RELIC_ACCOUNT_ID}"\
+  sudo NEW_RELIC_API_KEY=""${NEW_RELIC_API_KEY}"" \
+       NEW_RELIC_ACCOUNT_ID=""${NEW_RELIC_ACCOUNT_ID}""\
        NEW_RELIC_REGION=EU \
        /usr/local/bin/newrelic install -y"
 
@@ -125,3 +125,4 @@ sudo --user="${NEW_USER}" -- \
   --restart=unless-stopped \
   newrelic/nri-prometheus:latest \
   --configfile=/config.yml
+

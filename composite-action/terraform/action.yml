@@ -137,7 +137,7 @@ runs:
         AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
         TF_VAR_slack_token: ${{ inputs.slack_token }}
-        TF_VAR_NEW_RELIC_API_KEY: ${{ inputs.NEW_RELIC_API_KEY}
+        TF_VAR_NEW_RELIC_API_KEY: ${{ inputs.NEW_RELIC_API_KEY }}
         TF_VAR_NR_LICENSE_KEY: ${{ inputs.nr_NR_LICENSE_KEY }}
       run: |
         terraform destroy -auto-approve -input=false
