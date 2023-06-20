@@ -54,7 +54,7 @@ cat << EOF | sudo tee -a /etc/newrelic-infra.yml
 enable_process_metrics: true
 status_server_enabled: true
 status_server_port: 18003
-license_key: $NR_LICENSE_KEY
+license_key: "$NR_LICENSE_KEY"
 custom_attributes:
   nr_deployed_by: newrelic-cli
 display_name: "$NAME"
