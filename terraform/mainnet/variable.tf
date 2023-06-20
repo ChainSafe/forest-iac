@@ -69,14 +69,10 @@ variable "NR_LICENSE_KEY" {
 }
 
 variable "NEW_RELIC_API_KEY" {
-  description = "New Relic API KEY"
+  description = "The New Relic API KEY"
   type        = string
 }
 
-variable "NEW_RELIC_ACCOUNT_ID" {
-  description = "New Relic Account ID"
-  type        = string
-  default     = "3942575"
-}
+
 
 

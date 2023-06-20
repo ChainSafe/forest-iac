@@ -1,10 +1,10 @@
 name: Custom Composite action to deploy terraform resources
 
 description: |
-  This action deploys the Forest infarstructure with Terraform
+  This action deploys the Forest infrastructure with Terraform
 
 inputs:
-  enviroment:
+  environment:
     description: 'The terraform plan for the the environment infrastructure to be deployed'
     required: true
   do_token:
@@ -23,6 +23,12 @@ inputs:
     description: 'The SSH private key to use for connecting to Droplets via SSH'
   slack_token:
     description: 'The slack token secret used to connect the Infrastructure to Slack'
+  new_relic_api_key:
+    description: 'The New Relic API KEY'
+  nr_license_key:
+    description: 'The New Relic Access Token'
+
+
 
 runs:
   using: "composite"
@@ -57,6 +63,8 @@ runs:
         AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
         TF_VAR_slack_token: ${{ inputs.slack_token}}
+        TF_VAR_new_relic_api_key: ${{ inputs.new_relic_api_key}
+        TF_VAR_nr_license_key: ${{ inputs.nr_license_key}
 
     - name: Find Comment
       if: github.event_name == 'pull_request'
@@ -115,6 +123,8 @@ runs:
         AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
         TF_VAR_slack_token: ${{ inputs.slack_token}}
+        TF_VAR_new_relic_api_key: ${{ inputs.new_relic_api_key}
+        TF_VAR_nr_license_key: ${{ inputs.nr_license_key}
 
     - name: Terraform Force Apply
       if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
@@ -127,6 +137,8 @@ runs:
         AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
         TF_VAR_slack_token: ${{ inputs.slack_token}}
+        TF_VAR_new_relic_api_key: ${{ inputs.new_relic_api_key}
+        TF_VAR_nr_license_key: ${{ inputs.nr_license_key}
       run: |
         terraform destroy -auto-approve -input=false
         terraform apply -auto-approve -input=false
