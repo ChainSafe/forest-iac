@@ -70,3 +70,20 @@ variable "fw_name" {
   description = "The name assigned to the firewall in the cloud"
   type        = string
 }
+
+variable "NR_LICENSE_KEY" {
+  description = "New Relic Access Token"
+  type        = string
+}
+
+variable "NEW_RELIC_API_KEY" {
+  description = "New Relic API KEY"
+  type        = string
+}
+
+variable "NEW_RELIC_ACCOUNT_ID" {
+  description = "New Relic Account ID"
+  type        = string
+  default     = "3942575"
+}
+

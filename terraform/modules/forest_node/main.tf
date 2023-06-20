@@ -55,7 +55,10 @@ resource "digitalocean_droplet" "forest" {
       VOLUME_NAME         = "${var.attach_volume}" ? replace(var.volume_name, "-", "_") : ""
       CHAIN               = "${var.chain}"
       DISK_ID_VOLUME_NAME = "${var.attach_volume}" ? var.volume_name : ""
-
+      NR_LICENSE_KEY      = "${var.NR_LICENSE_KEY}"
+      NEW_RELIC_API_KEY   = "${var.NEW_RELIC_API_KEY}"
+      NEW_RELIC_ACCOUNT_ID = "${var.NEW_RELIC_ACCOUNT_ID}"
+ 
   })
 
   tags = [var.chain]

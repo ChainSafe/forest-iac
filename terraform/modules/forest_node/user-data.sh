@@ -90,8 +90,8 @@ sudo --user="${NEW_USER}" -- \
 # Set-up  New Relic Agent For logs collection and Infrastruture Metrics
 sudo --user="${NEW_USER}" -- \
   bash -c "curl -Ls https://download.newrelic.com/install/newrelic-cli/scripts/install.sh | bash && \
-  sudo NEW_RELIC_API_KEY="${NR_LICENSE_KEY}" \
-       NEW_RELIC_ACCOUNT_ID=3942575 \
+  sudo NEW_RELIC_API_KEY="${NEW_RELIC_API_KEY}" \
+       NEW_RELIC_ACCOUNT_ID="${NEW_RELIC_ACCOUNT_ID}"\
        NEW_RELIC_REGION=EU \
        /usr/local/bin/newrelic install -y"
 
@@ -101,7 +101,7 @@ echo "display_name: forest-${CHAIN}" >> /etc/newrelic-infra.yml
 # restart the New Relic Infrastruture Agent 
 sudo systemctl restart newrelic-infra
 
-# Create config.yml for New Relic Prometheus integration.
+# Create config.yml for New Relic OpenMetrics Prometheus integration.
 cat << EOF > "/home/${NEW_USER}/forest_data/config.yml"
 cluster_name: forest-${CHAIN}
 targets:

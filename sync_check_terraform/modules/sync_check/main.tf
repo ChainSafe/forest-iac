@@ -52,6 +52,8 @@ locals {
     "echo 'export FOREST_TARGET_RUBY_COMMON=/volumes/ruby_common' >> ~/.bashrc",
     "echo 'export FOREST_SLACK_API_TOKEN=\"${var.slack_token}\"' >> ~/.bashrc",
     "echo 'export FOREST_SLACK_NOTIF_CHANNEL=\"${var.slack_channel}\"' >> ~/.bashrc",
+    "echo 'export NR_LICENSE_KEY=\"${var.NR_LICENSE_KEY}\"' >> ~/.bashrc",
+    "echo 'export NAME=\"${var.name}\"' >> ~/.bashrc",
     "source ~/.bashrc",
     "/bin/bash ./init.sh > init_log.txt",
     "systemctl enable docker",
