@@ -49,22 +49,3 @@ cp --recursive /root/ruby_common/* /var/lib/docker/volumes/ruby-common/_data/
 ## Run health check status of a running node
 ruby sync_check_process.rb
 
-# Set-up the New Relic license key
-cat << EOF | sudo tee -a /etc/newrelic-infra.yml
-enable_process_metrics: true
-status_server_enabled: true
-status_server_port: 18003
-license_key: "$NR_LICENSE_KEY"
-custom_attributes:
-  nr_deployed_by: newrelic-cli
-display_name: "$NAME"
-EOF
-
-# Adding the  New Relic infrastructure monitoring agent repository
-sudo curl -o /etc/yum.repos.d/newrelic-infra.repo https://download.newrelic.com/infrastructure_agent/linux/yum/el/9/x86_64/newrelic-infra.repo
-
-# Refresh the the new relic repository
-sudo yum -q makecache -y --disablerepo='*' --enablerepo='newrelic-infra'
-
-# Install the new relic infrastructure agent
-sudo yum install newrelic-infra -y

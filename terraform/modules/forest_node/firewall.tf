@@ -13,6 +13,12 @@ resource "digitalocean_firewall" "forest_firewall" {
     source_addresses = var.source_addresses
   }
 
+    inbound_rule {
+    protocol         = "tcp"
+    port_range       = "80"
+    source_addresses = var.source_addresses
+  }
+
   outbound_rule {
     protocol              = "tcp"
     port_range            = "all"

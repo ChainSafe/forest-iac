@@ -1,11 +1,12 @@
 #!/bin/bash
 
-# This bash script is executed at the initialization of the Mainnet or Calibnet Droplet.
-# The script runs the mainnet or calibnet chain depending on the specification in the terraform script.
-# Additionally, it starts watchtower to keep the forest images up to date.
+# This bash script is used to initialize a Mainnet or Calibnet Droplet.
+# It starts the chain (either mainnet or calibnet) as specified in the terraform script.
+# The script also runs Watchtower to keep the Forest Docker images up-to-date,
+# and sets up the New Relic agent for system monitoring.
 
-# This script is templated using the terraform templating engine, where the variables are defined in the terraform.tfvars.
-# Hence, $${VARIABLES} are meant for the template engine, not BASH.
+# The script employs Terraform's templating engine, which uses variables defined in terraform.tfvars.
+# Thus, the $${VARIABLES} used here are for the template engine, not BASH.
 
 set -euxo pipefail
 
@@ -31,8 +32,11 @@ echo "AllowUsers ${NEW_USER}" >> /etc/ssh/sshd_config
 
 systemctl restart sshd
 
-# Add new user to "sudo" and "docker" group so they can run docker commands and have general admin rights.
-usermod --append --groups sudo,docker "${NEW_USER}"
+# Enable passwordless sudo for the new user. This allows the user to run sudo commands without being prompted for a password.
+echo "${NEW_USER} ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/"${NEW_USER}"
+
+# Add new user to "docker" group so they can run docker commands
+usermod --append --groups docker "${NEW_USER}"
 
 # Set up the directory where the Forest container will store its data.
 mkdir --parents -- "/home/${NEW_USER}/forest_data"
@@ -55,7 +59,7 @@ cat << EOF > "/home/${NEW_USER}/forest_data/config.toml"
 data_dir = "/home/${NEW_USER}/forest_data/data"
 EOF
 
-#Create docker network
+
 sudo --user="${NEW_USER}" -- docker network create forest
 
 # Run the Forest Docker container as the created user.
@@ -91,17 +95,15 @@ sudo --user="${NEW_USER}" -- \
 sudo --user="${NEW_USER}" -- \
   bash -c "curl -Ls https://download.newrelic.com/install/newrelic-cli/scripts/install.sh | bash && \
   sudo NEW_RELIC_API_KEY=""${NEW_RELIC_API_KEY}"" \
-       NEW_RELIC_ACCOUNT_ID=""${NEW_RELIC_ACCOUNT_ID}""\
+       NEW_RELIC_ACCOUNT_ID=""${NEW_RELIC_ACCOUNT_ID}"" \
        NEW_RELIC_REGION=EU \
        /usr/local/bin/newrelic install -y"
 
-# add custom display name to the new replic config
+# Adds custom display name to the New Relic config.
 echo "display_name: forest-${CHAIN}" >> /etc/newrelic-infra.yml
-
-# restart the New Relic Infrastruture Agent 
 sudo systemctl restart newrelic-infra
 
-# Create config.yml for New Relic OpenMetrics Prometheus integration.
+# Creates a configuration file for New Relic OpenMetrics Prometheus integration.
 cat << EOF > "/home/${NEW_USER}/forest_data/config.yml"
 cluster_name: forest-${CHAIN}
 targets:
@@ -114,7 +116,8 @@ retries: 3
 log_level: info
 EOF
 
-# Run Prometheus OpenMetrics integration for forest prometheus metric
+# Runs Prometheus OpenMetrics integration Docker container 
+# for Collection of Forest's Prometheus metrics.
 sudo --user="${NEW_USER}" -- \
   docker run \
   --detach \
