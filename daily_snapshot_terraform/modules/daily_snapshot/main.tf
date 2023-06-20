@@ -164,7 +164,7 @@ output "ip" {
 }
 
 resource "local_file" "inventory" {
-  filename = "../../../ansible/hosts"
+  filename = "../../ansible/hosts"
   content  = <<_EOF
 [${var.name}]
 ${digitalocean_droplet.forest.ipv4_address}

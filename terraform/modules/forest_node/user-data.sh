@@ -28,6 +28,7 @@ fi
 # Restrict SSH access to the new user only. preventing root user from accessing the system via SSH.
 echo "AllowUsers ${NEW_USER}" >> /etc/ssh/sshd_config
 
+
 systemctl restart sshd
 
 # Enable passwordless sudo for the new user. This allows the user to run sudo commands without being prompted for a password.
