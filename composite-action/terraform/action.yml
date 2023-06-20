@@ -23,9 +23,9 @@ inputs:
     description: 'The SSH private key to use for connecting to Droplets via SSH'
   slack_token:
     description: 'The slack token secret used to connect the Infrastructure to Slack'
-  new_relic_api_key:
+  NEW_RELIC_API_KEY:
     description: 'The New Relic API KEY'
-  nr_license_key:
+  NR_LICENSE_KEY:
     description: 'The New Relic Access Token'
 
 
@@ -62,9 +62,9 @@ runs:
         TF_VAR_AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
         AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
-        TF_VAR_slack_token: ${{ inputs.slack_token}}
-        TF_VAR_new_relic_api_key: ${{ inputs.new_relic_api_key}
-        TF_VAR_nr_license_key: ${{ inputs.nr_license_key}
+        TF_VAR_slack_token: ${{ inputs.slack_token }}
+        TF_VAR_NEW_RELIC_API_KEY: ${{ inputs.NEW_RELIC_API_KEY }}
+        TF_VAR_NR_LICENSE_KEY: ${{ inputs.NR_LICENSE_KEY }}
 
     - name: Find Comment
       if: github.event_name == 'pull_request'
@@ -122,9 +122,9 @@ runs:
         TF_VAR_AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
         AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
-        TF_VAR_slack_token: ${{ inputs.slack_token}}
-        TF_VAR_new_relic_api_key: ${{ inputs.new_relic_api_key}
-        TF_VAR_nr_license_key: ${{ inputs.nr_license_key}
+        TF_VAR_slack_token: ${{ inputs.slack_token }}
+        TF_VAR_NEW_RELIC_API_KEY: ${{ inputs.NEW_RELIC_API_KEY }}
+        TF_VAR_NR_LICENSE_KEY: ${{ inputs.NR_LICENSE_KEY }}
 
     - name: Terraform Force Apply
       if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
@@ -136,9 +136,9 @@ runs:
         TF_VAR_AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
         AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
-        TF_VAR_slack_token: ${{ inputs.slack_token}}
-        TF_VAR_new_relic_api_key: ${{ inputs.new_relic_api_key}
-        TF_VAR_nr_license_key: ${{ inputs.nr_license_key}
+        TF_VAR_slack_token: ${{ inputs.slack_token }}
+        TF_VAR_NEW_RELIC_API_KEY: ${{ inputs.NEW_RELIC_API_KEY}
+        TF_VAR_NR_LICENSE_KEY: ${{ inputs.nr_NR_LICENSE_KEY }}
       run: |
         terraform destroy -auto-approve -input=false
         terraform apply -auto-approve -input=false

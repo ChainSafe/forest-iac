@@ -26,5 +26,5 @@ module "calibnet" {
   project               = var.project
   fw_name               = var.fw_name
   NR_LICENSE_KEY        = var.NR_LICENSE_KEY
-  NEW_RELIC_API_KEY      = var.NEW_RELIC_API_KEY
+  NEW_RELIC_API_KEY     = var.NEW_RELIC_API_KEY
 }
