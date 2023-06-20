@@ -84,3 +84,41 @@ sudo --user="${NEW_USER}" -- \
   --restart=unless-stopped \
   containrrr/watchtower \
   --label-enable --include-stopped --revive-stopped --stop-timeout 120s --interval 600
+
+
+# Set-up  New Relic Agent For logs collection and Infrastruture Metrics
+sudo --user="${NEW_USER}" -- \
+  bash -c "curl -Ls https://download.newrelic.com/install/newrelic-cli/scripts/install.sh | bash && \
+  sudo NEW_RELIC_API_KEY="${NR_LICENSE_KEY}" \
+       NEW_RELIC_ACCOUNT_ID=3942575 \
+       NEW_RELIC_REGION=EU \
+       /usr/local/bin/newrelic install -y"
+
+# Add custom display name to the new replic config
+echo "display_name: forest-${CHAIN}" >> /etc/newrelic-infra.yml
+
+# Restart the New Relic Infrastruture Agent 
+sudo systemctl restart newrelic-infra
+
+# Create New Relic Custom Prometheus OpenMetrics
+cat << EOF > "/home/${NEW_USER}/forest_data/config.yml"
+targets:
+  - description: Forest "${CHAIN}" Prometheus Endpoint
+    urls: ["http://172.17.0.2:6116/metrics"]
+scrape_interval: 15s
+max_concurrency: 10
+timeout: 15s
+retries: 3
+log_level: info
+EOF
+
+# Run Prometheus OpenMetrics integration for forest prometheus metric
+sudo --user="${NEW_USER}" -- \
+  docker run \
+  --detach \
+  --name=watchtowernri-prometheus \
+  --e LICENSE_KEY=$\"${NR_LICENSE_KEY}"
+  --volume=/home/"${NEW_USER}"/forest_data/config.yml:/config.yml \
+  --restart=unless-stopped \
+  newrelic/nri-prometheus:latest \
+  --configfile=/config.yml
