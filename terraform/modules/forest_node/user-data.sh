@@ -55,32 +55,37 @@ cat << EOF > "/home/${NEW_USER}/forest_data/config.toml"
 data_dir = "/home/${NEW_USER}/forest_data/data"
 EOF
 
+#Create docker network
+sudo --user="${NEW_USER}" -- docker network create forest
+
 # Run the Forest Docker container as the created user.
 sudo --user="${NEW_USER}" -- \
   docker run \
   --detach \
-  --name=forest \
+  --network=forest \
+  --name=forest-"${CHAIN}" \
   --volume=/home/"${NEW_USER}"/forest_data:/home/"${NEW_USER}"/data \
   --publish=1234:1234 \
+  --publish=6116:6116 \
   --restart=always \
   ghcr.io/chainsafe/forest:latest \
   --config=/home/"${NEW_USER}"/data/config.toml \
-  --auto-download-snapshot \
   --encrypt-keystore false \
-  --chain="${CHAIN}"
+  --auto-download-snapshot \
+  --chain="${CHAIN}" 
 
-# Run the Watchtower Docker container.
-# It monitors running Docker containers and watches for changes to the images that those containers were originally started from.
+# It monitors running Docker containers and watches for changes to the images that those containers were originally started from. 
 # If Watchtower detects that an image has changed, it will automatically restart the container using the new image.
+# Run the Watchtower Docker container as created user.
 sudo --user="${NEW_USER}" -- \
   docker run \
   --detach \
   --name=watchtower \
+  --network=forest \
   --volume=/var/run/docker.sock:/var/run/docker.sock \
   --restart=unless-stopped \
   containrrr/watchtower \
   --label-enable --include-stopped --revive-stopped --stop-timeout 120s --interval 600
-
 
 # Set-up  New Relic Agent For logs collection and Infrastruture Metrics
 sudo --user="${NEW_USER}" -- \
@@ -90,17 +95,18 @@ sudo --user="${NEW_USER}" -- \
        NEW_RELIC_REGION=EU \
        /usr/local/bin/newrelic install -y"
 
-# Add custom display name to the new replic config
+# add custom display name to the new replic config
 echo "display_name: forest-${CHAIN}" >> /etc/newrelic-infra.yml
 
-# Restart the New Relic Infrastruture Agent 
+# restart the New Relic Infrastruture Agent 
 sudo systemctl restart newrelic-infra
 
-# Create New Relic Custom Prometheus OpenMetrics
+# Create config.yml for New Relic Prometheus integration.
 cat << EOF > "/home/${NEW_USER}/forest_data/config.yml"
+cluster_name: forest-${CHAIN}
 targets:
   - description: Forest "${CHAIN}" Prometheus Endpoint
-    urls: ["http://172.17.0.2:6116/metrics"]
+    urls: ["forest-${CHAIN}:6116/metrics"]
 scrape_interval: 15s
 max_concurrency: 10
 timeout: 15s
@@ -112,8 +118,9 @@ EOF
 sudo --user="${NEW_USER}" -- \
   docker run \
   --detach \
-  --name=watchtowernri-prometheus \
-  --e LICENSE_KEY=$\"${NR_LICENSE_KEY}"
+  --network=forest \
+  --name=nri-prometheus \
+  --e LICENSE_KEY="${NR_LICENSE_KEY}" \
   --volume=/home/"${NEW_USER}"/forest_data/config.yml:/config.yml \
   --restart=unless-stopped \
   newrelic/nri-prometheus:latest \
