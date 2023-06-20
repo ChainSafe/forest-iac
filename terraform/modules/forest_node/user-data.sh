@@ -28,14 +28,11 @@ fi
 # Restrict SSH access to the new user only. preventing root user from accessing the system via SSH.
 echo "AllowUsers ${NEW_USER}" >> /etc/ssh/sshd_config
 
+
 systemctl restart sshd
 
-# Enable passwordless sudo for the new user. This allows the user to run sudo commands without being prompted for a password.
-echo "${NEW_USER} ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/"${NEW_USER}"
-
-# Add new user to "docker" group to run docker commands
-usermod --append --groups docker "${NEW_USER}"
-
+# Add new user to "sudo" and "docker" group so they can run docker commands and have general admin rights.
+usermod --append --groups sudo,docker "${NEW_USER}"
 
 # Set up the directory where the Forest container will store its data.
 mkdir --parents -- "/home/${NEW_USER}/forest_data"
@@ -62,20 +59,19 @@ EOF
 sudo --user="${NEW_USER}" -- \
   docker run \
   --detach \
-  --name=forest-"${CHAIN}" \
+  --name=forest \
   --volume=/home/"${NEW_USER}"/forest_data:/home/"${NEW_USER}"/data \
   --publish=1234:1234 \
-  --publish=6116:6116 \
   --restart=always \
   ghcr.io/chainsafe/forest:latest \
   --config=/home/"${NEW_USER}"/data/config.toml \
-  --encrypt-keystore false \
   --auto-download-snapshot \
+  --encrypt-keystore false \
   --chain="${CHAIN}"
 
+# Run the Watchtower Docker container.
 # It monitors running Docker containers and watches for changes to the images that those containers were originally started from.
 # If Watchtower detects that an image has changed, it will automatically restart the container using the new image.
-# Run the Watchtower Docker container as created user.
 sudo --user="${NEW_USER}" -- \
   docker run \
   --detach \
