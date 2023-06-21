@@ -1,4 +1,4 @@
-name: Deploy
+name: Forest Calibnet
 
 on:
   pull_request:
@@ -17,7 +17,7 @@ on:
 
 jobs:
   deploy-forest-calibnet:
-    name: Forest Calibnet
+    name: Deploy
     runs-on: ubuntu-latest
     permissions: write-all
     steps:

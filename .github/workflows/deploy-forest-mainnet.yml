@@ -1,4 +1,4 @@
-name: Deploy
+name: Forest Mainnet
 
 on:
   pull_request:
@@ -17,7 +17,7 @@ on:
 
 jobs:
   deploy-forest-mainnet:
-    name: Forest Mainnet
+    name: Deploy
     runs-on: ubuntu-latest
     permissions: write-all
     steps:

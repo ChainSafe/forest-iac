@@ -1,5 +1,5 @@
 ---
-name: Deploy
+name: Sync Check Service
 
 on:
   workflow_dispatch:
@@ -12,7 +12,7 @@ on:
 
 jobs:
   sync-check:
-    name: Sync Check Service
+    name: Deploy
     runs-on: ubuntu-latest
     permissions: write-all
     steps:
