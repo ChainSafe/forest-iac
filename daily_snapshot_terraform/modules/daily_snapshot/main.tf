@@ -61,7 +61,6 @@ locals {
     "echo 'export SNAPSHOT_BUCKET=\"${var.snapshot_bucket}\"' >> .forest_env",
     "echo 'export SNAPSHOT_ENDPOINT=\"${var.snapshot_endpoint}\"' >> .forest_env",
     "echo 'export NR_LICENSE_KEY=\"${var.NR_LICENSE_KEY}\"' >> ~/.bashrc",
-    "echo 'export NAME=\"${var.name}\"' >> ~/.bashrc",
     "echo 'export BASE_FOLDER=\"/root\"' >> .forest_env",
     "echo 'export FOREST_TAG=\"${var.forest_tag}\"' >> .forest_env",
     "echo 'source .forest_env' >> .bashrc",
