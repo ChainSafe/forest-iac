@@ -1,4 +1,4 @@
-name: snapshot service
+name: Deploy
 
 
 on:
@@ -9,7 +9,7 @@ on:
 
 jobs:
   deploy-daily-snapshot-calibnet:
-    name: snapshot service
+    name: Snapshot Service
     runs-on: ubuntu-latest
     permissions: write-all
     steps:

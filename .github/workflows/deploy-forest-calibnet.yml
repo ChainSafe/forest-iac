@@ -1,4 +1,4 @@
-name: Forest Calibnet
+name: Deploy
 
 on:
   pull_request:
