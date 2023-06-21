@@ -1,6 +1,6 @@
 #!/bin/bash
 
-dnf install -y docker ruby ruby-devel s3cmd zstd
+dnf install -y docker ruby ruby-devel s3cmd
 gem install docker-api slack-ruby-client activesupport
 
 systemctl start docker
