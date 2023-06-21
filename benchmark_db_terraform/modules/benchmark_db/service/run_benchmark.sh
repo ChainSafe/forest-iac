@@ -14,5 +14,8 @@ s3cmd --dump-config \
 ## Run actual benchmark
 ruby bench.rb --chain calibnet --tempdir ./benchmark --daily
 
-## Upload benchmark result to s3
-s3cmd --acl-public put "/root/results_*.csv" s3://"$BENCHMARK_BUCKET"/benchmark-results/ || exit 1
+## Upload benchmark result to s3 weekly file
+week_number=$(date +%W) # Week starting on Monday
+tail -n +2 /root/results_*.csv | s3cmd --acl-public put - s3://"$BENCHMARK_BUCKET"/weekly-results/weekly_result_$week_number.csv || exit 1
+
+tail -n +2 /root/results_*.csv | s3cmd --acl-public put -  s3://"$BENCHMARK_BUCKET"/all-results/all_results.csv || exit 1
