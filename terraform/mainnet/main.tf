@@ -30,4 +30,5 @@ module "mainnet" {
   fw_name                 = var.fw_name
   NEW_RELIC_API_KEY       = var.NEW_RELIC_API_KEY
   NR_LICENSE_KEY          = var.NR_LICENSE_KEY
+  NEW_RELIC_ACCOUNT_ID    = var.NEW_RELIC_ACCOUNT_ID
 }

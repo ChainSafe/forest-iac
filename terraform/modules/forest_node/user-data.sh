@@ -96,7 +96,7 @@ sudo --user="${NEW_USER}" -- \
   bash -c "curl -Ls https://download.newrelic.com/install/newrelic-cli/scripts/install.sh | bash && \
   sudo NEW_RELIC_API_KEY=""${NEW_RELIC_API_KEY}"" \
        NEW_RELIC_ACCOUNT_ID=""${NEW_RELIC_ACCOUNT_ID}"" \
-       NEW_RELIC_REGION=EU \
+       NEW_RELIC_REGION=""{NEW_RELIC_REGION}""\
        /usr/local/bin/newrelic install -y"
 
 # Adds custom display name to the New Relic config.

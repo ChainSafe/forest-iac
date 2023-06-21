@@ -30,4 +30,4 @@ jobs:
           slack_token: ${{ secrets.SLACK_TOKEN }}
           working_directory: sync_check_terraform/
           environment: Sync Check Service
-          NR_LICENSE_KEY: ${{ secrets.NR_LICENSE_KEY }}
+          nr_license_key: ${{ secrets.NR_LICENSE_KEY }}

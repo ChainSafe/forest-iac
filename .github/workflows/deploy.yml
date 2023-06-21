@@ -27,4 +27,4 @@ jobs:
           slack_token: ${{ secrets.SLACK_TOKEN }}
           working_directory: daily_snapshot_terraform
           environment: Snapshot Service
-          NR_LICENSE_KEY: ${{ secrets.NR_LICENSE_KEY }}
+          nr_license_key: ${{ secrets.NR_LICENSE_KEY }}

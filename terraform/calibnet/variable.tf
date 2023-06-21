@@ -58,3 +58,7 @@ variable "NEW_RELIC_API_KEY" {
   type        = string
 }
 
+variable "NEW_RELIC_ACCOUNT_ID" {
+  description = "The New Relic Account ID"
+  type        = string
+}

@@ -23,11 +23,12 @@ inputs:
     description: 'The SSH private key to use for connecting to Droplets via SSH'
   slack_token:
     description: 'The slack token secret used to connect the Infrastructure to Slack'
-  NEW_RELIC_API_KEY:
+  new_relic_api_key:
     description: 'The New Relic API KEY'
-  NR_LICENSE_KEY:
+  nr_license_key:
     description: 'The New Relic Access Token'
-
+  new_relic_account_id:
+    description: 'The New Relic Plathom Region'
 
 
 runs:
@@ -63,8 +64,9 @@ runs:
         AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
         TF_VAR_slack_token: ${{ inputs.slack_token }}
-        TF_VAR_NEW_RELIC_API_KEY: ${{ inputs.NEW_RELIC_API_KEY }}
-        TF_VAR_NR_LICENSE_KEY: ${{ inputs.NR_LICENSE_KEY }}
+        TF_VAR_NEW_RELIC_API_KEY: ${{ inputs.new_relic_api_key }}
+        TF_VAR_NR_LICENSE_KEY: ${{ inputs.nr_license_key }}
+        TF_VAR_NEW_RELIC_ACCOUNT_ID: ${{ inputs.new_relic_account_id }}
 
     - name: Find Comment
       if: github.event_name == 'pull_request'
@@ -125,6 +127,7 @@ runs:
         TF_VAR_slack_token: ${{ inputs.slack_token }}
         TF_VAR_NEW_RELIC_API_KEY: ${{ inputs.NEW_RELIC_API_KEY }}
         TF_VAR_NR_LICENSE_KEY: ${{ inputs.NR_LICENSE_KEY }}
+        TF_VAR_NEW_RELIC_ACCOUNT_ID: ${{ inputs.new_relic_account_id }}
 
     - name: Terraform Force Apply
       if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
@@ -137,8 +140,9 @@ runs:
         AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
         TF_VAR_slack_token: ${{ inputs.slack_token }}
-        TF_VAR_NEW_RELIC_API_KEY: ${{ inputs.NEW_RELIC_API_KEY }}
-        TF_VAR_NR_LICENSE_KEY: ${{ inputs.nr_NR_LICENSE_KEY }}
+        TF_VAR_NEW_RELIC_API_KEY: ${{ inputs.new_relic_api_key }}
+        TF_VAR_NR_LICENSE_KEY: ${{ inputs.nr_license_key }}
+        TF_VAR_NEW_RELIC_ACCOUNT_ID: ${{ inputs.new_relic_account_id }}
       run: |
         terraform destroy -auto-approve -input=false
         terraform apply -auto-approve -input=false

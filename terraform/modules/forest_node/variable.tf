@@ -84,6 +84,10 @@ variable "NEW_RELIC_API_KEY" {
 variable "NEW_RELIC_ACCOUNT_ID" {
   description = "New Relic Account ID"
   type        = string
-  default     = "3942575"
 }
 
+variable "NEW_RELIC_REGION" {
+  description = "The New Relic Plathom Region"
+  type        = string
+  default     = "EU"
+}
