@@ -162,7 +162,7 @@ resource "newrelic_nrql_alert_condition" "container_issue" {
   policy_id                    = newrelic_alert_policy.alert.id
   type                         = "static"
   name                         = "container_issue"
-  description                  = "Alert when any container on any host is down or restarting for more than 10 minutes"
+  description                  = "Alert when any container on any host is down or restarting for more than 5 minutes"
   enabled                      = true
   violation_time_limit_seconds = 3600
 
