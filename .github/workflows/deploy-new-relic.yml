@@ -32,5 +32,7 @@ jobs:
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
           new_relic_api_key: ${{ secrets.NEW_RELIC_API_KEY }}
           new_relic_account_id: ${{ secrets.NEW_RELIC_ACCOUNT_ID }}
-          working_directory: newrelic
+          working_directory: new-relic
           environment: New Relic
+          slack_channel_id: ${{ secrets.SLACK_CHANNEL_ID }}
+          slack_destination_id: ${{ secrets.SLACK_DESTINATION_ID }}
