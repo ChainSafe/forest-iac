@@ -57,3 +57,4 @@ s3cmd --acl-public put "$BASE_FOLDER/forest_db/forest_snapshot_$CHAIN_NAME"* s3:
 
 # Delete snapshot files
 rm "$BASE_FOLDER/forest_db/forest_snapshot_$CHAIN_NAME"*
+
