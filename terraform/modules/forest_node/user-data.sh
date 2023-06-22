@@ -89,7 +89,7 @@ sudo --user="${NEW_USER}" -- \
   --volume=/var/run/docker.sock:/var/run/docker.sock \
   --restart=unless-stopped \
   containrrr/watchtower \
-  --label-enable --include-stopped --revive-stopped --stop-timeout 120s --interval 600
+  --include-stopped --revive-stopped --stop-timeout 120s --interval 600
 
 # Set-up  New Relic Agent For logs collection and Infrastruture Metrics
 sudo --user="${NEW_USER}" -- \
