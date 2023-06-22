@@ -22,7 +22,6 @@ LOG_DIR = get_and_assert_env_variable 'BASE_FOLDER'
 # Current datetime, to append to the log files
 DATE = Time.new.strftime '%FT%H:%M:%S'
 LOG_HEALTH = "#{LOG_DIR}/benchmark_#{DATE}_health"
-LOG = "#{LOG_DIR}/benchmark_#{DATE}_forest"
 LOG_SYNC = "#{LOG_DIR}/benchmark_#{DATE}_sync"
 
 # Create log directory
@@ -32,27 +31,20 @@ logger = Logger.new(LOG_SYNC)
 
 health_check_passed = false
 
-# Execute the shell commands
-init_commands = <<-CMD
-  dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo && \
-  dnf install -y dnf-plugins-core docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-compose gcc make aria2 zstd clang clang-devel cmake && \
-  dnf install -y git bzr jq pkgconfig mesa-libOpenCL mesa-libOpenCL-devel opencl-headers ocl-icd ocl-icd-devel llvm wget hwloc hwloc-devel golang rust cargo s3cmd
+# Install dependencies
+init_commands = <<CMD
+  dnf install -y aria2 zstd clang clang-devel cmake git bzr jq pkgconfig mesa-libOpenCL mesa-libOpenCL-devel opencl-headers ocl-icd ocl-icd-devel llvm wget hwloc hwloc-devel golang rust cargo s3cmd
   dnf clean all
-  gem install slack-ruby-client sys-filesystem bundler concurrent-ruby deep_merge tomlrb toml-rb csv fileutils logger open3 optparse set tmpdir
+  gem install sys-filesystem bundler concurrent-ruby deep_merge tomlrb toml-rb csv fileutils logger open3 optparse set tmpdir
 CMD
 
 # Init and Run benchmark
 logger.info 'Initializing...'
 init_status = system(init_commands)
 
-if init_status
-  logger.info 'Running the benchmark...'
-  health_check_passed = system("bash #{SCRIPTS_DIR}/run_benchmark.sh > #{LOG_HEALTH} 2>&1")
-  logger.info 'Benchmark run completed'
-
-# Save the log capture from the Forest container
-container_logs = DockerUtils.get_container_logs hostname
-File.write(LOG_FOREST, container_logs)
+logger.info 'Running the benchmark...'
+health_check_passed = system("bash #{SCRIPTS_DIR}/run_benchmark.sh > #{LOG_HEALTH} 2>&1")
+logger.info 'Benchmark run completed'
 
 client = SlackClient.new CHANNEL, SLACK_TOKEN
 
@@ -61,6 +53,6 @@ if init_status && health_check_passed
 else
   client.post_message "⛔ Benchmark run fiascoed. 🔥🌲🔥 "
 end
-client.attach_files(LOG_HEALTH, LOG_SYNC, LOG_FOREST)
+client.attach_files(LOG_HEALTH, LOG_SYNC)
 
 logger.info 'Benchmark finished'

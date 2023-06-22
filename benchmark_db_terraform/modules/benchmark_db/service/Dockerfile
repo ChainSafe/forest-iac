@@ -1,0 +1,24 @@
+FROM fedora:36
+
+RUN dnf -y install dnf-plugins-core && \
+    dnf config-manager \
+        --add-repo \
+        https://download.docker.com/linux/fedora/docker-ce.repo && dnf clean all
+
+RUN dnf install -y \
+    docker-ce \
+    docker-ce-cli \
+    containerd.io \
+    docker-buildx-plugin \
+    ruby \
+    ruby-devel \
+    make \
+    gcc \
+    && dnf clean all
+
+RUN gem install slack-ruby-client
+
+WORKDIR /chainsafe
+
+COPY . .
+COPY ruby_common ruby_common

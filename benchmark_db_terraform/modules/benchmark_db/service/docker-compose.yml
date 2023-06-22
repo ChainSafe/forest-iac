@@ -1,0 +1,26 @@
+# Docker compose file to run Benchmark
+
+version: "3"
+services:
+  benchmark_service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: forest-benchmark
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - BENCHMARK_BUCKET=${BENCHMARK_BUCKET}
+      - BENCHMARK_ENDPOINT=${BENCHMARK_ENDPOINT}
+      - BASE_FOLDER=${BASE_FOLDER}
+      - FOREST_TAG=${FOREST_TAG}
+      - SLACK_API_TOKEN=${SLACK_API_TOKEN}
+      - SLACK_NOTIF_CHANNEL=${SLACK_NOTIF_CHANNEL}
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - |
+        ruby run_benchmark.rb
+        wait
+        sleep infinity
+        rm -rf /snapshots
+    restart: unless-stopped

@@ -26,9 +26,9 @@ module "benchmark_db" {
   source = "./modules/benchmark_db"
 
   # Configure service:
-  name              = "forest-benchmark" # droplet name
-  size              = "so-2vcpu-16gb"    # droplet size
-  slack_channel     = "#forest-dump"     # slack channel for notifications
+  name               = "forest-benchmark" # droplet name
+  size               = "so-2vcpu-16gb"    # droplet size
+  slack_channel      = "#forest-dump"     # slack channel for notifications
   benchmark_bucket   = "forest-snapshots"
   benchmark_endpoint = "fra1.digitaloceanspaces.com"
 

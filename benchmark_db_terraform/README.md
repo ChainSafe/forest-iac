@@ -1,116 +1,66 @@
-# Forest benchmark db script
+# Overview
 
-This script was developed to help with testing of Forest db backends and their
-configuration; the script now also allows benchmarking ("daily" benchmarks) of
-Forest and Lotus snapshot import times (in sec) and validation times (in
-tipsets/sec).
+This folder contains an executable description of the Forest service, which has been developed to assist in testing Forest database backends and their configurations. Additionally, the script also offers the capability to perform benchmarking, specifically measuring the "daily" benchmarks for Forest and Lotus snapshot import times (in seconds) and validation times (in tipsets per second).
+The benchmark results are subsequently uploaded to an S3 bucket, where they are stored in both a weekly file and an all_result file.
 
-## Install dependencies
+# Workflow
 
-[Install Ruby](https://www.ruby-lang.org/en/documentation/installation/) first.
-Then go into `scripts/benchmark_db` and execute the following commands:
+Changing any of the settings (such as the size of the droplet or the operating
+system) will automatically re-deploy the service. The same is true for changing
+any of the scripts.
 
-```
-$ bundle config set --local path 'vendor/bundle'
-$ bundle install
-```
+To propose new changes, start by opening a PR. This will trigger a new
+deployment plan to be pasted in the PR comments. Once the PR is merged, the
+deployment plan is executed.
 
-Note: depending upon your Ruby installation, it may be necessary to execute
-`gem install bundler` first. In case of any issues with "native extensions"
-during `bundle install` on a \*nix machine, it may also be necessary to execute
-`apt-get update && apt-get install -y build-essential ruby-dev`.
+The workflow has access to all the required secrets (DO token, slack token, S3
+credentials, etc) and none of them have to be provided when creating a new PR.
+However, the deployment workflow is not triggered automatically if you change
+the secrets. In this case, you have to trigger the workflow manually. 
 
-The daily benchmarks also require the installation of
-[aria2](https://github.com/aria2/aria2) and
-[zstd](https://github.com/facebook/zstd), as well as dependencies required for
-the installation of [Forest](https://github.com/ChainSafe/forest) and
-[Lotus](https://github.com/filecoin-project/lotus) (note that the script handles
-installation of the Forest and Lotus binaries).
+# Manual deployments
 
-## Run benchmarks
+To manually deploy the service (useful for testing and debugging), you first
+need to set the following environment variables (you will be prompted later if
+you don't set these variables):
 
-Run the script at the root of the repository. I.e.,:
+## Required environment variables
 
-```
-$ ./scripts/benchmark_db/bench.rb <path to snapshot> <optional flags>
-```
-
-If the user does not specify a path to a snapshot, the script will automatically
-download a fresh snapshot, then pause for 5 minutes to allow the network to
-advance to ensure that enough time will be spent in the `message sync` stage for
-proper calculation of the validation time metric. Also note that if `--chain` is
-specified, the user must provide a script matching the specified `<chain>` (the
-script defaults to `mainnet`, so if `--chain` is not specified, provide a
-`mainnet` snapshot).
-
-If the `--daily` flag is included in the command line arguments, the script will
-run the daily benchmarks specified earlier; otherwise the script will run the
-backend metrics.
-
-On many machines, running the script with `--chain mainnet` may require more
-space than allocated to the `tmp` partition. To address this, specify the
-`--tempdir` flag with a user-defined directory (which will automatically be
-created if it does not already exist).
-
-To create a selection of benchmarks, use the `--pattern` flag (current defined
-patterns are `'*'`, `'baseline'`, `'jemalloc'`, and `'mimalloc'`). Using
-`--dry-run` outputs to the terminal the commands the script will run (without
-actually running the commands):
-
-```
-$ ./scripts/benchmark_db/bench.rb <path to snapshot> --chain calibnet --pattern jemalloc --dry-run
-(I) Using snapshot: <path to snapshot>
-(I) WORKING_DIR: <generated directory>
-
-(I) Running bench: jemalloc
-(I) Building artefacts...
-(I) Cloning repository
-$ git clone https://github.com/ChainSafe/forest.git forest
-(I) Clean and build client
-$ cargo clean
-$ cargo build --release --no-default-features --features forest_fil_cns,jemalloc
-$ ./forest/target/release/forest --config <tbd> --encrypt-keystore false --import-snapshot <tbd> --halt-after-import
-$ ./forest/target/release/forest --config <tbd> --encrypt-keystore false --import-snapshot <tbd> --halt-after-import --skip-load=true --height <height>
-(I) Clean db
-$ ./forest/target/release/forest-cli -c <path>
-toml db clean --force
-
-(I) Wrote result_<time>.md
+```bash
+# DigitalOcean personal access token: https://cloud.digitalocean.com/account/api/tokens
+export TF_VAR_do_token=
+# Slack access token: https://api.slack.com/apps
+export TF_VAR_slack_token=
+# S3 access keys used by the snapshot service. Can be generated here: https://cloud.digitalocean.com/account/api/spaces
+export TF_VAR_AWS_ACCESS_KEY_ID=
+export TF_VAR_AWS_SECRET_ACCESS_KEY=
+# S3 access keys used by terraform, use the same values as above
+export AWS_ACCESS_KEY_ID=
+export AWS_SECRET_ACCESS_KEY=
 ```
 
-```
-$ ./scripts/benchmark_db/bench.rb <path to snapshot> --chain calibnet --dry-run --daily
-(I) Using snapshot: <path to snapshot>
-(I) WORKING_DIR: <generated directory>
+Forest tokens can be found on 1password.
 
-(I) Running bench: forest
-(I) Building artefacts...
-(I) Cloning repository
-$ git clone https://github.com/ChainSafe/forest.git forest
-(I) Clean and build client
-$ cargo clean
-$ cargo build --release
-$ ./forest/target/release/forest-cli fetch-params --keys
-$ ./forest/target/release/forest --config <tbd> --encrypt-keystore false --import-snapshot <tbd> --halt-after-import
-$ ./forest/target/release/forest --config <tbd> --encrypt-keystore false
-(I) Clean db
-$ ./forest/target/release/forest-cli -c <path> db clean --force
+You also need to register your public key with Digital Ocean. This can be done
+here: https://cloud.digitalocean.com/account/security
 
-(I) Running bench: lotus
-(I) Building artefacts...
-(I) Cloning repository
-$ git clone https://github.com/filecoin-project/lotus.git lotus
-(I) Clean and build client
-$ make clean
-$ make calibnet
-$ ./lotus/lotus daemon --import-snapshot <tbd> --halt-after-import
-$ ./lotus/lotus daemon
-(I) Clean db
-
-Wrote result_<time>.csv
+To prepare terraform for other commands:
+```bash
+$ terraform init
 ```
 
-As seen in these examples, if `--daily` is passed in the command line, daily
-benchmark results are written to a CSV in the current directory with naming
-format `result_<time>.csv`. Otherwise, backend benchmark results will be written
-to a markdown file with a similar naming convention.
+To inspect a new deployment plan (it'll tell you which servers will be removed,
+added, etc.):
+```bash
+$ terraform plan
+```
+
+To deploy the service:
+```bash
+$ terraform apply
+```
+
+To shutdown the service:
+```bash
+$ terraform destroy
+```

@@ -52,7 +52,7 @@ locals {
     "echo 'export SLACK_NOTIF_CHANNEL=\"${var.slack_channel}\"' >> .forest_env",
     "echo 'export BENCHMARK_BUCKET=\"${var.benchmark_bucket}\"' >> .forest_env",
     "echo 'export BENCHMARK_ENDPOINT=\"${var.benchmark_endpoint}\"' >> .forest_env",
-    "echo 'export BASE_FOLDER=\"/root\"' >> .forest_env",
+    "echo 'export BASE_FOLDER=\"/chainsafe\"' >> .forest_env",
     "echo 'export FOREST_TAG=\"${var.forest_tag}\"' >> .forest_env",
     "echo 'source .forest_env' >> .bashrc",
     "source ~/.forest_env",
