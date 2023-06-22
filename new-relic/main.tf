@@ -23,30 +23,6 @@ provider "newrelic" {
 }
 
 
-data "newrelic_entity" "forest-calibnet" {
-  name   = "forest-calibnet"
-  domain = "INFRA"
-  type   = "HOST"
-}
-
-# data "newrelic_entity" "forest-mainnet" {
-#   name   = "forest-mainnet"
-#   domain = "INFRA"
-#   type   = "HOST"
-# }
-
-data "newrelic_entity" "forest-snapshot" {
-  name   = "forest-snapshot"
-  domain = "INFRA"
-  type   = "HOST"
-}
-
-data "newrelic_entity" "forest-sync-check" {
-  name   = "forest-sync-check"
-  domain = "INFRA"
-  type   = "HOST"
-}
-
 resource "newrelic_alert_policy" "alert" {
   name = "Infrastruture Downtime Alert"
 }
@@ -180,33 +156,33 @@ resource "newrelic_nrql_alert_condition" "container_issue" {
 }
 
 # Notification channel
-resource "newrelic_notification_channel" "slack_notification_channel" {
-  name           = "Sample Notification Channel"
-  type           = "EMAIL"
-  destination_id = newrelic_notification_destination.sample_notification_destination.id
-  product        = "IINT"
+# resource "newrelic_notification_channel" "slack_notification_channel" {
+#   name           = "Sample Notification Channel"
+#   type           = "EMAIL"
+#   destination_id = newrelic_notification_destination.sample_notification_destination.id
+#   product        = "IINT"
 
-  property {
-    key   = "subject"
-    value = "Sample Email Subject"
-  }
-}
+#   property {
+#     key   = "subject"
+#     value = "Sample Email Subject"
+#   }
+# }
 
-resource "newrelic_workflow" "slack_workflow" {
-  name                  = "Sample Workflow"
-  muting_rules_handling = "NOTIFY_ALL_ISSUES"
+# resource "newrelic_workflow" "slack_workflow" {
+#   name                  = "Sample Workflow"
+#   muting_rules_handling = "NOTIFY_ALL_ISSUES"
 
-  issues_filter {
-    name = "Issue Filter"
-    type = "FILTER"
-    predicate {
-      attribute = "labels.policyIds"
-      operator  = "EXACTLY_MATCHES"
-      values    = [newrelic_alert_policy.alert_policy_name.id]
-    }
-  }
+#   issues_filter {
+#     name = "Issue Filter"
+#     type = "FILTER"
+#     predicate {
+#       attribute = "labels.policyIds"
+#       operator  = "EXACTLY_MATCHES"
+#       values    = [newrelic_alert_policy.alert_policy_name.id]
+#     }
+#   }
 
-  destination {
-    channel_id = newrelic_notification_channel.sample_notification_channel.id
-  }
-}
+#   destination {
+#     channel_id = newrelic_notification_channel.sample_notification_channel.id
+#   }
+# }
