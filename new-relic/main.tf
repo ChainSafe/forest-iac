@@ -180,17 +180,17 @@ resource "newrelic_nrql_alert_condition" "container_issue" {
 
 # Setting up a Slack channel as the notification channel for alerts
 resource "newrelic_notification_channel" "slack-channel" {
-  name = "slack"
-  type = "SLACK"
+  name           = "slack"
+  type           = "SLACK"
   destination_id = var.slack_destination_id
-  product = "IINT"
+  product        = "IINT"
 
   property {
-    key = "channelId"
+    key   = "channelId"
     value = var.slack_channel_id
-  }  
+  }
   property {
-    key = "customDetailsSlack"
+    key   = "customDetailsSlack"
     value = "The '{{  annotations.description }}' has been activated. The condition has exceeded the defined threshold. Kindly examine this issue on the New Relic dashboard for more extensive data and potential mitigation steps."
 
   }
@@ -199,7 +199,7 @@ resource "newrelic_notification_channel" "slack-channel" {
 # Creation of a New Relic workflow that includes issues filtered by the policy IDs
 # and sends notifications to the configured Slack channel
 resource "newrelic_workflow" "slack_workflow" {
-  name = "Slack Workflow"
+  name                  = "Slack Workflow"
   muting_rules_handling = "NOTIFY_ALL_ISSUES"
 
   issues_filter {
@@ -208,8 +208,8 @@ resource "newrelic_workflow" "slack_workflow" {
 
     predicate {
       attribute = "labels.policyIds"
-      operator = "EXACTLY_MATCHES"
-      values = [newrelic_alert_policy.alert.id, data.newrelic_alert_policy.golden_signals.id] 
+      operator  = "EXACTLY_MATCHES"
+      values    = [newrelic_alert_policy.alert.id, data.newrelic_alert_policy.golden_signals.id]
     }
   }
 
