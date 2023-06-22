@@ -48,3 +48,4 @@ cp --recursive /root/ruby_common/* /var/lib/docker/volumes/ruby-common/_data/
 
 ## Run health check status of a running node
 ruby sync_check_process.rb
+

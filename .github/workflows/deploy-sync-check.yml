@@ -12,7 +12,7 @@ on:
 
 jobs:
   sync-check:
-    name: Sync Check Service
+    name: Deploy
     runs-on: ubuntu-latest
     permissions: write-all
     steps:
@@ -30,3 +30,4 @@ jobs:
           slack_token: ${{ secrets.SLACK_TOKEN }}
           working_directory: sync_check_terraform/
           environment: Sync Check Service
+          nr_license_key: ${{ secrets.NR_LICENSE_KEY }}
