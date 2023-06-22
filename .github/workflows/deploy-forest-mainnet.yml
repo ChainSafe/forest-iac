@@ -16,8 +16,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy-forest-mainnet-infrastruture-with-terraform:
-    name: Forest Mainnet
+  deploy-forest-mainnet:
+    name: Deploy
     runs-on: ubuntu-latest
     permissions: write-all
     steps:
@@ -34,3 +34,7 @@ jobs:
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
           working_directory: terraform/mainnet
           environment: mainnet
+          new_relic_account_id: ${{ secrets.NEW_RELIC_ACCOUNT_ID }}
+          nr_license_key: ${{ secrets.NR_LICENSE_KEY }}
+          new_relic_api_key: ${{ secrets.NEW_RELIC_API_KEY }}
+

@@ -68,3 +68,9 @@ variable "destination_addresses" {
   type        = list(string)
   default     = ["0.0.0.0/0", "::/0"]
 }
+
+variable "NR_LICENSE_KEY" {
+  description = "New Relic Access Token"
+  type        = string
+}
+

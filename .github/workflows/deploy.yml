@@ -1,4 +1,4 @@
-name: snapshot service (calibnet)
+name: Snapshot Service
 
 
 on:
@@ -9,7 +9,7 @@ on:
 
 jobs:
   deploy-daily-snapshot-calibnet:
-    name: snapshot service (calibnet)
+    name: Deploy
     runs-on: ubuntu-latest
     permissions: write-all
     steps:
@@ -27,3 +27,4 @@ jobs:
           slack_token: ${{ secrets.SLACK_TOKEN }}
           working_directory: daily_snapshot_terraform
           environment: Snapshot Service
+          nr_license_key: ${{ secrets.NR_LICENSE_KEY }}
