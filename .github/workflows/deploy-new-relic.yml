@@ -34,6 +34,5 @@ jobs:
           new_relic_account_id: ${{ secrets.NEW_RELIC_ACCOUNT_ID }}
           working_directory: new-relic
           environment: New Relic
-          slack_channel_id: ${{ secrets.SLACK_CHANNEL_ID }}
           slack_destination_id: ${{ secrets.SLACK_DESTINATION_ID }}
  

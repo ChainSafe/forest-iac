@@ -21,7 +21,7 @@ terraform {
 # Configure the New Relic provider
 provider "newrelic" {
   account_id = var.NEW_RELIC_ACCOUNT_ID
-  api_key    = var.NEW_RELIC_API_KEY # usually prefixed with 'NRAK'
+  api_key    = var.NEW_RELIC_API_KEY
   region     = "EU"                  # Valid regions are US and EU
 }
 
@@ -50,7 +50,7 @@ resource "newrelic_alert_policy" "alert" {
 # Different NRQL alert conditions for various types of events including host down,
 # high disk space, high RAM utilization, high memory utilization, and container issues
 # Each condition has specific criteria and triggers for warning and critical alerts
-# A NRQL (New Relic Query Language) query is used to determine when the alert conditions are met
+# The NRQL (New Relic Query Language) query is used to determine when the alert conditions are met
 resource "newrelic_nrql_alert_condition" "host_down" {
   policy_id                    = newrelic_alert_policy.alert.id
   type                         = "static"
@@ -69,12 +69,6 @@ resource "newrelic_nrql_alert_condition" "host_down" {
     threshold_occurrences = "ALL"
   }
 
-  warning {
-    operator              = "above"
-    threshold             = 70.0
-    threshold_duration    = 300
-    threshold_occurrences = "ALL"
-  }
 }
 
 resource "newrelic_nrql_alert_condition" "disk_space" {
@@ -217,3 +211,4 @@ resource "newrelic_workflow" "slack_workflow" {
     channel_id = newrelic_notification_channel.slack-channel.id
   }
 }
+
