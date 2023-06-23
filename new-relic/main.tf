@@ -22,7 +22,7 @@ terraform {
 provider "newrelic" {
   account_id = var.NEW_RELIC_ACCOUNT_ID
   api_key    = var.NEW_RELIC_API_KEY
-  region     = "EU"                  # Valid regions are US and EU
+  region     = "EU" # Valid regions are US and EU
 }
 
 # This block of code uses Terraform's data source to fetch details of an existing New Relic 
