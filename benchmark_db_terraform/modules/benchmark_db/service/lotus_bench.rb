@@ -41,11 +41,7 @@ class LotusBenchmark < BenchmarkBase
   end
 
   def checkout_command
-    if @chain == 'mainnet'
-      exec_command(%w[git checkout releases])
-    else
-      exec_command(%w[git checkout master])
-    end
+    exec_command(%w[git checkout master])
   end
 
   def clean_command
