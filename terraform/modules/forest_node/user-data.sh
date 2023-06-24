@@ -56,7 +56,7 @@ chown --recursive "${NEW_USER}":"${NEW_USER}" "/home/${NEW_USER}/forest_data"
 # Create the config.toml file in the forest_data directory.
 cat << EOF > "/home/${NEW_USER}/forest_data/config.toml"
 [client]
-data_dir = "/home/${NEW_USER}/forest_data/data"
+data_dir = "/home/${NEW_USER}/data"
 EOF
 
 
