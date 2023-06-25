@@ -107,21 +107,26 @@ resource "newrelic_nrql_alert_condition" "high_memory_utilization" {
 resource "newrelic_nrql_alert_condition" "container_issue" {
   policy_id                    = newrelic_alert_policy.alert.id
   type                         = "static"
-  name                         = "container_issue"
+  name                         = "Container Issue"
   description                  = "Alert when any container on any host is restarting for more than 5 minutes"
   enabled                      = true
   violation_time_limit_seconds = 3600
 
   nrql {
-    query = "SELECT count(*) FROM ContainerSample WHERE state = 'restarting' FACET containerName, entityName SINCE 5 minutes ago"
+    query = "SELECT count(*) FROM ContainerSample WHERE state = 'restarting' FACET containerName, entityName"
   }
 
   critical {
-    operator              = "above"
-    threshold             = 0
-    threshold_duration    = 300
-    threshold_occurrences = "AT_LEAST_ONCE"
+    operator = "above"
+    threshold = 0
+    threshold_duration = 300
+    threshold_occurrences = "all"
   }
+
+  fill_option = "none"
+  aggregation_window = 60
+  aggregation_method = "event_flow"
+  aggregation_delay = 120
 }
 
 # This resource block defines a New Relic alert condition to monitor for host downtime.
