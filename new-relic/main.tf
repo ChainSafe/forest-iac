@@ -117,16 +117,16 @@ resource "newrelic_nrql_alert_condition" "container_issue" {
   }
 
   critical {
-    operator = "above"
-    threshold = 0
-    threshold_duration = 300
+    operator              = "above"
+    threshold             = 0
+    threshold_duration    = 300
     threshold_occurrences = "all"
   }
 
-  fill_option = "none"
+  fill_option        = "none"
   aggregation_window = 60
   aggregation_method = "event_flow"
-  aggregation_delay = 120
+  aggregation_delay  = 120
 }
 
 # This resource block defines a New Relic alert condition to monitor for host downtime.
