@@ -32,11 +32,8 @@ echo "AllowUsers ${NEW_USER}" >> /etc/ssh/sshd_config
 
 systemctl restart sshd
 
-# Enable passwordless sudo for the new user. This allows the user to run sudo commands without being prompted for a password.
-echo "${NEW_USER} ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/"${NEW_USER}"
-
-# Add new user to "docker" group so they can run docker commands
-usermod --append --groups docker "${NEW_USER}"
+# Add new user to "sudo" and "docker" group so they can run docker commands and have general admin rights.
+usermod --append --groups sudo,docker "${NEW_USER}"
 
 # Set up the directory where the Forest container will store its data.
 mkdir --parents -- "/home/${NEW_USER}/forest_data"
@@ -97,7 +94,6 @@ curl -Ls https://download.newrelic.com/install/newrelic-cli/scripts/install.sh |
   NEW_RELIC_ACCOUNT_ID="${NEW_RELIC_ACCOUNT_ID}" \
   NEW_RELIC_REGION="${NEW_RELIC_REGION}" \
   /usr/local/bin/newrelic install -y
-
 
 # Adds custom display name to the New Relic config.
 echo "display_name: forest-${CHAIN}" >> /etc/newrelic-infra.yml

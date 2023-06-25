@@ -47,29 +47,8 @@ resource "newrelic_alert_policy" "alert" {
   name = "Infrastruture Downtime Alert"
 }
 
-# Different NRQL alert conditions for various types of events including host down,
-# high disk space, high RAM utilization, high memory utilization, and container issues
-# Each condition has specific criteria and triggers for warning and critical alerts
-# The NRQL (New Relic Query Language) query is used to determine when the alert conditions are met
-resource "newrelic_nrql_alert_condition" "host_down" {
-  policy_id                    = newrelic_alert_policy.alert.id
-  type                         = "static"
-  name                         = "host_down alert"
-  description                  = "Alert when any host is offline"
-  violation_time_limit_seconds = 3600
-
-  nrql {
-    query = "SELECT count(*) FROM SystemSample WHERE agentState = 'offline'"
-  }
-
-  critical {
-    operator              = "above"
-    threshold             = 0
-    threshold_duration    = 300
-    threshold_occurrences = "ALL"
-  }
-
-}
+# NRQL alert conditions for events such as host down, high disk/memory use, 
+# and container down, each with defined criteria and thresholds.
 
 resource "newrelic_nrql_alert_condition" "disk_space" {
   policy_id                    = newrelic_alert_policy.alert.id
@@ -80,7 +59,7 @@ resource "newrelic_nrql_alert_condition" "disk_space" {
   violation_time_limit_seconds = 3600
 
   nrql {
-    query = "SELECT average(diskUsedPercent) FROM SystemSample FACET entityName"
+    query = "SELECT average(`host.diskUsedPercent`) FROM Metric FACET entity.guid, host.hostname"
   }
 
   critical {
@@ -107,7 +86,7 @@ resource "newrelic_nrql_alert_condition" "high_memory_utilization" {
   violation_time_limit_seconds = 3600
 
   nrql {
-    query = "SELECT average(memoryUsedPercent) FROM SystemSample FACET entityName "
+    query = "SELECT average(`host.memoryUsedPercent`) FROM Metric FACET entity.guid, host.hostname"
   }
 
   critical {
@@ -129,12 +108,12 @@ resource "newrelic_nrql_alert_condition" "container_issue" {
   policy_id                    = newrelic_alert_policy.alert.id
   type                         = "static"
   name                         = "container_issue"
-  description                  = "Alert when any container on any host is down or restarting for more than 5 minutes"
+  description                  = "Alert when any container on any host is restarting for more than 5 minutes"
   enabled                      = true
   violation_time_limit_seconds = 3600
 
   nrql {
-    query = "SELECT count(*) FROM ContainerSample WHERE (state = 'stopped' OR state = 'restarting') FACET containerName, entityName"
+    query = "SELECT count(*) FROM ContainerSample WHERE state = 'restarting' FACET containerName, entityName SINCE 5 minutes ago"
   }
 
   critical {
@@ -143,6 +122,73 @@ resource "newrelic_nrql_alert_condition" "container_issue" {
     threshold_duration    = 300
     threshold_occurrences = "AT_LEAST_ONCE"
   }
+}
+
+# This resource block defines a New Relic alert condition to monitor for host downtime.
+# The NRQL query counts 'SystemSample' events from each host.
+# If a host does not report any such events for a continuous 5-minute period (threshold_duration), it indicates the host might be down.
+# The alert condition is critical and opens a violation when no events are detected from a host for the specified duration.
+# This approach provides a proactive alerting mechanism to ensure system reliability.
+resource "newrelic_nrql_alert_condition" "host_down" {
+  policy_id = newrelic_alert_policy.alert.id
+  type      = "static"
+  name      = "Host Down"
+
+  description = <<-EOT
+  Host Down' alert indicates no SystemSample events from a host for 5 minutes. Action needed to avoid possible issues
+  EOT
+
+  enabled                      = true
+  violation_time_limit_seconds = 259200
+
+  nrql {
+    query = "SELECT count(*) FROM SystemSample FACET entityName"
+  }
+
+  critical {
+    operator              = "below_or_equals"
+    threshold             = 0
+    threshold_duration    = 300
+    threshold_occurrences = "all"
+  }
+  fill_option                    = "none"
+  aggregation_window             = 60
+  aggregation_method             = "event_flow"
+  aggregation_delay              = 120
+  expiration_duration            = 600
+  open_violation_on_expiration   = true
+  close_violations_on_expiration = true
+}
+
+# This New Relic alert condition monitors the number of running containers with the specific 
+# image 'ghcr.io/chainsafe/forest:latest'. Because New Relic lacks a direct "stopped" status for containers, 
+# we use a workaround: we count unique 'containerId' from 'ProcessSample' events. If the count falls below 2 for 5 minutes,
+# it implies potential container downtime and triggers a critical alert. 
+resource "newrelic_nrql_alert_condition" "container_down" {
+  policy_id                    = newrelic_alert_policy.alert.id
+  type                         = "static"
+  name                         = "Container Down"
+  enabled                      = true
+  violation_time_limit_seconds = 259200
+
+  nrql {
+    query = "SELECT uniqueCount(containerId) FROM ProcessSample WHERE containerImageName = 'ghcr.io/chainsafe/forest:latest'"
+  }
+
+  critical {
+    operator              = "below"
+    threshold             = 2
+    threshold_duration    = 300
+    threshold_occurrences = "all"
+  }
+
+  fill_option                    = "none"
+  aggregation_window             = 60
+  aggregation_method             = "event_flow"
+  aggregation_delay              = 120
+  expiration_duration            = 600
+  open_violation_on_expiration   = true
+  close_violations_on_expiration = true
 }
 
 # Setting up a Slack channel as the notification channel for alerts
@@ -158,8 +204,9 @@ resource "newrelic_notification_channel" "slack-channel" {
   }
   property {
     key   = "customDetailsSlack"
-    value = "The '{{  annotations.description }}' has been activated. The condition has exceeded the defined threshold. Kindly examine this issue on the New Relic dashboard for more extensive data and potential mitigation steps."
-
+    value = <<-EOT
+    'The '{{  annotations.description }}' has been activated. The condition has exceeded the defined threshold. Kindly examine this issue on the New Relic dashboard for more extensive data and potential mitigation steps.'
+     EOT
   }
 }
 
@@ -183,5 +230,19 @@ resource "newrelic_workflow" "slack_workflow" {
   destination {
     channel_id = newrelic_notification_channel.slack-channel.id
   }
+}
+
+# 
+locals {
+  name = split(",", "forest-mainnet,forest-calibnet")
+}
+
+resource "newrelic_one_dashboard_json" "forest_dashboard" {
+  for_each = { for name in local.name : name => name }
+
+  json = templatefile("forest.json", {
+    name       = each.value
+    account_id = var.NEW_RELIC_ACCOUNT_ID
+  })
 }
 
