@@ -3,7 +3,7 @@
 # This bash script is used to initialize a Mainnet or Calibnet Droplet.
 # It starts the chain (either mainnet or calibnet) as specified in the terraform script.
 # The script also runs Watchtower to keep the Forest Docker images up-to-date,
-# and sets up the New Relic agent for system monitoring.
+# and sets up the New Relic agent and openMetrics prometheus for system monitoring and prometheus metrics.
 
 # The script employs Terraform's templating engine, which uses variables defined in terraform.tfvars.
 # Thus, the $${VARIABLES} used here are for the template engine, not BASH.
@@ -92,12 +92,12 @@ sudo --user="${NEW_USER}" -- \
   --include-stopped --revive-stopped --stop-timeout 120s --interval 600
 
 # Set-up  New Relic Agent For logs collection and Infrastruture Metrics
-sudo --user="${NEW_USER}" -- \
-  bash -c "curl -Ls https://download.newrelic.com/install/newrelic-cli/scripts/install.sh | bash && \
-  sudo NEW_RELIC_API_KEY=""${NEW_RELIC_API_KEY}"" \
-       NEW_RELIC_ACCOUNT_ID=""${NEW_RELIC_ACCOUNT_ID}"" \
-       NEW_RELIC_REGION=""{NEW_RELIC_REGION}""\
-       /usr/local/bin/newrelic install -y"
+curl -Ls https://download.newrelic.com/install/newrelic-cli/scripts/install.sh | bash && \
+  sudo  NEW_RELIC_API_KEY="${NEW_RELIC_API_KEY}" \
+  NEW_RELIC_ACCOUNT_ID="${NEW_RELIC_ACCOUNT_ID}" \
+  NEW_RELIC_REGION="${NEW_RELIC_REGION}" \
+  /usr/local/bin/newrelic install -y
+
 
 # Adds custom display name to the New Relic config.
 echo "display_name: forest-${CHAIN}" >> /etc/newrelic-infra.yml
@@ -108,7 +108,7 @@ cat << EOF > "/home/${NEW_USER}/forest_data/config.yml"
 cluster_name: forest-${CHAIN}
 targets:
   - description: Forest "${CHAIN}" Prometheus Endpoint
-    urls: ["forest-${CHAIN}:6116/metrics"]
+    urls: ["forest-${CHAIN}:6116"]
 scrape_interval: 15s
 max_concurrency: 10
 timeout: 15s
@@ -123,9 +123,8 @@ sudo --user="${NEW_USER}" -- \
   --detach \
   --network=forest \
   --name=nri-prometheus \
-  --e LICENSE_KEY="${NR_LICENSE_KEY}" \
+  --env LICENSE_KEY="${NR_LICENSE_KEY}" \
   --volume=/home/"${NEW_USER}"/forest_data/config.yml:/config.yml \
   --restart=unless-stopped \
   newrelic/nri-prometheus:latest \
   --configfile=/config.yml
-
