@@ -237,7 +237,6 @@ resource "newrelic_workflow" "slack_workflow" {
   }
 }
 
-# 
 locals {
   name = split(",", "forest-mainnet,forest-calibnet")
 }
