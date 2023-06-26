@@ -95,8 +95,11 @@ curl -Ls https://download.newrelic.com/install/newrelic-cli/scripts/install.sh |
   NEW_RELIC_REGION="${NEW_RELIC_REGION}" \
   /usr/local/bin/newrelic install -y
 
-# Adds custom display name to the New Relic config.
-echo "display_name: forest-${CHAIN}" >> /etc/newrelic-infra.yml
+# Adds custom display name and host-name to the New Relic config.
+cat << EOF >> /etc/newrelic-infra.yml
+display_name: forest-${CHAIN}
+override_hostname_short: forest-${CHAIN}
+EOF
 sudo systemctl restart newrelic-infra
 
 # Creates a configuration file for New Relic OpenMetrics Prometheus integration.
