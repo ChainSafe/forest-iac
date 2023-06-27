@@ -124,7 +124,7 @@
                 "accountIds": [
                   "${account_id}"
                 ],
-                "query": "SELECT ((latest(process_cpu_seconds_total) / 60) / 60) FROM Metric WHERE scrapedTargetURL = 'http://${name}:6116/metrics' SINCE 60 MINUTES AGO UNTIL NOW FACET dimensions() LIMIT 100 TIMESERIES 30000"
+                "query": "SELECT ((latest(process_cpu_seconds_total) / 60) / 60) FROM Metric WHERE scrapedTargetURL = 'http://${name}:6116/metrics' SINCE 1 day ago UNTIL NOW FACET dimensions() LIMIT 100 TIMESERIES AUTO"
               }
             ],
             "platformOptions": {
