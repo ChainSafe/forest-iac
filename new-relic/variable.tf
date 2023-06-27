@@ -10,6 +10,7 @@ variable "NEW_RELIC_API_KEY" {
 
 variable "slack_destination_id" {
   description = "The unique identifier for the Slack workspace where notifications will be sent."
+  default     = "f902e020-5993-4425-9ae3-133084fc870d"
   type        = string
 }
 
