@@ -46,7 +46,7 @@ resource "digitalocean_droplet" "forest" {
   ssh_keys   = data.digitalocean_ssh_keys.keys.ssh_keys.*.fingerprint
   monitoring = true
 
-  user_data = templatefile("${path.module}/user-data.sh",
+  user_data = templatefile("${path.module}/${var.script}",
     {
       NEW_USER = "${var.name}"
       # In the filesystem on the droplet, certain special characters, including "-",
