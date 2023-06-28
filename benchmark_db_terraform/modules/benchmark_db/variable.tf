@@ -36,7 +36,7 @@ variable "AWS_SECRET_ACCESS_KEY" {
 variable "benchmark_bucket" {
   description = "S3 bucket containing the benchmark results"
   type        = string
-  default     = "forest-snapshots"
+  default     = "forest-benchmarks"
 }
 
 variable "benchmark_endpoint" {

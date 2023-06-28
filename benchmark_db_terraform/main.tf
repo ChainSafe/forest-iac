@@ -29,7 +29,7 @@ module "benchmark_db" {
   name               = "forest-benchmark" # droplet name
   size               = "so-2vcpu-16gb"    # droplet size
   slack_channel      = "#forest-dump"     # slack channel for notifications
-  benchmark_bucket   = "forest-snapshots"
+  benchmark_bucket   = "forest-benchmarks"
   benchmark_endpoint = "fra1.digitaloceanspaces.com"
 
   # Variable passthrough:
