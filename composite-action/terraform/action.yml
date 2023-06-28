@@ -114,7 +114,7 @@ runs:
         ssh-private-key: ${{ inputs.ssh_private_key }}
 
     - name: Terraform Apply
-      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      if: github.ref == 'refs/heads/main' && ( github.event_name == 'push' || github.event_name == 'schedule' )
       run: terraform apply -auto-approve -input=false
       shell: bash
       working-directory: ${{ inputs.working_directory }}

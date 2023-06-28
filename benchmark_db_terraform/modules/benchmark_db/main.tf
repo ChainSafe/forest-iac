@@ -91,6 +91,18 @@ resource "digitalocean_droplet" "forest" {
   }
 }
 
+resource "null_resource" "destroy_droplet" {
+  triggers = {
+    benchmark_run_completed = fileexists("benchmark_run_completed")
+  }
+
+  provisioner "local-exec" {
+    command = "terraform destroy -auto-approve"
+  }
+
+  depends_on = [digitalocean_droplet.forest]
+}
+
 data "digitalocean_project" "forest_project" {
   name = var.project
 }

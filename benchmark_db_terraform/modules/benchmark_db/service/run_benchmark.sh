@@ -24,3 +24,6 @@ tail -n +2 -q /chainsafe/result_*.csv >> /tmp/weekly_result_"$week_number".csv &
 s3cmd get s3://"$BENCHMARK_BUCKET"/benchmark-results/all_results.csv /tmp/all_results.csv --force || 
 echo "Timestamp,Forest Version,Lotus Version,Chain,Metric,Forest Value,Lotus Value" > /tmp/all_results.csv
 tail -n +2 -q /chainsafe/result_*.csv >> /tmp/all_results.csv && s3cmd --acl-public put /tmp/all_results.csv s3://"$BENCHMARK_BUCKET"/benchmark-results/all_results.csv || exit 1
+
+## Create a synchronization file to indicate successful run
+touch benchmark_run_completed
