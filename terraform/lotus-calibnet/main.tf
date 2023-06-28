@@ -22,7 +22,7 @@ module "lotus-calibnet" {
   source_addresses      = ["0.0.0.0/0", "::/0"]
   attach_volume         = false
   destination_addresses = ["0.0.0.0/0", "::/0"]
-  chain                 = "calibnet"
+  chain                 = "calibrationnet"
   project               = "Forest-DEV"
   fw_name               = "lotus-calibnet-fw"
   script                = "lotus.sh"

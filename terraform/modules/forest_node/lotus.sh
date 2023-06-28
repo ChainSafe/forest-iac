@@ -51,27 +51,26 @@ fi
 # Change the ownership of the lotus_data directory to the created user.
 chown --recursive "${NEW_USER}":"${NEW_USER}" "/home/${NEW_USER}/lotus_data"
 
-sudo --user="${NEW_USER}" -- docker network create lotus
-
 IMAGETAG="stable"
-SNAPSHOTURL="https://snapshots.mainnet.filops.net/minimal/latest.zst"
 
 if [ "${CHAIN}" != "mainnet" ]; then
   IMAGETAG="stable-calibnet"
-  SNAPSHOTURL="https://snapshots.calibrationnet.filops.net/minimal/latest.zst"
 fi
 
+sudo --user="${NEW_USER}" -- docker network create lotus
+
+# Run the Lotus Docker container as the created user.
 sudo --user="${NEW_USER}" -- \
   docker run \
   --detach \
-  --network=forest \
+  --network=lotus \
   --name=lotus-"${CHAIN}" \
   --volume=parameters:/var/tmp/filecoin-proof-parameters \
   --volume=/home/"${NEW_USER}"/lotus_data:/var/lib/lotus \
   --publish=1234:1234 \
   --restart=always \
   filecoin/lotus-all-in-one:"$IMAGETAG" lotus daemon \
-  --import-snapshot $SNAPSHOTURL
+  --import-snapshot https://snapshots."${CHAIN}".filops.net/minimal/latest.zst
 
 # It monitors running Docker containers and watches for changes to the images that those containers were originally started from. 
 # If Watchtower detects that an image has changed, it will automatically restart the container using the new image.
@@ -79,8 +78,8 @@ sudo --user="${NEW_USER}" -- \
 sudo --user="${NEW_USER}" -- \
   docker run \
   --detach \
-  --name=watchtower \
   --network=lotus \
+  --name=watchtower \
   --volume=/var/run/docker.sock:/var/run/docker.sock \
   --restart=unless-stopped \
   containrrr/watchtower \
@@ -99,3 +98,4 @@ display_name: lotus-${CHAIN}
 override_hostname_short: lotus-${CHAIN}
 EOF
 sudo systemctl restart newrelic-infra
+
