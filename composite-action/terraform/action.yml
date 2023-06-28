@@ -28,7 +28,7 @@ inputs:
   nr_license_key:
     description: 'The New Relic Access Token'
   new_relic_account_id:
-    description: 'The New Relic Plathom Region'
+    description: 'The New Relic Platform Region'
 
 
 runs:

@@ -3,7 +3,7 @@
 # This bash script is used to initialize a Forest Mainnet or Calibnet Droplet.
 # It starts the chain (either mainnet or calibnet) as specified in the terraform script.
 # The script also runs Watchtower to keep the Forest Docker images up-to-date,
-# and sets up the New Relic agent for system monitoring.
+# and sets up the New Relic agent and openMetrics prometheus for system monitoring and prometheus metrics.
 
 # The script employs Terraform's templating engine, which uses variables defined in terraform.tfvars.
 # Thus, the $${VARIABLES} used here are for the template engine, not BASH.
@@ -32,11 +32,8 @@ echo "AllowUsers ${NEW_USER}" >> /etc/ssh/sshd_config
 
 systemctl restart sshd
 
-# Enable passwordless sudo for the new user. This allows the user to run sudo commands without being prompted for a password.
-echo "${NEW_USER} ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/"${NEW_USER}"
-
-# Add new user to "docker" group so they can run docker commands
-usermod --append --groups docker "${NEW_USER}"
+# Add new user to "sudo" and "docker" group so they can run docker commands and have general admin rights.
+usermod --append --groups sudo,docker "${NEW_USER}"
 
 # Set up the directory where the Forest container will store its data.
 mkdir --parents -- "/home/${NEW_USER}/forest_data"
@@ -56,7 +53,7 @@ chown --recursive "${NEW_USER}":"${NEW_USER}" "/home/${NEW_USER}/forest_data"
 # Create the config.toml file in the forest_data directory.
 cat << EOF > "/home/${NEW_USER}/forest_data/config.toml"
 [client]
-data_dir = "/home/${NEW_USER}/forest_data/data"
+data_dir = "/home/${NEW_USER}/data"
 EOF
 
 
@@ -92,15 +89,17 @@ sudo --user="${NEW_USER}" -- \
   --include-stopped --revive-stopped --stop-timeout 120s --interval 600
 
 # Set-up  New Relic Agent For logs collection and Infrastruture Metrics
-sudo --user="${NEW_USER}" -- \
-  bash -c "curl -Ls https://download.newrelic.com/install/newrelic-cli/scripts/install.sh | bash && \
-  sudo NEW_RELIC_API_KEY=""${NEW_RELIC_API_KEY}"" \
-       NEW_RELIC_ACCOUNT_ID=""${NEW_RELIC_ACCOUNT_ID}"" \
-       NEW_RELIC_REGION=""{NEW_RELIC_REGION}""\
-       /usr/local/bin/newrelic install -y"
+curl -Ls https://download.newrelic.com/install/newrelic-cli/scripts/install.sh | bash && \
+  sudo  NEW_RELIC_API_KEY="${NEW_RELIC_API_KEY}" \
+  NEW_RELIC_ACCOUNT_ID="${NEW_RELIC_ACCOUNT_ID}" \
+  NEW_RELIC_REGION="${NEW_RELIC_REGION}" \
+  /usr/local/bin/newrelic install -y
 
-# Adds custom display name to the New Relic config.
-echo "display_name: forest-${CHAIN}" >> /etc/newrelic-infra.yml
+# Adds custom display name and host-name to the New Relic config.
+cat << EOF >> /etc/newrelic-infra.yml
+display_name: forest-${CHAIN}
+override_hostname_short: forest-${CHAIN}
+EOF
 sudo systemctl restart newrelic-infra
 
 # Creates a configuration file for New Relic OpenMetrics Prometheus integration.
@@ -108,7 +107,7 @@ cat << EOF > "/home/${NEW_USER}/forest_data/config.yml"
 cluster_name: forest-${CHAIN}
 targets:
   - description: Forest "${CHAIN}" Prometheus Endpoint
-    urls: ["forest-${CHAIN}:6116/metrics"]
+    urls: ["forest-${CHAIN}:6116"]
 scrape_interval: 15s
 max_concurrency: 10
 timeout: 15s
@@ -123,9 +122,8 @@ sudo --user="${NEW_USER}" -- \
   --detach \
   --network=forest \
   --name=nri-prometheus \
-  --e LICENSE_KEY="${NR_LICENSE_KEY}" \
+  --env LICENSE_KEY="${NR_LICENSE_KEY}" \
   --volume=/home/"${NEW_USER}"/forest_data/config.yml:/config.yml \
   --restart=unless-stopped \
   newrelic/nri-prometheus:latest \
   --configfile=/config.yml
-
