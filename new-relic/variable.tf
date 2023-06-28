@@ -15,7 +15,7 @@ variable "slack_destination_id" {
 }
 
 variable "slack_channel_id" {
-  description = "The unique identifier for the Slack channel where notifications will be posted."
+  description = "The unique identifier for the Slack channel(forest-dump), where notifications will be posted."
   type        = string
   default     = "C05BHMZ7GTT"
 }
