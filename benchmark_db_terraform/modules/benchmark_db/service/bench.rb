@@ -144,7 +144,7 @@ end
 def write_csv(metrics, options)
   filename = "result_#{Time.now.to_i}.csv"
   CSV.open(filename, 'w') do |csv|
-    csv << ['Timestamp', 'Forest Version', 'Lotus Version', 'Chain', 'Forest Snapshot Import Time [sec]',
+    csv << ['Timestamp', 'Forest Version', 'Lotus Version', 'Chain', 'Metric', 'Forest Snapshot Import Time [sec]',
             'Forest Validation Time [tipsets/sec]', 'Lotus Snapshot Import Time [sec]', 'Lotus Validation Time [tipsets/sec]']
 
     timestamp = Time.now.strftime('%Y-%m-%d %H:%M:%S')
@@ -162,7 +162,7 @@ def write_csv(metrics, options)
         results[key.to_sym][:validation_time] = tpm
       end
     end
-    csv << [timestamp, FOREST_VERSION, LOTUS_VERSION, chain, results[:forest][:import_time],
+    csv << [timestamp, FOREST_VERSION, LOTUS_VERSION, chain, key, results[:forest][:import_time],
             results[:forest][:validation_time], results[:lotus][:import_time], results[:lotus][:validation_time]]
   end
   @logger.info "Wrote #{filename}"

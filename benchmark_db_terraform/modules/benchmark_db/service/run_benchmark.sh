@@ -18,8 +18,9 @@ ruby bench.rb --chain mainnet --tempdir ./snapshots --daily
 ## Upload benchmark result to s3 weekly file
 week_number=$(date +%W) # Week starting on Monday
 s3cmd get s3://"$BENCHMARK_BUCKET"/benchmark-results/weekly-results/weekly_result_"$week_number".csv /tmp/weekly_result_"$week_number".csv --force || 
-echo "Timestamp,Forest Version,Lotus Version,Chain,Forest Snapshot Import Time [sec],Forest Validation Time [tipsets/sec],Lotus Snapshot Import Time [sec],Lotus Validation Time [tipsets/sec]" > /tmp/weekly_result_"$week_number".csv
+echo "Timestamp,Forest Version,Lotus Version,Chain,Key,Forest Snapshot Import Time [sec],Forest Validation Time [tipsets/sec],Lotus Snapshot Import Time [sec],Lotus Validation Time [tipsets/sec]" > /tmp/weekly_result_"$week_number".csv
 tail -n +2 -q /chainsafe/result_*.csv >> /tmp/weekly_result_"$week_number".csv && s3cmd --acl-public put /tmp/weekly_result_"$week_number".csv s3://"$BENCHMARK_BUCKET"/benchmark-results/weekly-results/weekly_result_"$week_number".csv || exit 1
 
-s3cmd get s3://"$BENCHMARK_BUCKET"/benchmark-results/all_results.csv /tmp/all_results.csv --force || echo "Timestamp,Forest Version,Lotus Version,Chain,Forest Snapshot Import Time [sec],Forest Validation Time [tipsets/sec],Lotus Snapshot Import Time [sec],Lotus Validation Time [tipsets/sec]" > /tmp/all_results.csv
+s3cmd get s3://"$BENCHMARK_BUCKET"/benchmark-results/all_results.csv /tmp/all_results.csv --force || 
+echo "Timestamp,Forest Version,Lotus Version,Chain,Key,Forest Snapshot Import Time [sec],Forest Validation Time [tipsets/sec],Lotus Snapshot Import Time [sec],Lotus Validation Time [tipsets/sec]" > /tmp/all_results.csv
 tail -n +2 -q /chainsafe/result_*.csv >> /tmp/all_results.csv && s3cmd --acl-public put /tmp/all_results.csv s3://"$BENCHMARK_BUCKET"/benchmark-results/all_results.csv || exit 1
