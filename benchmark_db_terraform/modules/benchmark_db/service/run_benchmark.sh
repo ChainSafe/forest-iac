@@ -3,6 +3,10 @@
 ## Enable strict error handling, command tracing, and pipefail
 set -euxo pipefail
 
+# 1. Configure s3cmd
+# 2. Run benchmark
+# 3. Upload benchmark results to s3 bucket
+
 ## Configure s3cmd
 s3cmd --dump-config \
     --host="$BENCHMARK_ENDPOINT" \

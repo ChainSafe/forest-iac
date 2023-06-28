@@ -91,6 +91,7 @@ resource "digitalocean_droplet" "forest" {
   }
 }
 
+# Destroy droplet when the benchmark_run_completed file exists
 resource "null_resource" "destroy_droplet" {
   triggers = {
     benchmark_run_completed = fileexists("benchmark_run_completed")
