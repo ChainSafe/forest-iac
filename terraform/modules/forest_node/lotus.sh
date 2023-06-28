@@ -98,4 +98,3 @@ display_name: lotus-${CHAIN}
 override_hostname_short: lotus-${CHAIN}
 EOF
 sudo systemctl restart newrelic-infra
-
