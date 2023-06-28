@@ -144,26 +144,24 @@ end
 def write_csv(metrics, options)
   filename = "result_#{Time.now.to_i}.csv"
   CSV.open(filename, 'w') do |csv|
-    csv << ['Timestamp', 'Forest Version', 'Lotus Version', 'Chain', 'Metric', 'Forest Snapshot Import Time [sec]',
-            'Forest Validation Time [tipsets/sec]', 'Lotus Snapshot Import Time [sec]', 'Lotus Validation Time [tipsets/sec]']
+    csv << ['Timestamp', 'Forest Version', 'Lotus Version', 'Chain', 'Metric', 'Forest Value', 'Lotus Value']
 
     timestamp = Time.now.strftime('%Y-%m-%d %H:%M:%S')
     chain = options[:chain]
 
-    results = { forest: { import_time: 'n/a', validation_time: 'n/a' },
-                lotus: { import_time: 'n/a', validation_time: 'n/a' } }
+    results = { import: { forest: 'n/a', lotus: 'n/a' },
+    validate_online: { forest: 'n/a', lotus: 'n/a' } }
 
     metrics.each do |key, value|
       elapsed = value[:import][:elapsed] || 'n/a'
       tpm = value[:validate_online][:tpm] || 'n/a'
 
-      if results.key?(key.to_sym)
-        results[key.to_sym][:import_time] = elapsed
-        results[key.to_sym][:validation_time] = tpm
-      end
+      results[:import][key.to_sym] = elapsed
+      results[:validate_online][key.to_sym] = tpm
     end
-    csv << [timestamp, FOREST_VERSION, LOTUS_VERSION, chain, key, results[:forest][:import_time],
-            results[:forest][:validation_time], results[:lotus][:import_time], results[:lotus][:validation_time]]
+    results.each do |key, value|
+        csv << [timestamp, FOREST_VERSION, LOTUS_VERSION, chain, key, value[:forest], value[:lotus]]
+    end
   end
   @logger.info "Wrote #{filename}"
 end

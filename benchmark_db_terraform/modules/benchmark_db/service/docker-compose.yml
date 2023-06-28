@@ -21,6 +21,4 @@ services:
       - |
         ruby run_benchmark.rb
         wait
-        sleep infinity
-        rm -rf /snapshots
     restart: unless-stopped
