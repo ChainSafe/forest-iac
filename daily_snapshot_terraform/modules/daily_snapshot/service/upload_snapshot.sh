@@ -17,6 +17,13 @@ docker pull ghcr.io/chainsafe/forest:"${FOREST_TAG}"
 # Sync and export is done in a single container to make sure everything is
 # properly cleaned up.
 COMMANDS=$(cat << HEREDOC
+set -euxo pipefail
+
+function print_forest_logs {
+  cat forest.err forest.out
+}
+trap print_forest_logs EXIT
+
 echo "[client]" > config.toml
 echo 'data_dir = "/home/forest/forest_db"' >> config.toml
 echo 'encrypt_keystore = false' >> config.toml
@@ -25,18 +32,17 @@ echo 'encrypt_keystore = false' >> config.toml
 # help with debugging. We are doing this only for calibnet
 # because enabling this for mainnet might result in a huge
 # log file and bad performance.
-if [ $CHAIN_NAME = "calibnet" ]; then
+if [ "$CHAIN_NAME" = "calibnet" ]; then
   export RUST_LOG=debug
 fi
 
 echo "Chain: $CHAIN_NAME"
 echo "Snapshot: $NEWEST_SNAPSHOT"
-forest-cli --config config.toml --chain $CHAIN_NAME db clean --force
-forest --config config.toml --chain $CHAIN_NAME --import-snapshot $NEWEST_SNAPSHOT --halt-after-import
-forest --config config.toml --chain $CHAIN_NAME --detach || { echo "failed starting forest daemon"; exit 1; }
-timeout $SYNC_TIMEOUT forest-cli --chain $CHAIN_NAME sync wait || { echo "timed-out on forest-cli sync"; exit 1; }
-cat forest.err forest.out
-forest-cli --chain $CHAIN_NAME snapshot export -o forest_db/ || { echo "failed to export the snapshot"; exit 1; }
+forest-cli --config config.toml --chain "$CHAIN_NAME" db clean --force
+forest --config config.toml --chain "$CHAIN_NAME" --import-snapshot "$NEWEST_SNAPSHOT" --halt-after-import
+forest --config config.toml --chain "$CHAIN_NAME" --detach
+timeout "$SYNC_TIMEOUT" forest-cli --chain "$CHAIN_NAME" sync wait
+forest-cli --chain "$CHAIN_NAME" snapshot export -o forest_db/
 HEREDOC
 )
 
