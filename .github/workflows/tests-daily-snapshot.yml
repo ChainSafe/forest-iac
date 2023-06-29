@@ -1,0 +1,27 @@
+name: Snapshot service
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths: 
+      - daily_snapshot_terraform/**
+  push:
+    branches:
+      - main
+    paths:
+      - daily_snapshot_terraform/**
+jobs:
+  rspec:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+      - name: run rspec tests
+        working-directory: daily_snapshot_terraform/modules/daily_snapshot/service
+        run: |
+          gem install --no-document rspec activesupport
+          rspec tests
