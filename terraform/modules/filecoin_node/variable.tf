@@ -93,7 +93,7 @@ variable "NEW_RELIC_REGION" {
 }
 
 variable "script" {
-  description = "The name of the Script to be Ran at The Initialaziton of The Droplet"
+  description = "The Name of the Script Executed at the Initialization of the Droplet"
   type        = string
   default     = "user-data.sh"
 }

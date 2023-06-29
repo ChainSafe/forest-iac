@@ -3,7 +3,7 @@ terraform {
 
   backend "s3" {
     bucket                      = "forest-iac"
-    key                         = "lotus-mainner/terraform.tfstate"
+    key                         = "lotus-mainnet/terraform.tfstate"
     region                      = "us-west-1"
     endpoint                    = "fra1.digitaloceanspaces.com"
     skip_credentials_validation = true
