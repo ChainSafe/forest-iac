@@ -59,7 +59,7 @@ resource "newrelic_nrql_alert_condition" "disk_space" {
   violation_time_limit_seconds = 3600
 
   nrql {
-    query = "SELECT average(`host.diskUsedPercent`) FROM Metric FACET entity.guid, host.hostname"
+    query = "SELECT latest(diskUsedPercent) FROM StorageSample FACET hostname, mountPoint"
   }
 
   critical {
