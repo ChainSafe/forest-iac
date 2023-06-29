@@ -32,8 +32,8 @@ jobs:
           aws_access_key_id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
-          working_directory: terraform/calibnet
-          environment: calibnet
+          working_directory: terraform/forest-calibnet
+          environment: Forest Calibnet
           new_relic_account_id: ${{ secrets.NEW_RELIC_ACCOUNT_ID }}
           nr_license_key: ${{ secrets.NR_LICENSE_KEY }}
           new_relic_api_key: ${{ secrets.NEW_RELIC_API_KEY }}
