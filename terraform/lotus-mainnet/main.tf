@@ -24,7 +24,7 @@ module "lotus-calibnet" {
   destination_addresses   = ["0.0.0.0/0", "::/0"]
   volume_name             = "lotus-mainnet-volume"
   initial_filesystem_type = "ext4"
-  volume_size             = "400"
+  volume_size             = "1000"
   chain                   = "mainnet"
   project                 = "Forest-DEV"
   fw_name                 = "mainnet-calibnet-fw"
