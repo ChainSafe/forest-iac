@@ -11,8 +11,8 @@ terraform {
   }
 }
 
-module "lotus-calibnet" {
-  source = "../modules/forest_node"
+module "lotus-mainnet" {
+  source = "../modules/filecoin_node"
 
   do_token                = var.do_token
   name                    = "lotus"
