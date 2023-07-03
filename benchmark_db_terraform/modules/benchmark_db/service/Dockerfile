@@ -1,7 +1,6 @@
 FROM fedora:38
 
-RUN dnf -y update && \
-    dnf -y install dnf-plugins-core && \
+RUN dnf -y install dnf-plugins-core && \
     dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo && \
     dnf install -y \
         docker-ce docker-ce-cli containerd.io docker-buildx-plugin \
@@ -9,7 +8,9 @@ RUN dnf -y update && \
     dnf clean all
 
 # Lotus dependencies
-RUN dnf -y install bzr jq pkgconfig mesa-libOpenCL mesa-libOpenCL-devel opencl-headers ocl-icd ocl-icd-devel llvm wget hwloc hwloc-devel  
+RUN dnf -y install bzr jq pkgconfig mesa-libOpenCL mesa-libOpenCL-devel opencl-headers ocl-icd ocl-icd-devel llvm wget hwloc hwloc-devel && \
+    dnf clean all
+
 
 RUN gem install slack-ruby-client sys-filesystem bundler concurrent-ruby deep_merge tomlrb toml-rb csv fileutils logger open3 optparse set tmpdir
 
