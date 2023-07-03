@@ -12,7 +12,7 @@ terraform {
 }
 
 module "mainnet" {
-  source = "../modules/forest_node"
+  source = "../modules/filecoin_node"
 
   do_token                = var.do_token
   name                    = var.name

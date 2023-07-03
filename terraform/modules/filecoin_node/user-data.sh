@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This bash script is used to initialize a Mainnet or Calibnet Droplet.
+# This bash script is used to initialize a Forest Mainnet or Calibnet Droplet.
 # It starts the chain (either mainnet or calibnet) as specified in the terraform script.
 # The script also runs Watchtower to keep the Forest Docker images up-to-date,
 # and sets up the New Relic agent and openMetrics prometheus for system monitoring and prometheus metrics.
