@@ -91,3 +91,10 @@ variable "NEW_RELIC_REGION" {
   type        = string
   default     = "EU"
 }
+
+variable "script" {
+  description = "The Name of the Script Executed at the Initialization of the Droplet"
+  type        = string
+  default     = "user-data.sh"
+}
+
