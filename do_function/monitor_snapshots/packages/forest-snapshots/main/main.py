@@ -17,7 +17,7 @@ pattern = r'([^_]+?)_snapshot_([^_]+?)_(\d{4}-\d{2}-\d{2})_height_(\d+).car(.zst
 folders = ["mainnet", "calibnet"]
 
 def slack_alert(message):
-    client = WebClient(token=os.environ['SLACK_API_TOKEN'])
+    client = WebClient(token=os.environ['SLACK_TOKEN'])
     CHANNEL_ID = 'C05BHMZ7GTT'
     
     try:

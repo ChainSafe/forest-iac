@@ -1,19 +1,7 @@
-parameters: {}
-environment: {}
+environment: 
+  SLACK_TOKEN: ${SLACK_TOKEN}
 packages:
-    - name: sample
-      shared: false
-      environment: {}
-      parameters: {}
-      annotations: {}
-      functions:
-        - name: hello
-          binary: false
-          main: ""
+    - name: forest-snapshots
+      actions:
+        - name: main
           runtime: python:default
-          web: true
-          webSecure: false
-          parameters: {}
-          environment: {}
-          annotations: {}
-          limits: {}

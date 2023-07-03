@@ -18,7 +18,7 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: snapshot_function
+        working-directory: do_function/snapshot_function
 
     steps:
       - name: Checkout
