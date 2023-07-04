@@ -56,8 +56,6 @@ locals {
     "echo 'source .forest_env' >> .bashrc",
     "source ~/.forest_env",
     "nohup sh ./init.sh > init_log.txt &",
-    # Setup benchmark cron job for daily execution
-    "cp benchmark_cron_job /etc/cron.daily/",
     # Exiting without a sleep sometimes kills the script :-/
     "sleep 10s"
   ]
