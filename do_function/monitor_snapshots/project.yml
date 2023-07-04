@@ -9,6 +9,6 @@ packages:
           - name: trigger-snapshot
             sourceType: scheduler
             sourceDetails:
-              cron: "* 1 * * *"
+              cron: "0 8 * * *"
               withBody:
                 name: 'sammy'
