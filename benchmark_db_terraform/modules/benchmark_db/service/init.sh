@@ -12,7 +12,7 @@ if ! command -v docker &> /dev/null; then
 fi
 
 # Setup benchmark cron job for daily execution
-cp benchmark_cron_job /etc/cron.daily/
+sudo cp benchmark_cron_job /etc/cron.daily/
 
 # Run Docker Compose using the provided file which runs the benchmark
 docker-compose -f docker-compose.yml up -d --force-recreate
