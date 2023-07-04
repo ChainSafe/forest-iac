@@ -91,6 +91,11 @@ def main():
 
         # Calculate the age of the most recent snapshot and alert if it's older than 30 hours.
         snapshot_age_hours = (datetime.utcnow() - last_modified_time).total_seconds() / 3600
+        if snapshot_age_hours > 30:
+            checks_passed = False
+            slack_alert(f"⛔ The latest {folder} snapshot: {base_url}/{latest_snapshot_filename} is older than 30 hours (Age: {snapshot_age_hours:.2f} hours). 🔥🌲🔥")
+        else:
+            slack_alert(f"✅ The latest {folder} snapshot: {base_url}/{latest_snapshot_filename} is not older than 30 hours (Age: {snapshot_age_hours:.2f} hours. 🌲🌳🌲🌳🌲")
 
         # Checks for validity and integrity of each snapshot in the current folder.
         for snapshot_name, snapshot in snapshots.items():
