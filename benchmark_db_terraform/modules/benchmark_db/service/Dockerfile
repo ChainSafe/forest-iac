@@ -12,7 +12,7 @@ RUN dnf -y install bzr jq pkgconfig mesa-libOpenCL mesa-libOpenCL-devel opencl-h
     dnf clean all
 
 
-RUN gem install slack-ruby-client sys-filesystem bundler concurrent-ruby deep_merge tomlrb toml-rb csv fileutils logger open3 optparse set tmpdir
+RUN gem install slack-ruby-client sys-filesystem bundler concurrent-ruby deep_merge tomlrb toml-rb csv fileutils logger open3 optparse set tmpdir droplet_kit
 
 WORKDIR /chainsafe
 

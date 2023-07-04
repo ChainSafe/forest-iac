@@ -9,9 +9,6 @@ on:
   push:
     branches:
       - main
-  schedule:
-    - cron: '0 0 * * *' # Executes at midnight every day
-
 
 jobs:
   benchmark-db:

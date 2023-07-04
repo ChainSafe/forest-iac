@@ -12,4 +12,4 @@ if ! command -v docker &> /dev/null; then
 fi
 
 # Run Docker Compose using the provided file which runs the benchmark
-docker-compose -f docker-compose.yml up -d
+docker-compose -f docker-compose.yml up -d --force-recreate

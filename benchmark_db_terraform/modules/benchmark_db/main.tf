@@ -56,6 +56,8 @@ locals {
     "echo 'source .forest_env' >> .bashrc",
     "source ~/.forest_env",
     "nohup sh ./init.sh > init_log.txt &",
+    # Setup benchmark cron job for daily execution
+    "cp benchmark_cron_job /etc/cron.daily/",
     # Exiting without a sleep sometimes kills the script :-/
     "sleep 10s"
   ]
@@ -88,19 +90,6 @@ resource "digitalocean_droplet" "forest" {
   provisioner "remote-exec" {
     inline = local.init_commands
   }
-}
-
-# Destroy droplet when the benchmark_run_completed file exists
-resource "null_resource" "destroy_droplet" {
-  triggers = {
-    benchmark_run_completed = fileexists("benchmark_run_completed")
-  }
-
-  provisioner "local-exec" {
-    command = "terraform destroy -auto-approve"
-  }
-
-  depends_on = [digitalocean_droplet.forest]
 }
 
 data "digitalocean_project" "forest_project" {
