@@ -663,7 +663,7 @@
                 "accountIds": [
                   "${account_id}"
                 ],
-                "query": "SELECT latest(`host.diskUsedPercent`) FROM Metric WHERE host.hostname = '${name}'"
+                "query": "SELECT latest(diskUsedPercent) FROM StorageSample WHERE hostname = '${name}' FACET hostname, mountPoint"
               }
             ],
             "platformOptions": {

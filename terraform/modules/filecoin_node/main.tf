@@ -1,7 +1,7 @@
 # This terraform script executes the following steps:
 #  - Boot a New droplet for the Mainnet or Calibnet chain
 #  - Attach a volume to the droplet if Attach volume is set to true
-#  - Run the user-data.sh script at the initialization of the new droplet
+#  - Run the user-data.sh or lotus.sh script at the initialization of the new droplet
 
 terraform {
   required_version = "~> 1.3"
@@ -46,7 +46,7 @@ resource "digitalocean_droplet" "forest" {
   ssh_keys   = data.digitalocean_ssh_keys.keys.ssh_keys.*.fingerprint
   monitoring = true
 
-  user_data = templatefile("${path.module}/user-data.sh",
+  user_data = templatefile("${path.module}/${var.script}",
     {
       NEW_USER = "${var.name}"
       # In the filesystem on the droplet, certain special characters, including "-",
