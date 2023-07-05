@@ -121,7 +121,7 @@ def main():
                 snapshot_file_zst = snapshot_name.rsplit('.', 1)[0] + '.car.zst'
                 if snapshot_file not in snapshots and snapshot_file_zst not in snapshots:
                     checks_passed = False
-                    slack(f"🚨 Error! Stray .sha256sum file {snapshot_name} detected. Please verify. 🕵️")
+                    slack_alert(f"🚨 Error! Stray .sha256sum file {snapshot_name} detected. Please verify. 🕵️")
 
     # If all checks have passed, send success message. Otherwise, send failure message.
     if checks_passed:
