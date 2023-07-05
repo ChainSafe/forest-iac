@@ -1,5 +1,0 @@
-#!/bin/bash
-cd "$BASE_FOLDER" || exit
-# shellcheck source=/dev/null
-source .bashrc
-flock -n /tmp/init_script.lock -c "sh ./init.sh > init_log.txt 2>&1"

@@ -11,8 +11,5 @@ if ! command -v docker &> /dev/null; then
     sudo systemctl start docker
 fi
 
-# Setup benchmark cron job for daily execution
-sudo cp benchmark_cron_job /etc/cron.daily/
-
 # Run Docker Compose using the provided file which runs the benchmark
 docker-compose -f docker-compose.yml up -d --force-recreate

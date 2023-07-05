@@ -19,5 +19,4 @@ services:
     command:
       - |
         ruby run_benchmark.rb
-        wait
     restart: unless-stopped
