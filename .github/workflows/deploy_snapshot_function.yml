@@ -18,7 +18,7 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: snapshot_function
+        working-directory: do_function/snapshot_function
 
     steps:
       - name: Checkout
@@ -32,8 +32,37 @@ jobs:
       - name: Configure serverless
         run: |
           doctl serverless install
-          doctl serverless connect
+          doctl serverless connect snapshots
 
-      - name: Deploy function
+      - name: Deploy Redirect Snapshot function
         if: github.ref == 'refs/heads/main' && ( github.event_name == 'push' || github.event_name == 'workflow_dispatch' )
         run: doctl serverless deploy .
+
+  deploy-monitor-snapshot-function:
+    name: Forest Snapshot Check
+    runs-on: ubuntu-latest
+    env:
+      TF_VAR_do_token: ${{ secrets.DO_TOKEN }}
+      SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+    defaults:
+      run:
+        shell: bash
+        working-directory: do_function/monitor_snapshots
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DO_TOKEN }}
+
+      - name: Configure serverless
+        run: |
+          doctl serverless install
+          doctl serverless connect monitor-spaces
+
+      - name: Deploy Snapshot Checks function
+        if: github.ref == 'refs/heads/main' && ( github.event_name == 'push' || github.event_name == 'workflow_dispatch' )
+        run: doctl serverless deploy . --remote-build 
+
