@@ -63,5 +63,8 @@ jobs:
           doctl serverless connect monitor-spaces
 
       - name: Deploy Redirect Snapshot function
-        if: github.ref == 'refs/heads/main' && ( github.event_name == 'push' || github.event_name == 'workflow_dispatch' )
-        run: doctl serverless deploy . --remote-build
+        #if: github.ref == 'refs/heads/main' && ( github.event_name == 'push' || github.event_name == 'workflow_dispatch' )
+        run: doctl serverless deploy . 
+
+      - name: test function 
+        run: doctl serverless functions invoke monitor-snapshot/main

@@ -22,45 +22,42 @@ folders = ["mainnet", "calibnet"]
 def slack_alert(message_dict):
     # Instantiate a Slack client with token from environment variables.
     client = WebClient(token=os.environ['SLACK_TOKEN'])
-    CHANNEL_ID = 'C05BHMZ7GTT'
+    CHANNEL_NAME = '#forest-dump'
     
     # Format message as a JSON-like string for better readability.
     message = f'```{json.dumps(message_dict, indent=4, ensure_ascii=False)}```'
     
     # Try sending message, catch and print any errors.
     try:
-        response = client.chat_postMessage(channel=CHANNEL_ID, text=message)
+        response = client.chat_postMessage(channel=CHANNEL_NAME, text=message)
         print(f"Message sent. Response: {response['message']}")
     except SlackApiError as e:
         print(f"Slack API error: {e.response['error']}")
 
-# Function to get and return details of all snapshots from the server.
+# Function to send alert messages to a Slack channel.
 def get_snapshots():
-    # Send a GET request to the server and parse the XML response.
     response = requests.get(base_url)
     root = ET.fromstring(response.text)
     snapshots = {}
-    
-    # Iterate over each XML child element and extract snapshot details.
     for child in root:
         snapshot_dict = {}
         snapshot_name = ''
-        
         for snapshot in child:
             if snapshot.tag.endswith('Key'):
                 snapshot_name = snapshot.text
             elif snapshot.tag.endswith('Size'):
                 snapshot_dict['Size'] = int(snapshot.text)
-            elif snapshot.tag.endswith('LastModified'):
-                snapshot_dict['LastModified'] = datetime.strptime(snapshot.text, '%Y-%m-%dT%H:%M:%S.%fZ')
-        
-        # If the file is a valid snapshot, add it to the snapshot dictionary.
+
         if snapshot_name.endswith(('.car', '.car.zst', '.sha256sum')):
             folder_name = snapshot_name.split('/')[0]
             if folder_name not in snapshots:
                 snapshots[folder_name] = {}
+
+            match = re.match(pattern, snapshot_name)
+            if match:
+                snapshot_date_str = match.group(3)
+                snapshot_dict['Date'] = datetime.strptime(snapshot_date_str, '%Y-%m-%d')
             snapshots[folder_name][snapshot_name] = snapshot_dict
-    
     return snapshots
 
 # The main function checks the validity and integrity of the snapshots.
@@ -72,14 +69,14 @@ def main():
     for folder in folders:  
         snapshots = all_snapshots.get(folder, {}) 
 
-        last_modified_time = None
+        latest_snapshot_by_date = None
         latest_snapshot_filename = None
         latest_snapshot_name = None
 
-        # Find the most recently modified snapshot in the current folder.
+        # Find the most recent snapshot in the current folder by snapshot date.
         for snapshot_name, snapshot in snapshots.items():
-            if snapshot_name.endswith(('.car', '.car.zst')) and (last_modified_time is None or snapshot['LastModified'] > last_modified_time):
-                last_modified_time = snapshot['LastModified']
+            if snapshot_name.endswith(('.car', '.car.zst')) and (latest_snapshot_by_date is None or snapshot['Date'] > latest_snapshot_by_date):
+                latest_snapshot_by_date = snapshot['Date']
                 latest_snapshot_filename = snapshot_name
                 latest_snapshot_name = snapshot_name.split('/')[-1]  # Extract snapshot name from full path.
 
@@ -87,17 +84,20 @@ def main():
         if latest_snapshot_filename is None:
             checks_passed = False
             print(f"No snapshots found in {folder} folder.")
-            continue
+            continue       
 
-        # Calculate the age of the most recent snapshot and alert if it's older than 30 hours.
-        snapshot_age_hours = (datetime.utcnow() - last_modified_time).total_seconds() / 3600
-        if snapshot_age_hours > 30:
+        # Check if the most recent snapshot is older than one day.
+        current_date_utc = datetime.now(timezone.utc).date()
+        yesterday_date_utc = current_date_utc - timedelta(days=1)
+
+        if latest_snapshot_by_date.date() < yesterday_date_utc:
             checks_passed = False
-            slack_alert(f"⛔ The latest {folder} snapshot: {base_url}/{latest_snapshot_filename} is older than 30 hours (Age: {snapshot_age_hours:.2f} hours). 🔥🌲🔥")
+            slack_alert(f"⛔ The latest {folder} snapshot: {base_url}/{latest_snapshot_filename} is older than one day. Snapshot Date: {latest_snapshot_by_date}, Current Date: {current_date_utc}. 🔥🌲🔥")
         else:
-            slack_alert(f"✅ The latest {folder} snapshot: {base_url}/{latest_snapshot_filename} is not older than 30 hours (Age: {snapshot_age_hours:.2f} hours. 🌲🌳🌲🌳🌲")
-
+            slack_alert(f"✅ The latest {folder} snapshot: {base_url}/{latest_snapshot_filename} is from today or yesterday. Snapshot Date: {latest_snapshot_by_date}, Current Date: {current_date_utc}. 🌲🌳🌲🌳🌲")
+        
         # Checks for validity and integrity of each snapshot in the current folder.
+        
         for snapshot_name, snapshot in snapshots.items():
             # Check if the snapshot size is less than 1GB.
             if snapshot['Size'] < 1073741824 and snapshot_name.endswith(('.car', '.car.zst')):  # 1GB in bytes 
@@ -121,7 +121,7 @@ def main():
                 snapshot_file_zst = snapshot_name.rsplit('.', 1)[0] + '.car.zst'
                 if snapshot_file not in snapshots and snapshot_file_zst not in snapshots:
                     checks_passed = False
-                    print(f"🚨 Error! Stray .sha256sum file {snapshot_name} detected. Please verify. 🕵️")
+                    slack(f"🚨 Error! Stray .sha256sum file {snapshot_name} detected. Please verify. 🕵️")
 
     # If all checks have passed, send success message. Otherwise, send failure message.
     if checks_passed:
