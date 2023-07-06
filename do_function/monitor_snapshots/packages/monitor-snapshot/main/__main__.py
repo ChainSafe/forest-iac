@@ -34,7 +34,7 @@ def slack_alert(message_dict):
     except SlackApiError as e:
         print(f"Slack API error: {e.response['error']}")
 
-# Function to send alert messages to a Slack channel.
+# Function to get and return details of all snapshots
 def get_snapshots():
     response = requests.get(base_url)
     root = ET.fromstring(response.text)
@@ -83,7 +83,7 @@ def main():
         # If there are no snapshots in the folder, notify and skip to next folder.
         if latest_snapshot_filename is None:
             checks_passed = False
-            print(f"No snapshots found in {folder} folder.")
+            slack_alert(f"No snapshots found in {folder} folder.")
             continue       
 
         # Check if the most recent snapshot is older than one day.
@@ -110,15 +110,18 @@ def main():
 
             # Check if full snapshots have a corresponding sha256 checksum file.
             if snapshot_name.endswith(('.car', '.car.zst')):  # assuming this is a full snapshot
-                shasum_file = snapshot_name.rsplit('.', 1)[0] + '.sha256sum'
-                if shasum_file not in snapshots:
+                base_snapshot_name = snapshot_name.rsplit('.', 1)[0] # Remove the last extension
+                shasum_file = base_snapshot_name + '.sha256sum'
+                shasum_file_no_ext = base_snapshot_name.rsplit('.', 1)[0] + '.sha256sum'  # For case without the '.car' in sha256sum
+                if shasum_file not in snapshots and shasum_file_no_ext not in snapshots:  # Check for both
                     checks_passed = False
                     slack_alert(f"⚠️ Warning! The full snapshot {snapshot_name} is missing its corresponding .sha256sum file. Check required. 🔍")
 
             # Check for any stray sha256 checksum files.
             elif snapshot_name.endswith('.sha256sum'):  # Check for stray shasum files
-                snapshot_file = snapshot_name.rsplit('.', 1)[0] + '.car'
-                snapshot_file_zst = snapshot_name.rsplit('.', 1)[0] + '.car.zst'
+                base_snapshot_file = snapshot_name.rsplit('.', 2)[0]  # Extract base filename by splitting twice
+                snapshot_file = base_snapshot_file + '.car'
+                snapshot_file_zst = base_snapshot_file + '.car.zst'
                 if snapshot_file not in snapshots and snapshot_file_zst not in snapshots:
                     checks_passed = False
                     slack_alert(f"🚨 Error! Stray .sha256sum file {snapshot_name} detected. Please verify. 🕵️")
@@ -127,10 +130,11 @@ def main():
     if checks_passed:
         message = {"result": "✅ success", 
                    "message": "All checks passed successfully. All snapshots are valid and up-to-date. Lets keep up the good work! 🌲🌳🌲🌳🌲"}
-        slack_alert(message)
+        
+        #slack_alert(message)
         return message
     else:
         message = {"result": "⛔ failure", 
                    "message": "Some checks did not pass. Please review the issues reported above. Let's fix them and keep the forest green! 🔥🌲🔥"}
-        slack_alert(message)
+        #slack_alert(message)
         return message

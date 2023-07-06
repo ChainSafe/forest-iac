@@ -1,10 +1,6 @@
 # Overview
 
-This folder includes an executable description that facilitates the setup and 
-automatic initiation of the Forest Sync-Check service on a DigitalOcean droplet. 
-The service is designed to perform sync checks on both the calibnet and mainnet networks. 
-Additionally, it sends notifications to the Forest Slack notification channel and 
-the sync check service is configured to restart automatically upon droplet reboot.
+This folder contains an executable description that simplifies the setup and automatic initiation of the Forest Sync-Check service on a DigitalOcean droplet. The service is specifically designed to perform sync checks on both the calibnet and mainnet networks. It also sends notifications to the Forest Slack notification channel. Moreover, the sync check service is configured to automatically restart upon droplet reboot, and the New Relic Infrastructure agent is installed for monitoring purposes.
 
 # Workflow
 
@@ -39,6 +35,8 @@ export TF_VAR_AWS_SECRET_ACCESS_KEY=
 # S3 access keys used by terraform, use the same values as above
 export AWS_ACCESS_KEY_ID=
 export AWS_SECRET_ACCESS_KEY=
+# New Relic License key, Can be generated here: https://one.eu.newrelic.com/admin-portal/api-keys/home
+export NR_LICENSE_KEY=
 ```
 
 Forest tokens can be found on 1password.

@@ -1,10 +1,7 @@
 # Overview
 
 This folder contains an executable description of the Forest service for
-generating daily snapshots. The service will continuously verify that Forest can
-export snapshots. Once per day, this service will sync to calibnet and export a
-new snapshot. If the previous snapshot is more than a day old, the new snapshot
-is uploaded to Digital Ocean Spaces.
+generating daily snapshots. This service ensures the continuous verification of Forest's ability to export snapshots. Once every day, the service synchronizes with calibnet and creates a new snapshot. If the previous snapshot is older than one day, the new snapshot is uploaded to Digital Ocean Spaces. Additionally, the New Relic Infrastructure agent is installed to facilitate monitoring.
 
 
 # Workflow
@@ -41,6 +38,8 @@ export TF_VAR_AWS_SECRET_ACCESS_KEY=
 # S3 access keys used by terraform, use the same values as above
 export AWS_ACCESS_KEY_ID=
 export AWS_SECRET_ACCESS_KEY=
+# New Relic License ke, Can be generated here: https://one.eu.newrelic.com/admin-portal/api-keys/home
+export NR_LICENSE_KEY=
 ```
 
 Forest tokens can be found on 1password.
