@@ -6,7 +6,7 @@ terraform {
     # This key uniquely identifies the service. To create a new service (instead
     # of modifying this one), use a new key. Unfortunately, variables may not be
     # used here.
-    key = "benchmark_db.tfstate"
+    key = "benchmark.tfstate"
 
     # This value is completely unused by DO but _must_ be a known AWS region.
     region = "us-west-1"
@@ -21,9 +21,9 @@ terraform {
   }
 }
 
-module "benchmark_db" {
-  # Import the benchmark db module
-  source = "./modules/benchmark_db"
+module "benchmark" {
+  # Import the benchmark module
+  source = "./modules/benchmark"
 
   # Configure service:
   name               = "forest-benchmark"      # droplet name
@@ -41,5 +41,5 @@ module "benchmark_db" {
 
 # This ip address may be used in the future by monitoring software
 output "ip" {
-  value = [module.benchmark_db.ip]
+  value = [module.benchmark.ip]
 }

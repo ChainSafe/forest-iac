@@ -1,5 +1,5 @@
 ---
-name: DB Benchmark Service
+name: Benchmark Service
 
 on:
   workflow_dispatch:
@@ -11,8 +11,8 @@ on:
       - main
 
 jobs:
-  benchmark-db:
-    name: DB Benchmark Service
+  benchmark:
+    name: Benchmark Service
     runs-on: ubuntu-latest
     permissions: write-all
     steps:
@@ -28,5 +28,5 @@ jobs:
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
           slack_token: ${{ secrets.SLACK_TOKEN }}
-          working_directory: benchmark_db_terraform/
-          environment: DB Benchmark Service
+          working_directory: benchmark_terraform/
+          environment: Benchmark Service

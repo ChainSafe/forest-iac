@@ -6,7 +6,6 @@ set -euxo pipefail
 # 1. Configure s3cmd
 # 2. Run benchmark
 # 3. Upload benchmark results to s3 bucket
-# 4. Destroy droplet on successful run
 
 ## Configure s3cmd
 s3cmd --dump-config \

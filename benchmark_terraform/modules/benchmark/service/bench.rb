@@ -149,15 +149,15 @@ def write_csv(metrics, options)
     timestamp = Time.now.strftime('%Y-%m-%d %H:%M:%S')
     chain = options[:chain]
 
-    results = { import: { forest: 'n/a', lotus: 'n/a' },
-    validate_online: { forest: 'n/a', lotus: 'n/a' } }
+    results = { import_time: { forest: 'n/a', lotus: 'n/a' },
+    validation_time: { forest: 'n/a', lotus: 'n/a' } }
 
     metrics.each do |key, value|
       elapsed = value[:import][:elapsed] || 'n/a'
       tpm = value[:validate_online][:tpm] || 'n/a'
 
-      results[:import][key.to_sym] = elapsed
-      results[:validate_online][key.to_sym] = tpm
+      results[:import_time][key.to_sym] = "#{elapsed} sec"
+      results[:validation_time][key.to_sym] = "#{tpm} tipsets/sec"
     end
     results.each do |key, value|
         csv << [timestamp, FOREST_VERSION, LOTUS_VERSION, chain, key, value[:forest], value[:lotus]]

@@ -1,6 +1,6 @@
 # Overview
 
-This folder contains an executable description of the Forest service, which has been developed to assist in testing Forest database backends and their configurations. Additionally, the script also offers the capability to perform benchmarking, specifically measuring the "daily" benchmarks for Forest and Lotus snapshot import times (in seconds) and validation times (in tipsets per second).
+This folder contains an executable description of the Forest service, which offers the capability to perform benchmarking, measuring the "daily" benchmarks for Forest and Lotus snapshot import times (in seconds) and validation times (in tipsets per second).
 The benchmark results are subsequently uploaded to an S3 bucket, where they are stored in both a weekly file and an all_result file.
 
 # Workflow
