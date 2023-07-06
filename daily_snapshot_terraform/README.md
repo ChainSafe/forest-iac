@@ -38,7 +38,7 @@ export TF_VAR_AWS_SECRET_ACCESS_KEY=
 # S3 access keys used by terraform, use the same values as above
 export AWS_ACCESS_KEY_ID=
 export AWS_SECRET_ACCESS_KEY=
-# New Relic License ke, Can be generated here: https://one.eu.newrelic.com/admin-portal/api-keys/home
+# New Relic License key, Can be generated here: https://one.eu.newrelic.com/admin-portal/api-keys/home
 export NR_LICENSE_KEY=
 ```
 

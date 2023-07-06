@@ -8,6 +8,7 @@ Manual deployments can be done using `doctl`:
 - [Doctl](https://docs.digitalocean.com/reference/doctl/how-to/install/) 
 - VCPU: 1
 - Disk Size: >100 GB
+- Install `make`
 
 Before deploying, make sure to install the necessary dependencies by running:
 
