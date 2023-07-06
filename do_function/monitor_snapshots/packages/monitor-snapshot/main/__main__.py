@@ -131,10 +131,10 @@ def main():
         message = {"result": "✅ success", 
                    "message": "All checks passed successfully. All snapshots are valid and up-to-date. Lets keep up the good work! 🌲🌳🌲🌳🌲"}
         
-        #slack_alert(message)
+        slack_alert(message)
         return message
     else:
         message = {"result": "⛔ failure", 
                    "message": "Some checks did not pass. Please review the issues reported above. Let's fix them and keep the forest green! 🔥🌲🔥"}
-        #slack_alert(message)
+        slack_alert(message)
         return message
