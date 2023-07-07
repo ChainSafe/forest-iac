@@ -25,7 +25,7 @@ make install
 To deploy the redirecting function, execute the following commands:
 
 ```
-make con_link_lint
+make con_link
 
 make deploy_link
 ```
