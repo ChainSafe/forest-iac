@@ -1,7 +1,6 @@
 # Overview
 
-This folder contains an executable description of the Forest service for
-generating daily snapshots. This service ensures the continuous verification of Forest's ability to export snapshots. Once every day, the service synchronizes with calibnet and creates a new snapshot. If the previous snapshot is older than one day, the new snapshot is uploaded to Digital Ocean Spaces. Additionally, the New Relic Infrastructure agent is installed to facilitate monitoring.
+This directory contains an infrastructure configuration for the Forest service, which generates daily snapshots. This configuration ensures the continuous verification of Forest's ability to export snapshots. Once a day, the service synchronizes with Calibnet and creates a new snapshot. If the previous snapshot is older than one day, the new snapshot is uploaded to Digital Ocean Spaces. Additionally, the New Relic Infrastructure agent is installed to facilitate monitoring
 
 
 # Workflow

@@ -24,7 +24,7 @@ This repository contains machine-readable specifications for the auxillilary ser
 
 ## Overview
 
-The Terraform folder contains a script that utilizes Terraform to automate the setup of droplets on DigitalOcean. This script provides an executable description for configuring the necessary infrastructure to run Forest Mainnet, Calibnet, or lotus mainnet nodes The script automates several steps, including:
+The Terraform folder contains terraform scripts to automate the setup of droplets on DigitalOcean. These scripts enable the configuration of essential infrastructure required for running Forest Mainnet, Calibnet, or Lotus Mainnet nodes. The script automates several steps, including:
 
 - Booting up a New Droplet: It initializes a new droplet with specified parameters such as image, name, region, and size.
 

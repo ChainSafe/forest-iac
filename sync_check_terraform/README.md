@@ -1,6 +1,6 @@
 # Overview
 
-This folder contains an executable description that simplifies the setup and automatic initiation of the Forest Sync-Check service on a DigitalOcean droplet. The service is specifically designed to perform sync checks on both the calibnet and mainnet networks. It also sends notifications to the Forest Slack notification channel. Moreover, the sync check service is configured to automatically restart upon droplet reboot, and the New Relic Infrastructure agent is installed for monitoring purposes.
+This folder contains an infrastructure configuration that simplifies the setup and automatic initiation of the Forest Sync-Check service on a DigitalOcean droplet. The configuration is specifically designed to perform sync checks on both the Calibnet and Mainnet networks. It also sends notifications to the Forest Slack notification channel. Moreover, the sync check service is configured to automatically restart upon droplet reboot, and the New Relic Infrastructure agent is installed for monitoring purposes
 
 # Workflow
 
