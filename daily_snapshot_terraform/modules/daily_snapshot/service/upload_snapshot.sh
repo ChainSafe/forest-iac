@@ -19,8 +19,24 @@ docker pull ghcr.io/chainsafe/forest:"${FOREST_TAG}"
 COMMANDS=$(cat << HEREDOC
 set -euxo pipefail
 
+# Install utility binaries that do not come with the image.
+# This assumes the container was started as a superuser.
+apt-get update && apt-get install -y curl
+
+# Switch back to the service user for other service commands.
+su - forest
+
+# periodically write metrics to a file
+# this is done in a separate process to avoid blocking the sync process
+# and to ensure that the metrics are written even if it crashes
+function write_metrics {
+  while curl --silent --fail --output metrics.txt --max-time 5 --retry 5 --retry-delay 2 --retry-max-time 10 http://localhost:6116/metrics; do
+    sleep 5
+  done
+}
+
 function print_forest_logs {
-  cat forest.err forest.out
+  cat forest.err forest.out metrics.txt
 }
 trap print_forest_logs EXIT
 
@@ -38,11 +54,19 @@ fi
 
 echo "Chain: $CHAIN_NAME"
 echo "Snapshot: $NEWEST_SNAPSHOT"
+
+# spawn a task in the background to periodically write Prometheus metrics to a file
+write_metrics &
+
 forest-cli --config config.toml --chain "$CHAIN_NAME" db clean --force
 forest --config config.toml --chain "$CHAIN_NAME" --import-snapshot "$NEWEST_SNAPSHOT" --halt-after-import
 forest --config config.toml --chain "$CHAIN_NAME" --detach
 timeout "$SYNC_TIMEOUT" forest-cli --chain "$CHAIN_NAME" sync wait
 forest-cli --chain "$CHAIN_NAME" snapshot export -o forest_db/
+
+# Kill the metrics writer process
+kill %1
+
 HEREDOC
 )
 
@@ -53,6 +77,7 @@ docker stop forest-snapshot-upload-node-"$CHAIN_NAME"
 docker run \
   --name forest-snapshot-upload-node-"$CHAIN_NAME" \
   --rm \
+  --user root \
   -v "$BASE_FOLDER/forest_db:/home/forest/forest_db":z \
   --entrypoint /bin/bash \
   ghcr.io/chainsafe/forest:"${FOREST_TAG}" \
