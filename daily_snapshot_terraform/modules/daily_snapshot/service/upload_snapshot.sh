@@ -17,7 +17,7 @@ docker pull ghcr.io/chainsafe/forest:"${FOREST_TAG}"
 # Sync and export is done in a single container to make sure everything is
 # properly cleaned up.
 COMMANDS=$(cat << HEREDOC
-set -euxo pipefail
+set -eux
 
 # Install utility binaries that do not come with the image.
 # This assumes the container was started as a superuser.
@@ -30,7 +30,8 @@ su - forest
 # this is done in a separate process to avoid blocking the sync process
 # and to ensure that the metrics are written even if it crashes
 function write_metrics {
-  while curl --silent --fail --output metrics.txt --max-time 5 --retry 5 --retry-delay 2 --retry-max-time 10 http://localhost:6116/metrics; do
+  while true; do
+    curl --silent --fail --output metrics.txt --max-time 5 --retry 5 --retry-delay 2 --retry-max-time 10 http://localhost:6116/metrics || true
     sleep 5
   done
 }
