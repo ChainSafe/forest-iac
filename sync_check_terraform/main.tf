@@ -34,8 +34,6 @@ module "sync_check" {
 
   # Variable passthrough:
   slack_token           = var.slack_token
-  AWS_ACCESS_KEY_ID     = var.AWS_ACCESS_KEY_ID
-  AWS_SECRET_ACCESS_KEY = var.AWS_SECRET_ACCESS_KEY
   digitalocean_token    = var.do_token
   NR_LICENSE_KEY        = var.NR_LICENSE_KEY
 }

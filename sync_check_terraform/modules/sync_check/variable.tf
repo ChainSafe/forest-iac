@@ -18,6 +18,11 @@ variable "slack_channel" {
   type        = string
 }
 
+variable "slack_token" {
+  description = "slack access token"
+  type        = string
+}
+
 variable "image" {
   description = "The ID of the AMI to use for the Droplet"
   type        = string
