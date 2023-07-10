@@ -48,7 +48,7 @@ resource "digitalocean_droplet" "forest" {
 
   user_data = templatefile("${path.module}/${var.script}",
     {
-      NEW_USER             = var.name
+      NEW_USER = var.name
       # In the filesystem on the droplet, certain special characters, including "-",
       # are not allowed in device identifiers for block storage volumes.
       # Therefore, any "-" characters in the volume name are replaced with "_" when forming the device ID.
@@ -59,7 +59,7 @@ resource "digitalocean_droplet" "forest" {
       NEW_RELIC_API_KEY    = var.NEW_RELIC_API_KEY
       NEW_RELIC_ACCOUNT_ID = var.NEW_RELIC_ACCOUNT_ID
       NEW_RELIC_REGION     = var.NEW_RELIC_REGION
-    })
+  })
 
   tags = [var.chain]
 }
