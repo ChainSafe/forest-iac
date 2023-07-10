@@ -43,28 +43,26 @@ resource "digitalocean_droplet" "forest" {
   name       = var.name
   region     = var.region
   size       = var.size
-  ssh_keys   = data.digitalocean_ssh_keys.keys.ssh_keys.*.fingerprint
+  ssh_keys   = data.digitalocean_ssh_keys.keys.ssh_keys[*].fingerprint
   monitoring = true
 
   user_data = templatefile("${path.module}/${var.script}",
     {
-      NEW_USER = "${var.name}"
+      NEW_USER             = var.name
       # In the filesystem on the droplet, certain special characters, including "-",
       # are not allowed in device identifiers for block storage volumes.
       # Therefore, any "-" characters in the volume name are replaced with "_" when forming the device ID.
-      VOLUME_NAME          = "${var.attach_volume}" ? replace(var.volume_name, "-", "_") : ""
-      CHAIN                = "${var.chain}"
-      DISK_ID_VOLUME_NAME  = "${var.attach_volume}" ? var.volume_name : ""
-      NR_LICENSE_KEY       = "${var.NR_LICENSE_KEY}"
-      NEW_RELIC_API_KEY    = "${var.NEW_RELIC_API_KEY}"
-      NEW_RELIC_ACCOUNT_ID = "${var.NEW_RELIC_ACCOUNT_ID}"
-      NEW_RELIC_REGION     = "${var.NEW_RELIC_REGION}"
-
-  })
+      VOLUME_NAME          = var.attach_volume ? replace(var.volume_name, "-", "_") : ""
+      CHAIN                = var.chain
+      DISK_ID_VOLUME_NAME  = var.attach_volume ? var.volume_name : ""
+      NR_LICENSE_KEY       = var.NR_LICENSE_KEY
+      NEW_RELIC_API_KEY    = var.NEW_RELIC_API_KEY
+      NEW_RELIC_ACCOUNT_ID = var.NEW_RELIC_ACCOUNT_ID
+      NEW_RELIC_REGION     = var.NEW_RELIC_REGION
+    })
 
   tags = [var.chain]
 }
-
 
 resource "digitalocean_volume" "forest_volume" {
   count = var.attach_volume ? 1 : 0

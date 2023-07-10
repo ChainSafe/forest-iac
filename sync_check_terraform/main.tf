@@ -1,4 +1,6 @@
 terraform {
+  required_version = "~> 1.3"
+
   backend "s3" {
     # Note: This is the bucket for the internal terraform state. This bucket is
     # completely independent from the bucket that contains snapshots.

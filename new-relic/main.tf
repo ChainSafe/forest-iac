@@ -2,10 +2,11 @@
 # and alerting, including setting up alert policies and a notification channel for Slack.
 
 terraform {
-  required_version = "~> 1.0"
+  required_version = "~> 1.3"
   required_providers {
     newrelic = {
       source = "newrelic/newrelic"
+      version = "~> 2.0"
     }
   }
   backend "s3" {

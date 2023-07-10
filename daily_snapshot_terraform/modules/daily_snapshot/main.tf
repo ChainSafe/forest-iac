@@ -13,6 +13,15 @@ terraform {
       source  = "digitalocean/digitalocean"
       version = "~> 2.0"
     }
+    external = {
+      source  = "hashicorp/external"
+      version = "~> 2.1"
+    }
+    local = {
+      source  = "hashicorp/local"
+      version = "~> 2.1"
+    }
+
   }
 }
 
@@ -22,8 +31,9 @@ provider "digitalocean" {
 
 // Ugly hack because 'archive_file' cannot mix files and folders.
 data "external" "sources_tar" {
-  program = ["sh", "${path.module}/prep_sources.sh", "${path.module}"]
+  program = ["sh", "${path.module}/prep_sources.sh", path.module]
 }
+
 
 data "local_file" "sources" {
   filename = data.external.sources_tar.result.path
@@ -31,6 +41,8 @@ data "local_file" "sources" {
 
 // Note: The init.sh file is also included in the sources.zip such that the hash
 // of the archive captures the entire state of the machine.
+// This is currently not in use but will be needed for future implementation
+// tflint-ignore: terraform_unused_declarations
 data "local_file" "init" {
   filename = "${path.module}/service/init.sh"
 }
@@ -79,7 +91,7 @@ resource "digitalocean_droplet" "forest" {
   # Re-initialize resource if this hash changes:
   user_data  = join("-", [data.local_file.sources.content_sha256, sha256(join("", local.init_commands))])
   tags       = ["iac"]
-  ssh_keys   = data.digitalocean_ssh_keys.keys.ssh_keys.*.fingerprint
+  ssh_keys   = data.digitalocean_ssh_keys.keys.ssh_keys[*].fingerprint
   monitoring = true
 
   graceful_shutdown = false
