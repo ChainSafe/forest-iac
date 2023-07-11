@@ -94,6 +94,7 @@ resource "digitalocean_droplet" "forest" {
   tags       = ["iac"]
   ssh_keys   = data.digitalocean_ssh_keys.keys.ssh_keys[*].fingerprint
   monitoring = true
+  volume_ids = [digitalocean_volume.forest_storage.id]
 
   graceful_shutdown = false
 
@@ -114,10 +115,6 @@ resource "digitalocean_droplet" "forest" {
   }
 }
 
-resource "digitalocean_volume_attachment" "attach_forest_storage" {
-  droplet_id = digitalocean_droplet.forest.id
-  volume_id  = digitalocean_volume.forest_storage.id
-}
 
 data "digitalocean_project" "forest_project" {
   name = var.project
