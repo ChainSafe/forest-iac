@@ -23,22 +23,6 @@ variable "slack_token" {
   type        = string
 }
 
-variable "AWS_ACCESS_KEY_ID" {
-  description = "S3 access key id"
-  type        = string
-}
-
-variable "AWS_SECRET_ACCESS_KEY" {
-  description = "S3 private access key"
-  type        = string
-}
-
-variable "forest_tag" {
-  description = "Image tag for the Forest container"
-  type        = string
-  default     = "edge"
-}
-
 variable "image" {
   description = "The ID of the AMI to use for the Droplet"
   type        = string
@@ -55,18 +39,6 @@ variable "project" {
   description = "DigitalOcean project used as parent for the created droplet"
   type        = string
   default     = "Forest-DEV" # Alternative: "Default"
-}
-
-variable "source_addresses" {
-  description = "List of source addresses."
-  type        = list(string)
-  default     = ["0.0.0.0/0", "::/0"]
-}
-
-variable "destination_addresses" {
-  description = "List of destination addresses."
-  type        = list(string)
-  default     = ["0.0.0.0/0", "::/0"]
 }
 
 variable "NR_LICENSE_KEY" {

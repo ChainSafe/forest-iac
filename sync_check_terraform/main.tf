@@ -1,4 +1,6 @@
 terraform {
+  required_version = "~> 1.3"
+
   backend "s3" {
     # Note: This is the bucket for the internal terraform state. This bucket is
     # completely independent from the bucket that contains snapshots.
@@ -31,11 +33,9 @@ module "sync_check" {
   slack_channel = "#forest-notifications" # slack channel for notifications
 
   # Variable passthrough:
-  slack_token           = var.slack_token
-  AWS_ACCESS_KEY_ID     = var.AWS_ACCESS_KEY_ID
-  AWS_SECRET_ACCESS_KEY = var.AWS_SECRET_ACCESS_KEY
-  digitalocean_token    = var.do_token
-  NR_LICENSE_KEY        = var.NR_LICENSE_KEY
+  slack_token        = var.slack_token
+  digitalocean_token = var.do_token
+  NR_LICENSE_KEY     = var.NR_LICENSE_KEY
 }
 
 # This ip address may be used in the future by monitoring software
