@@ -54,40 +54,13 @@ resource "newrelic_alert_policy" "alert" {
 resource "newrelic_nrql_alert_condition" "disk_space" {
   policy_id                    = newrelic_alert_policy.alert.id
   type                         = "static"
-  name                         = "disk_space"
+  name                         = "High Disk Utilization"
   description                  = "Alert when disk space usage is high on any host"
   enabled                      = true
   violation_time_limit_seconds = 3600
 
   nrql {
     query = "SELECT latest(diskUsedPercent) FROM StorageSample FACET hostname, mountPoint"
-  }
-
-  critical {
-    operator              = "above"
-    threshold             = 85.0
-    threshold_duration    = 300
-    threshold_occurrences = "ALL"
-  }
-
-  warning {
-    operator              = "above"
-    threshold             = 70.0
-    threshold_duration    = 300
-    threshold_occurrences = "ALL"
-  }
-}
-
-resource "newrelic_nrql_alert_condition" "high_memory_utilization" {
-  policy_id                    = newrelic_alert_policy.alert.id
-  type                         = "static"
-  name                         = "high_memory_utilization"
-  description                  = "Alert when memory usage is high on any host"
-  enabled                      = true
-  violation_time_limit_seconds = 3600
-
-  nrql {
-    query = "SELECT average(`host.memoryUsedPercent`) FROM Metric FACET entity.guid, host.hostname"
   }
 
   critical {

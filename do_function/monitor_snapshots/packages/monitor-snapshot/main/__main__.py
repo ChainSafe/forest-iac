@@ -22,7 +22,7 @@ folders = ["mainnet", "calibnet"]
 def slack_alert(message_dict):
     # Instantiate a Slack client with token from environment variables.
     client = WebClient(token=os.environ['SLACK_TOKEN'])
-    CHANNEL_NAME = '#forest-dump'
+    CHANNEL_NAME = '#forest-notifications'
     
     # Format message as a JSON-like string for better readability.
     message = f'```{json.dumps(message_dict, indent=4, ensure_ascii=False)}```'
