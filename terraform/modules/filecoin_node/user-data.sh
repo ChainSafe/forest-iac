@@ -26,9 +26,12 @@ if [ -f "/root/.ssh/authorized_keys" ]; then
   chmod 0600 "/home/${NEW_USER}/.ssh/authorized_keys"
 fi
 
+#install NTP to synchronize the time differences
+timedatectl set-ntp no
+apt install -y ntp
+
 # Restrict SSH access to the new user only. preventing root user from accessing the system via SSH.
 echo "AllowUsers ${NEW_USER}" >> /etc/ssh/sshd_config
-
 
 systemctl restart sshd
 
