@@ -5,9 +5,7 @@ Changes made to the scripts will be automatically deployed using the CI script.
 Manual deployments can be done using `doctl`:
 
 ## Requirements
-- [Doctl](https://docs.digitalocean.com/reference/doctl/how-to/install/) 
-- VCPU: 1
-- Disk Size: >100 GB
+- [Doctl](https://docs.digitalocean.com/reference/doctl/how-to/install/)
 - Install `make`
 
 Before deploying, make sure to install the necessary dependencies by running:
