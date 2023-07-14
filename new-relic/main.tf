@@ -141,14 +141,14 @@ resource "newrelic_nrql_alert_condition" "host_down" {
 
 resource "newrelic_nrql_alert_condition" "forestmainnet_not_working" {
   policy_id = newrelic_alert_policy.alert.id
-  type = "static"
-  name = "Forest not working"
+  type      = "static"
+  name      = "Forest not working"
 
   description = <<-EOT
   Error: forest is currently not functioning properly. The issue appears to be that the Epoch Count has fallen to zero. Please verify all necessary configurations and requirements.
   EOT
 
-  enabled = true
+  enabled                      = true
   violation_time_limit_seconds = 21600
 
   nrql {
@@ -156,15 +156,15 @@ resource "newrelic_nrql_alert_condition" "forestmainnet_not_working" {
   }
 
   critical {
-    operator = "below_or_equals"
-    threshold = 0
-    threshold_duration = 300
+    operator              = "below_or_equals"
+    threshold             = 0
+    threshold_duration    = 300
     threshold_occurrences = "all"
   }
-  fill_option = "none"
+  fill_option        = "none"
   aggregation_window = 60
   aggregation_method = "event_flow"
-  aggregation_delay = 120
+  aggregation_delay  = 120
 }
 
 # Setting up a Slack channel as the notification channel for alerts
