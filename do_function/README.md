@@ -14,7 +14,7 @@ Before deploying, make sure to install the necessary dependencies by running:
 # DigitalOcean personal access token: https://cloud.digitalocean.com/account/api/tokens
 export TF_VAR_do_token=
 
-# # Slack access token: https://api.slack.com/apps
+# Slack access token: https://api.slack.com/apps
 export SLACK_TOKEN=
 
 make install
