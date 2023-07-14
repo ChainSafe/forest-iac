@@ -54,40 +54,13 @@ resource "newrelic_alert_policy" "alert" {
 resource "newrelic_nrql_alert_condition" "disk_space" {
   policy_id                    = newrelic_alert_policy.alert.id
   type                         = "static"
-  name                         = "disk_space"
+  name                         = "High Disk Utilization"
   description                  = "Alert when disk space usage is high on any host"
   enabled                      = true
   violation_time_limit_seconds = 3600
 
   nrql {
     query = "SELECT latest(diskUsedPercent) FROM StorageSample FACET hostname, mountPoint"
-  }
-
-  critical {
-    operator              = "above"
-    threshold             = 85.0
-    threshold_duration    = 300
-    threshold_occurrences = "ALL"
-  }
-
-  warning {
-    operator              = "above"
-    threshold             = 70.0
-    threshold_duration    = 300
-    threshold_occurrences = "ALL"
-  }
-}
-
-resource "newrelic_nrql_alert_condition" "high_memory_utilization" {
-  policy_id                    = newrelic_alert_policy.alert.id
-  type                         = "static"
-  name                         = "high_memory_utilization"
-  description                  = "Alert when memory usage is high on any host"
-  enabled                      = true
-  violation_time_limit_seconds = 3600
-
-  nrql {
-    query = "SELECT average(`host.memoryUsedPercent`) FROM Metric FACET entity.guid, host.hostname"
   }
 
   critical {
@@ -166,35 +139,32 @@ resource "newrelic_nrql_alert_condition" "host_down" {
   close_violations_on_expiration = true
 }
 
-# This New Relic alert condition monitors the number of running containers with the specific 
-# image 'ghcr.io/chainsafe/forest:latest'. Because New Relic lacks a direct "stopped" status for containers, 
-# we use a workaround: we count unique 'containerId' from 'ProcessSample' events. If the count falls below 2 for 5 minutes,
-# it implies potential container downtime and triggers a critical alert. 
-resource "newrelic_nrql_alert_condition" "container_down" {
-  policy_id                    = newrelic_alert_policy.alert.id
-  type                         = "static"
-  name                         = "Container Down"
+resource "newrelic_nrql_alert_condition" "forestmainnet_not_working" {
+  policy_id = newrelic_alert_policy.alert.id
+  type      = "static"
+  name      = "Forest not working"
+
+  description = <<-EOT
+  Error: forest is currently not functioning properly. The issue appears to be that the Epoch Count has fallen to zero. Please verify all necessary configurations and requirements.
+  EOT
+
   enabled                      = true
-  violation_time_limit_seconds = 259200
+  violation_time_limit_seconds = 21600
 
   nrql {
-    query = "SELECT uniqueCount(containerId) FROM ProcessSample WHERE containerImageName = 'ghcr.io/chainsafe/forest:latest'"
+    query = "SELECT latest(head_epoch) FROM Metric WHERE clusterName = 'forest-mainnet' or clusterName = 'forest-calibnet'"
   }
 
   critical {
-    operator              = "below"
-    threshold             = 2
+    operator              = "below_or_equals"
+    threshold             = 0
     threshold_duration    = 300
     threshold_occurrences = "all"
   }
-
-  fill_option                    = "none"
-  aggregation_window             = 60
-  aggregation_method             = "event_flow"
-  aggregation_delay              = 120
-  expiration_duration            = 600
-  open_violation_on_expiration   = true
-  close_violations_on_expiration = true
+  fill_option        = "none"
+  aggregation_window = 60
+  aggregation_method = "event_flow"
+  aggregation_delay  = 120
 }
 
 # Setting up a Slack channel as the notification channel for alerts
@@ -215,6 +185,7 @@ resource "newrelic_notification_channel" "slack-channel" {
      EOT
   }
 }
+
 
 # Creation of a New Relic workflow that includes issues filtered by the policy IDs
 # and sends notifications to the configured Slack channel

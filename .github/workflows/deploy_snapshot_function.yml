@@ -3,10 +3,10 @@ name: Forest Calibnet
 on:
   pull_request:
     branches: [main]
-    paths: ["snapshot_function/**"]
+    paths: ["do_function/**"]
   push:
     branches: [main]
-    paths: ["snapshot_function/**"]
+    paths: ["do_function/**"]
   workflow_dispatch:
 
 jobs:
