@@ -138,9 +138,9 @@ def main():
 
     # If checks fail, send a general failure message to Slack.
     if not checks_passed:
-        slack_alert("⛔ Snapshot check failed. 🔥🌲🔥")
+        thread = slack_alert("⛔ Snapshot check failed. 🔥🌲🔥")
         for error_message in error_messages:
-            slack_alert({"error": error_message}, thread_ts=ts)
+            slack_alert({"error": error_message}, thread_ts=thread)
         return {
             "result": "⛔ failure",
             "message": "Some checks did not pass. Please review the issues reported. Let's fix them and keep the forest green!. 🔥🌲🔥"
