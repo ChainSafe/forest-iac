@@ -19,20 +19,22 @@ pattern = r'([^_]+?)_snapshot_([^_]+?)_(\d{4}-\d{2}-\d{2})_height_(\d+).car(.zst
 folders = ["mainnet", "calibnet"]
 
 # Function to send alert messages to a Slack channel.
-def slack_alert(message_dict):
+def slack_alert(message, thread_ts=None):
     # Instantiate a Slack client with token from environment variables.
     client = WebClient(token=os.environ['SLACK_TOKEN'])
     CHANNEL_NAME = '#forest-notifications'
-    
+
     # Format message as a JSON-like string for better readability.
-    message = f'```{json.dumps(message_dict, indent=4, ensure_ascii=False)}```'
-    
+    message = f'```{json.dumps(message, indent=4, ensure_ascii=False)}```'
+
     # Try sending message, catch and print any errors.
     try:
-        response = client.chat_postMessage(channel=CHANNEL_NAME, text=message)
+        response = client.chat_postMessage(channel=CHANNEL_NAME, text=message, thread_ts=thread_ts)
         print(f"Message sent. Response: {response['message']}")
+        return response['ts']
     except SlackApiError as e:
         print(f"Slack API error: {e.response['error']}")
+        return None
 
 # Function to get and return details of all snapshots
 def get_snapshots():
@@ -82,6 +84,7 @@ def main():
         latest_snapshot_by_date = None
         latest_snapshot_filename = None
         latest_snapshot_name = None
+        error_messages = []  # List to store error messages
 
         # Find the most recent snapshot in the current folder by snapshot date.
         for snapshot_name, snapshot in snapshots.items():
@@ -93,7 +96,7 @@ def main():
         # If there are no snapshots in the folder, notify and skip to next folder.
         if latest_snapshot_filename is None:
             checks_passed = False
-            slack_alert(f"No snapshots found in {folder} folder.")
+            error_messages.append(f"No snapshots found in {folder} folder.")
             continue       
 
         # Check if the most recent snapshot is older than one day.
@@ -102,18 +105,18 @@ def main():
 
         if latest_snapshot_by_date.date() < yesterday_date_utc:
             checks_passed = False
-            slack_alert(f"⛔ The latest {folder} snapshot: {base_url}/{latest_snapshot_filename} is older than one day. Snapshot Date: {latest_snapshot_by_date}, Current Date: {current_date_utc}. 🔥🌲🔥")
+            error_messages.append(f"⛔ The latest {folder} snapshot: {base_url}/{latest_snapshot_filename} is older than one day. Snapshot Date: {latest_snapshot_by_date}, Current Date: {current_date_utc}. 🔥🌲🔥")
         
         # Checks for validity and integrity of each snapshot in the current folder.
         for snapshot_name, snapshot in snapshots.items():
             # Check if the snapshot size is less than 1GB.
             if snapshot['Size'] < 1073741824 and snapshot_name.endswith(('.car', '.car.zst')):  # 1GB in bytes 
                 checks_passed = False
-                slack_alert(f"🚫 Error! The snapshot {snapshot_name} is less than 1GB. Size anomalies detected. 📉")
+                error_messages.append(f"🚫 Error! The snapshot {snapshot_name} is less than 1GB. Size anomalies detected. 📉")
 
             # Check if the snapshot name matches the naming pattern.
             if not re.match(pattern, latest_snapshot_name) and snapshot_name.endswith(('.car', '.car.zst')):
-                slack_alert(f"🚫 Error! The snapshot {snapshot_name} does not conform to the standard naming convention. Please check. 📝")
+                error_messages.append(f"🚫 Error! The snapshot {snapshot_name} does not conform to the standard naming convention. Please check. 📝")
 
             # Check if full snapshots have a corresponding sha256 checksum file.
             if snapshot_name.endswith(('.car', '.car.zst')):  # assuming this is a full snapshot
@@ -122,7 +125,7 @@ def main():
                 shasum_file_no_ext = base_snapshot_name.rsplit('.', 1)[0] + '.sha256sum'  # For case without the '.car' in sha256sum filename.
                 if shasum_file not in snapshots and shasum_file_no_ext not in snapshots:  # Check for both
                     checks_passed = False
-                    slack_alert(f"⚠️ Warning! The full snapshot {snapshot_name} is missing its corresponding .sha256sum file. Check required. 🔍")
+                    error_messages.append(f"⚠️ Warning! The full snapshot {snapshot_name} is missing its corresponding .sha256sum file. Check required. 🔍")
 
             # Check if there are any sha256 checksum files without a corresponding snapshot file.
             elif snapshot_name.endswith('.sha256sum'):  # Check for stray shasum files
@@ -131,11 +134,20 @@ def main():
                 snapshot_file_zst = base_snapshot_file + '.car.zst'
                 if snapshot_file not in snapshots and snapshot_file_zst not in snapshots:
                     checks_passed = False
-                    slack_alert(f"🚨 Error! Stray .sha256sum file {snapshot_name} detected. Please verify. 🕵️")
+                    error_messages.append(f"🚨 Error! Stray .sha256sum file {snapshot_name} detected. Please verify. 🕵️")
 
     # If checks fail, send a general failure message to Slack.
     if not checks_passed:
-        message = {"result": "⛔ failure", 
-                   "message": "Some checks did not pass. Please review the issues reported above. Let's fix them and keep the forest green!"}
-        slack_alert(message)
-        return message
+        thread = slack_alert("⛔ Snapshot check failed. 🔥🌲🔥")
+        for error_message in error_messages:
+            slack_alert({"error": error_message}, thread_ts=thread)
+        return {
+            "result": "⛔ failure",
+            "message": "Some checks did not pass. Please review the issues reported. Let's fix them and keep the forest green!. 🔥🌲🔥"
+        }
+    else:
+        return {
+            "result": "✅ success",
+            "message": "All checks passed successfully. All snapshots are valid and up-to-date. Lets keep up the good work!. 🌲🌳🌲🌳🌲"
+        }
+
