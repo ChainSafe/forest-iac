@@ -26,10 +26,6 @@ if [ -f "/root/.ssh/authorized_keys" ]; then
   chmod 0600 "/home/${NEW_USER}/.ssh/authorized_keys"
 fi
 
-#install NTP to synchronize the time differences
-timedatectl set-ntp no
-apt install -y ntp
-
 # Restrict SSH access to the new user only. preventing root user from accessing the system via SSH.
 echo "AllowUsers ${NEW_USER}" >> /etc/ssh/sshd_config
 systemctl restart sshd
@@ -76,7 +72,7 @@ sudo --user="${NEW_USER}" -- \
   filecoin/lotus-all-in-one:"$IMAGETAG" lotus daemon \
   --import-snapshot https://snapshots."${CHAIN}".filops.net/minimal/latest.zst
 
-# It monitors running Docker containers and watches for changes to the images that those containers were originally started from. 
+# It monitors running Docker containers and watches for changes to the images that those containers were originally started from.
 # If Watchtower detects that an image has changed, it will automatically restart the container using the new image.
 # Run the Watchtower Docker container as created user.
 sudo --user="${NEW_USER}" -- \
