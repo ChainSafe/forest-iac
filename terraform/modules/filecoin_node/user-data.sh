@@ -26,10 +26,6 @@ if [ -f "/root/.ssh/authorized_keys" ]; then
   chmod 0600 "/home/${NEW_USER}/.ssh/authorized_keys"
 fi
 
-#install NTP to synchronize the time differences
-timedatectl set-ntp no
-apt install -y ntp
-
 # Restrict SSH access to the new user only. preventing root user from accessing the system via SSH.
 echo "AllowUsers ${NEW_USER}" >> /etc/ssh/sshd_config
 
@@ -76,9 +72,9 @@ sudo --user="${NEW_USER}" -- \
   --config=/home/"${NEW_USER}"/data/config.toml \
   --encrypt-keystore false \
   --auto-download-snapshot \
-  --chain="${CHAIN}" 
+  --chain="${CHAIN}"
 
-# It monitors running Docker containers and watches for changes to the images that those containers were originally started from. 
+# It monitors running Docker containers and watches for changes to the images that those containers were originally started from.
 # If Watchtower detects that an image has changed, it will automatically restart the container using the new image.
 # Run the Watchtower Docker container as created user.
 sudo --user="${NEW_USER}" -- \
@@ -118,7 +114,7 @@ retries: 3
 log_level: info
 EOF
 
-# Runs Prometheus OpenMetrics integration Docker container 
+# Runs Prometheus OpenMetrics integration Docker container
 # for Collection of Forest's Prometheus metrics.
 sudo --user="${NEW_USER}" -- \
   docker run \
