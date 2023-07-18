@@ -65,6 +65,7 @@ sudo --user="${NEW_USER}" -- \
   --detach \
   --network=lotus \
   --name=lotus-"${CHAIN}" \
+  --env LOTUS_CHAINSTORE_SPLITSTORE_COLDSTORETYPE="discard" \
   --volume=parameters:/var/tmp/filecoin-proof-parameters \
   --volume=/home/"${NEW_USER}"/lotus_data:/var/lib/lotus \
   --publish=1234:1234 \
