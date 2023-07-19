@@ -3,6 +3,9 @@
 require_relative 'ruby_common/slack_client'
 require_relative 'ruby_common/utils'
 
+# Call init_s3cmd.rb script (if not already required)
+require_relative 'init_s3cmd' unless defined?(initialize_s3cmd)
+
 require 'logger'
 require 'fileutils'
 
@@ -31,15 +34,15 @@ loop do
   logger = Logger.new(LOG_SYNC)
   
   logger.info 'Running the benchmark...'
-  health_check_passed = system("bash #{SCRIPTS_DIR}/run_benchmark.sh > #{LOG_HEALTH} 2>&1")
+  benchmark_check_passed = system("bash #{SCRIPTS_DIR}/run_benchmark.sh > #{LOG_HEALTH} 2>&1")
   logger.info 'Benchmark run completed'
   
   client = SlackClient.new CHANNEL, SLACK_TOKEN
   
-  if health_check_passed
+  if benchmark_check_passed
     client.post_message "✅ Benchmark run was successful. 🌲🌳🌲🌳🌲"
   else
-    client.post_message "⛔ Benchmark run fiascoed. 🔥🌲🔥 "
+    client.post_message "⛔ Benchmark run fiascoed. 🔥🌲🔥"
   end
   client.attach_files(LOG_HEALTH, LOG_SYNC)
   

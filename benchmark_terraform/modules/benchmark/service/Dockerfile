@@ -1,10 +1,8 @@
 FROM fedora:38
 
 RUN dnf -y install dnf-plugins-core && \
-    dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo && \
     dnf install -y \
-        docker-ce docker-ce-cli containerd.io docker-buildx-plugin \
-        ruby ruby-devel make gcc git golang rust cargo s3cmd clang aria2 zstd clang-devel cmake && \
+        ruby ruby-devel make gcc git golang rust cargo s3cmd clang aria2 zstd clang-devel && \
     dnf clean all
 
 # Lotus dependencies

@@ -1,7 +1,8 @@
 # Overview
 
-This folder contains an executable description of the Forest service, which offers the capability to perform benchmarking, measuring the "daily" benchmarks for Forest and Lotus snapshot import times (in seconds) and validation times (in tipsets per second).
-The benchmark results are subsequently uploaded to an S3 bucket, where they are stored in both a weekly file and an all_result file.
+This folder contains an executable description of a benchmarking service that 
+compares the performance of Forest relative to Lotus. The benchmark results are 
+uploaded to an S3 bucket, where they are stored in both weekly file and `all_result` file.
 
 # Workflow
 

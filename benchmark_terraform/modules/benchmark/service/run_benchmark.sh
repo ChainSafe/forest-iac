@@ -3,17 +3,12 @@
 ## Enable strict error handling, command tracing, and pipefail
 set -euxo pipefail
 
-# 1. Configure s3cmd
+# 1. Initialize s3cmd (if not already configured)
 # 2. Run benchmark
 # 3. Upload benchmark results to s3 bucket
 
-## Configure s3cmd
-s3cmd --dump-config \
-    --host="$BENCHMARK_ENDPOINT" \
-    --host-bucket="%(bucket)s.$BENCHMARK_ENDPOINT" \
-    --access_key="$AWS_ACCESS_KEY_ID" \
-    --secret_key="$AWS_SECRET_ACCESS_KEY" \
-    --multipart-chunk-size-mb=4096 > ~/.s3cfg
+# Initialize s3cmd using Ruby script (if not already configured)
+ruby init_s3cmd.rb
 
 ## Run actual benchmark
 ruby bench.rb --chain calibnet --tempdir ./snapshots --daily
