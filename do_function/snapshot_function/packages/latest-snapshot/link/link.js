@@ -4,7 +4,7 @@ import { XMLParser } from "fast-xml-parser";
 const region = "fra1";
 const bucket = "forest-snapshots";
 
-const base_url = "https://" + region + ".cdn.digitaloceanspaces.com/" + bucket;
+const base_url = "https://" + region + ".digitaloceanspaces.com/" + bucket;
 
 // "calibnet/forest_snapshot_calibnet_2022-11-30_height_81393.car"
 
