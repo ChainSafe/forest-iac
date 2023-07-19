@@ -4,7 +4,11 @@ import { XMLParser } from "fast-xml-parser";
 const region = "fra1";
 const bucket = "forest-snapshots";
 
-const base_url = "https://" + region + ".cdn.digitaloceanspaces.com/" + bucket;
+// we need two base urls because the CDN doesn't support the ListBucket operation
+const base_url_no_cdn =
+  "https://" + region + ".digitaloceanspaces.com/" + bucket;
+const base_url_cdn =
+  "https://" + region + ".cdn.digitaloceanspaces.com/" + bucket;
 
 // "calibnet/forest_snapshot_calibnet_2022-11-30_height_81393.car"
 
@@ -19,7 +23,7 @@ export async function main(args) {
   // default to the calibnet network unless we're told otherwise
   let network = args.network || "calibnet";
 
-  const response = await fetch(base_url);
+  const response = await fetch(base_url_no_cdn);
   const body = await response.text();
 
   const parser = new XMLParser();
@@ -56,7 +60,7 @@ export async function main(args) {
     return {
       statusCode: 302,
       body: "redirecting",
-      headers: { location: base_url + "/" + snapshots[0].key },
+      headers: { location: base_url_cdn + "/" + snapshots[0].key },
     };
   }
 }
