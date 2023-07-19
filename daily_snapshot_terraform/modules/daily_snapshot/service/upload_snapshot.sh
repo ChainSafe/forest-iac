@@ -1,4 +1,4 @@
- #!/bin/bash
+#!/bin/bash
 
 # If Forest hasn't synced to the network after 8 hours, something has gone wrong.
 SYNC_TIMEOUT=8h

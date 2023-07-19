@@ -33,17 +33,20 @@ type Snapshot struct {
 
 
 // Downloads and generate correscorresponding for the filops snapshot
-func fetchFilopsSnapshot() error {
-	err := exec.Command("/bin/sh", "./download_snapshot.sh").Run()
+func fetchFilopsSnapshot(chain string) error {
+	cmd := exec.Command("/bin/sh", "./download_snapshot.sh")
+	cmd.Env = append(os.Environ(), fmt.Sprintf("CHAIN=%s", chain))
+
+	err := cmd.Run()
 	if err != nil {
-		return errors.New("Oops, something went wrong. Unable to get FilOps snapshot")
+		return fmt.Errorf("Oops, something went wrong.", err)
 	}
 
 	return nil
 }
 
 // renames the download the snapshot and shasum to follow the naming convention
-func namingConvention(dir string) error {
+func namingConvention(dir, folder string) error {
 	files, err := ioutil.ReadDir(dir)
 	if err != nil {
 		return err
@@ -63,7 +66,7 @@ func namingConvention(dir string) error {
 		}
 
 		height, year, month, day := match[1], match[2], match[3], match[4]
-		newFilename := fmt.Sprintf("forest_snapshot_calibnet_%v-%v-%v_height_%v.car.zst", year, month, day, height)
+		newFilename := fmt.Sprintf("forest_snapshot_%v_%v-%v-%v_height_%v.car.zst", folder, year, month, day, height)
 
 		err = os.Rename(filepath.Join(dir, filename), filepath.Join(dir, newFilename))
 		if err != nil {
@@ -155,15 +158,15 @@ func main() {
 			fmt.Println(err.Error())
 			return
 		}
-		oneDayAgo := time.Now().Add(-24 * time.Hour)
+		oneDayAgo := time.Now().Add(-1 * time.Hour)
 		if latestSnapshot.Before(oneDayAgo) {
 			fmt.Printf("The latest snapshot in the %s folder is older than one day\n", folder)
-			err = fetchFilopsSnapshot()
+			err = fetchFilopsSnapshot(folder)
 			if err != nil {
 				fmt.Println(err.Error())
 				return
 			}
-			err = namingConvention(dir)
+			err = namingConvention(dir, folder)
 			if err != nil {
 				fmt.Println(err.Error())
 				return
