@@ -8,7 +8,7 @@ const bucket = "forest-snapshots";
 const base_url_no_cdn =
   "https://" + region + ".digitaloceanspaces.com/" + bucket;
 const base_url_cdn =
-  "https://" + region + ".cdn.digitaloceanspaces.com/" + bucket;
+  "https://" + bucket + "." + region + ".cdn.digitaloceanspaces.com/";
 
 // "calibnet/forest_snapshot_calibnet_2022-11-30_height_81393.car"
 
