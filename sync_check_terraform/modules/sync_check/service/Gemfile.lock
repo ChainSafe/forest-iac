@@ -14,6 +14,7 @@ GEM
     faraday-multipart (1.0.4)
       multipart-post (~> 2)
     faraday-net_http (3.0.2)
+    ffi (1.15.5)
     gli (2.21.0)
     hashie (5.0.0)
     multi_json (1.15.0)
@@ -25,6 +26,8 @@ GEM
       faraday-multipart
       gli
       hashie
+    sys-filesystem (1.4.3)
+      ffi (~> 1.1)
 
 PLATFORMS
   x86_64-linux
@@ -32,6 +35,7 @@ PLATFORMS
 DEPENDENCIES
   docker-api (>= 2.2.0)
   slack-ruby-client (>= 2.1.0)
+  sys-filesystem (>= 1.4.3)
 
 BUNDLED WITH
    2.3.4
