@@ -3,6 +3,25 @@
 require_relative '../snapshots_prune'
 require 'rspec'
 
+DAILY_SNAPSHOTS = 1
+
+# Creates a list of snapshots for the same day.
+# Returns an array of doubles.
+def create_same_day_snapshots(date, count)
+  (1..count).map do
+    double(date: date, delete: nil)
+  end
+end
+
+# Creates a list of snapshots for consecutive days. The snapshots are in descending order.
+# Returns an array of doubles.
+def create_consecutive_days_snapshots(start_date, count)
+  (0...count).map do |i|
+    date = start_date - i
+    double(date: date, delete: nil)
+  end
+end
+
 describe 'prune_snapshots' do
   describe 'when there are no snapshots' do
     it 'returns an empty array' do
@@ -11,7 +30,7 @@ describe 'prune_snapshots' do
   end
 
   describe 'when there is one snapshot' do
-    let(:snapshot) { double(delete: nil, date: '2023-06-27') }
+    let(:snapshot) { create_same_day_snapshots(Date.parse('2023-06-27'), 1).first }
     it 'it is not deleted' do
       expect(prune_snapshots([snapshot])).to eq([])
       expect(snapshot).not_to have_received(:delete)
@@ -19,52 +38,34 @@ describe 'prune_snapshots' do
   end
 
   describe 'when are multiple snapshots for a single day' do
-    # Buffer of two recent snapshots
-    let(:snapshot1) { double(delete: nil, date: '2023-06-27') }
-    # Last snapshot of the day
-    let(:snapshot2) { double(delete: nil, date: '2023-06-27') }
-    # Snapshot to be deleted
-    let(:snapshot3) { double(delete: nil, date: '2023-06-27') }
+    snapshot_count = BUFFER_SIZE + 42
+    let :snapshots do
+      create_same_day_snapshots(Date.parse('2023-06-27'), snapshot_count)
+    end
 
     it 'deletes all but the first two (assumes snapshots are provided in descending height order)' do
-      pruned_snapshots = prune_snapshots([snapshot1, snapshot2, snapshot3])
+      pruned_snapshots = prune_snapshots(snapshots)
+      expect(pruned_snapshots.length).to eq(snapshots.length - BUFFER_SIZE - DAILY_SNAPSHOTS)
 
-      expect(pruned_snapshots).to eq([snapshot3])
-      expect(snapshot1).not_to have_received(:delete)
-      expect(snapshot2).not_to have_received(:delete)
-      expect(snapshot3).to have_received(:delete)
-    end
-  end
-
-  describe 'when there are multiple snapshots for the past week' do
-    # snapshot from Tuesday
-    let(:snapshot1) { double(delete: nil, date: '2023-06-27') }
-    # snapshot from Monday
-    let(:snapshot2) { double(delete: nil, date: '2023-06-26') }
-    # snapshot from Sunday
-    let(:snapshot3) { double(delete: nil, date: '2023-06-25') }
-    # snapshot from last Tuesday
-    let(:snapshot4) { double(delete: nil, date: '2023-06-20') }
-
-    it 'does not delete anything' do
-      pruned_snapshots = prune_snapshots([snapshot1, snapshot2, snapshot3, snapshot4])
-
-      expect(pruned_snapshots).to eq([])
-      [snapshot1, snapshot2, snapshot3].each do |snapshot|
-        expect(snapshot).not_to have_received(:delete)
+      snapshots.each_with_index do |snapshot, index|
+        if index < BUFFER_SIZE + DAILY_SNAPSHOTS
+          expect(snapshot).not_to have_received(:delete)
+        else
+          expect(snapshot).to have_received(:delete)
+        end
       end
     end
   end
 
   describe 'when there are multiple snapshot over more one year' do
     current_date = Date.parse('2023-06-27')
-    days_in_test = 365
+    days_in_test = 366
+    first_day_snapshots = 9
 
     let :snapshots do
-      (1..days_in_test).map do |i|
-        snapshot_date = current_date - i
-        double(date: snapshot_date, delete: nil)
-      end
+      same_day = create_same_day_snapshots(current_date, first_day_snapshots)
+      rest = create_consecutive_days_snapshots(current_date, days_in_test - first_day_snapshots)
+      same_day + rest
     end
 
     it 'deletes all but the first one of each week' do
@@ -72,19 +73,19 @@ describe 'prune_snapshots' do
       pruned_snapshots = prune_snapshots(snapshots)
 
       weeks_in_test = days_in_test / 7
-      # Should keep 1 buffer + 7 snapshots in in the first week + 1 snapshot per week afterwards
-      expected_snapshots_keep_count = 1 + 7 + weeks_in_test
+      # Should keep daily + 10 (buffer) + 7 snapshots in in the first week
+      expected_snapshots_keep_count = BUFFER_SIZE + 7 + weeks_in_test
       expect(pruned_snapshots.length).to eq(snapshots_count - expected_snapshots_keep_count)
 
-      snapshots.take(9).each do |snapshot|
+      snapshots.take(18).each do |snapshot|
         expect(snapshot).not_to have_received(:delete)
       end
 
-      # First 9 snapshots should not be deleted
+      # First 18 snapshots should not be deleted (day + buffer + week)
       # afterwards, only Sunday snapshots should be kept
       # Year boundary will be kept as well.
-      snapshots.each_with_index do |snapshot, i|
-        if i < 9 || snapshot.date.sunday? || snapshot.date == Date.parse('2022-12-31')
+      snapshots.drop(18).each do |snapshot|
+        if snapshot.date.sunday? || snapshot.date == Date.parse('2022-12-31')
           expect(snapshot).not_to have_received(:delete)
         else
           expect(snapshot).to have_received(:delete)
