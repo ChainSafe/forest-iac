@@ -2,6 +2,7 @@
 
 require 'cs_utils/slack_client'
 require 'cs_utils/docker_utils'
+require_relative 'sync_check_process'
 require 'logger'
 require 'fileutils'
 
@@ -13,13 +14,15 @@ def get_and_assert_env_variable(name)
   var
 end
 
-SLACK_TOKEN = get_and_assert_env_variable 'SLACK_API_TOKEN'
-CHANNEL = get_and_assert_env_variable 'SLACK_NOTIF_CHANNEL'
+SLACK_TOKEN = get_and_assert_env_variable 'FOREST_SLACK_API_TOKEN'
+CHANNEL = get_and_assert_env_variable 'FOREST_SLACK_NOTIF_CHANNEL'
 SCRIPTS_DIR = get_and_assert_env_variable 'SCRIPTS_DIR'
 LOG_DIR = get_and_assert_env_variable 'LOG_DIR'
 
 hostname = ARGV[0]
 raise 'No arguments supplied. Please provide Forest hostname, e.g. forest-mainnet' if ARGV.empty?
+
+network = hostname.match(/-(\w+)$/)[1]
 
 # Current datetime, to append to the log files
 DATE = Time.new.strftime '%FT%H:%M:%S'
@@ -46,7 +49,9 @@ client = SlackClient.new CHANNEL, SLACK_TOKEN
 if health_check_passed
   client.post_message "✅ Sync check for #{hostname} passed. 🌲🌳🌲🌳🌲"
 else
-  client.post_message "⛔ Sync check for #{hostname} fiascoed. 🔥🌲🔥 "
+  client.post_message "⛔ Sync check for #{hostname} fiascoed. 🔥🌲🔥"
+  SyncCheck.new.run_forest_cli("--chain #{network} db clean --force")
+  logger.info 'DB Cleaned'
 end
 client.attach_files(LOG_HEALTH, LOG_SYNC, LOG_FOREST)
 

@@ -113,4 +113,5 @@ class SyncCheck
 end
 
 #####
-SyncCheck.new.run
+# Runs only when executed directly
+SyncCheck.new.run if __FILE__ == $PROGRAM_NAME
