@@ -5,6 +5,8 @@ require_relative 'list_snapshots'
 require 'date'
 require 'pathname'
 
+BUFFER_SIZE = 10
+
 # Class representing a snapshot bucket with a defined number of entries.
 class SnapshotBucket
   def initialize(max_entries = nil)
@@ -49,11 +51,12 @@ def prune_snapshots(snapshots)
 
   # iterate over each entry and try to add it to the buckets, newest first.
   snapshots
-    # ignore the first snapshot to keep a buffer of two recent snapshots.
-    # this makes it less likely that we delete a snapshot that is being downloaded.
-    .drop(1)
+    # Ignore the first 10 snapshots to keep a solid buffer.
+    # This makes it less likely that we delete a snapshot that is being downloaded.
+    # It also helps with the CDN cache not propagating fast enough.
+    .drop(BUFFER_SIZE)
     # keep snapshots (ie reject) if they fit in a bucket while also having a unique date
-    .reject  { |f| day_unique_bucket.add? f and buckets.any? { |bucket| bucket.add? f } }
+    .reject { |f| day_unique_bucket.add? f and buckets.any? { |bucket| bucket.add? f } }
     # delete all snapshots that weren't rejected or dropped
     .each(&:delete)
 end
