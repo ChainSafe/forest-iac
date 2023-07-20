@@ -91,11 +91,3 @@ else
     echo "The snapshot is from today or yesterday."
 fi
 
-docker run \
-  --name filops-snapshot-upload-node-"$CHAIN" \
-  --rm \
-  --user root \
-  --volume=/root/forest_db:/home/forest/forest_db/data \
-  --entrypoint /bin/bash \
-  ghcr.io/chainsafe/forest:latest \
-  -c "$COMMANDS"
