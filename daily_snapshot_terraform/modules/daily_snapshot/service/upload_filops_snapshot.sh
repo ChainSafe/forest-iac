@@ -6,13 +6,13 @@ CHAIN="$1"
 URL="https://forest.chainsafe.io/$CHAIN/snapshot-latest.car.zst"
 
 # Fetch the actual URL after following redirection
-SNAPSHOT_URL=$(wget --spider -S $URL 2>&1 | grep "Location" | awk '{print $2}' | tr -d '\r' | tail -1)
+SNAPSHOT_URL=$(wget --spider -S "$URL" 2>&1 | grep "Location" | awk '{print $2}' | tr -d '\r' | tail -1)
 
 # Extract the file name
-SNAPSHOT_NAME=$(basename $SNAPSHOT_URL)
+SNAPSHOT_NAME=$(basename "$SNAPSHOT_URL")
 
 # Extract the date from the snapshot file name
-SNAPSHOT_DATE=$(echo $SNAPSHOT_NAME | cut -d'_' -f4)
+SNAPSHOT_DATE=$(echo "$SNAPSHOT_NAME" | cut -d'_' -f4)
 
 # Convert the snapshot date to Unix timestamp (at start of the day)
 SNAPSHOT_TIMESTAMP=$(date -u -d "$SNAPSHOT_DATE" +%s)
@@ -48,17 +48,16 @@ forest --config config.toml --chain "$CHAIN" --detach
 cd /home/forest/forest_db/data && forest-cli snapshot fetch --vendor filops
 
 # Get the most recently downloaded snapshot's name
-DOWNLOADED_SNAPSHOT_NAME=$(ls -tr | grep "^filops_snapshot_$CHAIN_*" | tail -n 1)
+DOWNLOADED_SNAPSHOT_NAME=\$(find . -name "filops_snapshot_$CHAIN*" -type f -print0 | xargs -r -0 ls -1 -t | head -1)
 
 # Remove the '.zst' part from the filename
-BASE_SNAPSHOT_NAME=${DOWNLOADED_SNAPSHOT_NAME%.zst}
+BASE_SNAPSHOT_NAME=\${DOWNLOADED_SNAPSHOT_NAME%.zst}
     
 # Generate SHA-256 checksum
-sha256sum $DOWNLOADED_SNAPSHOT_NAME > $BASE_SNAPSHOT_NAME.sha256sum
+sha256sum \$DOWNLOADED_SNAPSHOT_NAME > \$BASE_SNAPSHOT_NAME.sha256sum
 HEREDOC
 )
 
-# If the difference is more than one day, run the command
 # Function to send Slack alert
 send_slack_alert() {
     local message="$1"
@@ -77,22 +76,20 @@ if [ $DIFF -gt 1 ]; then
       --volume=/root/forest_db:/home/forest/forest_db/data \
       --entrypoint /bin/bash \
       ghcr.io/chainsafe/forest:latest \
-      -c "$COMMANDS" || exit 1  
-    if s3cmd --acl-public put "$BASE_FOLDER/forest_db/filops_snapshot_$CHAIN_NAME"* s3://"$SNAPSHOT_BUCKET"/"$CHAIN_NAME"/; then
-        rm "$BASE_FOLDER/forest_db/filops_snapshot_$CHAIN_NAME"*
+      -c "$COMMANDS" || (send_slack_alert "Docker run command failed:🔥"; exit 1)
+    if s3cmd --acl-public put "$BASE_FOLDER/forest_db/filops_snapshot_$CHAIN"* s3://"$SNAPSHOT_BUCKET"/"$CHAIN"/; then
+        rm "$BASE_FOLDER/forest_db/filops_snapshot_$CHAIN"*
         # Send alert to Slack only if upload is successful
-        send_slack_alert "Old snapshot detected. 🔥🌲🔥. Filops Snapshot upload failed:✅"
+        send_slack_alert "Old snapshot detected. 🔥🌲🔥. Filops Snapshot upload successful:✅"
     else
         echo "Failed to upload the snapshot."
         # Send alert to Slack for failed upload
         send_slack_alert "Old snapshot detected. 🔥🌲🔥. Filops Snapshot upload failed:🔥" 
+        exit 1
     fi
 else
     echo "The snapshot is from today or yesterday."
 fi
-
-
-
 
 docker run \
   --name filops-snapshot-upload-node-"$CHAIN" \
