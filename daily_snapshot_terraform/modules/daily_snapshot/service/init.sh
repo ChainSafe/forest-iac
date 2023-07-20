@@ -1,6 +1,6 @@
 #!/bin/bash
 
-dnf install -y docker ruby ruby-devel s3cmd go aria2
+dnf install -y docker ruby ruby-devel s3cmd wget 
 gem install docker-api slack-ruby-client activesupport 
 
 
