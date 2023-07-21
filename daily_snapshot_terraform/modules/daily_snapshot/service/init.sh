@@ -24,6 +24,8 @@ mount -o defaults,nofail,discard,noatime /dev/disk/by-id/scsi-0DO_Volume_snapsho
 chmod 777 forest_db
 mkdir --parents -- "$BASE_FOLDER/forest_db/filops"
 
+chmod +x ./upload_filops_snapshot.sh
+
 # Setup cron jobs
 cp calibnet_cron_job mainnet_cron_job /etc/cron.hourly/
 
@@ -49,3 +51,4 @@ sudo yum -q makecache -y --disablerepo='*' --enablerepo='newrelic-infra'
 
 # Installs the New Relic infrastructure agent. This package provides the monitoring functionality needed.
 sudo yum install newrelic-infra -y
+
