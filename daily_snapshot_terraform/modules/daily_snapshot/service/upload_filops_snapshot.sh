@@ -28,20 +28,13 @@ DIFF=$(( (CURRENT_TIMESTAMP - SNAPSHOT_TIMESTAMP) / 86400 ))
 send_slack_alert() {
     local message="$1"
     curl -X POST -H 'Content-type: application/json' -H "Authorization: Bearer $SLACK_API_TOKEN" \
-    --data "{\"channel\":\"#forest-dump\",\"text\":\"${message}\"}" \
+    --data "{\"channel\":\"#forest-notification\",\"text\":\"${message}\"}" \
     https://slack.com/api/chat.postMessage
 }
 
 COMMANDS=$(cat << HEREDOC
 set -eux
-cat << EOF > "config.toml"
-[client]
-data_dir = "/home/forest/forest_db"
-encrypt_keystore = false
-EOF
-forest --config config.toml --chain "$CHAIN" --detach
-cd forest_db && forest-cli snapshot fetch --vendor filops
-
+cd forest_db && forest-cli --chain $CHAIN snapshot fetch --vendor filops
 
 # Get the most recently downloaded snapshot's name
 DOWNLOADED_SNAPSHOT_NAME=\$(basename \$(find . -name "filops_snapshot_$CHAIN*" -type f -print0 | xargs -r -0 ls -1 -t | head -1))
@@ -65,7 +58,7 @@ if [ ${DIFF} -gt 1 ]; then
       --user root \
       --volume=/root/forest_db:/home/forest/forest_db/data \
       --entrypoint /bin/bash \
-      ghcr.io/chainsafe/forest:latest \
+      ghcr.io/chainsafe/forest:"${FOREST_TAG}" \
       -c "$COMMANDS" || exit 1
 
     if s3cmd --acl-public put "$BASE_FOLDER/forest_db/filops/filops_snapshot_$CHAIN"* s3://"$SNAPSHOT_BUCKET/$CHAIN/"; then
