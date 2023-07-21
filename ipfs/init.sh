@@ -15,6 +15,10 @@ fetch_add() {
 fetch_add https://github.com/filecoin-project/builtin-actors/releases/download/v9.0.3/builtin-actors-calibrationnet.car
 fetch_add https://github.com/filecoin-project/builtin-actors/releases/download/v10.0.0-rc.1/builtin-actors-calibrationnet.car
 fetch_add https://github.com/filecoin-project/builtin-actors/releases/download/v11.0.0-rc2/builtin-actors-calibrationnet.car
+
+fetch_add https://github.com/filecoin-project/builtin-actors/releases/download/v10.0.0/builtin-actors-devnet.car
+fetch_add https://github.com/filecoin-project/builtin-actors/releases/download/v11.0.0/builtin-actors-devnet.car
+
 fetch_add https://github.com/filecoin-project/builtin-actors/releases/download/v9.0.3/builtin-actors-mainnet.car
 fetch_add https://github.com/filecoin-project/builtin-actors/releases/download/v10.0.0/builtin-actors-mainnet.car
 fetch_add https://github.com/filecoin-project/builtin-actors/releases/download/v11.0.0/builtin-actors-mainnet.car
