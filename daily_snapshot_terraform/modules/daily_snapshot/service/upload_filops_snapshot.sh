@@ -63,7 +63,7 @@ if [ ${DIFF} -gt 1 ]; then
 
     if s3cmd --acl-public put "$BASE_FOLDER/forest_db/filops/filops_snapshot_$CHAIN"* s3://"$SNAPSHOT_BUCKET/$CHAIN/"; then
         # Send alert to Slack only if upload is successful
-        send_slack_alert "Old snapshot detected. 🔥🌲🔥. Filops Snapshot upload:✅"
+        send_slack_alert "Old snapshot detected. 🔥🌲🔥. Filops Snapshot upload successful:✅"
         rm "$BASE_FOLDER/forest_db/filops/filops_snapshot_$CHAIN"*
     else
         echo "Failed to upload the snapshot."
