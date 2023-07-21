@@ -1,7 +1,8 @@
 #!/bin/bash
 
-dnf install -y docker ruby ruby-devel s3cmd
-gem install docker-api slack-ruby-client activesupport
+dnf install -y docker ruby ruby-devel s3cmd wget 
+gem install docker-api slack-ruby-client activesupport 
+
 
 systemctl start docker
 
@@ -21,6 +22,7 @@ s3cmd --dump-config \
 mkdir forest_db
 mount -o defaults,nofail,discard,noatime /dev/disk/by-id/scsi-0DO_Volume_snapshot-gen-storage forest_db
 chmod 777 forest_db
+mkdir --parents -- "$BASE_FOLDER/forest_db/filops"
 
 # Setup cron jobs
 cp calibnet_cron_job mainnet_cron_job /etc/cron.hourly/

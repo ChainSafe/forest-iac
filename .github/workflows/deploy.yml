@@ -1,10 +1,16 @@
 name: Snapshot Service
 
-
 on:
-  push:
-    branches: [main]
   pull_request:
+    branches:
+      - main
+    paths:
+      - 'daily_snapshot_terraform/**'
+  push:
+    branches:
+      - main
+    paths:
+      - 'daily_snapshot_terraform/**'
   workflow_dispatch:
 
 jobs:
