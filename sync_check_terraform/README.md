@@ -29,14 +29,8 @@ you don't set these variables):
 export TF_VAR_do_token=
 # Slack access token: https://api.slack.com/apps
 export TF_VAR_slack_token=
-# S3 access keys used by the sync check service. Can be generated here: https://cloud.digitalocean.com/account/api/spaces
-export TF_VAR_AWS_ACCESS_KEY_ID=
-export TF_VAR_AWS_SECRET_ACCESS_KEY=
-# S3 access keys used by terraform, use the same values as above
-export AWS_ACCESS_KEY_ID=
-export AWS_SECRET_ACCESS_KEY=
 # New Relic License key, Can be generated here: https://one.eu.newrelic.com/admin-portal/api-keys/home
-export NR_LICENSE_KEY=
+export TF_VAR_NR_LICENSE_KEY=
 ```
 
 Forest tokens can be found on 1password.
