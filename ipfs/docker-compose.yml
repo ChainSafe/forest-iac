@@ -1,0 +1,23 @@
+# Docker compose file to run a ipfs node that serves the files defined in init.sh
+# Run command: `docker compose up --build --force-recreate --detach`
+# Check stats: `docker exec forest-ipfs ipfs stats bw`
+
+version: "3.7"
+
+services:
+  forest_ipfs:
+    image: ipfs/kubo
+    container_name: forest-ipfs
+    ports:
+      - "4001:4001"
+      - "4001:4001/udp"
+      - "8080:8080"
+      - "8081:8081"
+    volumes:
+      - type: bind
+        source: init.sh
+        target: /container-init.d/forest-init.sh
+    command:
+    restart: unless-stopped
+    labels:
+      com.centurylinklabs.watchtower.enable: true
