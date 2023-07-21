@@ -29,6 +29,7 @@ docker wait watchtower 2> /dev/null || true
 docker run \
     --detach \
     --restart unless-stopped \
+    --privileged \
     -v /var/run/docker.sock:/var/run/docker.sock \
     --name watchtower \
     containrrr/watchtower \
