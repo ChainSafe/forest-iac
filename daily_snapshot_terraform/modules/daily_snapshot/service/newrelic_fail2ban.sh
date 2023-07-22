@@ -1,5 +1,5 @@
 #!/bin/bash
-# This script configures New Relic infrastructure monitoring and Fail2Ban on a Fedora system.
+# This script configures New Relic infrastructure monitoring and Fail2Ban.
 # It sets up the New Relic license key and custom configuration, adds the New Relic repository,
 # refreshes it, and installs the New Relic infrastructure agent.
 # It also installs Fail2Ban, sets up its default configuration, and enables it to start at boot
@@ -29,8 +29,7 @@ sudo yum -q makecache -y --disablerepo='*' --enablerepo='newrelic-infra'
 # Installs the New Relic infrastructure agent. This package provides the monitoring functionality needed.
 sudo yum install newrelic-infra -y
 
-
 #set-up fail2ban with the default configuration
 sudo dnf install fail2ban -y
 sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
-sudo systemctl enable fail2ban && sudo systemctl status fail2ban
+sudo systemctl enable fail2ban && sudo systemctl start fail2ban
