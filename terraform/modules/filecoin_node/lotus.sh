@@ -86,31 +86,18 @@ sudo --user="${NEW_USER}" -- \
   containrrr/watchtower \
   --include-stopped --revive-stopped --stop-timeout 120s --interval 600
 
-if [ -n "${NEW_RELIC_API_KEY}" ] || [ -n "${NR_LICENSE_KEY}" ]; then
-  # Set-up  New Relic Agent For logs collection and Infrastruture Metrics
+# If New Relic license key and API key are provided,
+# install the new relic agent and New relic agent and OpenMetrics Prometheus integration.
+if [ -n "${NEW_RELIC_API_KEY}" ]; then
   curl -Ls https://download.newrelic.com/install/newrelic-cli/scripts/install.sh | bash && \
   sudo  NEW_RELIC_API_KEY="${NEW_RELIC_API_KEY}" \
   NEW_RELIC_ACCOUNT_ID="${NEW_RELIC_ACCOUNT_ID}" \
   NEW_RELIC_REGION="${NEW_RELIC_REGION}" \
   /usr/local/bin/newrelic install -y
 
-  # Adds custom display name and host-name to the New Relic config.
-  cat << EOF >> /etc/newrelic-infra.yml
-  display_name: forest-${CHAIN}
-  override_hostname_short: forest-${CHAIN}
+cat >> /etc/newrelic-infra.yml <<EOF
+display_name: forest-${CHAIN}
+override_hostname_short: forest-${CHAIN}
 EOF
   sudo systemctl restart newrelic-infra
-
-  # Creates a configuration file for New Relic OpenMetrics Prometheus integration.
-  cat << EOF > "/home/${NEW_USER}/forest_data/config.yml"
-  cluster_name: forest-${CHAIN}
-  targets:
-    - description: Forest "${CHAIN}" Prometheus Endpoint
-      urls: ["forest-${CHAIN}:6116"]
-  scrape_interval: 15s
-  max_concurrency: 10
-  timeout: 15s
-  retries: 3
-  log_level: info
-EOF
 fi
