@@ -73,11 +73,13 @@ variable "fw_name" {
 
 variable "NR_LICENSE_KEY" {
   description = "New Relic Access Token"
+  default     = ""
   type        = string
 }
 
 variable "NEW_RELIC_API_KEY" {
   description = "New Relic API KEY"
+  default     = ""
   type        = string
 }
 
