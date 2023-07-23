@@ -10,7 +10,7 @@ gem install slack-ruby-client sys-filesystem
 
 nohup /bin/bash ./run_service.sh > run_service_log.txt &
 
-if [ -n "${NR_LICENSE_KEY}" ]; then
+if [ -n "$NR_LICENSE_KEY" ]; then
 # Set-up the New Relic license key and custom configuration
   cat << EOF | sudo tee -a /etc/newrelic-infra.yml
   enable_process_metrics: true

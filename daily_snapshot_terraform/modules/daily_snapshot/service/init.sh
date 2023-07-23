@@ -30,7 +30,7 @@ chmod +x ./upload_filops_snapshot.sh
 # Setup cron jobs
 cp calibnet_cron_job mainnet_cron_job /etc/cron.hourly/
 
-if [ -n "${NR_LICENSE_KEY}" ]; then
+if [ -n "$NR_LICENSE_KEY" ]; then
 # Set-up the New Relic license key and custom configuration
   cat << EOF | sudo tee -a /etc/newrelic-infra.yml
   enable_process_metrics: true
