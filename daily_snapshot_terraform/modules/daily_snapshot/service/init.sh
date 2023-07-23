@@ -32,12 +32,13 @@ cp calibnet_cron_job mainnet_cron_job /etc/cron.hourly/
 
 if [ -n "$NR_LICENSE_KEY" ]; then
 # Set-up the New Relic license key and custom configuration
-  cat << EOF | sudo tee -a /etc/newrelic-infra.yml
-  enable_process_metrics: true
-  status_server_enabled: true
-  status_server_port: 18003
-  license_key: "$NR_LICENSE_KEY"
-  custom_attributes:
+
+cat >> /etc/newrelic-infra.yml <<EOF
+enable_process_metrics: true
+status_server_enabled: true
+status_server_port: 18003
+license_key: "$NR_LICENSE_KEY"
+custom_attributes:
   nr_deployed_by: newrelic-cli
 EOF
 
