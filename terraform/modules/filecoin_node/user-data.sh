@@ -6,7 +6,7 @@
 # and sets up the New Relic agent and openMetrics prometheus for system monitoring and prometheus metrics.
 
 # The script employs Terraform's templating engine, which uses variables defined in terraform.tfvars.
-# Thus, the $${VARIABLES} used here are for the template engine, not BASH.
+# therefore, variables like ${NEW_USER} used here are intended for the template engine, not BASH
 
 set -euxo pipefail
 
