@@ -100,6 +100,7 @@ display_name: forest-${CHAIN}
 override_hostname_short: forest-${CHAIN}
 EOF
   sudo systemctl restart newrelic-infra
+fi
 
 # If New Relic license key is provided, run OpenMetrics Prometheus integration container.
 if [ -n "${NR_LICENSE_KEY}" ]; then
