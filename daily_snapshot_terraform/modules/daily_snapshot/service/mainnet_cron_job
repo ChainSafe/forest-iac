@@ -3,4 +3,4 @@ cd "$BASE_FOLDER" || exit
 # shellcheck source=/dev/null
 source .bashrc
 flock -n /tmp/mainnet.lock -c "ruby daily_snapshot.rb mainnet > mainnet_log.txt 2>&1"
-flock -n /tmp/calibnet.lock -c "./upload_filops_snapshot mainnet.sh > filops_mainnet_log.txt 2>&1"
+flock -n /tmp/mainnet_filops.lock -c "./upload_filops_snapshot.sh mainnet > filops_mainnet_log.txt 2>&1"
