@@ -1,8 +1,4 @@
 #!/bin/bash
-# This script fetches the latest Forest blockchain snapshot from forest.
-# If the snapshot is more than a day old, it downloads the snapshot, generates a SHA-256 checksum,
-# uploads them to an Spaces bucket, and sends a notification to a Slack channel.
-# If the upload fails, a separate Slack notification is sent.
 
 set -euo pipefail
 
@@ -32,13 +28,13 @@ DIFF=$(( (CURRENT_TIMESTAMP - SNAPSHOT_TIMESTAMP) / 86400 ))
 send_slack_alert() {
     local message="$1"
     curl -X POST -H 'Content-type: application/json' -H "Authorization: Bearer $SLACK_API_TOKEN" \
-    --data "{\"channel\":\"#forest-notifications\",\"text\":\"${message}\"}" \
+    --data "{\"channel\":\"#forest-notification\",\"text\":\"${message}\"}" \
     https://slack.com/api/chat.postMessage
 }
 
 COMMANDS=$(cat << HEREDOC
 set -eux
-cd forest_db/filops && forest-cli --chain $CHAIN snapshot fetch --vendor filops
+cd forest_db && forest-cli --chain $CHAIN snapshot fetch --vendor filops
 
 # Get the most recently downloaded snapshot's name
 DOWNLOADED_SNAPSHOT_NAME=\$(basename \$(find . -name "filops_snapshot_$CHAIN*" -type f -print0 | xargs -r -0 ls -1 -t | head -1))
@@ -60,19 +56,19 @@ if [ ${DIFF} -gt 1 ]; then
       --name filops-snapshot-upload-node-"$CHAIN" \
       --rm \
       --user root \
-      --volume=/root/forest_db:/home/forest/forest_db \
+      --volume=/root/forest_db:/home/forest/forest_db/data \
       --entrypoint /bin/bash \
       ghcr.io/chainsafe/forest:"${FOREST_TAG}" \
       -c "$COMMANDS" || exit 1
 
-    if s3cmd --acl-public put "$BASE_FOLDER/forest_db/filops/filops_snapshot_$CHAIN"_* s3://"$SNAPSHOT_BUCKET/$CHAIN/"; then
+    if s3cmd --acl-public put "$BASE_FOLDER/forest_db/filops/filops_snapshot_$CHAIN"* s3://"$SNAPSHOT_BUCKET/$CHAIN/"; then
         # Send alert to Slack only if upload is successful
-        send_slack_alert "Old $CHAIN snapshot detected. 🔥🌲🔥. Filops Snapshot upload successful:✅"
+        send_slack_alert "Old snapshot detected. 🔥🌲🔥. Filops Snapshot upload successful:✅"
         rm "$BASE_FOLDER/forest_db/filops/filops_snapshot_$CHAIN"*
     else
         echo "Failed to upload the snapshot."
         # Send alert to Slack for failed upload
-        send_slack_alert "Old $CHAIN snapshot detected. 🔥🌲🔥. Filops Snapshot upload failed:🔥" 
+        send_slack_alert "Old snapshot detected. 🔥🌲🔥. Filops Snapshot upload failed:🔥" 
         exit 1
     fi
 else
