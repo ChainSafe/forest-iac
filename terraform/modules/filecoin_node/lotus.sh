@@ -96,8 +96,8 @@ if [ -n "${NEW_RELIC_API_KEY}" ]; then
   /usr/local/bin/newrelic install -y
 
 cat >> /etc/newrelic-infra.yml <<EOF
-display_name: forest-${CHAIN}
-override_hostname_short: forest-${CHAIN}
+display_name: lotus-${CHAIN}
+override_hostname_short: lotus-${CHAIN}
 EOF
   sudo systemctl restart newrelic-infra
 fi

@@ -87,9 +87,8 @@ sudo --user="${NEW_USER}" -- \
   containrrr/watchtower \
   --include-stopped --revive-stopped --stop-timeout 120s --interval 600
 
-# If New Relic license key and API key are provided,
-# install the new relic agent and New relic agent and OpenMetrics Prometheus integration.
-if [ -n "${NEW_RELIC_API_KEY}" ] || [ -n "${NR_LICENSE_KEY}" ]; then
+# If new relic API key is provided, install the new relic agent
+if [ -n "${NEW_RELIC_API_KEY}" ] ; then
   curl -Ls https://download.newrelic.com/install/newrelic-cli/scripts/install.sh | bash && \
   sudo  NEW_RELIC_API_KEY="${NEW_RELIC_API_KEY}" \
   NEW_RELIC_ACCOUNT_ID="${NEW_RELIC_ACCOUNT_ID}" \
@@ -102,6 +101,8 @@ override_hostname_short: forest-${CHAIN}
 EOF
   sudo systemctl restart newrelic-infra
 
+# If New Relic license key is provided, run OpenMetrics Prometheus integration container.
+if [ -n "${NR_LICENSE_KEY}" ]; then
 cat > "/home/${NEW_USER}/forest_data/config.yml" <<EOF
 cluster_name: forest-${CHAIN}
 targets:
