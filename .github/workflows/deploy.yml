@@ -1,4 +1,5 @@
 name: Snapshot Service
+concurrency: ci-${{ github.ref }}
 
 on:
   pull_request:

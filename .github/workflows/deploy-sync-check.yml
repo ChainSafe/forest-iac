@@ -1,5 +1,6 @@
 ---
 name: Sync Check Service
+concurrency: ci-${{ github.ref }}
 
 on:
   workflow_dispatch:
