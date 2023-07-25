@@ -29,6 +29,8 @@ you don't set these variables):
 export TF_VAR_do_token=
 # Slack access token: https://api.slack.com/apps
 export TF_VAR_slack_token=
+
+# Optional, only if you want install new relic agent
 # New Relic License key, Can be generated here: https://one.eu.newrelic.com/admin-portal/api-keys/home
 export TF_VAR_NR_LICENSE_KEY=
 ```
