@@ -44,5 +44,6 @@ variable "project" {
 variable "NR_LICENSE_KEY" {
   description = "New Relic Access Token"
   type        = string
+  default     = ""
 }
 

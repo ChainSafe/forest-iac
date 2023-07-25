@@ -83,5 +83,6 @@ variable "destination_addresses" {
 
 variable "NR_LICENSE_KEY" {
   description = "New Relic Access Token"
+  default     = ""
   type        = string
 }
