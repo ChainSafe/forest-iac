@@ -115,7 +115,6 @@ timeout: 15s
 retries: 3
 log_level: info
 EOF
-
   sudo --user="${NEW_USER}" -- \
     docker run \
     --detach \
@@ -127,3 +126,8 @@ EOF
     newrelic/nri-prometheus:latest \
     --configfile=/config.yml
 fi
+
+#set-up fail2ban with the default configuration
+sudo apt-get install fail2ban -y
+sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+sudo systemctl enable fail2ban && sudo systemctl start fail2ban
