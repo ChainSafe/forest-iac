@@ -34,3 +34,8 @@ EOF
   # Installs the New Relic infrastructure agent. This package provides the monitoring functionality needed.
   sudo yum install newrelic-infra -y
 fi 
+
+#set-up fail2ban with the default configuration
+sudo dnf install fail2ban -y
+sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+sudo systemctl enable fail2ban && sudo systemctl start fail2ban
