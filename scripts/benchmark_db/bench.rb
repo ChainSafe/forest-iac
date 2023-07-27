@@ -278,7 +278,6 @@ def run_benchmarks(benchmarks, options)
   end
 end
 
-
 # Benchmarks for database metrics.
 FOREST_BENCHMARKS = [
   ForestBenchmark.new(name: 'baseline'),
