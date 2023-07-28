@@ -15,13 +15,12 @@ module ExecCommands
 
 # Measures execution time of command and peak memory usage.
 def exec_command_with_memory(command, benchmark = nil)
-  @logger.info "$ /usr/bin/time -v ls / 2>&1"
+  @logger.info '$ /usr/bin/time -v ls / 2>&1'
   return {} if @dry_run
 
   metrics = Concurrent::Hash.new
   t0 = Process.clock_gettime(Process::CLOCK_MONOTONIC)
   exec_command_aux(command, metrics, benchmark)
-  t1 = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
   # Measure peak memory usage
   output = `'/usr/bin/time -v ls / 2>&1'`
