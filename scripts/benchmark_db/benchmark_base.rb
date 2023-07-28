@@ -15,22 +15,27 @@ module ExecCommands
 
   # Measures execution time of command and peak memory usage.
   def exec_command_with_memory(command, benchmark = nil)
-    @logger.info '$ /usr/bin/time -v ls / 2>&1'
+    @logger.info "$ /usr/bin/time -v #{command.join(' ')} 2>&1"
     return {} if @dry_run
 
     metrics = Concurrent::Hash.new
     t0 = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-    exec_command_aux(command, metrics, benchmark)
-
+    
+    # Execute the command and capture the output
+    output = `'/usr/bin/time -v #{command.join(' ')} 2>&1'`
+    
     # Measure peak memory usage
-    output = `'/usr/bin/time -v ls / 2>&1'`
     peak_memory = output[/Maximum resident set size \(kbytes\): (\d+)/, 1].to_i
     metrics[:peak_memory] = peak_memory
 
     t1 = Process.clock_gettime(Process::CLOCK_MONOTONIC)
     metrics[:elapsed] = trunc_seconds(t1 - t0)
+
+    # If the command failed, raise an error
+    raise "Command failed with status (#{$?}): #{command}" if $?.exitstatus != 0
+
     metrics
-  end
+end
 
   # Measures validation time for daily metrics.
   def measure_online_validation(benchmark, pid, metrics)
@@ -173,14 +178,22 @@ module RunCommands
       metrics[:validate] = exec_command(validate_command)
       return
     end
-
+  
     validate_online_command = splice_args(@validate_online_command, args)
-    new_metrics = exec_command(validate_online_command, self)
-    new_metrics[:tpm] =
-      new_metrics[:num_epochs] ? new_metrics[:num_epochs] / online_validation_secs : 'n/a'
-    new_metrics[:tpm] = new_metrics[:tpm].ceil(3)
-    metrics[:validate_online] = new_metrics
-  end
+  
+    # Run the original command
+    original_metrics = exec_command(validate_online_command, self)
+  
+    # Measure memory usage
+    memory_metrics = exec_command_with_memory(validate_online_command, self)
+  
+    # Combine the results
+    metrics[:validate_online] = original_metrics.merge(memory_metrics)
+  
+    metrics[:validate_online][:tpm] =
+      metrics[:validate_online][:num_epochs] ? metrics[:validate_online][:num_epochs] / online_validation_secs : 'n/a'
+    metrics[:validate_online][:tpm] = metrics[:validate_online][:tpm].ceil(3)
+  end  
 
   # Import snapshot, write metrics, and call validation function, returning metrics.
   def import_and_validation(daily, args, metrics)
