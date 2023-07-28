@@ -144,13 +144,13 @@ end
 def write_csv(metrics)
   filename = "result_#{Time.now.to_i}.csv"
   CSV.open(filename, 'w') do |csv|
-    csv << ['Client', 'Snapshot Import Time [sec]', 'Validation Time [tipsets/sec]']
+    csv << ['Client', 'Snapshot Import Time [sec]', 'Validation Time [tipsets/sec]', 'Peak Memory Usage [KB]']
 
     metrics.each do |key, value|
       elapsed = value[:import][:elapsed] || 'n/a'
       tpm = value[:validate_online][:tpm] || 'n/a'
-
-      csv << [key, elapsed, tpm]
+      peak_memory = value[:peak_memory] || 'n/a'
+      csv << [key, elapsed, tpm, peak_memory]
     end
   end
   @logger.info "Wrote #{filename}"
