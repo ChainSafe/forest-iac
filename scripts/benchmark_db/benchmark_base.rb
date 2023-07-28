@@ -13,6 +13,25 @@ module ExecCommands
     epoch
   end
 
+  # Measures execution time of command and peak memory usage.
+  def exec_command(command, benchmark = nil)
+    @logger.info "$ #{command.join(' ')}"
+    return {} if @dry_run
+
+    metrics = Concurrent::Hash.new
+    t0 = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    exec_command_aux(command, metrics, benchmark)
+    t1 = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    
+    # Measure peak memory usage
+    output = `'/usr/bin/time -v #{command.join(' ')} 2>&1'`
+    peak_memory = output[/Maximum resident set size \(kbytes\): (\d+)/, 1].to_i
+    metrics[:peak_memory] = peak_memory
+
+    metrics[:elapsed] = trunc_seconds(t1 - t0)
+    metrics
+  end
+
   # Measures validation time for daily metrics.
   def measure_online_validation(benchmark, pid, metrics)
     Thread.new do
@@ -161,6 +180,22 @@ module RunCommands
       new_metrics[:num_epochs] ? new_metrics[:num_epochs] / online_validation_secs : 'n/a'
     new_metrics[:tpm] = new_metrics[:tpm].ceil(3)
     metrics[:validate_online] = new_metrics
+  end
+
+  # Output daily benchmark metrics to comma-separated value file.
+  def write_csv(metrics)
+    filename = "result_#{Time.now.to_i}.csv"
+    CSV.open(filename, 'w') do |csv|
+      csv << ['Client', 'Snapshot Import Time [sec]', 'Validation Time [tipsets/sec]', 'Peak Memory Usage [KB]']
+
+      metrics.each do |key, value|
+        elapsed = value[:import][:elapsed] || 'n/a'
+        tpm = value[:validate_online][:tpm] || 'n/a'
+        peak_memory = value[:peak_memory] || 'n/a'
+        csv << [key, elapsed, tpm, peak_memory]
+      end
+    end
+    @logger.info "Wrote #{filename}"
   end
 
   # Import snapshot, write metrics, and call validation function, returning metrics.

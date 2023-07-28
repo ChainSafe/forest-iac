@@ -87,17 +87,6 @@ def sample_proc(pid, metrics)
   metrics[:vsz].push(output[1].to_i)
 end
 
-def get_peak_memory_usage(pid)
-  stdout, _stderr, status = Open3.capture3("/usr/bin/time -v -p #{pid}")
-
-  raise 'Cannot get the memory usage' unless status.success?
-
-  max_res_set_size = stdout.match(/Maximum resident set size \(kbytes\): (\d+)/)[1].to_i
-
-  # convert kilobytes to bytes
-  max_res_set_size * 1024
-end
-
 # Populate import table with metrics.
 def format_import_table_row(key, value)
   elapsed = value[:import][:elapsed] || 'n/a'
@@ -155,14 +144,13 @@ end
 def write_csv(metrics)
   filename = "result_#{Time.now.to_i}.csv"
   CSV.open(filename, 'w') do |csv|
-    csv << ['Client', 'Snapshot Import Time [sec]', 'Validation Time [tipsets/sec]', 'Peak Memory Usage [bytes]']
+    csv << ['Client', 'Snapshot Import Time [sec]', 'Validation Time [tipsets/sec]']
 
     metrics.each do |key, value|
       elapsed = value[:import][:elapsed] || 'n/a'
       tpm = value[:validate_online][:tpm] || 'n/a'
-      peak_memory_usage = get_peak_memory_usage(value[:pid]) || 'n/a'
 
-      csv << [key, elapsed, tpm, peak_memory_usage]
+      csv << [key, elapsed, tpm]
     end
   end
   @logger.info "Wrote #{filename}"
