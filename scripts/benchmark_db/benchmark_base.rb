@@ -20,10 +20,10 @@ module ExecCommands
 
     metrics = Concurrent::Hash.new
     t0 = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-    
+
     # Execute the command and capture the output
     output = `'/usr/bin/time -v #{command.join(' ')} 2>&1'`
-    
+
     # Measure peak memory usage
     peak_memory = output[/Maximum resident set size \(kbytes\): (\d+)/, 1].to_i
     metrics[:peak_memory] = peak_memory
@@ -57,6 +57,8 @@ end
       benchmark.stop_command(pid)
     end
   end
+
+  
 
   # Calls online validation function and runs monitor to measure memory usage.
   def proc_monitor(pid, benchmark)
@@ -178,18 +180,17 @@ module RunCommands
       metrics[:validate] = exec_command(validate_command)
       return
     end
-  
+
     validate_online_command = splice_args(@validate_online_command, args)
-  
+
     # Run the original command
     original_metrics = exec_command(validate_online_command, self)
-  
+
     # Measure memory usage
     memory_metrics = exec_command_with_memory(validate_online_command, self)
-  
+
     # Combine the results
     metrics[:validate_online] = original_metrics.merge(memory_metrics)
-  
     metrics[:validate_online][:tpm] =
       metrics[:validate_online][:num_epochs] ? metrics[:validate_online][:num_epochs] / online_validation_secs : 'n/a'
     metrics[:validate_online][:tpm] = metrics[:validate_online][:tpm].ceil(3)
