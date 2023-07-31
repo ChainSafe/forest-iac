@@ -6,7 +6,7 @@
 # and sets up the New Relic agent and openMetrics prometheus for system monitoring and prometheus metrics.
 
 # The script employs Terraform's templating engine, which uses variables defined in terraform.tfvars.
-# Thus, the $${VARIABLES} used here are for the template engine, not BASH.
+# therefore, variables like ${NEW_USER} used here are intended for the template engine, not BASH
 
 set -euxo pipefail
 
@@ -87,22 +87,24 @@ sudo --user="${NEW_USER}" -- \
   containrrr/watchtower \
   --include-stopped --revive-stopped --stop-timeout 120s --interval 600
 
-# Set-up  New Relic Agent For logs collection and Infrastruture Metrics
-curl -Ls https://download.newrelic.com/install/newrelic-cli/scripts/install.sh | bash && \
+# If new relic API key is provided, install the new relic agent
+if [ -n "${NEW_RELIC_API_KEY}" ] ; then
+  curl -Ls https://download.newrelic.com/install/newrelic-cli/scripts/install.sh | bash && \
   sudo  NEW_RELIC_API_KEY="${NEW_RELIC_API_KEY}" \
   NEW_RELIC_ACCOUNT_ID="${NEW_RELIC_ACCOUNT_ID}" \
   NEW_RELIC_REGION="${NEW_RELIC_REGION}" \
   /usr/local/bin/newrelic install -y
 
-# Adds custom display name and host-name to the New Relic config.
-cat << EOF >> /etc/newrelic-infra.yml
+cat >> /etc/newrelic-infra.yml <<EOF
 display_name: forest-${CHAIN}
 override_hostname_short: forest-${CHAIN}
 EOF
-sudo systemctl restart newrelic-infra
+  sudo systemctl restart newrelic-infra
+fi
 
-# Creates a configuration file for New Relic OpenMetrics Prometheus integration.
-cat << EOF > "/home/${NEW_USER}/forest_data/config.yml"
+# If New Relic license key is provided, run OpenMetrics Prometheus integration container.
+if [ -n "${NR_LICENSE_KEY}" ]; then
+cat > "/home/${NEW_USER}/forest_data/config.yml" <<EOF
 cluster_name: forest-${CHAIN}
 targets:
   - description: Forest "${CHAIN}" Prometheus Endpoint
@@ -113,16 +115,19 @@ timeout: 15s
 retries: 3
 log_level: info
 EOF
+  sudo --user="${NEW_USER}" -- \
+    docker run \
+    --detach \
+    --network=forest \
+    --name=nri-prometheus \
+    --env LICENSE_KEY="${NR_LICENSE_KEY}" \
+    --volume=/home/"${NEW_USER}"/forest_data/config.yml:/config.yml \
+    --restart=unless-stopped \
+    newrelic/nri-prometheus:latest \
+    --configfile=/config.yml
+fi
 
-# Runs Prometheus OpenMetrics integration Docker container
-# for Collection of Forest's Prometheus metrics.
-sudo --user="${NEW_USER}" -- \
-  docker run \
-  --detach \
-  --network=forest \
-  --name=nri-prometheus \
-  --env LICENSE_KEY="${NR_LICENSE_KEY}" \
-  --volume=/home/"${NEW_USER}"/forest_data/config.yml:/config.yml \
-  --restart=unless-stopped \
-  newrelic/nri-prometheus:latest \
-  --configfile=/config.yml
+#set-up fail2ban with the default configuration
+sudo apt-get install fail2ban -y
+sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+sudo systemctl enable fail2ban && sudo systemctl start fail2ban

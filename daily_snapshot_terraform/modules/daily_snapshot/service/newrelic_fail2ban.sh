@@ -1,17 +1,14 @@
 #!/bin/bash
+# This script configures New Relic infrastructure monitoring and Fail2Ban.
+# It sets up the New Relic license key and custom configuration, adds the New Relic repository,
+# refreshes it, and installs the New Relic infrastructure agent.
+# It also installs Fail2Ban, sets up its default configuration, and enables it to start at boot
 
-## Enable strict error handling, command tracing, and pipefail
-set -euxo pipefail
-
-## Install dependencies
-dnf install -y dnf-plugins-core docker docker-compose ruby ruby-devel gcc make && \
-  dnf clean all
-gem install slack-ruby-client sys-filesystem
-
-nohup /bin/bash ./run_service.sh > run_service_log.txt &
+set -euo pipefail
 
 if [ -n "$NR_LICENSE_KEY" ]; then
 # Set-up the New Relic license key and custom configuration
+
 cat >> /etc/newrelic-infra.yml <<EOF
 enable_process_metrics: true
 status_server_enabled: true
@@ -33,7 +30,7 @@ EOF
 
   # Installs the New Relic infrastructure agent. This package provides the monitoring functionality needed.
   sudo yum install newrelic-infra -y
-fi 
+fi
 
 #set-up fail2ban with the default configuration
 sudo dnf install fail2ban -y

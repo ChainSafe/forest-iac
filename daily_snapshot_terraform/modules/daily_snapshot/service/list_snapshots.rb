@@ -49,7 +49,7 @@ end
 # List the snapshots available in the S3 space hosted by Forest
 def list_snapshots(chain_name = 'calibnet', bucket = 'forest-snapshots', endpoint = 'fra1.digitaloceanspaces.com')
   ls_format = /\d{4}-\d{2}-\d{2} \d{2}:\d{2}\s*\d*\s*s3:\/\/#{bucket}\/#{chain_name}\/(.+)/
-  snapshot_format = /^([^_]+?)_snapshot_(?<network>[^_]+?)_(?<date>\d{4}-\d{2}-\d{2})_height_(?<height>\d+)\.car.zst$/
+  snapshot_format = /^([^_]+?)_snapshot_(?<network>[^_]+?)_(?<date>\d{4}-\d{2}-\d{2})_height_(?<height>\d+)\.(\.forest)?car.zst$/
 
   output = `s3cmd ls s3://#{bucket}/#{chain_name}/`
 

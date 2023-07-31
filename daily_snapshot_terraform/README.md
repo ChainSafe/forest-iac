@@ -37,8 +37,10 @@ export TF_VAR_AWS_SECRET_ACCESS_KEY=
 # S3 access keys used by terraform, use the same values as above
 export AWS_ACCESS_KEY_ID=
 export AWS_SECRET_ACCESS_KEY=
+
+# Optional, only if you want install new relic agent
 # New Relic License key, Can be generated here: https://one.eu.newrelic.com/admin-portal/api-keys/home
-export NR_LICENSE_KEY=
+export TF_VAR_NR_LICENSE_KEY=
 ```
 
 Forest tokens can be found on 1password.

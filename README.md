@@ -50,7 +50,7 @@ To implement the infrastructure, run the following:
 
 - Generate `digitalocean_api_token` from DigitalOcean console; you can check [here](https://docs.digitalocean.com/reference/api/create-personal-access-token/) for more details.
 
-- If you need to run this locally, you first need to set the following environment variables (you will be prompted later if you don't put these variables):
+If you need to run this locally, you first need to set the following environment variables (you will be prompted later if you don't put these variables):
 
 ```bash
 # DigitalOcean personal access token
@@ -58,6 +58,8 @@ export TF_VAR_do_token=<digitalocean_api_token>
 # S3 access keys used by terraform. Can be generated here: https://cloud.digitalocean.com/account/api/spaces
 export AWS_ACCESS_KEY_ID=
 export AWS_SECRET_ACCESS_KEY=
+
+# Optional, only if you want install new relic agent
 # New Relic details used, Can be gotten here: https://one.eu.newrelic.com/admin-portal/api-keys/home
 export NEW_RELIC_API_KEY=
 export NEW_RELIC_ACCOUNT_ID=

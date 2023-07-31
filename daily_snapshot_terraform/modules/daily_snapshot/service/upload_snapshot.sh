@@ -61,7 +61,7 @@ write_metrics &
 
 forest-cli --config config.toml --chain "$CHAIN_NAME" db clean --force
 forest --config config.toml --chain "$CHAIN_NAME" --import-snapshot "$NEWEST_SNAPSHOT" --halt-after-import
-forest --config config.toml --chain "$CHAIN_NAME" --detach
+forest --config config.toml --chain "$CHAIN_NAME" --no-gc --detach
 timeout "$SYNC_TIMEOUT" forest-cli --chain "$CHAIN_NAME" sync wait
 forest-cli --chain "$CHAIN_NAME" snapshot export -o forest_db/
 
