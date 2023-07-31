@@ -40,7 +40,7 @@ resource "digitalocean_project_resources" "connect_forest_project" {
 
 resource "digitalocean_droplet" "forest" {
   image      = var.image
-  name       = var.name
+  name       = "${var.name}-${var.chain}"
   region     = var.region
   size       = var.size
   ssh_keys   = data.digitalocean_ssh_keys.keys.ssh_keys[*].fingerprint

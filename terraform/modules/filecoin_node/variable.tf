@@ -4,7 +4,7 @@ variable "image" {
 }
 
 variable "name" {
-  description = "The name of Forest Droplet"
+  description = "The name of Forest Droplet User"
   type        = string
 }
 
