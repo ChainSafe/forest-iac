@@ -1,4 +1,5 @@
 name: New-Relic
+concurrency: ci-${{ github.ref }}
 
 on:
   pull_request:

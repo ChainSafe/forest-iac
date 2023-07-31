@@ -1,4 +1,5 @@
 name: Forest Calibnet
+concurrency: ci-${{ github.ref }}
 
 on:
   pull_request:
