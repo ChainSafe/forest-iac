@@ -26,10 +26,6 @@ if [ -f "/root/.ssh/authorized_keys" ]; then
   chmod 0600 "/home/${NEW_USER}/.ssh/authorized_keys"
 fi
 
-# Restrict SSH access to the new user only. preventing root user from accessing the system via SSH.
-echo "AllowUsers ${NEW_USER}" >> /etc/ssh/sshd_config
-
-systemctl restart sshd
 
 # Add new user to "sudo" and "docker" group so they can run docker commands and have general admin rights.
 usermod --append --groups sudo,docker "${NEW_USER}"
@@ -54,7 +50,6 @@ cat << EOF > "/home/${NEW_USER}/forest_data/config.toml"
 [client]
 data_dir = "/home/${NEW_USER}/data"
 EOF
-
 
 sudo --user="${NEW_USER}" -- docker network create forest
 
