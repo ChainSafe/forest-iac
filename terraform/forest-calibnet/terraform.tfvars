@@ -6,8 +6,9 @@ source_addresses      = ["0.0.0.0/0", "::/0"]
 destination_addresses = ["0.0.0.0/0", "::/0"]
 chain                 = "calibnet"
 project               = "Forest-DEV"
-name                  = "forest"
+name                  = "forest-calibnet"
 fw_name               = "forest-calibnet-fw"
+forest_user           = "forest"
 
 # This set of variables are unique and must be defined here in order to deploy successfully
 # do_token = ""
