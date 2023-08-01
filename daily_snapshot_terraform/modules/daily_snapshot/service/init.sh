@@ -3,6 +3,7 @@
 dnf install -y docker ruby ruby-devel s3cmd wget 
 gem install docker-api slack-ruby-client activesupport 
 
+
 systemctl start docker
 
 # 1. Configure s3cmd
@@ -22,6 +23,9 @@ mkdir forest_db
 mount -o defaults,nofail,discard,noatime /dev/disk/by-id/scsi-0DO_Volume_snapshot-gen-storage forest_db
 chmod 777 forest_db
 mkdir --parents -- "$BASE_FOLDER/forest_db/filops"
+
+# make the scripts executable
+chmod +x ./upload_filops_snapshot.sh
 
 # run new_relic and fail2ban scripts
 bash newrelic_fail2ban.sh

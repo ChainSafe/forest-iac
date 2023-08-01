@@ -89,12 +89,6 @@ if [ -n "${NEW_RELIC_API_KEY}" ] ; then
   NEW_RELIC_ACCOUNT_ID="${NEW_RELIC_ACCOUNT_ID}" \
   NEW_RELIC_REGION="${NEW_RELIC_REGION}" \
   /usr/local/bin/newrelic install -y
-
-cat >> /etc/newrelic-infra.yml <<EOF
-display_name: forest-${CHAIN}
-override_hostname_short: forest-${CHAIN}
-EOF
-  sudo systemctl restart newrelic-infra
 fi
 
 # If New Relic license key is provided, run OpenMetrics Prometheus integration container.
