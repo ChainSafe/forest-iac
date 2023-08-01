@@ -48,7 +48,7 @@ resource "digitalocean_droplet" "forest" {
 
   user_data = templatefile("${path.module}/${var.script}",
     {
-      NEW_USER = var.name
+      NEW_USER = var.forest_user
       # In the filesystem on the droplet, certain special characters, including "-",
       # are not allowed in device identifiers for block storage volumes.
       # Therefore, any "-" characters in the volume name are replaced with "_" when forming the device ID.
