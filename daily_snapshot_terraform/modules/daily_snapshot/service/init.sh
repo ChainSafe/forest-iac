@@ -23,9 +23,6 @@ mount -o defaults,nofail,discard,noatime /dev/disk/by-id/scsi-0DO_Volume_snapsho
 chmod 777 forest_db
 mkdir --parents -- "$BASE_FOLDER/forest_db/filops"
 
-# make the scripts executable
-chmod +x ./upload_filops_snapshot.sh
-
 # run new_relic and fail2ban scripts
 bash newrelic_fail2ban.sh
 
