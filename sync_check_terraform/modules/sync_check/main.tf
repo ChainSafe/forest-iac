@@ -65,7 +65,6 @@ locals {
     "echo 'export FOREST_SLACK_API_TOKEN=\"${var.slack_token}\"' >> ~/.bashrc",
     "echo 'export FOREST_SLACK_NOTIF_CHANNEL=\"${var.slack_channel}\"' >> ~/.bashrc",
     "echo 'export NR_LICENSE_KEY=\"${var.NR_LICENSE_KEY}\"' >> ~/.bashrc",
-    "echo 'export USER=forest' >> ~/.bashrc",
     "source ~/.bashrc",
     "/bin/bash ./init.sh > init_log.txt",
     "systemctl enable docker",
