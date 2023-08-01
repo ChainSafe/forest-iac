@@ -26,10 +26,6 @@ if [ -f "/root/.ssh/authorized_keys" ]; then
   chmod 0600 "/home/${NEW_USER}/.ssh/authorized_keys"
 fi
 
-# Restrict SSH access to the new user only. preventing root user from accessing the system via SSH.
-echo "AllowUsers ${NEW_USER}" >> /etc/ssh/sshd_config
-systemctl restart sshd
-
 # Enable passwordless sudo for the new user. This allows the user to run sudo commands without being prompted for a password.
 echo "${NEW_USER} ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/"${NEW_USER}"
 
