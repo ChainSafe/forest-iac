@@ -8,6 +8,11 @@ variable "name" {
   type        = string
 }
 
+variable "forest_user" {
+  description = "The name of Forest Droplet user"
+  type        = string
+}
+
 variable "region" {
   description = "The region where resources will be created"
   type        = string

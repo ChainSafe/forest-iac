@@ -40,7 +40,7 @@ resource "digitalocean_project_resources" "connect_forest_project" {
 
 resource "digitalocean_droplet" "forest" {
   image      = var.image
-  name       = "${var.name}-${var.chain}"
+  name       = var.name
   region     = var.region
   size       = var.size
   ssh_keys   = data.digitalocean_ssh_keys.keys.ssh_keys[*].fingerprint
@@ -48,7 +48,7 @@ resource "digitalocean_droplet" "forest" {
 
   user_data = templatefile("${path.module}/${var.script}",
     {
-      NEW_USER = var.name
+      NEW_USER = var.forest_user
       # In the filesystem on the droplet, certain special characters, including "-",
       # are not allowed in device identifiers for block storage volumes.
       # Therefore, any "-" characters in the volume name are replaced with "_" when forming the device ID.
