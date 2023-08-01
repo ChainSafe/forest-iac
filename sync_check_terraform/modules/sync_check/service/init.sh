@@ -22,9 +22,6 @@ fi
 # Add new user to "sudo" and "docker" group so they can run docker commands and have general admin rights.
 usermod --append --groups sudo,docker "$USER"
 
-# Set up the directory where the Forest container will store its data.
-mkdir --parents -- "/home/$USER/forest_data"
-
 ## Install dependencies
 dnf install -y dnf-plugins-core docker docker-compose ruby ruby-devel gcc make && \
   dnf clean all

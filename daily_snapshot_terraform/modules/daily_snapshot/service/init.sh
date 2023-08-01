@@ -3,7 +3,6 @@
 dnf install -y docker ruby ruby-devel s3cmd wget 
 gem install docker-api slack-ruby-client activesupport 
 
-
 systemctl start docker
 
 # 1. Configure s3cmd
