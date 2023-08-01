@@ -16,6 +16,7 @@ module "calibnet" {
 
   do_token              = var.do_token
   name                  = var.name
+  forest_user           = var.forest_user
   region                = var.region
   image                 = var.image
   size                  = var.size
