@@ -3,12 +3,35 @@
 ## Enable strict error handling, command tracing, and pipefail
 set -euxo pipefail
 
+# Create a new user with a home directory, no password (SSH login only), and no gecos info.
+adduser --disabled-password --gecos "" "$USER"
+
+# Set up SSH for the new user.
+mkdir --parents -- "/home/$USER/.ssh"
+chown "$USER:$USER" "/home/$USER/.ssh"
+chmod 0700 "/home/$USER/.ssh"
+
+# Inherit authorized_keys from root, if they exist, to allow the same key-based access for the new user.
+if [ -f "/root/.ssh/authorized_keys" ]; then
+  : Allowing those with root ssh keys to log in as "$USER"
+  cp /root/.ssh/authorized_keys "/home/$USER/.ssh/authorized_keys"
+  chown "$USER:$USER" "/home/$USER/.ssh/authorized_keys"
+  chmod 0600 "/home/$USER/.ssh/authorized_keys"
+fi
+
+# Add new user to "sudo" and "docker" group so they can run docker commands and have general admin rights.
+usermod --append --groups sudo,docker "$USER"
+
+# Set up the directory where the Forest container will store its data.
+mkdir --parents -- "/home/$USER/forest_data"
+
 ## Install dependencies
 dnf install -y dnf-plugins-core docker docker-compose ruby ruby-devel gcc make && \
   dnf clean all
 gem install slack-ruby-client sys-filesystem
 
-nohup /bin/bash ./run_service.sh > run_service_log.txt &
+sudo --user="$USER" -- \
+  nohup /bin/bash ./run_service.sh > run_service_log.txt &
 
 if [ -n "$NR_LICENSE_KEY" ]; then
 # Set-up the New Relic license key and custom configuration
