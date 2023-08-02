@@ -26,10 +26,6 @@ if [ -f "/root/.ssh/authorized_keys" ]; then
   chmod 0600 "/home/${NEW_USER}/.ssh/authorized_keys"
 fi
 
-# Restrict SSH access to the new user only. preventing root user from accessing the system via SSH.
-echo "AllowUsers ${NEW_USER}" >> /etc/ssh/sshd_config
-systemctl restart sshd
-
 # Enable passwordless sudo for the new user. This allows the user to run sudo commands without being prompted for a password.
 echo "${NEW_USER} ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/"${NEW_USER}"
 
@@ -51,6 +47,13 @@ fi
 # Change the ownership of the lotus_data directory to the created user.
 chown --recursive "${NEW_USER}":"${NEW_USER}" "/home/${NEW_USER}/lotus_data"
 
+cat << EOF > "/home/${NEW_USER}/lotus_data/config.toml"
+[Chainstore]
+EnableSplitstore = true
+[Chainstore.Splitstore]
+ColdStoreType = "discard"
+EOF
+
 IMAGETAG="stable"
 
 if [ "${CHAIN}" != "mainnet" ]; then
@@ -65,12 +68,13 @@ sudo --user="${NEW_USER}" -- \
   --detach \
   --network=lotus \
   --name=lotus-"${CHAIN}" \
-  --env LOTUS_CHAINSTORE_SPLITSTORE_COLDSTORETYPE="discard" \
+  --volume=/home/"${NEW_USER}"/lotus_data:/home/"${NEW_USER}"/data \
   --volume=parameters:/var/tmp/filecoin-proof-parameters \
   --volume=/home/"${NEW_USER}"/lotus_data:/var/lib/lotus \
   --publish=1234:1234 \
   --restart=always \
   filecoin/lotus-all-in-one:"$IMAGETAG" lotus daemon \
+ --config=/home/"${NEW_USER}"/data/config.toml \
   --import-snapshot https://snapshots."${CHAIN}".filops.net/minimal/latest.zst
 
 # It monitors running Docker containers and watches for changes to the images that those containers were originally started from.
@@ -94,13 +98,6 @@ if [ -n "${NEW_RELIC_API_KEY}" ]; then
   NEW_RELIC_ACCOUNT_ID="${NEW_RELIC_ACCOUNT_ID}" \
   NEW_RELIC_REGION="${NEW_RELIC_REGION}" \
   /usr/local/bin/newrelic install -y
-
-cat >> /etc/newrelic-infra.yml <<EOF
-display_name: lotus-${CHAIN}
-override_hostname_short: lotus-${CHAIN}
-EOF
-
-  sudo systemctl restart newrelic-infra
 fi
 
 #set-up fail2ban with the default configuration
