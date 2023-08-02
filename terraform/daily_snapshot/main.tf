@@ -25,7 +25,7 @@ terraform {
 
 module "daily_snapshot" {
   # Import the daily_snapshot module
-  source = "./modules/daily_snapshot"
+  source = "../modules/daily_snapshot"
 
   # Configure service:
   name              = "forest-snapshot"       # droplet name

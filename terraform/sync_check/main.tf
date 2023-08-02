@@ -25,7 +25,7 @@ terraform {
 
 module "sync_check" {
   # Import the sync_check module
-  source = "./modules/sync_check"
+  source = "../modules/sync_check"
 
   # Configure service:
   name          = "forest-sync-check"     # droplet name
