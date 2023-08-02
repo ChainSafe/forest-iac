@@ -55,14 +55,6 @@ data "digitalocean_ssh_keys" "keys" {
   }
 }
 
-resource "digitalocean_volume" "forest_storage" {
-  region                  = "fra1"
-  name                    = "snapshot-gen-storage"
-  size                    = 400
-  initial_filesystem_type = "ext4"
-  description             = "DB storage for snapshot generation"
-}
-
 locals {
   init_commands = ["cd /root/",
     "tar xf sources.tar",
@@ -94,7 +86,6 @@ resource "digitalocean_droplet" "forest" {
   tags       = ["iac"]
   ssh_keys   = data.digitalocean_ssh_keys.keys.ssh_keys[*].fingerprint
   monitoring = true
-  volume_ids = [digitalocean_volume.forest_storage.id]
 
   graceful_shutdown = false
 

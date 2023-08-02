@@ -7,7 +7,7 @@ gem install docker-api slack-ruby-client activesupport
 systemctl start docker
 
 # 1. Configure s3cmd
-# 2. Mount volume at 'forest_db'
+# 2. create forest_db directory
 # 3. Copy scripts to /etc/cron.hourly
 
 ## Configure s3cmd
@@ -18,9 +18,8 @@ s3cmd --dump-config \
     --secret_key="$AWS_SECRET_ACCESS_KEY" \
     --multipart-chunk-size-mb=4096 > ~/.s3cfg
 
-## Setup volume
+## Create forest data directory
 mkdir forest_db
-mount -o defaults,nofail,discard,noatime /dev/disk/by-id/scsi-0DO_Volume_snapshot-gen-storage forest_db
 chmod 777 forest_db
 mkdir --parents -- "$BASE_FOLDER/forest_db/filops"
 
