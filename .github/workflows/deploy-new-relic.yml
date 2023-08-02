@@ -33,6 +33,6 @@ jobs:
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
           new_relic_api_key: ${{ secrets.NEW_RELIC_API_KEY }}
           new_relic_account_id: ${{ secrets.NEW_RELIC_ACCOUNT_ID }}
-          working_directory: terraform/modules/new-relic
+          working_directory: terraform/new-relic
           environment: New Relic
  
