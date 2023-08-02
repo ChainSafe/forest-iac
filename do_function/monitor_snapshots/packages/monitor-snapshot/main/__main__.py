@@ -13,7 +13,8 @@ bucket = "forest-snapshots"
 base_url = f"https://{region}.digitaloceanspaces.com/{bucket}"
 
 # Define the pattern for valid snapshot file names.
-pattern = r'([^_]+?)_snapshot_([^_]+?)_(\d{4}-\d{2}-\d{2})_height_(\d+).car(.zst)?$'
+pattern = r'([^_]+?)_snapshot_([^_]+?)_(\d{4}-\d{2}-\d{2})_height_(\d+)(\.forest)?\.car(\.zst)?$'
+
 
 # Define the folders that the script should scan for snapshots.
 folders = ["mainnet", "calibnet"]
