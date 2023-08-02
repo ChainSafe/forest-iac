@@ -64,8 +64,9 @@ forest --config config.toml --chain "$CHAIN_NAME" --import-snapshot "$NEWEST_SNA
 forest --config config.toml --chain "$CHAIN_NAME" --no-gc --detach
 timeout "$SYNC_TIMEOUT" forest-cli --chain "$CHAIN_NAME" sync wait
 forest-cli --chain "$CHAIN_NAME" snapshot export -o forest_db/
+forest-cli shutdown --force
 forest-cli archive info forest_db/forest_snapshot_$CHAIN_NAME"*.forest.car.zst
-forest-cli snapshot validate --check-links 0 --check-network "$CHAIN_NAME" forest_db/forest_snapshot_$CHAIN_NAME"*.forest.car.zst
+forest-cli snapshot validate --check-links 0 --check-network "$CHAIN_NAME" --check-stateroots 5 forest_db/forest_snapshot_$CHAIN_NAME"*.forest.car.zst
 
 # Kill the metrics writer process
 kill %1
