@@ -61,9 +61,19 @@ write_metrics &
 
 forest-cli --config config.toml --chain "$CHAIN_NAME" db clean --force
 forest --config config.toml --chain "$CHAIN_NAME" --import-snapshot "$NEWEST_SNAPSHOT" --halt-after-import
-forest --config config.toml --chain "$CHAIN_NAME" --no-gc --detach
+forest --config config.toml --chain "$CHAIN_NAME" --no-gc --save-token=token.txt --detach
 timeout "$SYNC_TIMEOUT" forest-cli --chain "$CHAIN_NAME" sync wait
 forest-cli --chain "$CHAIN_NAME" snapshot export -o forest_db/
+forest-cli --token=$(cat token.txt) shutdown --force
+
+# Run full checks only for calibnet, given that it takes too long for mainnet.
+if [ "$CHAIN_NAME" = "calibnet" ]; then
+  forest-cli snapshot validate --check-network "$CHAIN_NAME" forest_db/forest_snapshot_*.forest.car.zst
+else
+  forest-cli archive info forest_db/forest_snapshot_*.forest.car.zst
+  forest-cli snapshot validate --check-links 0 --check-network "$CHAIN_NAME" --check-stateroots 5 forest_db/forest_snapshot_*.forest.car.zst
+fi
+
 
 # Kill the metrics writer process
 kill %1
