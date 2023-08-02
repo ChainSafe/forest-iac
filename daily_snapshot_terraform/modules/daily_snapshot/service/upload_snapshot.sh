@@ -57,7 +57,8 @@ echo "Chain: $CHAIN_NAME"
 echo "Snapshot: $NEWEST_SNAPSHOT"
 
 # spawn a task in the background to periodically write Prometheus metrics to a file
-write_metrics &
+# Disabled to reduce logging noise. Re-enable if Forest starts having network troubles again.
+# write_metrics &
 
 forest-cli --config config.toml --chain "$CHAIN_NAME" db clean --force
 forest --config config.toml --chain "$CHAIN_NAME" --import-snapshot "$NEWEST_SNAPSHOT" --halt-after-import
