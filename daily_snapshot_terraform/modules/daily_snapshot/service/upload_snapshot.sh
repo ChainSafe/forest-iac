@@ -64,7 +64,7 @@ forest --config config.toml --chain "$CHAIN_NAME" --import-snapshot "$NEWEST_SNA
 forest --config config.toml --chain "$CHAIN_NAME" --no-gc --save-token=token.txt --detach
 timeout "$SYNC_TIMEOUT" forest-cli --chain "$CHAIN_NAME" sync wait
 forest-cli --chain "$CHAIN_NAME" snapshot export -o forest_db/
-forest-cli shutdown --force --token=$(cat token.txt)
+forest-cli --token=$(cat token.txt) shutdown --force
 
 # Run full checks only for calibnet, given that it takes too long for mainnet.
 if [ "$CHAIN_NAME" = "calibnet" ]; then
