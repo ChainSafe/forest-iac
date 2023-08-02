@@ -53,9 +53,9 @@ chown --recursive "${NEW_USER}":"${NEW_USER}" "/home/${NEW_USER}/lotus_data"
 
 cat << EOF > "/home/${NEW_USER}/lotus_data/config.toml"
 [Chainstore]
-  EnableSplitstore = true
-  [Chainstore.Splitstore]
-    ColdStoreType = "discard"
+EnableSplitstore = true
+[Chainstore.Splitstore]
+ColdStoreType = "discard"
 EOF
 
 IMAGETAG="stable"
