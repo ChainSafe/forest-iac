@@ -6,7 +6,7 @@ on:
     branches:
       - main
     paths:
-      - 'new-relic/**'
+      - 'terraform/new-relic/**'
   push:
     branches:
       - main
