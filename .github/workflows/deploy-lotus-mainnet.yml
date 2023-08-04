@@ -6,12 +6,12 @@ on:
     branches:
       - main
     paths:
-      - 'terraform/**'
+      - 'terraform/lotus-mainnet/**'
   push:
     branches:
       - main
     paths:
-      - 'terraform/**'
+      - 'terraform/lotus-mainnet/**'
   workflow_dispatch:
 
 jobs:
