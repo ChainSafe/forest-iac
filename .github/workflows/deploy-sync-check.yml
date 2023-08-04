@@ -3,13 +3,17 @@ name: Sync Check Service
 concurrency: ci-${{ github.ref }}
 
 on:
-  workflow_dispatch:
   pull_request:
     branches:
       - main
+    paths:
+      - 'terraform/**'
   push:
     branches:
       - main
+    paths:
+      - 'terraform/**'
+  workflow_dispatch:
 
 jobs:
   sync-check:
@@ -29,6 +33,6 @@ jobs:
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
           slack_token: ${{ secrets.SLACK_TOKEN }}
-          working_directory: sync_check_terraform/
+          working_directory: terraform/sync_check
           environment: Sync Check Service
           nr_license_key: ${{ secrets.NR_LICENSE_KEY }}
