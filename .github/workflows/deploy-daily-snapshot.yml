@@ -6,12 +6,12 @@ on:
     branches:
       - main
     paths:
-      - 'terraform/**'
+      - 'terraform/daily_snapshot/**'
   push:
     branches:
       - main
     paths:
-      - 'terraform/**'
+      - 'terraform/daily_snapshot/**'
   workflow_dispatch:
 
 jobs:
