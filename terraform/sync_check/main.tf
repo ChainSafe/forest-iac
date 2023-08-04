@@ -8,7 +8,7 @@ terraform {
     # This key uniquely identifies the service. To create a new service (instead
     # of modifying this one), use a new key. Unfortunately, variables may not be
     # used here.
-    key = "daily_snapshot.tfstate"
+    key = "sync_check.tfstate"
 
     # This value is completely unused by DO but _must_ be a known AWS region.
     region = "us-west-1"
@@ -23,27 +23,22 @@ terraform {
   }
 }
 
-module "daily_snapshot" {
-  # Import the daily_snapshot module
-  source = "./modules/daily_snapshot"
+module "sync_check" {
+  # Import the sync_check module
+  source = "../modules/sync_check"
 
   # Configure service:
-  name              = "forest-snapshot"       # droplet name
-  size              = "so-2vcpu-16gb"         # droplet size
-  slack_channel     = "#forest-notifications" # slack channel for notifications
-  snapshot_bucket   = "forest-snapshots"
-  snapshot_endpoint = "fra1.digitaloceanspaces.com"
-  forest_tag        = "latest"
+  name          = "forest-sync-check"     # droplet name
+  size          = "so-2vcpu-16gb"         # droplet size
+  slack_channel = "#forest-notifications" # slack channel for notifications
 
   # Variable passthrough:
-  slack_token           = var.slack_token
-  AWS_ACCESS_KEY_ID     = var.AWS_ACCESS_KEY_ID
-  AWS_SECRET_ACCESS_KEY = var.AWS_SECRET_ACCESS_KEY
-  digitalocean_token    = var.do_token
-  NR_LICENSE_KEY        = var.NR_LICENSE_KEY
+  slack_token        = var.slack_token
+  digitalocean_token = var.do_token
+  NR_LICENSE_KEY     = var.NR_LICENSE_KEY
 }
 
 # This ip address may be used in the future by monitoring software
 output "ip" {
-  value = [module.daily_snapshot.ip]
+  value = [module.sync_check.ip]
 }
