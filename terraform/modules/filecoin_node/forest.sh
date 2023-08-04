@@ -34,24 +34,14 @@ usermod --append --groups sudo,docker "${NEW_USER}"
 # Set up the directory where the Forest container will store its data.
 mkdir --parents -- "/home/${NEW_USER}/forest_data"
 
-# If a volume name is defined, mount the volume to the forest_data directory.
-if [ -n "${VOLUME_NAME}" ]; then
-  # discard: notify the volume to free blocks (useful for SSDs)
-  # defaults: default mount options, including rw
-  # noatime: don't preserve file access times
-  : mounting volume at the forest_data directory
-  mount --options discard,defaults,noatime /dev/disk/by-id/scsi-0DO_Volume_"${DISK_ID_VOLUME_NAME}" "/home/${NEW_USER}/forest_data"
-fi
-
 # Change the ownership of the forest_data directory to the created user.
 chown --recursive "${NEW_USER}":"${NEW_USER}" "/home/${NEW_USER}/forest_data"
 
 # Create the config.toml file in the forest_data directory.
 cat << EOF > "/home/${NEW_USER}/forest_data/config.toml"
 [client]
-data_dir = "/home/${NEW_USER}/data"
+data_dir = "/home/${NEW_USER}/forest_data"
 EOF
-
 
 sudo --user="${NEW_USER}" -- docker network create forest
 
@@ -61,12 +51,12 @@ sudo --user="${NEW_USER}" -- \
   --detach \
   --network=forest \
   --name=forest-"${CHAIN}" \
-  --volume=/home/"${NEW_USER}"/forest_data:/home/"${NEW_USER}"/data \
+  --volume=/home/"${NEW_USER}"/forest_data:/home/"${NEW_USER}"/forest_data:z \
   --publish=1234:1234 \
   --publish=6116:6116 \
   --restart=always \
   ghcr.io/chainsafe/forest:latest \
-  --config=/home/"${NEW_USER}"/data/config.toml \
+  --config=/home/"${NEW_USER}"/forest_data/config.toml \
   --encrypt-keystore false \
   --auto-download-snapshot \
   --chain="${CHAIN}"
