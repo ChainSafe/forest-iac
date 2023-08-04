@@ -84,19 +84,21 @@ HEREDOC
 # Stop any lingering docker containers
 docker stop forest-snapshot-upload-node-"$CHAIN_NAME"
 
+CHAIN_DB_DIR="$BASE_FOLDER/forest_db/$CHAIN_NAME"
+
 # Run forest and generate a snapshot in forest_db/
 docker run \
   --name forest-snapshot-upload-node-"$CHAIN_NAME" \
   --rm \
   --user root \
-  -v "$BASE_FOLDER/forest_db:/home/forest/forest_db":z \
+  -v "$CHAIN_DB_DIR:/home/forest/forest_db":z \
   --entrypoint /bin/bash \
   ghcr.io/chainsafe/forest:"${FOREST_TAG}" \
   -c "$COMMANDS" || exit 1
 
 # Upload snapshot to s3
-s3cmd --acl-public put "$BASE_FOLDER/forest_db/forest_snapshot_$CHAIN_NAME"* s3://"$SNAPSHOT_BUCKET"/"$CHAIN_NAME"/ || exit 1
+s3cmd --acl-public put "$CHAIN_DB_DIR/forest_snapshot_$CHAIN_NAME"* s3://"$SNAPSHOT_BUCKET"/"$CHAIN_NAME"/ || exit 1
 
 # Delete snapshot files
-rm "$BASE_FOLDER/forest_db/forest_snapshot_$CHAIN_NAME"*
+rm "$CHAIN_DB_DIR/forest_snapshot_$CHAIN_NAME"*
 
