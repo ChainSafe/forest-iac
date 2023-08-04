@@ -23,7 +23,7 @@ module "mainnet" {
   source_addresses        = var.source_addresses
   initial_filesystem_type = var.initial_filesystem_type
   volume_size             = var.volume_size
-  attach_volume           = true
+  attach_volume           = false
   destination_addresses   = var.destination_addresses
   chain                   = var.chain
   volume_name             = var.volume_name
