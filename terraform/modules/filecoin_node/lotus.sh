@@ -52,6 +52,8 @@ cat << EOF > "/home/${NEW_USER}/lotus_data/config.toml"
 EnableSplitstore = true
 [Chainstore.Splitstore]
 ColdStoreType = "discard"
+HotStoreType = "badger"
+HotStoreFullGCFrequency = 1
 EOF
 
 IMAGETAG="stable"
