@@ -11,7 +11,7 @@ on:
     branches:
       - main
     paths:
-      - 'new-relic/**'
+      - 'terraform/new-relic/**'
   workflow_dispatch:
 
 jobs:
