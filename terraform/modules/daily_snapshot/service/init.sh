@@ -1,6 +1,6 @@
 #!/bin/bash
 
-dnf install -y docker ruby ruby-devel s3cmd wget 
+apt-get install -y docker ruby ruby-devel s3cmd wget 
 gem install docker-api slack-ruby-client activesupport 
 
 

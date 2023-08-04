@@ -26,7 +26,7 @@ variable "slack_token" {
 variable "image" {
   description = "The ID of the AMI to use for the Droplet"
   type        = string
-  default     = "fedora-38-x64"
+  default     = "docker-20-04"
 }
 
 variable "region" {
