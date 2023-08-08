@@ -41,9 +41,18 @@ variable "project" {
   default     = "Forest-DEV" # Alternative: "Default"
 }
 
-variable "NR_LICENSE_KEY" {
-  description = "New Relic Access Token"
+variable "NEW_RELIC_REGION" {
+  description = "The New Relic Plathom Region"
   type        = string
-  default     = ""
+  default     = "EU"
 }
 
+variable "NEW_RELIC_API_KEY" {
+  description = "New Relic API KEY"
+  type        = string
+}
+
+variable "NEW_RELIC_ACCOUNT_ID" {
+  description = "The New Relic Account ID"
+  type        = string
+}
