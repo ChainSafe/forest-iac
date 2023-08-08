@@ -4,7 +4,7 @@
 set -euxo pipefail
 
 ## Install dependencies
-apt-get install -y docker docker-compose ruby ruby-dev gcc make && \
+apt-get install -y docker-compose ruby ruby-dev gcc make && \
   apt clean
 gem install slack-ruby-client sys-filesystem
 

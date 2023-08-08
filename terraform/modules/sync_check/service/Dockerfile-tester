@@ -1,12 +1,12 @@
-FROM fedora:38
+FROM ubuntu:22.04
 
-RUN dnf install -y \
+RUN apt-get install -y \
     docker \
     ruby \
     ruby-devel \
     make \
     gcc \
-    && dnf clean all
+    && apt clean
 
 WORKDIR /chainsafe
 
