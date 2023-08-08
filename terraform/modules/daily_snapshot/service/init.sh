@@ -1,6 +1,6 @@
 #!/bin/bash
 
-apt-get install -y docker ruby ruby-devel s3cmd wget 
+apt-get update && apt-get install -y docker ruby ruby-dev s3cmd wget 
 gem install docker-api slack-ruby-client activesupport 
 
 # 1. Configure s3cmd

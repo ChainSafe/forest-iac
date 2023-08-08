@@ -7,11 +7,11 @@
 set -euo pipefail
 
 # If new relic API key is provided, install the new relic agent
-if [ -n "${NEW_RELIC_API_KEY}" ] ; then
+if [ -n "$NEW_RELIC_API_KEY" ] ; then
   curl -Ls https://download.newrelic.com/install/newrelic-cli/scripts/install.sh | bash && \
-  sudo  NEW_RELIC_API_KEY="${NEW_RELIC_API_KEY}" \
-  NEW_RELIC_ACCOUNT_ID="${NEW_RELIC_ACCOUNT_ID}" \
-  NEW_RELIC_REGION="${NEW_RELIC_REGION}" \
+  sudo  NEW_RELIC_API_KEY="$NEW_RELIC_API_KEY" \
+  NEW_RELIC_ACCOUNT_ID="$NEW_RELIC_ACCOUNT_ID" \
+  NEW_RELIC_REGION="$NEW_RELIC_REGION" \
   /usr/local/bin/newrelic install -y
 fi
 

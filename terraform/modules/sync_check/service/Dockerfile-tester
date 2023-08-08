@@ -1,7 +1,9 @@
 FROM ubuntu:22.04
 
 RUN apt-get update && \
-    apt-get install --no-install-recommends -y docker ruby make gcc build-essential ruby-dev
+    apt-get install --no-install-recommends -y docker ruby make gcc build-essential ruby-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /chainsafe
 

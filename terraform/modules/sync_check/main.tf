@@ -68,7 +68,7 @@ locals {
     "echo 'export NEW_RELIC_ACCOUNT_ID=\"${var.NEW_RELIC_ACCOUNT_ID}\"' >> ~/.bashrc",
     "echo 'export NEW_RELIC_REGION=\"${var.NEW_RELIC_REGION}\"' >> ~/.bashrc",
     "source ~/.bashrc",
-    "/bin/bash ./init.sh > init_log.txt",
+    "/bin/bash ./init.sh > init_log.txt &",
     "cp ./restart.service /etc/systemd/system/",
     "systemctl enable restart.service",
     # Exiting without a sleep sometimes kills the script :-/
