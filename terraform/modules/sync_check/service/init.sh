@@ -4,7 +4,7 @@
 set -euxo pipefail
 
 ## Install dependencies
-apt-get install -y docker-compose ruby ruby-dev gcc make
+sudo apt-get install -y ruby ruby-dev gcc make
 gem install slack-ruby-client sys-filesystem
 
 nohup /bin/bash ./run_service.sh > run_service_log.txt &

@@ -65,7 +65,6 @@ locals {
     "echo 'export SLACK_NOTIF_CHANNEL=\"${var.slack_channel}\"' >> .forest_env",
     "echo 'export SNAPSHOT_BUCKET=\"${var.snapshot_bucket}\"' >> .forest_env",
     "echo 'export SNAPSHOT_ENDPOINT=\"${var.snapshot_endpoint}\"' >> .forest_env",
-    "echo 'export NR_LICENSE_KEY=\"${var.NR_LICENSE_KEY}\"' >> .forest_env",
     "echo 'export NEW_RELIC_API_KEY=\"${var.NEW_RELIC_API_KEY}\"' >> .forest_env",
     "echo 'export NEW_RELIC_ACCOUNT_ID=\"${var.NEW_RELIC_ACCOUNT_ID}\"' .forest_env",
     "echo 'export NEW_RELIC_REGION=\"${var.NEW_RELIC_REGION}\"' >> .forest_env",
