@@ -1,7 +1,7 @@
 // Copyright 2019-2023 ChainSafe Systems
 // SPDX-License-Identifier: Apache-2.0, MIT
 
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use anyhow::bail;
 use clap::Parser;
@@ -77,20 +77,12 @@ fn main() -> anyhow::Result<()> {
         .step_by(args.lite_snapshot_every_n_epochs as usize)
         .par_bridge()
         .for_each(|epoch_boundary| {
-            debug!("Generating lite snapshot for epoch {}", epoch_boundary);
-            std::process::Command::new("forest-cli")
-                .args([
-                    "archive",
-                    "export",
-                    "--epoch",
-                    epoch_boundary.to_string().as_str(),
-                    "--depth",
-                    args.lite_snapshot_depth.to_string().as_str(),
-                    args.snapshot_file.to_str().expect("invalid snapshot file"),
-                ])
-                .output()
-                .expect("failed to generate lite snapshot");
-            info!("Generated lite snapshot for epoch {}", epoch_boundary);
+            generate_lite_snapshot(
+                epoch_boundary,
+                args.lite_snapshot_depth,
+                &args.snapshot_file,
+            )
+            .expect("failed to generate lite snapshot");
 
             if epoch_boundary == 0 {
                 return;
@@ -101,33 +93,75 @@ fn main() -> anyhow::Result<()> {
                 .step_by(diff_snapshot_depth as usize)
                 .skip(1)
             {
-                let start_epoch = epoch - diff_snapshot_depth;
-                debug!("Generating diff snapshot for epochs: [{start_epoch}, {epoch}]");
-                let diff_snapshot_name = format!(
-                    "forest_diff_{}_height_{}+{}.forest.car.zst",
-                    args.network, start_epoch, diff_snapshot_depth
-                );
-
-                std::process::Command::new("forest-cli")
-                    .args([
-                        "archive",
-                        "export",
-                        "--epoch",
-                        epoch.to_string().as_str(),
-                        "--depth",
-                        diff_snapshot_depth.to_string().as_str(),
-                        "--diff",
-                        start_epoch.to_string().as_str(),
-                        "--output-path",
-                        diff_snapshot_name.as_str(),
-                        args.snapshot_file.to_str().expect("invalid snapshot file"),
-                    ])
-                    .output()
-                    .expect("failed to generate diff snapshot");
-
-                info!("Generated diff snapshot for epochs: [{start_epoch}, {epoch}]");
+                let diff = epoch - diff_snapshot_depth;
+                generate_diff_snapshot(
+                    diff,
+                    epoch,
+                    diff_snapshot_depth,
+                    &args.snapshot_file,
+                    &args.network,
+                )
+                .expect("failed to generate diff snapshot");
             }
         });
 
+    Ok(())
+}
+
+fn generate_lite_snapshot(
+    epoch: u64,
+    lite_snapshot_depth: u64,
+    snapshot_file: &Path,
+) -> anyhow::Result<()> {
+    debug!("Generating lite snapshot for epoch {epoch}");
+    std::process::Command::new("forest-cli")
+        .args([
+            "archive",
+            "export",
+            "--epoch",
+            epoch.to_string().as_str(),
+            "--depth",
+            lite_snapshot_depth.to_string().as_str(),
+            snapshot_file
+                .to_str()
+                .ok_or_else(|| anyhow::anyhow!("invalid snapshot file"))?,
+        ])
+        .output()?;
+    info!("Generated lite snapshot for epoch {epoch}");
+    Ok(())
+}
+
+fn generate_diff_snapshot(
+    diff: u64,
+    epoch: u64,
+    diff_snapshot_depth: u64,
+    snapshot_file: &Path,
+    network: &str,
+) -> anyhow::Result<()> {
+    debug!("Generating diff snapshot for epochs: [{diff}, {epoch}]");
+    let diff_snapshot_name = format!(
+        "forest_diff_{}_height_{}+{}.forest.car.zst",
+        network, diff, diff_snapshot_depth
+    );
+
+    std::process::Command::new("forest-cli")
+        .args([
+            "archive",
+            "export",
+            "--epoch",
+            epoch.to_string().as_str(),
+            "--depth",
+            diff_snapshot_depth.to_string().as_str(),
+            "--diff",
+            diff.to_string().as_str(),
+            "--output-path",
+            diff_snapshot_name.as_str(),
+            snapshot_file
+                .to_str()
+                .ok_or_else(|| anyhow::anyhow!("invalid snapshot file"))?,
+        ])
+        .output()?;
+
+    info!("Generated diff snapshot for epochs: [{diff}, {epoch}]");
     Ok(())
 }
