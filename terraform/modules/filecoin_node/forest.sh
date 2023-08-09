@@ -86,7 +86,6 @@ cat >> /etc/newrelic-infra.yml <<EOF
 include_matching_metrics:
   process.name:
     - regex "^forest.*"
-    - regex "^lotus-mainnet.*"
     - regex "^fail2ban.*"
     - regex "^rsyslog.*"
     - regex "^syslog.*"
