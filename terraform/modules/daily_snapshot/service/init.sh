@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euxo pipefail
+
 apt-get update && apt-get install -y docker ruby ruby-dev s3cmd wget 
 gem install docker-api slack-ruby-client activesupport 
 
