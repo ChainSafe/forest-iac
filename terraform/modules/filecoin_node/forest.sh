@@ -91,11 +91,11 @@ include_matching_metrics:
     - regex "^rsyslog.*"
     - regex "^syslog.*"
     - regex "^gpg-agent.*"
-metrics_network_sample_rate: 200
-metrics_process_sample_rate: 200
-metrics_system_sample_rate: 200
+metrics_network_sample_rate: 300
+metrics_process_sample_rate: 300
+metrics_system_sample_rate: 300
 disable_all_plugins: true
-disable_cloud_metadata: true
+disable_cloud_metadata: true 
 EOF
 
   sudo systemctl restart newrelic-infra  
@@ -108,7 +108,7 @@ cluster_name: forest-${CHAIN}
 targets:
   - description: Forest "${CHAIN}" Prometheus Endpoint
     urls: ["forest-${CHAIN}:6116"]
-scrape_interval: 120s
+scrape_interval: 300s
 max_concurrency: 10
 timeout: 15s
 retries: 3
