@@ -81,6 +81,24 @@ if [ -n "${NEW_RELIC_API_KEY}" ] ; then
   NEW_RELIC_ACCOUNT_ID="${NEW_RELIC_ACCOUNT_ID}" \
   NEW_RELIC_REGION="${NEW_RELIC_REGION}" \
   /usr/local/bin/newrelic install -y
+
+cat >> /etc/newrelic-infra.yml <<EOF
+include_matching_metrics:
+  process.name:
+    - regex "^forest.*"
+    - regex "^lotus-mainnet.*"
+    - regex "^fail2ban.*"
+    - regex "^rsyslog.*"
+    - regex "^syslog.*"
+    - regex "^gpg-agent.*"
+metrics_network_sample_rate: 120
+metrics_process_sample_rate: 120
+metrics_system_sample_rate: 120
+disable_all_plugins: true
+disable_cloud_metadata: true
+EOF
+
+  sudo systemctl restart newrelic-infra  
 fi
 
 # If New Relic license key is provided, run OpenMetrics Prometheus integration container.
@@ -90,7 +108,7 @@ cluster_name: forest-${CHAIN}
 targets:
   - description: Forest "${CHAIN}" Prometheus Endpoint
     urls: ["forest-${CHAIN}:6116"]
-scrape_interval: 15s
+scrape_interval: 60s
 max_concurrency: 10
 timeout: 15s
 retries: 3
