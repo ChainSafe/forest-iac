@@ -16,9 +16,7 @@ status_server_port: 18003
 license_key: "$NR_LICENSE_KEY"
 custom_attributes:
   nr_deployed_by: newrelic-cli
-EOF
 
-cat >> /etc/newrelic-infra.yml <<EOF
 include_matching_metrics:
   process.name:
     - regex "^forest.*"

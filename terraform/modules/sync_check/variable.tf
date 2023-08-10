@@ -26,7 +26,7 @@ variable "slack_token" {
 variable "image" {
   description = "The ID of the AMI to use for the Droplet"
   type        = string
-  default     = "docker-20-04"
+  default     = "fedora-38-x64"
 }
 
 variable "region" {
@@ -41,20 +41,8 @@ variable "project" {
   default     = "Forest-DEV" # Alternative: "Default"
 }
 
-variable "NEW_RELIC_REGION" {
-  description = "The New Relic Plathom Region"
+variable "NR_LICENSE_KEY" {
+  description = "New Relic Access Token"
   type        = string
-  default     = "EU"
-}
-
-variable "NEW_RELIC_API_KEY" {
-  description = "New Relic API KEY"
   default     = ""
-  type        = string
-}
-
-variable "NEW_RELIC_ACCOUNT_ID" {
-  description = "The New Relic Account ID"
-  default     = ""
-  type        = string
 }

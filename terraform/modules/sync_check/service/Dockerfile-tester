@@ -1,9 +1,12 @@
-FROM ubuntu:22.04
+FROM fedora:38
 
-RUN apt-get update && \
-    apt-get install --no-install-recommends -y docker ruby make gcc build-essential ruby-dev \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+RUN dnf install -y \
+    docker \
+    ruby \
+    ruby-devel \
+    make \
+    gcc \
+    && dnf clean all
 
 WORKDIR /chainsafe
 
