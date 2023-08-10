@@ -66,7 +66,7 @@ locals {
     "echo 'export SNAPSHOT_BUCKET=\"${var.snapshot_bucket}\"' >> .forest_env",
     "echo 'export SNAPSHOT_ENDPOINT=\"${var.snapshot_endpoint}\"' >> .forest_env",
     "echo 'export NEW_RELIC_API_KEY=\"${var.NEW_RELIC_API_KEY}\"' >> .forest_env",
-    "echo 'export NEW_RELIC_ACCOUNT_ID=\"${var.NEW_RELIC_ACCOUNT_ID}\"' .forest_env",
+    "echo 'export NEW_RELIC_ACCOUNT_ID=\"${var.NEW_RELIC_ACCOUNT_ID}\"' >> .forest_env",
     "echo 'export NEW_RELIC_REGION=\"${var.NEW_RELIC_REGION}\"' >> .forest_env",
     "echo 'export BASE_FOLDER=\"/root\"' >> .forest_env",
     "echo 'export FOREST_TAG=\"${var.forest_tag}\"' >> .forest_env",
