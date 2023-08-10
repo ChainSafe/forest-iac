@@ -16,6 +16,7 @@ if [ -n "$NEW_RELIC_API_KEY" ] ; then
   NEW_RELIC_REGION="$NEW_RELIC_REGION" \
   /usr/local/bin/newrelic install -y
 
+cat >> /etc/newrelic-infra.yml <<EOF
 include_matching_metrics:
   process.name:
     - regex "^forest.*"
