@@ -1,9 +1,10 @@
 #!/bin/bash
 
-set -eux
-
-apt-get update && apt-get install -y docker ruby ruby-dev s3cmd wget 
+dnf install -y docker ruby ruby-devel s3cmd wget 
 gem install docker-api slack-ruby-client activesupport 
+
+
+systemctl start docker
 
 # 1. Configure s3cmd
 # 2. create forest_db directory
@@ -26,7 +27,7 @@ mkdir --parents -- "$BASE_FOLDER/forest_db/filops"
 chmod +x ./upload_filops_snapshot.sh
 
 # run new_relic and fail2ban scripts
-bash newrelic_fail2ban.sh &
+bash newrelic_fail2ban.sh
 
 # Setup cron jobs
 cp calibnet_cron_job mainnet_cron_job /etc/cron.hourly/

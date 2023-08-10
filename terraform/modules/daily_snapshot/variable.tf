@@ -54,7 +54,7 @@ variable "forest_tag" {
 variable "image" {
   description = "The ID of the AMI to use for the Droplet"
   type        = string
-  default     = "docker-20-04"
+  default     = "fedora-36-x64"
 }
 
 variable "region" {
@@ -81,20 +81,8 @@ variable "destination_addresses" {
   default     = ["0.0.0.0/0", "::/0"]
 }
 
-variable "NEW_RELIC_REGION" {
-  description = "The New Relic Plathom Region"
-  type        = string
-  default     = "EU"
-}
-
-variable "NEW_RELIC_API_KEY" {
-  description = "New Relic API KEY"
-  default     = ""
-  type        = string
-}
-
-variable "NEW_RELIC_ACCOUNT_ID" {
-  description = "The New Relic Account ID"
+variable "NR_LICENSE_KEY" {
+  description = "New Relic Access Token"
   default     = ""
   type        = string
 }
