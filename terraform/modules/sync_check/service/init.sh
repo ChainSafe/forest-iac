@@ -26,11 +26,14 @@ include_matching_metrics:
     - regex "^rsyslog.*"
     - regex "^syslog.*"
     - regex "^gpg-agent.*"
-metrics_network_sample_rate: 300
+metrics_network_sample_rate: -1
 metrics_process_sample_rate: 300
 metrics_system_sample_rate: 300
+metrics_storage_sample_rate: 300
+disable_zero_mem_process_filter: true
 disable_all_plugins: true
-disable_cloud_metadata: true
+disable_cloud_metadata: true 
+ignore_system_proxy: true
 EOF
 
   # Add the New Relic infrastructure monitoring agent repository to the system's list of yum repos.
