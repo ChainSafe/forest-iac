@@ -55,20 +55,20 @@ class SyncCheck
   # Starts docker compose services.
   def start_services
     @logger.info 'Starting services'
-    `docker-compose up --build --force-recreate --detach`
+    `docker compose up --build --force-recreate --detach`
     raise 'Failed to start services' unless $CHILD_STATUS.success?
   end
 
   # Stops docker compose services
   def stop_services
     @logger.info 'Stopping services'
-    `docker-compose down`
+    `docker compose down`
     raise 'Failed to stop services' unless $CHILD_STATUS.success?
   end
 
   # Checks if the docker compose services are up
   def services_up?
-    output = `docker-compose ps --services --filter "status=running"`
+    output = `docker compose ps --services --filter "status=running"`
     $CHILD_STATUS.success? && !output.strip.empty?
   end
 
