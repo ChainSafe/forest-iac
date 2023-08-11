@@ -82,13 +82,15 @@ HEREDOC
 )
 
 # Stop any lingering docker containers
-docker stop forest-snapshot-upload-node-"$CHAIN_NAME"
+CONTAINER_NAME="forest-snapshot-upload-node-$CHAIN_NAME"
+docker stop "$CONTAINER_NAME" || true
+docker rm --force "$CONTAINER_NAME"
 
 CHAIN_DB_DIR="$BASE_FOLDER/forest_db/$CHAIN_NAME"
 
 # Run forest and generate a snapshot in forest_db/
 docker run \
-  --name forest-snapshot-upload-node-"$CHAIN_NAME" \
+  --name "$CONTAINER_NAME" \
   --rm \
   --user root \
   -v "$CHAIN_DB_DIR:/home/forest/forest_db":z \
