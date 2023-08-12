@@ -23,6 +23,9 @@ struct Args {
     #[arg(long, default_value = "10")]
     /// Number of diff snapshots to generate between lite snapshots
     diff_snapshots_between_lite: u64,
+    #[arg(long)]
+    /// Disable lite snapshots generation
+    no_lite_snapshots: bool,
     /// Full snapshot file to generate lite and diff snapshots from
     snapshot_file: PathBuf,
 }
@@ -73,23 +76,25 @@ fn main() -> anyhow::Result<()> {
         .expect("failed to build rayon thread pool");
 
     let diff_snapshot_depth = args.lite_snapshot_every_n_epochs / args.diff_snapshots_between_lite;
-    (0..epochs)
+    (0..=epochs)
         .step_by(args.lite_snapshot_every_n_epochs as usize)
         .par_bridge()
         .for_each(|epoch_boundary| {
-            generate_lite_snapshot(
-                epoch_boundary,
-                args.lite_snapshot_depth,
-                &args.snapshot_file,
-            )
-            .expect("failed to generate lite snapshot");
+            if !args.no_lite_snapshots {
+                generate_lite_snapshot(
+                    epoch_boundary,
+                    args.lite_snapshot_depth,
+                    &args.snapshot_file,
+                )
+                .expect("failed to generate lite snapshot");
+            }
 
             if epoch_boundary == 0 {
                 return;
             }
 
             // generate diff snapshots between the lite snapshots
-            for epoch in (epoch_boundary - args.lite_snapshot_every_n_epochs..epoch_boundary)
+            for epoch in (epoch_boundary - args.lite_snapshot_every_n_epochs..=epoch_boundary)
                 .step_by(diff_snapshot_depth as usize)
                 .skip(1)
             {
@@ -143,6 +148,11 @@ fn generate_diff_snapshot(
         "forest_diff_{}_height_{}+{}.forest.car.zst",
         network, diff, diff_snapshot_depth
     );
+
+    if Path::new(&diff_snapshot_name).exists() {
+        info!("Diff snapshot for epochs: [{diff}, {epoch}] already exists",);
+        return Ok(());
+    }
 
     std::process::Command::new("forest-cli")
         .args([
