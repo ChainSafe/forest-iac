@@ -1,0 +1,20 @@
+name: archival snapshots generate
+on:
+  pull_request:
+    paths:
+      - 'archival-snapshots-generate/**'
+  push:
+    paths:
+      - 'archival-snapshots-generate/**'
+
+jobs:
+  run-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - working-directory: 'archival-snapshots-generate'
+        run: |
+          cargo fmt --check
+          cargo build
+          cargo test
+          cargo clippy -- -D warnings
