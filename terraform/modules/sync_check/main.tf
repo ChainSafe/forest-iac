@@ -58,7 +58,7 @@ locals {
   init_commands = [
     "tar xf sources.tar",
     # Set required environment variables
-    "echo 'export FOREST_TAG=edge' >> ~/.forest_env",
+    "echo 'export FOREST_TAG=edge' >> .forest_env",
     "echo 'export FOREST_TARGET_DATA=/volumes/forest_data' >> .forest_env",
     "echo 'export FOREST_TARGET_SCRIPTS=/volumes/sync_check' >> .forest_env",
     "echo 'export FOREST_TARGET_RUBY_COMMON=/volumes/ruby_common' >> .forest_env",
