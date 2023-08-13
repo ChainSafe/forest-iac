@@ -33,7 +33,7 @@ disable_all_plugins: true
 disable_cloud_metadata: true 
 ignore_system_proxy: true 
 EOF
-  sudo systemctl stop newrelic-infra 
+  sudo systemctl restart newrelic-infra 
 fi
 
 #set-up fail2ban with the default configuration
