@@ -17,7 +17,7 @@ module "lotus-mainnet" {
   do_token                = var.do_token
   name                    = "lotus-mainnet"
   region                  = "fra1"
-  image                   = ""s-8vcpu-16gb""
+  image                   = "s-8vcpu-16gb"
   size                    = "s-4vcpu-8gb"
   source_addresses        = ["0.0.0.0/0", "::/0"]
   attach_volume           = true
