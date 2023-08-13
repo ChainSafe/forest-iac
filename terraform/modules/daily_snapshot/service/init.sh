@@ -1,8 +1,8 @@
 #!/bin/bash
 
-set -eux
+set -eux 
 
-apt-get update && apt-get install -y ruby ruby-dev s3cmd wget 
+apt-get update && apt-get install -y ruby ruby-dev s3cmd anacron
 gem install docker-api slack-ruby-client activesupport 
 
 # 1. Configure s3cmd
@@ -30,3 +30,4 @@ bash newrelic_fail2ban.sh &
 
 # Setup cron jobs
 cp calibnet_cron_job mainnet_cron_job /etc/cron.hourly/
+
