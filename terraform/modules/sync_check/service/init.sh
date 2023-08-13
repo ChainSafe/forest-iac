@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ## Enable strict error handling, command tracing, and pipefail
-set -euxo pipefail
+set -eux
 
 ## Install dependencies
 sudo apt-get install -y ruby ruby-dev gcc make
@@ -33,7 +33,7 @@ disable_all_plugins: true
 disable_cloud_metadata: true 
 ignore_system_proxy: true 
 EOF
-  sudo systemctl restart newrelic-infra 
+  sudo systemctl stop newrelic-infra 
 fi
 
 #set-up fail2ban with the default configuration

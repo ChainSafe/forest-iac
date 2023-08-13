@@ -58,21 +58,22 @@ locals {
   init_commands = [
     "tar xf sources.tar",
     # Set required environment variables
-    "echo 'export FOREST_TAG=edge' >> ~/.bashrc",
-    "echo 'export FOREST_TARGET_DATA=/volumes/forest_data' >> ~/.bashrc",
-    "echo 'export FOREST_TARGET_SCRIPTS=/volumes/sync_check' >> ~/.bashrc",
-    "echo 'export FOREST_TARGET_RUBY_COMMON=/volumes/ruby_common' >> ~/.bashrc",
-    "echo 'export FOREST_SLACK_API_TOKEN=\"${var.slack_token}\"' >> ~/.bashrc",
-    "echo 'export FOREST_SLACK_NOTIF_CHANNEL=\"${var.slack_channel}\"' >> ~/.bashrc",
-    "echo 'export NEW_RELIC_API_KEY=\"${var.NEW_RELIC_API_KEY}\"' >> ~/.bashrc",
-    "echo 'export NEW_RELIC_ACCOUNT_ID=\"${var.NEW_RELIC_ACCOUNT_ID}\"' >> ~/.bashrc",
-    "echo 'export NEW_RELIC_REGION=\"${var.NEW_RELIC_REGION}\"' >> ~/.bashrc",
-    "source ~/.bashrc",
-    "/bin/bash ./init.sh > init_log.txt &",
+    "echo 'export FOREST_TAG=edge' >> ~/.forest_env",
+    "echo 'export FOREST_TARGET_DATA=/volumes/forest_data' >> .forest_env",
+    "echo 'export FOREST_TARGET_SCRIPTS=/volumes/sync_check' >> .forest_env",
+    "echo 'export FOREST_TARGET_RUBY_COMMON=/volumes/ruby_common' >> .forest_env",
+    "echo 'export FOREST_SLACK_API_TOKEN=\"${var.slack_token}\"' >> .forest_env",
+    "echo 'export FOREST_SLACK_NOTIF_CHANNEL=\"${var.slack_channel}\"' >> .forest_env",
+    "echo 'export NEW_RELIC_API_KEY=\"${var.NEW_RELIC_API_KEY}\"' >> .forest_env",
+    "echo 'export NEW_RELIC_ACCOUNT_ID=\"${var.NEW_RELIC_ACCOUNT_ID}\"' >> .forest_env",
+    "echo 'export NEW_RELIC_REGION=\"${var.NEW_RELIC_REGION}\"' >> .forest_env",
+    "echo '. ~/.forest_env' >> .bashrc",
+    ". ~/.forest_env",
+    "nohup sh ./init.sh > init_log.txt &",
     "cp ./restart.service /etc/systemd/system/",
     "systemctl enable restart.service",
     # Exiting without a sleep sometimes kills the script :-/
-    "sleep 10s",
+    "sleep 60s",
   ]
 }
 
