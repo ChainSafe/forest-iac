@@ -18,7 +18,7 @@ module "lotus-mainnet" {
   name                    = "lotus-mainnet"
   region                  = "fra1"
   image                   = "docker-20-04"
-  size                    = "s-4vcpu-8gb"
+  size                    = "s-8vcpu-16gb"
   source_addresses        = ["0.0.0.0/0", "::/0"]
   attach_volume           = true
   destination_addresses   = ["0.0.0.0/0", "::/0"]
