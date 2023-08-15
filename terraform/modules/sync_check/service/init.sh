@@ -1,10 +1,10 @@
 #!/bin/bash
 
 ## Enable strict error handling, command tracing, and pipefail
-set -euxo pipefail
+set -eux
 
 ## Install dependencies
-sudo apt-get install -y ruby ruby-dev gcc make
+apt-get update && apt-get install -y ruby ruby-dev gcc make
 gem install slack-ruby-client sys-filesystem
 
 nohup /bin/bash ./run_service.sh > run_service_log.txt &
