@@ -4,10 +4,14 @@
 use std::path::{Path, PathBuf};
 
 use anyhow::bail;
+use chrono::NaiveDateTime;
 use clap::Parser;
 use env_logger::Env;
 use log::{debug, info};
 use rayon::prelude::*;
+
+type ChainEpoch = u64;
+const EPOCH_DURATION_SECONDS: u64 = 30;
 
 #[derive(Parser, Debug)]
 struct Args {
@@ -17,7 +21,7 @@ struct Args {
     #[arg(long, default_value = "30000")]
     /// Number of epochs between each lite snapshot
     lite_snapshot_every_n_epochs: u64,
-    #[arg(long, default_value = "2000")]
+    #[arg(long, default_value = "900")]
     /// Number of epochs to include in each lite snapshot
     lite_snapshot_depth: u64,
     #[arg(long, default_value = "10")]
@@ -99,10 +103,13 @@ fn main() -> anyhow::Result<()> {
                 .skip(1)
             {
                 let diff = epoch - diff_snapshot_depth;
+                let diff_depth = diff - (epoch_boundary - args.lite_snapshot_every_n_epochs)
+                    + args.lite_snapshot_depth;
                 generate_diff_snapshot(
                     diff,
                     epoch,
                     diff_snapshot_depth,
+                    diff_depth,
                     &args.snapshot_file,
                     &args.network,
                 )
@@ -140,13 +147,17 @@ fn generate_diff_snapshot(
     diff: u64,
     epoch: u64,
     diff_snapshot_depth: u64,
+    diff_depth: u64,
     snapshot_file: &Path,
     network: &str,
 ) -> anyhow::Result<()> {
     debug!("Generating diff snapshot for epochs: [{diff}, {epoch}]");
     let diff_snapshot_name = format!(
-        "forest_diff_{}_height_{}+{}.forest.car.zst",
-        network, diff, diff_snapshot_depth
+        "forest_diff_{}_{}_height_{}+{}.forest.car.zst",
+        network,
+        epoch_to_date(diff + diff_snapshot_depth),
+        diff,
+        diff_snapshot_depth
     );
 
     if Path::new(&diff_snapshot_name).exists() {
@@ -164,6 +175,8 @@ fn generate_diff_snapshot(
             diff_snapshot_depth.to_string().as_str(),
             "--diff",
             diff.to_string().as_str(),
+            "--diff-depth",
+            diff_depth.to_string().as_str(),
             "--output-path",
             diff_snapshot_name.as_str(),
             snapshot_file
@@ -174,4 +187,16 @@ fn generate_diff_snapshot(
 
     info!("Generated diff snapshot for epochs: [{diff}, {epoch}]");
     Ok(())
+}
+
+fn epoch_to_date(epoch: ChainEpoch) -> String {
+    let genesis_timestamp = 1667326380;
+
+    NaiveDateTime::from_timestamp_opt(
+        (genesis_timestamp + epoch * EPOCH_DURATION_SECONDS) as i64,
+        0,
+    )
+    .unwrap_or_default()
+    .format("%Y-%m-%d")
+    .to_string()
 }
