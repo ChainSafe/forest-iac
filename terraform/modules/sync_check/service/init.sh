@@ -27,7 +27,7 @@ include_matching_metrics:
     - regex "^syslog.*"
     - regex "^gpg-agent.*"
 metrics_network_sample_rate: -1
-metrics_process_sample_rate:-1
+metrics_process_sample_rate: -1
 metrics_system_sample_rate: 300
 metrics_storage_sample_rate: 300
 metrics_nfs_sample_rate: 300
