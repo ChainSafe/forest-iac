@@ -21,7 +21,7 @@ require_relative 'benchmark_base'
 
 # Define `regex` for capturing the snapshot height.
 SNAPSHOT_REGEXES = [
-  /_height_(?<height>\d+)\.car/,
+  /_height_(?<height>\d+)(\.forest)?\.car/,
   %r{/(?<height>\d+)_*}
 ].freeze
 
