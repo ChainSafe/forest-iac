@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
-require 'cs_utils/slack_client'
-require 'cs_utils/docker_utils'
+require_relative 'ruby_common/slack_client'
+require_relative 'ruby_common/docker_utils'
+require_relative 'ruby_common/utils'
 require_relative 'sync_check_process'
 require 'logger'
 require 'fileutils'
