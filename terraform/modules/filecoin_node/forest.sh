@@ -104,7 +104,7 @@ disable_cloud_metadata: true
 ignore_system_proxy: true 
 EOF
 
-  sudo systemctl status newrelic-infra  
+  sudo systemctl restart newrelic-infra  
 fi
 
 # If New Relic license key is provided, run OpenMetrics Prometheus integration container.
