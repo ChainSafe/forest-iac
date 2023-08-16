@@ -70,11 +70,11 @@ locals {
     "echo 'export NEW_RELIC_REGION=\"${var.NEW_RELIC_REGION}\"' >> .forest_env",
     "echo 'export BASE_FOLDER=\"/root\"' >> .forest_env",
     "echo 'export FOREST_TAG=\"${var.forest_tag}\"' >> .forest_env",
-    "echo 'source .forest_env' >> .bashrc",
-    "source ~/.forest_env",
+    "echo '. ~/.forest_env' >> .bashrc",
+    ". ~/.forest_env",
     "nohup sh ./init.sh > init_log.txt &",
     # Exiting without a sleep sometimes kills the script :-/
-    "sleep 10s"
+    "sleep 60s"
   ]
 }
 
