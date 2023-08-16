@@ -20,10 +20,12 @@ variable "slack_token" {
 
 variable "NEW_RELIC_API_KEY" {
   description = "New Relic API KEY"
+  default     = ""
   type        = string
 }
 
 variable "NEW_RELIC_ACCOUNT_ID" {
   description = "The New Relic Account ID"
+  default     = ""
   type        = string
 }
