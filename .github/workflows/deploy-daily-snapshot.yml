@@ -12,6 +12,7 @@ on:
       - main
     paths:
       - 'terraform/daily_snapshot/**'
+      - 'terraform/modules/daily_snapshot/**'
   workflow_dispatch:
 
 jobs:
