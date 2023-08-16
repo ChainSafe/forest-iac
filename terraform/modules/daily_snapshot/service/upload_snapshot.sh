@@ -59,7 +59,7 @@ echo "Snapshot: $NEWEST_SNAPSHOT"
 # spawn a task in the background to periodically write Prometheus metrics to a file
 write_metrics &
 
-forest-cli --config config.toml --chain "$CHAIN_NAME" db clean --force
+forest-tool db destroy --config config.toml --chain "$CHAIN_NAME" --force
 forest --config config.toml --chain "$CHAIN_NAME" --import-snapshot "$NEWEST_SNAPSHOT" --halt-after-import
 forest --config config.toml --chain "$CHAIN_NAME" --no-gc --save-token=token.txt --detach
 timeout "$SYNC_TIMEOUT" forest-cli --chain "$CHAIN_NAME" sync wait
