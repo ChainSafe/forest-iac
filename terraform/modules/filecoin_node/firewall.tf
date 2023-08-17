@@ -32,6 +32,11 @@ resource "digitalocean_firewall" "forest_firewall" {
   }
 
   outbound_rule {
+    protocol              = "udp"
+    port_range            = "123"
+    destination_addresses = var.destination_addresses
+  }
+  outbound_rule {
     protocol              = "icmp"
     destination_addresses = var.destination_addresses
   }
