@@ -36,6 +36,19 @@ disable_zero_mem_process_filter: true
 disable_all_plugins: true
 disable_cloud_metadata: true 
 ignore_system_proxy: true 
+log:
+  file: /var/log/auth.log
+  level: smart
+  forward: false
+  smart_level_entry_limit: 50
+  attributes:
+    logtype: linux_auth
+  file: /var/log/syslog
+  level: smart
+  forward: false
+  smart_level_entry_limit: 50
+  attributes:
+    logtype: linux_syslog
 EOF
   sudo systemctl restart newrelic-infra 
 fi
