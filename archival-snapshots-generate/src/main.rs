@@ -155,7 +155,7 @@ fn generate_diff_snapshot(
     let diff_snapshot_name = format!(
         "forest_diff_{}_{}_height_{}+{}.forest.car.zst",
         network,
-        epoch_to_date(diff + diff_snapshot_depth),
+        epoch_to_date(network, diff + diff_snapshot_depth)?,
         diff,
         diff_snapshot_depth
     );
@@ -189,14 +189,18 @@ fn generate_diff_snapshot(
     Ok(())
 }
 
-fn epoch_to_date(epoch: ChainEpoch) -> String {
-    let genesis_timestamp = 1667326380;
+fn epoch_to_date(network: &str, epoch: ChainEpoch) -> anyhow::Result<String> {
+    let genesis_timestamp = match network {
+        "mainnet" => 1598306400,
+        "calibnet" => 1667326380,
+        _ => bail!("unsupported network"),
+    };
 
-    NaiveDateTime::from_timestamp_opt(
+    Ok(NaiveDateTime::from_timestamp_opt(
         (genesis_timestamp + epoch * EPOCH_DURATION_SECONDS) as i64,
         0,
     )
     .unwrap_or_default()
     .format("%Y-%m-%d")
-    .to_string()
+    .to_string())
 }
