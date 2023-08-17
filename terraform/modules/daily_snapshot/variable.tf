@@ -54,7 +54,7 @@ variable "forest_tag" {
 variable "image" {
   description = "The ID of the AMI to use for the Droplet"
   type        = string
-  default     = "docker-20-04"
+  default     = "fedora-38-x64"
 }
 
 variable "region" {
