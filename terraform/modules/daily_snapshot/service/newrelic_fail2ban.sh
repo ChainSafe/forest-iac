@@ -32,7 +32,7 @@ container_cache_metadata_limit: 300
 disable_zero_mem_process_filter: true
 disable_all_plugins: true
 disable_cloud_metadata: true 
-ignore_system_proxy: true  
+ignore_system_proxy: true
 EOF
   # remove logging configuration form newrelic config
   rm -rf /etc/newrelic-infra/logging.d/logging.yml
