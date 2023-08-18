@@ -7,13 +7,11 @@ on:
       - main
     paths:
       - 'terraform/forest-calibnet/**'
-      - 'terraform/modules/filecoin_node/**'
   push:
     branches:
       - main
     paths:
       - 'terraform/forest-calibnet/**'
-      - 'terraform/modules/filecoin_node/**'
   workflow_dispatch:
 
 jobs:
