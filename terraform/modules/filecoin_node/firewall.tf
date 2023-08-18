@@ -31,6 +31,8 @@ resource "digitalocean_firewall" "forest_firewall" {
     destination_addresses = var.destination_addresses
   }
 
+
+  // Added for NTP synchronization Port
   outbound_rule {
     protocol              = "udp"
     port_range            = "123"
