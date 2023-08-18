@@ -26,6 +26,9 @@ if [ -f "/root/.ssh/authorized_keys" ]; then
   chmod 0600 "/home/${NEW_USER}/.ssh/authorized_keys"
 fi
 
+#install NTP to synchronize the time differences
+apt-get install -y ntp
+
 systemctl restart sshd
 
 # Add new user to "sudo" and "docker" group so they can run docker commands and have general admin rights.

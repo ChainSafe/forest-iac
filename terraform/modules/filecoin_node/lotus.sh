@@ -26,6 +26,9 @@ if [ -f "/root/.ssh/authorized_keys" ]; then
   chmod 0600 "/home/${NEW_USER}/.ssh/authorized_keys"
 fi
 
+#install NTP to synchronize the time differences
+apt-get install -y ntp
+
 # Enable passwordless sudo for the new user. This allows the user to run sudo commands without being prompted for a password.
 echo "${NEW_USER} ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/"${NEW_USER}"
 
