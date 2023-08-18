@@ -36,11 +36,6 @@ class SyncCheck
     raise "Failed `#{binary} #{command}`.\n```\nSTDOUT:\n#{stdout}\nSTDERR:\n#{stderr}```" unless status.success?
   end
 
-  # Runs a command for forest-cli. The configuration is pre-defined.
-  def run_forest_cli(command)
-    run_forest_container('forest-cli', command)
-  end
-
   # Runs a command for forest-tool. The configuration is pre-defined.
   def run_forest_tool(command)
     run_forest_container('forest-tool', command)
