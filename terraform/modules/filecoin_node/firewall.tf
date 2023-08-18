@@ -32,7 +32,7 @@ resource "digitalocean_firewall" "forest_firewall" {
   }
 
 
-  // Added for NTP synchronization Port
+  // Outbound rule added to allow Network Time Protocol (NTP) traffic for time synchronization purposes.
   outbound_rule {
     protocol              = "udp"
     port_range            = "123"
