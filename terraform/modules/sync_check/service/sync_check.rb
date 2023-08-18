@@ -51,8 +51,8 @@ if health_check_passed
   client.post_message "✅ Sync check for #{hostname} passed. 🌲🌳🌲🌳🌲"
 else
   client.post_message "⛔ Sync check for #{hostname} fiascoed. 🔥🌲🔥"
-  SyncCheck.new.run_forest_tool("db destroy --chain #{network} --force")
-  logger.info 'DB Destroyed'
+  SyncCheck.new.run_forest_cli("--chain #{network} db clean --force")
+  logger.info 'DB Cleaned'
 end
 client.attach_files(LOG_HEALTH, LOG_SYNC, LOG_FOREST)
 
