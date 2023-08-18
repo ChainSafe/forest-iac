@@ -7,11 +7,13 @@ on:
       - main
     paths:
       - 'terraform/lotus-mainnet/**'
+      - 'terraform/modules/filecoin_node/**'
   push:
     branches:
       - main
     paths:
       - 'terraform/lotus-mainnet/**'
+      - 'terraform/modules/filecoin_node/**'
   workflow_dispatch:
 
 jobs:
