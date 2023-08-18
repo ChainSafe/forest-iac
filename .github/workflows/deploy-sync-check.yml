@@ -35,4 +35,3 @@ jobs:
           working_directory: terraform/sync_check
           environment: Sync Check Service
           nr_license_key: ${{ secrets.NR_LICENSE_KEY }}
-          
