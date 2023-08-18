@@ -44,7 +44,7 @@ class ForestBenchmark < BenchmarkBase
   end
 
   def clone_command
-    exec_command(['git', 'clone', 'https://github.com/ChainSafe/forest.git', repository_name])
+    exec_command(['git', 'clone', '--recursive', 'https://github.com/ChainSafe/forest.git', repository_name])
   end
 
   def checkout_command
