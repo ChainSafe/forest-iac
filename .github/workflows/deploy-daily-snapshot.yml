@@ -7,11 +7,13 @@ on:
       - main
     paths:
       - 'terraform/daily_snapshot/**'
+      - 'terraform/modules/daily_snapshot/**'
   push:
     branches:
       - main
     paths:
       - 'terraform/daily_snapshot/**'
+      - 'terraform/modules/daily_snapshot/**'
   workflow_dispatch:
 
 jobs:
@@ -34,4 +36,5 @@ jobs:
           slack_token: ${{ secrets.SLACK_TOKEN }}
           working_directory: terraform/daily_snapshot
           environment: Snapshot Service
-          nr_license_key: ${{ secrets.NR_LICENSE_KEY }}
+          new_relic_account_id: ${{ secrets.NEW_RELIC_ACCOUNT_ID }}
+          new_relic_api_key: ${{ secrets.NEW_RELIC_API_KEY }}
