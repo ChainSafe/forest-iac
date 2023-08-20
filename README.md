@@ -46,7 +46,7 @@ The user's local machine requirements include the following:
 To implement the infrastructure, run the following:
 - Create an `ssh-key` to be added to the DigitalOcean list and store the fingerprint for use in the next few steps; you can check more details [here](https://docs.digitalocean.com/products/droplets/how-to/add-ssh-keys/to-team/)
 
-- Create a space on DigitalOcean with any preferred unique name, then add the bucket name and endpoint to the `backend.tf` file located in the terraform Mainnet or Calibnet directory, depending on which one you plan to run.
+- Create a space on DigitalOcean with any preferred unique name, then add the bucket name and endpoint to the `backend.tf` file located in the `forest-mainnet`, `forest-calibnet` or `lotus-mainnet` directory, depending on which one you plan to run.
 
 - Generate `digitalocean_api_token` from DigitalOcean console; you can check [here](https://docs.digitalocean.com/reference/api/create-personal-access-token/) for more details.
 
