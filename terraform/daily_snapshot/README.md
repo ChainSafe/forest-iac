@@ -46,10 +46,7 @@ export TF_VAR_NEW_RELIC_ACCOUNT_ID=
 
 Forest tokens can be found on 1password.
 
-You also need to register your public key with Digital Ocean. This can be done
-here: https://cloud.digitalocean.com/account/security
-
-To configure your SSH key, execute the commands below:
+you'll also need to link your public key with Digital Ocean. To do this, visit https://cloud.digitalocean.com/account/security. Additionally, set up your SSH key by following the commands provided below:
 
 ```bash
 eval $(ssh-agent)
