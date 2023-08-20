@@ -150,17 +150,21 @@ def write_csv(metrics, options)
     chain = options[:chain]
 
     results = { import_time: { forest: 'n/a', lotus: 'n/a' },
-    validation_time: { forest: 'n/a', lotus: 'n/a' } }
+                validation_time: { forest: 'n/a', lotus: 'n/a' },
+                peak_memory: { forest: 'n/a', lotus: 'n/a' } }
 
     metrics.each do |key, value|
       elapsed = value[:import][:elapsed] || 'n/a'
       tpm = value[:validate_online][:tpm] || 'n/a'
+      peak_memory = value[:peak_memory] || 'n/a'
 
       results[:import_time][key.to_sym] = "#{elapsed} sec"
       results[:validation_time][key.to_sym] = "#{tpm} tipsets/sec"
+      results[:peak_memory][key.to_sym] = "#{peak_memory} KB"
     end
+
     results.each do |key, value|
-        csv << [timestamp, FOREST_VERSION, LOTUS_VERSION, chain, key, value[:forest], value[:lotus]]
+      csv << [timestamp, FOREST_VERSION, LOTUS_VERSION, chain, key, value[:forest], value[:lotus]]
     end
   end
   @logger.info "Wrote #{filename}"
