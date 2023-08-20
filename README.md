@@ -61,9 +61,9 @@ export AWS_SECRET_ACCESS_KEY=
 
 # Optional, only if you want install new relic agent
 # New Relic details used, Can be gotten here: https://one.eu.newrelic.com/admin-portal/api-keys/home
-export NEW_RELIC_API_KEY=
-export NEW_RELIC_ACCOUNT_ID=
-export NR_LICENSE_KEY=
+export TF_VAR_NEW_RELIC_API_KEY=
+export TF_VAR_NEW_RELIC_ACCOUNT_ID=
+export TF_VAR_NR_LICENSE_KEY=
 ```
 Then save the file and restart the terminal for the changes to take effect.
 

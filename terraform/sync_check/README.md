@@ -29,16 +29,38 @@ you don't set these variables):
 export TF_VAR_do_token=
 # Slack access token: https://api.slack.com/apps
 export TF_VAR_slack_token=
+# S3 access keys used by the snapshot service. Can be generated here: https://cloud.digitalocean.com/account/api/spaces
+export TF_VAR_AWS_ACCESS_KEY_ID=
+export TF_VAR_AWS_SECRET_ACCESS_KEY=
+# S3 access keys used by terraform, use the same values as above
+export AWS_ACCESS_KEY_ID=
+export AWS_SECRET_ACCESS_KEY=
 
 # Optional, only if you want install new relic agent
 # New Relic License key, Can be generated here: https://one.eu.newrelic.com/admin-portal/api-keys/home
-export TF_VAR_NR_LICENSE_KEY=
+export TF_VAR_NEW_RELIC_API_KEY=
+export TF_VAR_NEW_RELIC_ACCOUNT_ID=
 ```
 
 Forest tokens can be found on 1password.
 
 You also need to register your public key with Digital Ocean. This can be done
 here: https://cloud.digitalocean.com/account/security
+
+To configure your SSH key, execute the commands below:
+
+```bash
+eval $(ssh-agent)
+
+ssh-add <path_to_your_ssh_key>
+```
+
+To ensure the production Snapshot service remains intact, modify certain variables in the `Main.tf` file:
+
+- Change `key = "daily_snapshot.tfstate"` to `key = "<your_custom_name>.tfstate"`.
+- Replace `name = "forest-snapshot"` with `name = "<your_desired_name>"`.
+
+Remember to replace `<path_to_your_ssh_key>`, `<your_custom_name>`, and `<your_desired_name>` with appropriate values.
 
 To prepare terraform for other commands:
 ```bash
@@ -50,6 +72,10 @@ added, etc.):
 ```bash
 $ terraform plan
 ```
+For Mac users, if you encounter the `Error: External Program Execution Failed`, you'll need to adjust the `prep_sources.sh` file located in the `../modules/daily_snapshot` directory. Make the following changes:
+
+- Replace `--archive` with `-Rp`.
+- Install `gnu-tar` using the command `brew install gnu-tar`. Afterward, switch `tar cf ../sources.tar` to `gtar cf ../sources.tar`
 
 To deploy the service:
 ```bash
