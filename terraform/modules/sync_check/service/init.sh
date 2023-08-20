@@ -31,7 +31,7 @@ disable_cloud_metadata: true
 ignore_system_proxy: true 
 EOF
 
-cat > etc/newrelic-infra/logging.d/logging.yml <<EOF
+cat > /etc/newrelic-infra/logging.d/logging.yml <<EOF
 logs:
   - name: alternatives.log
     file: /var/log/alternatives.log
