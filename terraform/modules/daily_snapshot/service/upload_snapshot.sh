@@ -88,6 +88,10 @@ docker rm --force "$CONTAINER_NAME"
 
 CHAIN_DB_DIR="$BASE_FOLDER/forest_db/$CHAIN_NAME"
 
+# Delete any existing snapshot files. It may be that the previous run failed
+# before deleting those.
+rm "$CHAIN_DB_DIR/forest_snapshot_$CHAIN_NAME"*
+
 # Run forest and generate a snapshot in forest_db/
 docker run \
   --name "$CONTAINER_NAME" \
