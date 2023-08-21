@@ -2,7 +2,7 @@ FROM fedora:38
 
 RUN dnf -y install dnf-plugins-core && \
     dnf install -y \
-        ruby ruby-devel make gcc git golang rust cargo s3cmd clang aria2 zstd clang-devel git-lfs && \
+        ruby ruby-devel make gcc git golang rust cargo s3cmd clang aria2 zstd clang-devel git-lfs time && \
     dnf clean all
 
 # Lotus dependencies
