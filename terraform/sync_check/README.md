@@ -54,8 +54,9 @@ ssh-add <path_to_your_ssh_key>
 
 To ensure the production Snapshot service remains intact, modify certain variables in the `Main.tf` file:
 
-- Change `key = "daily_snapshot.tfstate"` to `key = "<your_custom_name>.tfstate"`.
-- Replace `name = "forest-snapshot"` with `name = "<your_desired_name>"`.
+- Change `key = "sync_check.tfstate"` to `key = "<your_custom_name>.tfstate"`.
+- Replace `name = "forest-sync-check"` with `name = "<your_desired_name>"`.
+- Replace ` slack_channel = "#forest-notifications"` with  `slack_channel = "#forest-dump"`
 
 Remember to replace `<path_to_your_ssh_key>`, `<your_custom_name>`, and `<your_desired_name>` with appropriate values.
 
@@ -69,7 +70,7 @@ added, etc.):
 ```bash
 $ terraform plan
 ```
-For Mac users, if you encounter the `Error: External Program Execution Failed`, you'll need to adjust the `prep_sources.sh` file located in the `../modules/daily_snapshot` directory. Make the following changes:
+For Mac users, if you encounter the `Error: External Program Execution Failed`, you'll need to adjust the `prep_sources.sh` file located in the `../modules/sync_check` directory. Make the following changes:
 
 - Replace `--archive` with `-Rp`.
 - Install `gnu-tar` using the command `brew install gnu-tar`. Afterward, switch `tar cf ../sources.tar` to `gtar cf ../sources.tar`

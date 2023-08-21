@@ -58,6 +58,7 @@ To ensure the production Snapshot service remains intact, modify certain variabl
 
 - Change `key = "daily_snapshot.tfstate"` to `key = "<your_custom_name>.tfstate"`.
 - Replace `name = "forest-snapshot"` with `name = "<your_desired_name>"`.
+- Replace ` slack_channel     = "#forest-notifications"` with  `slack_channel     = "#forest-dump"`
 
 Remember to replace `<path_to_your_ssh_key>`, `<your_custom_name>`, and `<your_desired_name>` with appropriate values.
 
