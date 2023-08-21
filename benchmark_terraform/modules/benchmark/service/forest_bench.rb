@@ -23,7 +23,7 @@ class ForestBenchmark < BenchmarkBase
   def clean_db
     config_path = "#{data_dir}/#{@name}.toml"
 
-    exec_command([target_cli, '-c', config_path, 'db', 'clean', '--force'])
+    exec_command([target_tool, '-c', config_path, 'db', 'destroy', '--force'])
   end
 
   def target
@@ -32,6 +32,10 @@ class ForestBenchmark < BenchmarkBase
 
   def target_cli
     File.join('.', repository_name, 'target', 'release', 'forest-cli')
+  end
+
+  def target_tool
+    File.join('.', repository_name, 'target', 'release', 'forest-tool')
   end
 
   def repository_name
