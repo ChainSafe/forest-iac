@@ -23,7 +23,7 @@ class ForestBenchmark < BenchmarkBase
   def clean_db
     config_path = "#{data_dir}/#{@name}.toml"
 
-    exec_command([target_tool, '-c', config_path, 'db', 'destroy', '--force'])
+    exec_command([target_tool, 'db', 'destroy', '-c', config_path ])
   end
 
   def target

@@ -11,8 +11,8 @@ set -euxo pipefail
 ruby init_s3cmd.rb
 
 ## Run actual benchmark
-ruby bench.rb --chain calibnet --tempdir ./snapshots --daily
-ruby bench.rb --chain mainnet --tempdir ./snapshots --daily
+ruby bench.rb --chain calibnet --tempdir ./tmp --daily
+ruby bench.rb --chain mainnet --tempdir ./tmp --daily
 
 ## Upload benchmark result to s3 weekly file
 week_number=$(date +%W) # Week starting on Monday
