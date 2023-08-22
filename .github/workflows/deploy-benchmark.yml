@@ -28,5 +28,5 @@ jobs:
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
           slack_token: ${{ secrets.SLACK_TOKEN }}
-          working_directory: benchmark_terraform/
+          working_directory: terraform/benchmark
           environment: Benchmark Service
