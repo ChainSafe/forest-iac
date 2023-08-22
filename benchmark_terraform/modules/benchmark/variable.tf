@@ -45,12 +45,6 @@ variable "benchmark_endpoint" {
   default     = "https://fra1.digitaloceanspaces.com/"
 }
 
-variable "forest_tag" {
-  description = "Image tag for the Forest container"
-  type        = string
-  default     = "edge"
-}
-
 variable "image" {
   description = "The ID of the AMI to use for the Droplet"
   type        = string
@@ -67,16 +61,4 @@ variable "project" {
   description = "DigitalOcean project used as parent for the created droplet"
   type        = string
   default     = "Forest-DEV" # Alternative: "Default"
-}
-
-variable "source_addresses" {
-  description = "List of source addresses."
-  type        = list(string)
-  default     = ["0.0.0.0/0", "::/0"]
-}
-
-variable "destination_addresses" {
-  description = "List of destination addresses."
-  type        = list(string)
-  default     = ["0.0.0.0/0", "::/0"]
 }

@@ -29,12 +29,6 @@ data "local_file" "sources" {
   filename = data.external.sources_tar.result.path
 }
 
-// Note: The init.sh file is also included in the sources.zip such that the hash
-// of the archive captures the entire state of the machine.
-data "local_file" "init" {
-  filename = "${path.module}/service/init.sh"
-}
-
 data "digitalocean_ssh_keys" "keys" {
   sort {
     key       = "name"
@@ -69,7 +63,7 @@ resource "digitalocean_droplet" "forest" {
   # Re-initialize resource if this hash changes:
   user_data = join("-", [data.local_file.sources.content_sha256, sha256(join("", local.init_commands))])
   tags      = ["iac"]
-  ssh_keys  = data.digitalocean_ssh_keys.keys.ssh_keys.*.fingerprint
+  ssh_keys  = data.digitalocean_ssh_keys.keys.ssh_keys[*].fingerprint
 
   graceful_shutdown = false
 
