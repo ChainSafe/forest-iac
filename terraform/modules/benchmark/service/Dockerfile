@@ -1,5 +1,7 @@
 FROM ubuntu:22.04
 
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
 # Prevent interactive prompts during package installation
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -12,7 +14,7 @@ RUN apt-get update && \
 
 # Install Rust using rustup
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
-RUN echo 'source $HOME/.cargo/env' >> $HOME/.bashrc
+RUN echo "source $HOME/.cargo/env" >> $HOME/.bashrc
 
 # Install required Ruby gems
 RUN gem install slack-ruby-client sys-filesystem bundler concurrent-ruby deep_merge tomlrb toml-rb csv droplet_kit
