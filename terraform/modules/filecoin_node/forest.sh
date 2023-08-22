@@ -54,6 +54,7 @@ sudo --user="${NEW_USER}" -- \
   --detach \
   --network=forest \
   --name=forest-"${CHAIN}" \
+  --env FOREST_GC_TRIGGER_FACTOR: "1.4"
   --volume=/home/"${NEW_USER}"/forest_data:/home/"${NEW_USER}"/forest_data:z \
   --publish=1234:1234 \
   --publish=6116:6116 \
