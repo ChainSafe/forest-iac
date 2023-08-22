@@ -25,7 +25,7 @@ terraform {
 
 module "benchmark" {
   # Import the benchmark module
-  source = "./modules/benchmark"
+  source = "../modules/benchmark"
 
   # Configure service:
   name               = "forest-benchmark" # droplet name
