@@ -5,7 +5,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Install required forest and lotus packages
 RUN apt-get update && \
-    apt-get install -y ruby ruby-dev make gcc git golang rustc cargo s3cmd clang aria2 zstd git-lfs time \
+    apt-get install --no-install-recommends -y ruby ruby-dev make gcc git golang rustc cargo s3cmd clang aria2 zstd git-lfs time \
     bzr jq pkg-config ocl-icd-libopencl1 ocl-icd-dev llvm wget hwloc && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
