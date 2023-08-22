@@ -55,6 +55,7 @@ sudo --user="${NEW_USER}" -- \
   --network=forest \
   --name=forest-"${CHAIN}" \
   --volume=/home/"${NEW_USER}"/forest_data:/home/"${NEW_USER}"/forest_data:z \
+  --env "FOREST_GC_TRIGGER_FACTOR=1.2" \
   --publish=1234:1234 \
   --publish=6116:6116 \
   --restart=always \
