@@ -1,0 +1,4 @@
+target/
+
+# main output of this binary
+*.forest.car.zst

@@ -15,10 +15,10 @@ module "lotus-mainnet" {
   source = "../modules/filecoin_node"
 
   do_token                = var.do_token
-  name                    = "lotus"
+  name                    = "lotus-mainnet"
   region                  = "fra1"
   image                   = "docker-20-04"
-  size                    = "s-4vcpu-8gb"
+  size                    = "s-8vcpu-16gb"
   source_addresses        = ["0.0.0.0/0", "::/0"]
   attach_volume           = true
   destination_addresses   = ["0.0.0.0/0", "::/0"]
@@ -27,8 +27,9 @@ module "lotus-mainnet" {
   volume_size             = "1000"
   chain                   = "mainnet"
   project                 = "Forest-DEV"
-  fw_name                 = "mainnet-calibnet-fw"
+  fw_name                 = "lotus-mainnet-fw"
   script                  = "lotus.sh"
+  forest_user             = "forest"
   NR_LICENSE_KEY          = var.NR_LICENSE_KEY
   NEW_RELIC_API_KEY       = var.NEW_RELIC_API_KEY
   NEW_RELIC_ACCOUNT_ID    = var.NEW_RELIC_ACCOUNT_ID

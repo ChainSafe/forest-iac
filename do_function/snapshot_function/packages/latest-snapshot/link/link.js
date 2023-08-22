@@ -26,7 +26,7 @@ export async function main(args) {
   let s3_listing = parser.parse(body);
 
   const re =
-    /([^_]+?)_snapshot_([^_]+?)_(\d{4}-\d{2}-\d{2})_height_(\d+).car(.zst)?$/;
+    /([^_]+?)_snapshot_([^_]+?)_(\d{4}-\d{2}-\d{2})_height_(\d+)(\.forest)?\.car(\.zst)?$/;
 
   var snapshots = [];
 
@@ -40,7 +40,7 @@ export async function main(args) {
         network: myArray[2],
         date: myArray[3],
         epoch: parseInt(myArray[4]),
-        compressed: myArray[5] === ".zst",
+        compressed: myArray[6] === ".zst",
       };
       if (snapshot.network === network && snapshot.compressed === compressed) {
         snapshots.push(snapshot);

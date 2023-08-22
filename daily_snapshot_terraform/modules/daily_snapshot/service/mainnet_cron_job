@@ -1,5 +1,0 @@
-#!/bin/bash
-cd "$BASE_FOLDER" || exit
-# shellcheck source=/dev/null
-source .bashrc
-flock -n /tmp/mainnet.lock -c "ruby daily_snapshot.rb mainnet > mainnet_log.txt 2>&1"

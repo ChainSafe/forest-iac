@@ -6,7 +6,7 @@
 # and sets up the New Relic agent for system monitoring.
 
 # The script employs Terraform's templating engine, which uses variables defined in terraform.tfvars.
-# Thus, the $${VARIABLES} used here are for the template engine, not BASH.
+# therefore, variables like ${NEW_USER} used here are intended for the template engine, not BASH
 
 set -euxo pipefail
 
@@ -26,9 +26,8 @@ if [ -f "/root/.ssh/authorized_keys" ]; then
   chmod 0600 "/home/${NEW_USER}/.ssh/authorized_keys"
 fi
 
-# Restrict SSH access to the new user only. preventing root user from accessing the system via SSH.
-echo "AllowUsers ${NEW_USER}" >> /etc/ssh/sshd_config
-systemctl restart sshd
+#install NTP to synchronize the time differences
+apt-get install -y ntp
 
 # Enable passwordless sudo for the new user. This allows the user to run sudo commands without being prompted for a password.
 echo "${NEW_USER} ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/"${NEW_USER}"
@@ -65,6 +64,9 @@ sudo --user="${NEW_USER}" -- \
   --detach \
   --network=lotus \
   --name=lotus-"${CHAIN}" \
+  --env LOTUS_CHAIN_BADGERSTORE_DISABLE_FSYNC=true \
+  --env LOTUS_CHAINSTORE_SPLITSTORE_COLDSTORETYPE="discard" \
+  --env LOTUS_CHAINSTORE_SPLITSTORE_HOTSTOREFULLGCFREQUENCY=1 \
   --volume=parameters:/var/tmp/filecoin-proof-parameters \
   --volume=/home/"${NEW_USER}"/lotus_data:/var/lib/lotus \
   --publish=1234:1234 \
@@ -72,7 +74,7 @@ sudo --user="${NEW_USER}" -- \
   filecoin/lotus-all-in-one:"$IMAGETAG" lotus daemon \
   --import-snapshot https://snapshots."${CHAIN}".filops.net/minimal/latest.zst
 
-# It monitors running Docker containers and watches for changes to the images that those containers were originally started from. 
+# It monitors running Docker containers and watches for changes to the images that those containers were originally started from.
 # If Watchtower detects that an image has changed, it will automatically restart the container using the new image.
 # Run the Watchtower Docker container as created user.
 sudo --user="${NEW_USER}" -- \
@@ -85,16 +87,38 @@ sudo --user="${NEW_USER}" -- \
   containrrr/watchtower \
   --include-stopped --revive-stopped --stop-timeout 120s --interval 600
 
-# Set-up  New Relic Agent For logs collection and Infrastruture Metrics
-curl -Ls https://download.newrelic.com/install/newrelic-cli/scripts/install.sh | bash && \
+# If New Relic license key and API key are provided,
+# install the new relic agent and New relic agent and OpenMetrics Prometheus integration.
+if [ -n "${NEW_RELIC_API_KEY}" ]; then
+  curl -Ls https://download.newrelic.com/install/newrelic-cli/scripts/install.sh | bash && \
   sudo  NEW_RELIC_API_KEY="${NEW_RELIC_API_KEY}" \
   NEW_RELIC_ACCOUNT_ID="${NEW_RELIC_ACCOUNT_ID}" \
   NEW_RELIC_REGION="${NEW_RELIC_REGION}" \
   /usr/local/bin/newrelic install -y
 
-# Adds custom display name and host-name to the New Relic config.
-cat << EOF >> /etc/newrelic-infra.yml
-display_name: lotus-${CHAIN}
-override_hostname_short: lotus-${CHAIN}
+cat >> /etc/newrelic-infra.yml <<EOF
+include_matching_metrics:
+  process.name:
+    - regex "^lotus-mainnet.*"
+    - regex "^fail2ban.*"
+    - regex "^rsyslog.*"
+    - regex "^syslog.*"
+    - regex "^gpg-agent.*"
+metrics_network_sample_rate: -1
+metrics_process_sample_rate: 300
+metrics_system_sample_rate: 300
+metrics_storage_sample_rate: 300
+disable_zero_mem_process_filter: true
+disable_all_plugins: true
+disable_cloud_metadata: true 
+ignore_system_proxy: true
 EOF
-sudo systemctl restart newrelic-infra
+
+  sudo systemctl restart newrelic-infra  
+fi
+
+#set-up fail2ban with the default configuration
+sudo apt-get install fail2ban -y
+sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+sudo systemctl enable fail2ban && sudo systemctl start fail2ban
+
