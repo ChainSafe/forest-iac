@@ -13,8 +13,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Install Rust using rustup
-RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
-RUN echo "source $HOME/.cargo/env" >> $HOME/.bashrc
+RUN curl https://sh.rustup.rs -sSf | sh -s -- -y | echo "source $HOME/.cargo/env" >> "$HOME/.bashrc"
 
 # Install required Ruby gems
 RUN gem install slack-ruby-client sys-filesystem bundler concurrent-ruby deep_merge tomlrb toml-rb csv droplet_kit
