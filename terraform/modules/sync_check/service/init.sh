@@ -3,6 +3,10 @@
 ## Enable strict error handling, command tracing, and pipefail
 set -eux
 
+# Delaying 15 seconds to ensure any ongoing system boot operations,
+# especially apt tasks, complete before this script proceeds.
+sleep 15s
+
 ## Install dependencies
 apt-get update && apt-get install -y ruby ruby-dev gcc make
 gem install slack-ruby-client sys-filesystem

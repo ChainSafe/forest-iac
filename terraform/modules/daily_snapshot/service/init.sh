@@ -2,6 +2,10 @@
 
 set -eux 
 
+# Delaying 15 seconds to ensure any ongoing system boot operations,
+# especially apt tasks, complete before this script proceeds.
+sleep 15s
+
 apt-get update && apt-get install -y ruby ruby-dev s3cmd anacron
 gem install docker-api slack-ruby-client activesupport 
 
