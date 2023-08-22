@@ -22,7 +22,7 @@ provider "digitalocean" {
 
 // Ugly hack because 'archive_file' cannot mix files and folders.
 data "external" "sources_tar" {
-  program = ["sh", "${path.module}/prep_sources.sh", "${path.module}"]
+  program = ["sh", "${path.module}/prep_sources.sh", path.module]
 }
 
 data "local_file" "sources" {
