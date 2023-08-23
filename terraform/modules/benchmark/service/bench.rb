@@ -244,17 +244,14 @@ end
 # run metrics, and assign metrics for each benchmark.
 def benchmarks_loop(benchmarks, options, bench_metrics)
   benchmarks.each do |bench|
-    bench.dry_run, bench.snapshot_path, bench.heights, bench.chain = bench_loop_assignments(options)
-    bench.run(options[:daily], @snapshot_downloaded)
+    handle_exception(true) do
+      bench.dry_run, bench.snapshot_path, bench.heights, bench.chain = bench_loop_assignments(options)
+      bench.run(options[:daily], @snapshot_downloaded)
 
-    bench_metrics[bench.name] = bench.metrics
+      bench_metrics[bench.name] = bench.metrics
 
-    puts "\n"
-  rescue StandardError, Interrupt
-    @logger.error('Fiasco during benchmark run. Exiting...')
-    # Delete snapshot if downloaded, but not if user-provided.
-    FileUtils.rm_f(@snapshot_path) if @snapshot_downloaded
-    exit(1)
+      puts "\n"
+    end
   end
 end
 
@@ -295,7 +292,7 @@ raise "The file '#{@snapshot_path}' does not exist" if @snapshot_path && !File.f
 @snapshot_downloaded = false
 
 # Download snapshot if a snapshot path is not specified by the user.
-handle_exception do
+handle_exception(nil) do
   if @snapshot_path.nil?
     @logger.info 'No snapshot provided, downloading one'
     download_snapshot(chain: options[:chain])

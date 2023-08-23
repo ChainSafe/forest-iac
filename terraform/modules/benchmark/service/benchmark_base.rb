@@ -1,18 +1,22 @@
 # frozen_string_literal: true
 
-def handle_exception
+def handle_exception(db_created)
   yield
 rescue StandardError => e
-  @logger.error("Fiasco during snapshot download: #{e}. Deleting snapshot and exiting...")
+  @logger.error("Fiasco during run: #{e}. Cleaning up and exiting...")
   # Delete downloaded snapshot if it exists.
-  FileUtils.rm_f(@snapshot_path) unless @snapshot_path.nil?
+  FileUtils.rm_f(@snapshot_path) unless !@snapshot_downloaded || @snapshot_path.nil?
   FileUtils.rm_rf("#{WORKING_DIR}/snapshot_dl_files")
+  clean_db if db_created
+  FileUtils.rm_rf(repository_name) if @created_repository
   exit(1)
 rescue Interrupt
   @logger.error('Interrupt received. Cleaning up and exiting...')
   # Delete downloaded snapshot if it exists.
-  FileUtils.rm_f(@snapshot_path) unless @snapshot_path.nil?
+  FileUtils.rm_f(@snapshot_path) unless !@snapshot_downloaded || @snapshot_path.nil?
   FileUtils.rm_rf("#{WORKING_DIR}/snapshot_dl_files")
+  clean_db if db_created
+  FileUtils.rm_rf(repository_name) if @created_repository
   exit(1)
 end
 
@@ -205,20 +209,16 @@ module RunCommands
 
   # Import snapshot, write metrics, and call validation function, returning metrics.
   def import_and_validation(daily, args, metrics)
-    import_command = splice_args(@import_command, args)
-    metrics[:import] = exec_command(import_command)
+    handle_exception(true) do
+      import_command = splice_args(@import_command, args)
+      metrics[:import] = exec_command(import_command)
 
-    # Save db size just after import.
-    metrics[:import][:db_size] = db_size unless @dry_run
+      # Save db size just after import.
+      metrics[:import][:db_size] = db_size unless @dry_run
 
-    run_validation_step(daily, args, metrics)
-    metrics
-  rescue StandardError, Interrupt
-    @logger.error('Fiasco during benchmark run. Deleting downloaded files, cleaning DB and stopping process...')
-    FileUtils.rm_f(@snapshot_path) if @snapshot_downloaded
-    clean_db
-    FileUtils.rm_rf(repository_name) if @created_repository
-    exit(1)
+      run_validation_step(daily, args, metrics)
+      metrics
+    end
   end
 
   def forest_init(args)
@@ -229,23 +229,19 @@ module RunCommands
   # This is the primary function called in `bench.rb` to run the metrics for
   # each benchmark.
   def run(daily, snapshot_downloaded)
-    begin
+    handle_exception(@db_created = false) do
       @snapshot_downloaded = snapshot_downloaded
       @logger.info "Running bench: #{@name}"
 
       metrics = Concurrent::Hash.new
       args = build_artefacts
+      @db_created = true
       set_version
       @sync_status_command = splice_args(@sync_status_command, args)
 
       forest_init(args) if @name == 'forest'
 
       @metrics = import_and_validation(daily, args, metrics)
-    rescue StandardError, Interrupt
-      @logger.error('Fiasco during benchmark run. Deleting downloaded files and stopping process...')
-      FileUtils.rm_f(@snapshot_path) if @snapshot_downloaded
-      FileUtils.rm_rf(repository_name) if @created_repository
-      exit(1)
     end
 
     @logger.info 'Cleaning database'
