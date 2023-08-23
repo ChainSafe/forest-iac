@@ -3,24 +3,11 @@
 ## Enable strict error handling, command tracing, and pipefail
 set -eux
 
-# Use an active loop to wait for the apt package system to become available.
-# This is done to handle any ongoing system boot operations, especially apt tasks,
-# and ensure that the initialization doesn't collide with other apt processes.
-timeout=15 # Set a maximum waiting time of 5 seconds
-interval=5  # Check the apt lock status every 5 seconds
 
-while sudo fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do
-    sleep $interval
-    timeout=$((timeout - interval))
+# Use APT specific mechanism to ensure non-interactive operation and wait indefinitely for the lock
+sudo DEBIAN_FRONTEND=noninteractive apt-get -qqq --yes -o DPkg::Lock::Timeout=-1 update
+sudo DEBIAN_FRONTEND=noninteractive apt-get -qqq --yes -o DPkg::Lock::Timeout=-1 install -y ruby ruby-dev s3cmd anacron
 
-    if [ $timeout -le 0 ]; then
-        echo "Timed out waiting for apt to become available."
-        exit 1
-    fi
-done
-
-## Install dependencies
-apt-get update && apt-get install -y ruby ruby-dev gcc make
 gem install slack-ruby-client sys-filesystem
 
 nohup /bin/bash ./run_service.sh > run_service_log.txt &
