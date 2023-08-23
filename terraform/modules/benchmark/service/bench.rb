@@ -316,7 +316,7 @@ options[:snapshot_path] = @snapshot_path
 if options[:daily]
   # Benchmarks for daily metrics.
   selection = Set[
-    #ForestBenchmark.new(name: 'forest'),
+    ForestBenchmark.new(name: 'forest'),
     LotusBenchmark.new(name: 'lotus')
   ]
   run_benchmarks(selection, options)
