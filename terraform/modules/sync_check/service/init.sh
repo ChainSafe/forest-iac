@@ -4,7 +4,7 @@
 set -eux
 
 
-# Use APT specific mechanism to ensure non-interactive operation and wait indefinitely for the lock
+# Use APT specific mechanism to ensure non-interactive operation and wait for the lock
 sudo DEBIAN_FRONTEND=noninteractive apt-get -qqq --yes -o DPkg::Lock::Timeout=-1 update
 sudo DEBIAN_FRONTEND=noninteractive apt-get -qqq --yes -o DPkg::Lock::Timeout=-1 install -y ruby ruby-dev s3cmd anacron
 
