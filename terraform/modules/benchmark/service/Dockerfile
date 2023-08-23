@@ -15,7 +15,9 @@ RUN apt-get update && \
 RUN gem install bundler slack-ruby-client sys-filesystem concurrent-ruby deep_merge tomlrb toml-rb csv droplet_kit 
 
 # Download and install Rust using rustup
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+RUN curl --proto '=https' --tlsv1.2 -sSf -o rustup.sh https://sh.rustup.rs && sh rustup.sh -y
+# Set the Rust environment variables
+ENV PATH="/root/.cargo/bin:$PATH"
 
 WORKDIR /chainsafe
 
