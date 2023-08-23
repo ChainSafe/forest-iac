@@ -9,13 +9,7 @@ resource "digitalocean_firewall" "forest_firewall" {
 
   inbound_rule {
     protocol         = "tcp"
-    port_range       = "1234"
-    source_addresses = var.source_addresses
-  }
-
-  inbound_rule {
-    protocol         = "tcp"
-    port_range       = "2345"
+    port_range       = var.rpc_port
     source_addresses = var.source_addresses
   }
 

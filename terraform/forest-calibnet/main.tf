@@ -24,6 +24,7 @@ module "calibnet" {
   attach_volume         = false
   destination_addresses = var.destination_addresses
   chain                 = var.chain
+  rpc_port              = "2345"
   project               = var.project
   fw_name               = var.fw_name
   NR_LICENSE_KEY        = var.NR_LICENSE_KEY
