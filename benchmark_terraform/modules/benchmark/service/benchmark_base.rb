@@ -1,5 +1,21 @@
 # frozen_string_literal: true
 
+def handle_exception
+  yield
+rescue StandardError => e
+  @logger.error("Fiasco during snapshot download: #{e}. Deleting snapshot and exiting...")
+  # Delete downloaded snapshot if it exists.
+  FileUtils.rm_f(@snapshot_path) unless @snapshot_path.nil?
+  FileUtils.rm_rf("#{WORKING_DIR}/snapshot_dl_files")
+  exit(1)
+rescue Interrupt
+  @logger.error('Interrupt received. Cleaning up and exiting...')
+  # Delete downloaded snapshot if it exists.
+  FileUtils.rm_f(@snapshot_path) unless @snapshot_path.nil?
+  FileUtils.rm_rf("#{WORKING_DIR}/snapshot_dl_files")
+  exit(1)
+end
+
 # Mixin module for base benchmark class exec (and exec helper) commands.
 module ExecCommands
   # Helper function used in calculation of number of epochs.
