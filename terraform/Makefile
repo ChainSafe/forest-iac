@@ -1,7 +1,8 @@
 # Define variables for Terraform
 TF      = terraform
-TF_MAIN_DIR  = mainnet
-TF_CALIB_DIR = calibnet
+TF_MAIN_DIR  = forest-mainnet
+TF_CALIB_DIR = forest-calibnet
+TF_LT_MAIN_DIR = lotus-mainnet
 
 # Define the default target
 .DEFAULT_GOAL := help
@@ -10,11 +11,11 @@ help:
 	@echo "Usage: make [target]"
 	@echo ""
 	@echo "Targets:"
-	@echo "  init_calib or init_main        Initialize Terraform for either mainnet or calibnet"
-	@echo "  plan_calib or plan_main        Generate and show an execution plan for either mainnet or calibnet"
-	@echo "  apply_main or apply_calib      Apply the changes for either mainnet or calibnet"
-	@echo "  destroy_main or destroy_calib  Destroy the Terraform-managed infrastructure for either mainnet or calibnet"
-	@echo "  help                           Shows this help message"
+	@echo "  init_calib, init_main, or init_lt_main                  Initialize Terraform for either Forest mainnet, calibnet, or lotus mainnet"
+	@echo "  plan_calib, plan_main, or plan_lt_main                  Generate and show an execution plan for either Forest mainnet, calibnet, or lotus mainnet"
+	@echo "  apply_main, apply_calib, or apply_lt_main               Apply the changes for either Forest mainnet, calibnet, or lotus mainnet"
+	@echo "  destroy_main, destroy_calib or destroy_lt_main          Destroy the Terraform-managed infrastructure for either Forest mainnet, calibnet, or lotus mainnet"
+	@echo "  help                                                    Shows this help message"
 
 init_calib:
 	@cd $(TF_CALIB_DIR) && $(TF) init
@@ -39,3 +40,16 @@ apply_main:
 
 destroy_main:
 	@cd $(TF_MAIN_DIR) && $(TF) destroy
+
+init_lt_main:
+	@cd $(TF_LT_MAIN_DIR) && $(TF) init
+
+plan_lt_main:
+	@cd $(TF_LT_MAIN_DIR) && $(TF) plan
+
+apply_lt_main:
+	@cd $(TF_LT_MAIN_DIR) && $(TF) apply --auto-approve
+
+destroy_lt_main:
+	@cd $(TF_LT_MAIN_DIR) && $(TF) destroy
+

@@ -1,18 +1,19 @@
 name: Lotus Mainnet
+concurrency: ci-${{ github.ref }}
 
 on:
   pull_request:
     branches:
       - main
     paths:
-      - 'terraform/**'
-      - 'ansible/**'
+      - 'terraform/lotus-mainnet/**'
+      - 'terraform/modules/filecoin_node/**'
   push:
     branches:
       - main
     paths:
-      - 'terraform/**'
-      - 'ansible/**'
+      - 'terraform/lotus-mainnet/**'
+      - 'terraform/modules/filecoin_node/**'
   workflow_dispatch:
 
 jobs:

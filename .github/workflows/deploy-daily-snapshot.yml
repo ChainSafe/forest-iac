@@ -1,0 +1,40 @@
+name: Snapshot Service
+concurrency: ci-${{ github.ref }}
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'terraform/daily_snapshot/**'
+      - 'terraform/modules/daily_snapshot/**'
+  push:
+    branches:
+      - main
+    paths:
+      - 'terraform/daily_snapshot/**'
+      - 'terraform/modules/daily_snapshot/**'
+  workflow_dispatch:
+
+jobs:
+  deploy-daily-snapshot-calibnet:
+    name: Deploy
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v3
+
+      # Using Custom Composite action in ./composite-action/terraform folder
+      - name: Composite Action for Deploying Terraform Resources
+        uses: ./composite-action/terraform
+        with:
+          do_token: ${{ secrets.DO_TOKEN }}
+          aws_access_key_id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          slack_token: ${{ secrets.SLACK_TOKEN }}
+          working_directory: terraform/daily_snapshot
+          environment: Snapshot Service
+          new_relic_account_id: ${{ secrets.NEW_RELIC_ACCOUNT_ID }}
+          new_relic_api_key: ${{ secrets.NEW_RELIC_API_KEY }}

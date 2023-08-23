@@ -1,0 +1,20 @@
+[package]
+name = "archival-snapshots-generate"
+version = "0.1.0"
+authors = ["ChainSafe Systems <info@chainsafe.io>"]
+repository = "https://github.com/ChainSafe/forest"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+description = "Archival snapshots generator"
+
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1.0.72"
+chrono = "0.4.26"
+clap = { version = "4.3.21", features = ["derive"] }
+env_logger = "0.10.0"
+log = "0.4.19"
+rayon = "1.7.0"
+which = "4.4.0"

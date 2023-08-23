@@ -33,7 +33,7 @@ jobs:
         run: tflint --init
 
       - name: Run TFLint
-        run: tflint -f compact
+        run: tflint --recursive
 
   fmt_terraform:
     runs-on: ubuntu-latest

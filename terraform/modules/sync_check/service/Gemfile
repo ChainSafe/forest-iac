@@ -1,0 +1,7 @@
+# frozen_string_literal: true
+
+source 'https://rubygems.org'
+
+gem 'docker-api', '>= 2.2.0'
+gem 'slack-ruby-client', '>= 2.1.0'
+gem 'sys-filesystem', '>=1.4.3'

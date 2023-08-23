@@ -21,7 +21,7 @@ jobs:
         with:
           ruby-version: '3.2'
       - name: run rspec tests
-        working-directory: daily_snapshot_terraform/modules/daily_snapshot/service
+        working-directory: terraform/modules/daily_snapshot/service
         run: |
           gem install --no-document rspec activesupport
           rspec tests
