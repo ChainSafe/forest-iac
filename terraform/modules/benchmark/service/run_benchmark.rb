@@ -3,9 +3,6 @@
 require_relative 'ruby_common/slack_client'
 require_relative 'ruby_common/utils'
 
-# Call init_s3cmd.rb script (if not already required)
-require_relative 'init_s3cmd' unless defined?(initialize_s3cmd)
-
 require 'logger'
 require 'fileutils'
 
