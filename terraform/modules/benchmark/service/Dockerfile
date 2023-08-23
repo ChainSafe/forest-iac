@@ -3,7 +3,7 @@ FROM ubuntu:22.04
 # Prevent interactive prompts during package installation
 ENV DEBIAN_FRONTEND noninteractive
 
-# Update the package repository and install necessary packages
+# Install necessary forest and lotus packages
 RUN apt-get update && \
     apt-get install --no-install-recommends -y \
     ruby ruby-dev make gcc golang git curl wget pkg-config clang build-essential \
@@ -11,7 +11,7 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Install required Ruby gems using Bundler
+# Install required Ruby gems
 RUN gem install bundler slack-ruby-client sys-filesystem concurrent-ruby deep_merge tomlrb toml-rb csv droplet_kit 
 
 # Download and install Rust using rustup
@@ -21,5 +21,6 @@ ENV PATH="/root/.cargo/bin:$PATH"
 
 WORKDIR /chainsafe
 
+# Copy all required files
 COPY . .
 COPY ruby_common ruby_common
