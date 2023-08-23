@@ -8,12 +8,19 @@ set -eux
 # 3. Upload benchmark results to s3 bucket
 
 ## Configure s3cmd
-s3cmd --dump-config \
-    --host="$BENCHMARK_ENDPOINT" \
-    --host-bucket="%(bucket)s.$BENCHMARK_ENDPOINT" \
-    --access_key="$AWS_ACCESS_KEY_ID" \
-    --secret_key="$AWS_SECRET_ACCESS_KEY" \
-    --multipart-chunk-size-mb=4096 > ~/.s3cfg
+CFG=~/.s3cfg
+
+if [ ! -f "$CFG" ]; then
+    s3cmd --dump-config \
+        --host="$BENCHMARK_ENDPOINT" \
+        --host-bucket="%(bucket)s.$BENCHMARK_ENDPOINT" \
+        --access_key="$AWS_ACCESS_KEY_ID" \
+        --secret_key="$AWS_SECRET_ACCESS_KEY" \
+        --multipart-chunk-size-mb=4096 > "$CFG"
+    echo "Configuration file created at $CFG"
+else
+    echo "s3cmd Configuration file exist at $CFG"
+fi
 
 ## Run actual benchmark
 ruby bench.rb --chain calibnet --tempdir ./tmp --daily
