@@ -1,23 +1,24 @@
 # frozen_string_literal: true
 
+def cleanup(db_created)
+  # Delete downloaded snapshot if it exists.
+  FileUtils.rm_f(@snapshot_path) unless !@snapshot_downloaded || @snapshot_path.nil?
+  FileUtils.rm_rf("#{WORKING_DIR}/snapshot_dl_files")
+  FileUtils.rm_rf("#{WORKING_DIR}/.#{repository_name}") if @created_repository
+  clean_db if db_created
+  FileUtils.rm_rf(repository_name) if @created_repository
+  FileUtils.rm_rf(".#{repository_name}") if @created_repository
+  exit(1)
+end
+
 def handle_exception(db_created)
   yield
 rescue StandardError => e
-  @logger.error("Fiasco during run: #{e}. Cleaning up and exiting...")
-  # Delete downloaded snapshot if it exists.
-  FileUtils.rm_f(@snapshot_path) unless !@snapshot_downloaded || @snapshot_path.nil?
-  FileUtils.rm_rf("#{WORKING_DIR}/snapshot_dl_files")
-  clean_db if db_created
-  FileUtils.rm_rf(repository_name) if @created_repository
-  exit(1)
+  @logger.error("Fiasco during script execution: #{e}. Cleaning up and exiting...")
+  cleanup(db_created)
 rescue Interrupt
   @logger.error('Interrupt received. Cleaning up and exiting...')
-  # Delete downloaded snapshot if it exists.
-  FileUtils.rm_f(@snapshot_path) unless !@snapshot_downloaded || @snapshot_path.nil?
-  FileUtils.rm_rf("#{WORKING_DIR}/snapshot_dl_files")
-  clean_db if db_created
-  FileUtils.rm_rf(repository_name) if @created_repository
-  exit(1)
+  cleanup(db_created)
 end
 
 # Mixin module for base benchmark class exec (and exec helper) commands.

@@ -270,10 +270,12 @@ def run_benchmarks(benchmarks, options)
   Dir.chdir(WORKING_DIR) do
     benchmarks_loop(benchmarks, options, bench_metrics)
   end
-  if options[:daily]
-    write_csv(bench_metrics, options)
-  else
-    write_markdown(bench_metrics)
+  handle_exception(nil) do
+    if options[:daily]
+      write_csv(bench_metrics, options)
+    else
+      write_markdown(bench_metrics)
+    end
   end
 end
 
@@ -314,7 +316,7 @@ options[:snapshot_path] = @snapshot_path
 if options[:daily]
   # Benchmarks for daily metrics.
   selection = Set[
-    ForestBenchmark.new(name: 'forest'),
+    #ForestBenchmark.new(name: 'forest'),
     LotusBenchmark.new(name: 'lotus')
   ]
   run_benchmarks(selection, options)
