@@ -3,8 +3,11 @@
 ## Enable strict error handling, command tracing, and pipefail
 set -eux
 
-## Install dependencies
-apt-get update && apt-get install -y ruby ruby-dev gcc make
+
+# Use APT specific mechanism to ensure non-interactive operation and wait for the lock
+sudo DEBIAN_FRONTEND=noninteractive apt-get -qqq --yes -o DPkg::Lock::Timeout=-1 update
+sudo DEBIAN_FRONTEND=noninteractive apt-get -qqq --yes -o DPkg::Lock::Timeout=-1 install -y ruby ruby-dev s3cmd anacron
+
 gem install slack-ruby-client sys-filesystem
 
 nohup /bin/bash ./run_service.sh > run_service_log.txt &
