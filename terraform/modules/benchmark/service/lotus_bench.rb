@@ -27,11 +27,6 @@ class LotusBenchmark < BenchmarkBase
     'lotus'
   end
 
-  def set_version
-    version = syscall(target, '--version').match(/\b(\d+\.\d+\.\d+)\b/)&.captures&.first
-    Object.const_set('LOTUS_VERSION', version)
-  end
-
   def target
     File.join('.', repository_name, 'lotus')
   end
@@ -41,7 +36,11 @@ class LotusBenchmark < BenchmarkBase
   end
 
   def checkout_command
-    exec_command(%w[git checkout master])
+    if @chain == 'mainnet'
+      exec_command(%w[git checkout releases])
+    else
+      exec_command(%w[git checkout master])
+    end
   end
 
   def clean_command

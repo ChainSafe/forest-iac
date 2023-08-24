@@ -219,7 +219,6 @@ module RunCommands
 
       metrics = Concurrent::Hash.new
       args = build_artefacts
-      set_version
       @sync_status_command = splice_args(@sync_status_command, args)
 
       forest_init(args) if @name == 'forest'

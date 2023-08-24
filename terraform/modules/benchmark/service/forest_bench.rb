@@ -42,13 +42,8 @@ class ForestBenchmark < BenchmarkBase
     'forest'
   end
 
-  def set_version
-    version = syscall(target, '--version').match(/(\d+\.\d+\.\d+)/)&.captures&.first
-    Object.const_set('FOREST_VERSION', version)
-  end
-
   def clone_command
-    exec_command(['git', 'clone', '--recursive', 'https://github.com/ChainSafe/forest.git', repository_name])
+    exec_command(['git', 'clone', 'https://github.com/ChainSafe/forest.git', repository_name])
   end
 
   def checkout_command
