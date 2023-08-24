@@ -29,7 +29,7 @@ jobs:
       - name: Run rubocop
         run: |
           gem install rubocop --no-document
-          rubocop scripts/
+          rubocop modules/benchmark # TODO: Apply rubocop to modules/ 
   run-js-linters:
     runs-on: ubuntu-latest
     steps:

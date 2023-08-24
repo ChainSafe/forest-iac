@@ -74,25 +74,25 @@ module ExecCommands
     end
   end
 
-    # Helper function for measuring Peak memory usage
+  # Helper function for measuring Peak memory usage
   def measure_memory(command)
     peak_memory = nil
-    
+
     # Run the command with /usr/bin/time -v in the background
-    memory_command = ["/usr/bin/time", "-v"] + command
-    
+    memory_command = ['/usr/bin/time', '-v'] + command
+
     # Capture the stderr of /usr/bin/time directly
-    Open3.popen3(*memory_command) do |i, o, e, t|
-        i.close
-        o.each_line { |l| print l } # This will print the original command's output
-        
-        e.each_line do |l|
-            if l.include?("Maximum resident set size")
-                peak_memory = l.split.last.to_i # get the memory value in kilobytes
-            end
+    Open3.popen3(*memory_command) do |i, o, e, _t|
+      i.close
+      o.each_line { |l| print l } # This will print the original command's output
+
+      e.each_line do |l|
+        if l.include?('Maximum resident set size')
+          peak_memory = l.split.last.to_i # get the memory value in kilobytes
         end
+      end
     end
-  
+
     peak_memory
   end
 
