@@ -15,7 +15,7 @@ class ForestBenchmark < BenchmarkBase
   def db_size
     config_path = "#{data_dir}/#{@name}.toml"
 
-    line = syscall(target_cli, '-c', config_path, 'db', 'stats').split("\n")[1]
+    line = syscall(target_tool, 'db', 'stats', '-c', config_path).split("\n")[1]
     match = line.match(/Database size: (.+)/)
     match[1]
   end
