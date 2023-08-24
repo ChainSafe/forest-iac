@@ -27,7 +27,7 @@ if [ -f "/root/.ssh/authorized_keys" ]; then
 fi
 
 #install NTP to synchronize the time differences
-apt-get install -y ntp
+sudo DEBIAN_FRONTEND=noninteractive apt-get -qqq --yes -o DPkg::Lock::Timeout=-1 install -y ntp
 
 systemctl restart sshd
 
@@ -137,6 +137,6 @@ EOF
 fi
 
 #set-up fail2ban with the default configuration
-sudo apt-get install fail2ban -y
+sudo DEBIAN_FRONTEND=noninteractive apt-get -qqq --yes -o DPkg::Lock::Timeout=-1 install -y fail2ban
 sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
 sudo systemctl enable fail2ban && sudo systemctl start fail2ban
