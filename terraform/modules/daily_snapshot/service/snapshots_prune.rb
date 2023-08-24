@@ -51,6 +51,9 @@ def prune_snapshots(snapshots)
 
   # iterate over each entry and try to add it to the buckets, newest first.
   snapshots
+    # `rubocop` raises a lint error for dot tokens after comments, which is a false positive;
+    # workarounds are undesirable or lead to other lint issues, so best solution seems to be to disable the lint for this block
+    # rubocop:disable Lint/Syntax: unexpected token tDOT
     # Ignore the first 10 snapshots to keep a solid buffer.
     # This makes it less likely that we delete a snapshot that is being downloaded.
     # It also helps with the CDN cache not propagating fast enough.
@@ -59,4 +62,5 @@ def prune_snapshots(snapshots)
     .reject { |f| day_unique_bucket.add? f and buckets.any? { |bucket| bucket.add? f } }
     # delete all snapshots that weren't rejected or dropped
     .each(&:delete)
+    # rubocop:enable Lint/Syntax: unexpected token tDOT
 end

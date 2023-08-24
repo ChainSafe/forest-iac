@@ -75,6 +75,7 @@ def multiple_snapshots_one_day
   end
 end
 
+# Helper function for `delete_all_but_first_of_each_week`
 def snapshot_preprocessing(snapshots, days_in_test)
   snapshots_count = snapshots.length
   pruned_snapshots = prune_snapshots(snapshots)
@@ -85,6 +86,7 @@ def snapshot_preprocessing(snapshots, days_in_test)
   expect(pruned_snapshots.length).to eq(snapshots_count - expected_snapshots_keep_count)
 end
 
+# Helper function for `delete_all_but_first_of_each_week`
 def one_year_pruning(snapshots)
   # First 18 snapshots should not be deleted (day + buffer + week)
   # afterwards, only Sunday snapshots should be kept
@@ -111,6 +113,7 @@ def delete_all_but_first_of_each_week(snapshots, days_in_test)
   end
 end
 
+# Helper function for `multiple_snapshots_one_year`
 def multiple_snapshots_one_year_assignments
   current_date = Date.parse('2023-06-27')
   days_in_test = 366
