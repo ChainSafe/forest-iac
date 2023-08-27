@@ -27,6 +27,11 @@ class LotusBenchmark < BenchmarkBase
     'lotus'
   end
 
+  def set_version
+    version = syscall(target, '--version').match(/\b(\d+\.\d+\.\d+)\b/)&.captures&.first
+    Object.const_set('LOTUS_VERSION', version)
+  end
+
   def target
     File.join('.', repository_name, 'lotus')
   end
