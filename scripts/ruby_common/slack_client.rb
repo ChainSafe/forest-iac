@@ -9,7 +9,7 @@ class SlackClient
   @client = nil
 
   def initialize(channel, token)
-    raise "Invalid channel name: #{channel}, must start with \#" unless channel.start_with? '#'
+    raise "Invalid channel name: #{channel}, must start with #" unless channel.start_with? '#'
     raise 'Missing token' if token.nil?
 
     Slack.configure do |config|

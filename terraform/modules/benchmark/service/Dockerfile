@@ -12,7 +12,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Install required Ruby gems
-RUN gem install bundler slack-ruby-client sys-filesystem concurrent-ruby deep_merge tomlrb toml-rb csv droplet_kit 
+RUN gem install bundler && bundle install
 
 # Download and install Rust using rustup
 RUN curl --proto '=https' --tlsv1.2 -sSf -o rustup.sh https://sh.rustup.rs && sh rustup.sh -y
