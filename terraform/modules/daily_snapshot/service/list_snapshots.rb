@@ -12,21 +12,33 @@ require 'active_support/time'
 class Snapshot
   attr_accessor :network, :date, :height, :file_name, :url_s3, :url
 
-  def initialize(network, date, height, file_name, url_s3, url)
-    if network.nil? || date.nil? || height.nil? || file_name.nil? || url_s3.nil? || url.nil?
-      raise ArgumentError, 'Missing argument'
+  def initialize(params)
+    check_for_nil_params(params)
+    check_network_param(params)
+
+    @network = params[:network].downcase
+    @date = params[:date].to_date
+    @height = params[:height].to_i
+    @file_name = params[:file_name]
+    @url_s3 = params[:url_s3]
+    @url = params[:url]
+  end
+
+  def check_for_nil_params(params)
+    unless params[:network].nil? || params[:date].nil? || params[:height].nil? || \
+           params[:file_name].nil? || params[:url_s3].nil? || params[:url].nil?
+      return
     end
 
-    network = network.downcase
+    raise ArgumentError,
+          'Missing argument'
+  end
 
-    raise ArgumentError, 'Invalid network' if network != 'mainnet' && network != 'calibnet'
+  def check_network_param(params)
+    return unless params[:network].downcase != 'mainnet' && params[:network].downcase != 'calibnet'
 
-    @network = network
-    @date = date.to_date
-    @height = height.to_i
-    @file_name = file_name
-    @url_s3 = url_s3
-    @url = url
+    raise ArgumentError,
+          'Invalid network'
   end
 
   def to_s
@@ -44,26 +56,40 @@ class Snapshot
   end
 end
 
-# List the snapshots available in the S3 space hosted by Forest
-def list_snapshots(chain_name = 'calibnet', bucket = 'forest-snapshots', endpoint = 'fra1.digitaloceanspaces.com')
+def prepare_to_list_snapshots(chain_name, bucket)
   ls_format = %r{\d{4}-\d{2}-\d{2} \d{2}:\d{2}\s*\d*\s*s3://#{bucket}/#{chain_name}/(.+)}
-  snapshot_format = /^([^_]+?)_snapshot_(?<network>[^_]+?)_(?<date>\d{4}-\d{2}-\d{2})_height_(?<height>\d+)(\.forest)?\.car.zst$/
 
   output = `s3cmd ls s3://#{bucket}/#{chain_name}/`
 
+  [ls_format, output]
+end
+
+def prepare_to_update_snapshot_list
+  snapshot_format = /^([^_]+?)_snapshot_(?<network>[^_]+?)_(?<date>\d{4}-\d{2}-\d{2})_height_(?<height>\d+)(\.forest)?\.car.zst$/
   snapshot_list = []
+  [snapshot_format, snapshot_list]
+end
+
+def update_snapshot_list(ls_format, output, bucket, chain_name, endpoint)
+  (snapshot_format, snapshot_list) = prepare_to_update_snapshot_list
 
   output.each_line do |line|
-    line.match(ls_format) do |m|
-      file = m.captures[0]
+    line.match(ls_format) do |l|
+      file = l.captures[0]
       file.match(snapshot_format) do |m|
-        url = "https://#{bucket}.#{endpoint}/#{chain_name}/#{file}"
-        url_s3 = "s3://#{bucket}/#{chain_name}/#{file}"
-        snapshot = Snapshot.new m[:network], m[:date], m[:height], file, url_s3, url
+        snapshot = Snapshot.new m[:network], m[:date], m[:height], file, "s3://#{bucket}/#{chain_name}/#{file}", "https://#{bucket}.#{endpoint}/#{chain_name}/#{file}"
         snapshot_list << snapshot
       end
     end
   end
+end
+
+# List the snapshots available in the S3 space hosted by Forest
+def list_snapshots(chain_name = 'calibnet', bucket = 'forest-snapshots', endpoint = 'fra1.digitaloceanspaces.com')
+  (ls_format, output) = prepare_to_list_snapshots(chain_name, bucket)
+
+  update_snapshot_list(ls_format, output, bucket, chain_name, endpoint)
+
   # Sort the snapshots by decreasing height
   snapshot_list.sort_by { |a| -a.height }
 end
