@@ -55,21 +55,28 @@ data "digitalocean_ssh_keys" "keys" {
   }
 }
 
+# Set required environment variables
+locals {
+  env_content = templatefile("${path.module}/service/forest-env.tpl", {
+    AWS_ACCESS_KEY_ID     = var.AWS_ACCESS_KEY_ID,
+    AWS_SECRET_ACCESS_KEY = var.AWS_SECRET_ACCESS_KEY,
+    slack_token           = var.slack_token,
+    slack_channel         = var.slack_channel,
+    snapshot_bucket       = var.snapshot_bucket,
+    snapshot_endpoint     = var.snapshot_endpoint,
+    NEW_RELIC_API_KEY     = var.NEW_RELIC_API_KEY,
+    NEW_RELIC_ACCOUNT_ID  = var.NEW_RELIC_ACCOUNT_ID,
+    NEW_RELIC_REGION      = var.NEW_RELIC_REGION,
+    BASE_FOLDER           = "/root",
+    forest_tag            = var.forest_tag
+  })
+}
+
 locals {
   init_commands = ["cd /root/",
     "tar xf sources.tar",
     # Set required environment variables
-    "echo 'export AWS_ACCESS_KEY_ID=\"${var.AWS_ACCESS_KEY_ID}\"' >> .forest_env",
-    "echo 'export AWS_SECRET_ACCESS_KEY=\"${var.AWS_SECRET_ACCESS_KEY}\"' >> .forest_env",
-    "echo 'export SLACK_API_TOKEN=\"${var.slack_token}\"' >> .forest_env",
-    "echo 'export SLACK_NOTIF_CHANNEL=\"${var.slack_channel}\"' >> .forest_env",
-    "echo 'export SNAPSHOT_BUCKET=\"${var.snapshot_bucket}\"' >> .forest_env",
-    "echo 'export SNAPSHOT_ENDPOINT=\"${var.snapshot_endpoint}\"' >> .forest_env",
-    "echo 'export NEW_RELIC_API_KEY=\"${var.NEW_RELIC_API_KEY}\"' >> .forest_env",
-    "echo 'export NEW_RELIC_ACCOUNT_ID=\"${var.NEW_RELIC_ACCOUNT_ID}\"' >> .forest_env",
-    "echo 'export NEW_RELIC_REGION=\"${var.NEW_RELIC_REGION}\"' >> .forest_env",
-    "echo 'export BASE_FOLDER=\"/root\"' >> .forest_env",
-    "echo 'export FOREST_TAG=\"${var.forest_tag}\"' >> .forest_env",
+    "echo '${local.env_content}' >> /root/.forest_env",
     "echo '. ~/.forest_env' >> .bashrc",
     ". ~/.forest_env",
     "nohup sh ./init.sh > init_log.txt &",
