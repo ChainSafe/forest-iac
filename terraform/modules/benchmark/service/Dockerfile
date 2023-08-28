@@ -6,7 +6,7 @@ ENV DEBIAN_FRONTEND noninteractive
 # Install necessary forest and lotus packages
 RUN apt-get update && \
     apt-get install --no-install-recommends -y \
-    ruby ruby-dev make gcc golang git git-lfs curl wget pkg-config clang build-essential \
+    ruby ruby-dev make gcc git git-lfs curl wget pkg-config clang build-essential \
     mesa-opencl-icd ocl-icd-opencl-dev hwloc libhwloc-dev s3cmd aria2 zstd time && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
@@ -18,6 +18,14 @@ RUN gem install bundler slack-ruby-client sys-filesystem concurrent-ruby deep_me
 RUN curl --proto '=https' --tlsv1.2 -sSf -o rustup.sh https://sh.rustup.rs && sh rustup.sh -y
 # Set the Rust environment variables
 ENV PATH="/root/.cargo/bin:$PATH"
+
+# Download and install Go
+RUN wget -c https://go.dev/dl/go1.20.2.linux-amd64.tar.gz -O /tmp/go.tar.gz && \
+    tar -xz -C /usr/local -f /tmp/go.tar.gz && \
+    rm /tmp/go.tar.gz
+# Set the Go environment variables
+RUN echo "export PATH=\$PATH:/usr/local/go/bin" >> ~/.bashrc
+ENV PATH="/usr/local/go/bin:$PATH"
 
 # Initialize Git LFS 
 RUN git lfs install
