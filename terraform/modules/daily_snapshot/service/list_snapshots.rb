@@ -75,20 +75,20 @@ def update_snapshot_list(ls_format, output, bucket, chain_name, endpoint)
 
   output.each_line do |line|
     line.match(ls_format) do |l|
-      file = l.captures[0]
-      file.match(snapshot_format) do |m|
+      l.captures[0].match(snapshot_format) do |m|
         snapshot = Snapshot.new m[:network], m[:date], m[:height], file, "s3://#{bucket}/#{chain_name}/#{file}", "https://#{bucket}.#{endpoint}/#{chain_name}/#{file}"
         snapshot_list << snapshot
       end
     end
   end
+  snapshot_list
 end
 
 # List the snapshots available in the S3 space hosted by Forest
 def list_snapshots(chain_name = 'calibnet', bucket = 'forest-snapshots', endpoint = 'fra1.digitaloceanspaces.com')
   (ls_format, output) = prepare_to_list_snapshots(chain_name, bucket)
 
-  update_snapshot_list(ls_format, output, bucket, chain_name, endpoint)
+  snapshot_list = update_snapshot_list(ls_format, output, bucket, chain_name, endpoint)
 
   # Sort the snapshots by decreasing height
   snapshot_list.sort_by { |a| -a.height }
