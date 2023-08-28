@@ -11,9 +11,6 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Install required Ruby gems
-RUN gem install bundler && bundle install
-
 # Download and install Rust using rustup
 RUN curl --proto '=https' --tlsv1.2 -sSf -o rustup.sh https://sh.rustup.rs && sh rustup.sh -y
 # Set the Rust environment variables
@@ -35,3 +32,6 @@ WORKDIR /chainsafe
 # Copy all required files
 COPY . .
 COPY ruby_common ruby_common
+
+# Install required Ruby gems
+RUN gem install bundler && bundle install
