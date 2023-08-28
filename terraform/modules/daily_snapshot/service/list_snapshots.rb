@@ -75,9 +75,10 @@ def update_snapshot_list(ls_format, output, bucket, chain_name, endpoint)
 
   output.each_line do |line|
     line.match(ls_format) do |l|
-      l.captures[0].match(snapshot_format) do |m|
-        snapshot = Snapshot.new m[:network], m[:date], m[:height], file, "s3://#{bucket}/#{chain_name}/#{file}", "https://#{bucket}.#{endpoint}/#{chain_name}/#{file}"
-        snapshot_list << snapshot
+      file = l.captures[0]
+      file.match(snapshot_format) do |m|
+        snapshot_list << Snapshot.new(m[:network], m[:date], m[:height], file, "s3://#{bucket}/#{chain_name}/#{file}",
+                                      "https://#{bucket}.#{endpoint}/#{chain_name}/#{file}")
       end
     end
   end
