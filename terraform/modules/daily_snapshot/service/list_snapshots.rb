@@ -65,21 +65,19 @@ def prepare_to_list_snapshots(chain_name, bucket)
 end
 
 def prepare_to_update_snapshot_list
-  snapshot_format = /^([^_]+?)_snapshot_(?<network>[^_]+?)_(?<date>\d{4}-\d{2}-\d{2})_height_(?<height>\d+)(\.forest)?\.car.zst$/
+  snapshot_format = \
+    /^(?:[^_]+?)_snapshot_(?<network>[^_]+?)_(?<date>\d{4}-\d{2}-\d{2})_height_(?<height>\d+)(?:\.forest)?\.car.zst$/
   snapshot_list = []
   [snapshot_format, snapshot_list]
 end
 
 def update_snapshot_list(ls_format, output, bucket, chain_name, endpoint)
   (snapshot_format, snapshot_list) = prepare_to_update_snapshot_list
-
-  output.each_line do |line|
-    line.match(ls_format) do |l|
-      file = l.captures[0]
-      file.match(snapshot_format) do |m|
-        snapshot_list << Snapshot.new(m[:network], m[:date], m[:height], file, "s3://#{bucket}/#{chain_name}/#{file}",
-                                      "https://#{bucket}.#{endpoint}/#{chain_name}/#{file}")
-      end
+  output.each_line.match(ls_format) do |l|
+    file = l.captures[0]
+    file.match(snapshot_format) do |m|
+      snapshot_list << Snapshot.new(m[:network], m[:date], m[:height], file, "s3://#{bucket}/#{chain_name}/#{file}",
+                                    "https://#{bucket}.#{endpoint}/#{chain_name}/#{file}")
     end
   end
   snapshot_list
