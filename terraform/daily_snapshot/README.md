@@ -16,7 +16,7 @@ deployment plan is executed.
 The workflow has access to all the required secrets (DO token, slack token, S3
 credentials, etc) and none of them have to be provided when creating a new PR.
 However, the deployment workflow is not triggered automatically if you change
-the secrets. In this case, you have to trigger the workflow manually. 
+the secrets. In this case, you have to trigger the workflow manually.
 
 # Manual deployments
 

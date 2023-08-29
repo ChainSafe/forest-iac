@@ -1,0 +1,39 @@
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+    -   id: trailing-whitespace
+    -   id: end-of-file-fixer
+    -   id: check-yaml
+    -   id: check-added-large-files
+    -   id: detect-private-key
+    -   id: detect-aws-credentials
+
+-   repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+    -   id: detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+
+-   repo: local
+    hooks:
+    -   id: detect-dop
+        name: 'Detect Digital Ocean API Secret'
+        entry: 'dop_v1_[a-f0-9]{64}'
+        language: pygrep
+        types: [text, file]
+    -   id: detect-eu01
+        name: 'Detect Secret New Relic Secret Token'
+        entry: 'eu01[a-zA-Z0-9]{32}'
+        language: pygrep
+        types: [text, file]
+    -   id: detect-new-relic-secret-token
+        name: 'Detect New Relic API Token'
+        entry: 'NRAK-[A-Z0-9]{27}'
+        language: pygrep
+        types: [text, file]
+    -   id: detect-do
+        name: 'Detect DO Secret'
+        entry: 'DO[0-9]{2}[A-Z0-9]{16}'
+        language: pygrep
+        types: [text, file]

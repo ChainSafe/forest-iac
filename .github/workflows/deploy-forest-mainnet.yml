@@ -38,4 +38,3 @@ jobs:
           new_relic_account_id: ${{ secrets.NEW_RELIC_ACCOUNT_ID }}
           nr_license_key: ${{ secrets.NR_LICENSE_KEY }}
           new_relic_api_key: ${{ secrets.NEW_RELIC_API_KEY }}
-

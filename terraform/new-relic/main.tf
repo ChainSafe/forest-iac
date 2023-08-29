@@ -26,29 +26,29 @@ provider "newrelic" {
   region     = "EU" # Valid regions are US and EU
 }
 
-# This block of code uses Terraform's data source to fetch details of an existing New Relic 
+# This block of code uses Terraform's data source to fetch details of an existing New Relic
 # alert policy named "Golden Signals". The "Golden Signals" are a set of monitoring parameters
 # that originate from the Google SRE (Site Reliability Engineering) Handbook. They provide
 # a high level overview of a system's health and are typically included in most monitoring setups.
 #
-# In the context of New Relic, the "Golden Signals" alert policy is created by default 
+# In the context of New Relic, the "Golden Signals" alert policy is created by default
 #  when a new New Relic account is created. This policy includes a set of predefined alert conditions based
 # on the Google's Golden Signals concept.
 #
 # By fetching this policy using the data source, we can integrate these conditions with other
-# resources managed in this script, such as linking it with a notification channel or adding it 
+# resources managed in this script, such as linking it with a notification channel or adding it
 # to a workflow.
 
 data "newrelic_alert_policy" "golden_signals" {
   name = "Golden Signals"
 }
 
-# Creation of a new New Relic alert policy for infrastructure or Contianer downtime 
+# Creation of a new New Relic alert policy for infrastructure or Contianer downtime
 resource "newrelic_alert_policy" "alert" {
   name = "Infrastruture Downtime Alert"
 }
 
-# NRQL alert conditions for events such as host down, high disk/memory use, 
+# NRQL alert conditions for events such as host down, high disk/memory use,
 # and container down, each with defined criteria and thresholds.
 
 resource "newrelic_nrql_alert_condition" "disk_space" {
@@ -221,4 +221,3 @@ resource "newrelic_one_dashboard_json" "forest_dashboard" {
     account_id = var.NEW_RELIC_ACCOUNT_ID
   })
 }
-
