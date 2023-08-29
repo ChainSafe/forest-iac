@@ -22,16 +22,16 @@ LOG_DIR = get_and_assert_env_variable 'BASE_FOLDER'
 loop do
   # Current datetime, to append to the log files
   datetime = Time.new.strftime '%FT%H:%M:%S'
-  health_log = "#{LOG_DIR}/benchmark_#{datetime}_health"
-  sync_log = "#{LOG_DIR}/benchmark_#{datetime}_sync"
+  run_log = "#{LOG_DIR}/benchmark_#{datetime}_run"
+  report_log = "#{LOG_DIR}/benchmark_#{datetime}_report"
 
   # Create log directory
   FileUtils.mkdir_p LOG_DIR
 
-  logger = Logger.new(sync_log)
+  logger = Logger.new(report_log)
 
   logger.info 'Running the benchmark...'
-  benchmark_check_passed = system("bash #{SCRIPTS_DIR}/run_benchmark.sh > #{health_log} 2>&1")
+  benchmark_check_passed = system("bash #{SCRIPTS_DIR}/run_benchmark.sh > #{run_log} 2>&1")
   logger.info 'Benchmark run completed'
 
   client = SlackClient.new CHANNEL, SLACK_TOKEN
@@ -41,7 +41,7 @@ loop do
   else
     client.post_message '⛔ Benchmark run fiascoed. 🔥🌲🔥'
   end
-  client.attach_files(health_log, sync_log)
+  client.attach_files(run_log, report_log)
 
   logger.info 'Benchmark finished'
 end

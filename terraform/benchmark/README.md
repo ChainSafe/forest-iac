@@ -1,7 +1,7 @@
 # Overview
 
 This folder contains an executable description of a benchmarking service that 
-compares the performance of Forest relative to Lotus. The benchmark results are 
+compares the performance of Forest and Lotus latest releases. The benchmark results are 
 uploaded to an S3 bucket, where they are stored in both weekly file and `all_result` file.
 
 # Workflow

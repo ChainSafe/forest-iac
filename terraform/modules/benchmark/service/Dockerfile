@@ -17,7 +17,7 @@ RUN curl --proto '=https' --tlsv1.2 -sSf -o rustup.sh https://sh.rustup.rs && sh
 ENV PATH="/root/.cargo/bin:$PATH"
 
 # Download and install Go
-RUN curl -o /tmp/go.tar.gz -L https://go.dev/dl/go1.21.0.linux-amd64.tar.gz && \
+RUN curl -o /tmp/go.tar.gz -L https://go.dev/dl/go1.20.7.linux-amd64.tar.gz && \
     tar -xz -C /usr/local -f /tmp/go.tar.gz && \
     rm /tmp/go.tar.gz
 # Set the Go environment variables
