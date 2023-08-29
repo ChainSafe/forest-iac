@@ -54,19 +54,26 @@ data "digitalocean_ssh_keys" "keys" {
   }
 }
 
+# Set required environment variables
+locals {
+  env_content = templatefile("${path.module}/service/forest-env.tpl", {
+    FOREST_TARGET_DATA        = "/volumes/forest_data",
+    FOREST_TARGET_SCRIPTS     = "/volumes/sync_check",
+    FOREST_TARGET_RUBY_COMMON = "/volumes/ruby_common",
+    slack_token               = var.slack_token,
+    slack_channel             = var.slack_channel,
+    NEW_RELIC_API_KEY         = var.NEW_RELIC_API_KEY,
+    NEW_RELIC_ACCOUNT_ID      = var.NEW_RELIC_ACCOUNT_ID,
+    NEW_RELIC_REGION          = var.NEW_RELIC_REGION,
+    forest_tag                = "edge"
+  })
+}
+
 locals {
   init_commands = [
     "tar xf sources.tar",
     # Set required environment variables
-    "echo 'export FOREST_TAG=edge' >> .forest_env",
-    "echo 'export FOREST_TARGET_DATA=/volumes/forest_data' >> .forest_env",
-    "echo 'export FOREST_TARGET_SCRIPTS=/volumes/sync_check' >> .forest_env",
-    "echo 'export FOREST_TARGET_RUBY_COMMON=/volumes/ruby_common' >> .forest_env",
-    "echo 'export FOREST_SLACK_API_TOKEN=\"${var.slack_token}\"' >> .forest_env",
-    "echo 'export FOREST_SLACK_NOTIF_CHANNEL=\"${var.slack_channel}\"' >> .forest_env",
-    "echo 'export NEW_RELIC_API_KEY=\"${var.NEW_RELIC_API_KEY}\"' >> .forest_env",
-    "echo 'export NEW_RELIC_ACCOUNT_ID=\"${var.NEW_RELIC_ACCOUNT_ID}\"' >> .forest_env",
-    "echo 'export NEW_RELIC_REGION=\"${var.NEW_RELIC_REGION}\"' >> .forest_env",
+    "echo '${local.env_content}' >> /root/.forest_env",
     "echo '. ~/.forest_env' >> .bashrc",
     ". ~/.forest_env",
     "nohup sh ./init.sh > init_log.txt &",
