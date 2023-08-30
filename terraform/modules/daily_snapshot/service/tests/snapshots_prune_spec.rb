@@ -69,9 +69,8 @@ def multiple_snapshots_one_day
     snapshot_count = BUFFER_SIZE + 42
     let :snapshots do
       create_same_day_snapshots(Date.parse('2023-06-27'), snapshot_count)
+      delete_all_but_first_two(snapshots)
     end
-
-    delete_all_but_first_two(snapshots)
   end
 end
 
@@ -129,10 +128,9 @@ def multiple_snapshots_one_year
     let :snapshots do
       same_day = create_same_day_snapshots(current_date, first_day_snapshots)
       rest = create_consecutive_days_snapshots(current_date, days_in_test - first_day_snapshots)
-      same_day + rest
-    end
 
-    delete_all_but_first_of_each_week(snapshots, days_in_test)
+      delete_all_but_first_of_each_week((same_day + rest), days_in_test)
+    end
   end
 end
 
