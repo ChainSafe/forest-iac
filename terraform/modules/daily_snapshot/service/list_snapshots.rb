@@ -71,13 +71,26 @@ def prepare_to_update_snapshot_list
   [snapshot_format, snapshot_list]
 end
 
+def match_assignments(bucket, chain_name, endpoint, file, match)
+  params = {}
+  params[:network] = match[:network]
+  params[:date] = match[:date]
+  params[:height] = match[:height]
+  params[:file_name] = file
+  params[:url_s3] = "s3://#{bucket}/#{chain_name}/#{file}"
+  params[:url] = "https://#{bucket}.#{endpoint}/#{chain_name}/#{file}"
+  params
+end
+
 def update_snapshot_list(ls_format, output, bucket, chain_name, endpoint)
   (snapshot_format, snapshot_list) = prepare_to_update_snapshot_list
-  output.each_line.match(ls_format) do |l|
-    file = l.captures[0]
-    file.match(snapshot_format) do |m|
-      snapshot_list << Snapshot.new(m[:network], m[:date], m[:height], file, "s3://#{bucket}/#{chain_name}/#{file}",
-                                    "https://#{bucket}.#{endpoint}/#{chain_name}/#{file}")
+  output.each_line do |line|
+    line.match(ls_format) do |l|
+      file = l.captures[0]
+      file.match(snapshot_format) do |match|
+        params = match_assignments(bucket, chain_name, endpoint, file, match)
+        snapshot_list << Snapshot.new(params)
+      end
     end
   end
   snapshot_list
