@@ -38,13 +38,16 @@ fn main() -> anyhow::Result<()> {
     if which::which("forest-cli").is_err() {
         bail!("forest-cli is not installed");
     }
+    if which::which("forest-tool").is_err() {
+        bail!("forest-tool is not installed");
+    }
 
     env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
 
     let args = Args::parse();
 
     info!("Analyzing the provided snapshot file");
-    let epochs = std::process::Command::new("forest-cli")
+    let epochs = std::process::Command::new("forest-tool")
         .args([
             "archive",
             "info",
