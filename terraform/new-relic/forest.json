@@ -12,7 +12,7 @@
           "layout": {
             "column": 1,
             "row": 1,
-            "width": 12,
+            "width": 6,
             "height": 3
           },
           "linkedEntityGuids": null,
@@ -28,36 +28,7 @@
                 "accountIds": [
                   "${account_id}"
                 ],
-                "query": "SELECT latest(head_epoch) FROM Metric WHERE clusterName = '${name}' SINCE 60 MINUTES AGO UNTIL NOW"
-              }
-            ],
-            "platformOptions": {
-              "ignoreTimeRange": false
-            }
-          }
-        },
-        {
-          "title": "Healthy Peers",
-          "layout": {
-            "column": 1,
-            "row": 4,
-            "width": 4,
-            "height": 3
-          },
-          "linkedEntityGuids": null,
-          "visualization": {
-            "id": "viz.billboard"
-          },
-          "rawConfiguration": {
-            "facet": {
-              "showOtherSeries": false
-            },
-            "nrqlQueries": [
-              {
-                "accountIds": [
-                  "${account_id}"
-                ],
-                "query": "SELECT latest(full_peers) FROM Metric WHERE clusterName = '${name}' SINCE 1 day ago UNTIL NOW"
+                "query": "SELECT latest(head_epoch) FROM Metric WHERE clusterName = '${name}' SINCE 30 minutes ago"
               }
             ],
             "platformOptions": {
@@ -68,9 +39,9 @@
         {
           "title": "",
           "layout": {
-            "column": 5,
-            "row": 4,
-            "width": 8,
+            "column": 7,
+            "row": 1,
+            "width": 6,
             "height": 3
           },
           "linkedEntityGuids": null,
@@ -93,39 +64,10 @@
           }
         },
         {
-          "title": "Forest Host Cpu Useage ",
-          "layout": {
-            "column": 1,
-            "row": 7,
-            "width": 4,
-            "height": 8
-          },
-          "linkedEntityGuids": null,
-          "visualization": {
-            "id": "viz.billboard"
-          },
-          "rawConfiguration": {
-            "facet": {
-              "showOtherSeries": false
-            },
-            "nrqlQueries": [
-              {
-                "accountIds": [
-                  "${account_id}"
-                ],
-                "query": "SELECT latest(host.cpuPercent) AS 'CPU used %' FROM Metric WHERE host.hostname = '${name}'"
-              }
-            ],
-            "platformOptions": {
-              "ignoreTimeRange": false
-            }
-          }
-        },
-        {
           "title": "",
           "layout": {
             "column": 5,
-            "row": 7,
+            "row": 4,
             "width": 4,
             "height": 3
           },
@@ -154,6 +96,41 @@
           "title": "Process Resident Memory",
           "layout": {
             "column": 9,
+            "row": 4,
+            "width": 4,
+            "height": 3
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.line"
+          },
+          "rawConfiguration": {
+            "facet": {
+              "showOtherSeries": false
+            },
+            "legend": {
+              "enabled": true
+            },
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  "${account_id}"
+                ],
+                "query": "SELECT (latest(process_resident_memory_bytes) / 1073741824) as 'Process Resident Memory GB' FROM Metric WHERE scrapedTargetURL = 'http://${name}:6116/metrics' SINCE 1 day ago UNTIL NOW TIMESERIES auto"
+              }
+            ],
+            "platformOptions": {
+              "ignoreTimeRange": false
+            },
+            "yAxisLeft": {
+              "zero": true
+            }
+          }
+        },
+        {
+          "title": "",
+          "layout": {
+            "column": 1,
             "row": 7,
             "width": 4,
             "height": 3
@@ -171,7 +148,7 @@
                 "accountIds": [
                   "${account_id}"
                 ],
-                "query": "SELECT (latest(process_resident_memory_bytes) / 1073741824) as 'Process Resident Memory GB' FROM Metric WHERE scrapedTargetURL = 'http://${name}:6116/metrics' SINCE 1 day ago UNTIL NOW "
+                "query": "SELECT derivative(head_epoch, 1 minute) AS `Tipsets Validated Per Minute` FROM Metric WHERE clusterName = '${name}' SINCE 1 day ago"
               }
             ],
             "platformOptions": {
@@ -183,9 +160,9 @@
           "title": "Forest Host Disk Used",
           "layout": {
             "column": 5,
-            "row": 10,
+            "row": 7,
             "width": 8,
-            "height": 5
+            "height": 3
           },
           "linkedEntityGuids": null,
           "visualization": {
@@ -207,6 +184,35 @@
               "ignoreTimeRange": false
             }
           }
+        },
+        {
+          "title": "Forest Host Cpu Useage ",
+          "layout": {
+            "column": 1,
+            "row": 10,
+            "width": 4,
+            "height": 3
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.billboard"
+          },
+          "rawConfiguration": {
+            "facet": {
+              "showOtherSeries": false
+            },
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  "${account_id}"
+                ],
+                "query": "SELECT latest(host.cpuPercent) AS 'CPU used %' FROM Metric WHERE host.hostname = '${name}'"
+              }
+            ],
+            "platformOptions": {
+              "ignoreTimeRange": false
+            }
+          }
         }
       ]
     },
@@ -215,11 +221,40 @@
       "description": null,
       "widgets": [
         {
-          "title": "Bad Peers",
+          "title": "Healthy Peers",
           "layout": {
             "column": 1,
             "row": 1,
-            "width": 8,
+            "width": 4,
+            "height": 3
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.billboard"
+          },
+          "rawConfiguration": {
+            "facet": {
+              "showOtherSeries": false
+            },
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  "${account_id}"
+                ],
+                "query": "SELECT latest(full_peers) FROM Metric WHERE clusterName = '${name}' SINCE 1 day ago UNTIL NOW"
+              }
+            ],
+            "platformOptions": {
+              "ignoreTimeRange": false
+            }
+          }
+        },
+        {
+          "title": "Bad Peers",
+          "layout": {
+            "column": 5,
+            "row": 1,
+            "width": 4,
             "height": 3
           },
           "linkedEntityGuids": null,
@@ -283,36 +318,42 @@
           "layout": {
             "column": 1,
             "row": 4,
-            "width": 8,
+            "width": 6,
             "height": 3
           },
           "linkedEntityGuids": null,
           "visualization": {
-            "id": "viz.billboard"
+            "id": "viz.line"
           },
           "rawConfiguration": {
             "facet": {
               "showOtherSeries": false
+            },
+            "legend": {
+              "enabled": true
             },
             "nrqlQueries": [
               {
                 "accountIds": [
                   "${account_id}"
                 ],
-                "query": "SELECT latest(libp2p_messsage_total) FROM Metric WHERE clusterName = '${name}' SINCE 1 day ago UNTIL NOW"
+                "query": "SELECT latest(libp2p_messsage_total) FROM Metric WHERE clusterName = '${name}' SINCE 1 day ago UNTIL NOW TIMESERIES AUTO"
               }
             ],
             "platformOptions": {
               "ignoreTimeRange": false
+            },
+            "yAxisLeft": {
+              "zero": true
             }
           }
         },
         {
           "title": "Block P2P Events",
           "layout": {
-            "column": 9,
+            "column": 7,
             "row": 4,
-            "width": 4,
+            "width": 6,
             "height": 3
           },
           "linkedEntityGuids": null,
@@ -562,24 +603,38 @@
           }
         },
         {
-          "title": "Forest logs",
+          "title": "Process Virtual Memory",
           "layout": {
             "column": 5,
             "row": 1,
             "width": 4,
-            "height": 6
+            "height": 3
           },
           "linkedEntityGuids": null,
           "visualization": {
-            "id": "logger.log-table-widget"
+            "id": "viz.line"
           },
           "rawConfiguration": {
+            "facet": {
+              "showOtherSeries": false
+            },
+            "legend": {
+              "enabled": true
+            },
             "nrqlQueries": [
               {
-                "accountId":" ${account_id}",
-                "query": "SELECT `log_severity`,`timestamp`,`message` FROM Log WHERE `hostname` = '${name}'"
+                "accountIds": [
+                  "${account_id}"
+                ],
+                "query": "SELECT (latest(process_virtual_memory_bytes) / 1073741824) as 'Process Virtual Memory' FROM Metric WHERE scrapedTargetURL = 'http://${name}:6116/metrics' SINCE 1 day ago UNTIL NOW TIMESERIES AUTO"
               }
-            ]
+            ],
+            "platformOptions": {
+              "ignoreTimeRange": false
+            },
+            "yAxisLeft": {
+              "zero": true
+            }
           }
         },
         {
@@ -592,22 +647,28 @@
           },
           "linkedEntityGuids": null,
           "visualization": {
-            "id": "viz.billboard"
+            "id": "viz.line"
           },
           "rawConfiguration": {
             "facet": {
               "showOtherSeries": false
+            },
+            "legend": {
+              "enabled": true
             },
             "nrqlQueries": [
               {
                 "accountIds": [
                   "${account_id}"
                 ],
-                "query": "SELECT (latest(forest_db_size) / 1073741824) as 'Forest Db Size GB ' FROM Metric WHERE clusterName = '${name}' SINCE 1 day ago UNTIL NOW "
+                "query": "SELECT (latest(forest_db_size) / 1073741824) as 'Forest Db Size GB ' FROM Metric WHERE clusterName = '${name}' SINCE 1 day ago UNTIL NOW TIMESERIES AUTO"
               }
             ],
             "platformOptions": {
               "ignoreTimeRange": false
+            },
+            "yAxisLeft": {
+              "zero": true
             }
           }
         },
@@ -617,7 +678,7 @@
             "column": 1,
             "row": 4,
             "width": 4,
-            "height": 6
+            "height": 3
           },
           "linkedEntityGuids": null,
           "visualization": {
@@ -649,9 +710,9 @@
         {
           "title": "Open File Descriptors",
           "layout": {
-            "column": 9,
+            "column": 5,
             "row": 4,
-            "width": 4,
+            "width": 8,
             "height": 3
           },
           "linkedEntityGuids": null,
@@ -682,32 +743,24 @@
           }
         },
         {
-          "title": "Process Virtual Memory",
+          "title": "Forest logs",
           "layout": {
-            "column": 5,
+            "column": 1,
             "row": 7,
-            "width": 8,
+            "width": 12,
             "height": 3
           },
           "linkedEntityGuids": null,
           "visualization": {
-            "id": "viz.billboard"
+            "id": "logger.log-table-widget"
           },
           "rawConfiguration": {
-            "facet": {
-              "showOtherSeries": false
-            },
             "nrqlQueries": [
               {
-                "accountIds": [
-                 "${account_id}"
-                ],
-                "query": "SELECT (latest(process_virtual_memory_bytes) / 1073741824) as 'Process Virtual Memory GB' FROM Metric WHERE scrapedTargetURL = 'http://${name}:6116/metrics' SINCE 1 day ago UNTIL NOW"
+                "accountId": "${account_id}",
+                "query": "SELECT `log_severity`,`timestamp`,`message` FROM Log WHERE `hostname` = '${name}'"
               }
-            ],
-            "platformOptions": {
-              "ignoreTimeRange": false
-            }
+            ]
           }
         }
       ]
