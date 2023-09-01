@@ -26,6 +26,9 @@ if [ -f "/root/.ssh/authorized_keys" ]; then
   chmod 0600 "/home/${NEW_USER}/.ssh/authorized_keys"
 fi
 
+#install NTP to synchronize the time differences
+sudo DEBIAN_FRONTEND=noninteractive apt-get -qqq --yes -o DPkg::Lock::Timeout=-1 install -y ntp
+
 systemctl restart sshd
 
 # Add new user to "sudo" and "docker" group so they can run docker commands and have general admin rights.
@@ -51,6 +54,7 @@ sudo --user="${NEW_USER}" -- \
   --detach \
   --network=forest \
   --name=forest-"${CHAIN}" \
+  --env "FOREST_GC_TRIGGER_FACTOR=1.4" \
   --volume=/home/"${NEW_USER}"/forest_data:/home/"${NEW_USER}"/forest_data:z \
   --publish=2345:2345 \
   --publish=6116:6116 \
@@ -82,6 +86,8 @@ if [ -n "${NEW_RELIC_API_KEY}" ] ; then
   NEW_RELIC_REGION="${NEW_RELIC_REGION}" \
   /usr/local/bin/newrelic install -y
 
+# The provided configurations are specific to New Relic. To gain a deeper understanding of these configuration details, you can visit:
+# https://docs.newrelic.com/docs/infrastructure/install-infrastructure-agent/configuration/infrastructure-agent-configuration-settings/#offline-time-to-reset
 cat >> /etc/newrelic-infra.yml <<EOF
 include_matching_metrics:
   process.name:
@@ -91,9 +97,11 @@ include_matching_metrics:
     - regex "^syslog.*"
     - regex "^gpg-agent.*"
 metrics_network_sample_rate: -1
-metrics_process_sample_rate: 300
-metrics_system_sample_rate: 300
-metrics_storage_sample_rate: 300
+metrics_process_sample_rate: 600
+metrics_system_sample_rate: 600
+metrics_storage_sample_rate: 600
+metrics_nfs_sample_rate: 600
+container_cache_metadata_limit: 600
 disable_zero_mem_process_filter: true
 disable_all_plugins: true
 disable_cloud_metadata: true 
@@ -110,7 +118,7 @@ cluster_name: forest-${CHAIN}
 targets:
   - description: Forest "${CHAIN}" Prometheus Endpoint
     urls: ["forest-${CHAIN}:6116"]
-scrape_interval: 300s
+scrape_interval: 600s
 max_concurrency: 10
 timeout: 15s
 retries: 3
@@ -129,6 +137,6 @@ EOF
 fi
 
 #set-up fail2ban with the default configuration
-sudo apt-get install fail2ban -y
+sudo DEBIAN_FRONTEND=noninteractive apt-get -qqq --yes -o DPkg::Lock::Timeout=-1 install -y fail2ban
 sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
 sudo systemctl enable fail2ban && sudo systemctl start fail2ban

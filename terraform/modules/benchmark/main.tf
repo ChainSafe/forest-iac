@@ -3,7 +3,7 @@
 #    determine when to re-deploy the service)
 #  - Boot a new droplet
 #  - Copy over the zip file
-#  - Run calibnet and mainnet sync check in the background
+#  - Run the init.sh script in the background
 
 terraform {
   required_version = "~> 1.3"
@@ -29,15 +29,6 @@ provider "digitalocean" {
   token = var.digitalocean_token
 }
 
-// Ugly hack because 'archive_file' cannot mix files and folders.
-data "external" "sources_tar" {
-  program = ["sh", "${path.module}/prep_sources.sh", path.module]
-}
-
-data "local_file" "sources" {
-  filename = data.external.sources_tar.result.path
-}
-
 // Note: The init.sh file is also included in the sources.zip such that the hash
 // of the archive captures the entire state of the machine.
 // This is a workaround, and because of this, we need to suppress the tflint warning here 
@@ -47,6 +38,16 @@ data "local_file" "init" {
   filename = "${path.module}/service/init.sh"
 }
 
+
+// Ugly hack because 'archive_file' cannot mix files and folders.
+data "external" "sources_tar" {
+  program = ["sh", "${path.module}/prep_sources.sh", path.module]
+}
+
+data "local_file" "sources" {
+  filename = data.external.sources_tar.result.path
+}
+
 data "digitalocean_ssh_keys" "keys" {
   sort {
     key       = "name"
@@ -54,33 +55,22 @@ data "digitalocean_ssh_keys" "keys" {
   }
 }
 
-# Set required environment variables
 locals {
-  env_content = templatefile("${path.module}/service/forest-env.tpl", {
-    FOREST_TARGET_DATA        = "/volumes/forest_data",
-    FOREST_TARGET_SCRIPTS     = "/volumes/sync_check",
-    FOREST_TARGET_RUBY_COMMON = "/volumes/ruby_common",
-    slack_token               = var.slack_token,
-    slack_channel             = var.slack_channel,
-    NEW_RELIC_API_KEY         = var.NEW_RELIC_API_KEY,
-    NEW_RELIC_ACCOUNT_ID      = var.NEW_RELIC_ACCOUNT_ID,
-    NEW_RELIC_REGION          = var.NEW_RELIC_REGION,
-    forest_tag                = "edge"
-  })
-}
-
-locals {
-  init_commands = [
+  init_commands = ["cd /root/",
     "tar xf sources.tar",
     # Set required environment variables
-    "echo '${local.env_content}' >> /root/.forest_env",
+    "echo 'export AWS_ACCESS_KEY_ID=\"${var.AWS_ACCESS_KEY_ID}\"' >> .forest_env",
+    "echo 'export AWS_SECRET_ACCESS_KEY=\"${var.AWS_SECRET_ACCESS_KEY}\"' >> .forest_env",
+    "echo 'export SLACK_API_TOKEN=\"${var.slack_token}\"' >> .forest_env",
+    "echo 'export SLACK_NOTIF_CHANNEL=\"${var.slack_channel}\"' >> .forest_env",
+    "echo 'export BENCHMARK_BUCKET=\"${var.benchmark_bucket}\"' >> .forest_env",
+    "echo 'export BENCHMARK_ENDPOINT=\"${var.benchmark_endpoint}\"' >> .forest_env",
+    "echo 'export BASE_FOLDER=\"/chainsafe\"' >> .forest_env",
     "echo '. ~/.forest_env' >> .bashrc",
     ". ~/.forest_env",
     "nohup sh ./init.sh > init_log.txt &",
-    "cp ./restart.service /etc/systemd/system/",
-    "systemctl enable restart.service",
     # Exiting without a sleep sometimes kills the script :-/
-    "sleep 60s",
+    "sleep 10s"
   ]
 }
 
@@ -90,10 +80,9 @@ resource "digitalocean_droplet" "forest" {
   region = var.region
   size   = var.size
   # Re-initialize resource if this hash changes:
-  user_data  = join("-", [data.local_file.sources.content_sha256, sha256(join("", local.init_commands))])
-  tags       = ["iac"]
-  ssh_keys   = data.digitalocean_ssh_keys.keys.ssh_keys[*].fingerprint
-  monitoring = true
+  user_data = join("-", [data.local_file.sources.content_sha256, sha256(join("", local.init_commands))])
+  tags      = ["iac"]
+  ssh_keys  = data.digitalocean_ssh_keys.keys.ssh_keys[*].fingerprint
 
   graceful_shutdown = false
 

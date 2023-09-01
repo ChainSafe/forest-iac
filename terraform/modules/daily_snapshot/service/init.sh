@@ -2,11 +2,15 @@
 
 set -eux 
 
-apt-get update && apt-get install -y ruby ruby-dev s3cmd anacron
+# Use APT specific mechanism to ensure non-interactive operation and wait for the lock
+sudo DEBIAN_FRONTEND=noninteractive apt-get -qqq --yes -o DPkg::Lock::Timeout=-1 update
+sudo DEBIAN_FRONTEND=noninteractive apt-get -qqq --yes -o DPkg::Lock::Timeout=-1 install -y ruby ruby-dev s3cmd anacron
+
+# Install the gems
 gem install docker-api slack-ruby-client activesupport 
 
 # 1. Configure s3cmd
-# 2. create forest_db directory
+# 2. Create forest_db directory
 # 3. Copy scripts to /etc/cron.hourly
 
 ## Configure s3cmd
@@ -22,12 +26,11 @@ mkdir forest_db
 chmod 777 forest_db
 mkdir --parents -- "$BASE_FOLDER/forest_db/filops"
 
-# make the scripts executable
+# Make the scripts executable
 chmod +x ./upload_filops_snapshot.sh
 
-# run new_relic and fail2ban scripts
+# Run new_relic and fail2ban scripts
 bash newrelic_fail2ban.sh &
 
 # Setup cron jobs
 cp calibnet_cron_job mainnet_cron_job /etc/cron.hourly/
-
