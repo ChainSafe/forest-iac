@@ -28,7 +28,7 @@
                 "accountIds": [
                   "${account_id}"
                 ],
-                "query": "SELECT latest(head_epoch) FROM Metric WHERE clusterName = '${name}' SINCE 30 minutes ago"
+                "query": "SELECT latest(head_epoch) FROM Metric WHERE clusterName = '${name}' SINCE 1 minutes ago"
               }
             ],
             "platformOptions": {
@@ -56,6 +56,35 @@
               {
                 "accountId": "${account_id}",
                 "query": "SELECT (((aggregationendtime() / 1000) - latest(process_start_time_seconds)) / 3600) as 'Process Uptime Hour' FROM Metric WHERE scrapedTargetURL = 'http://${name}:6116/metrics' SINCE 1440 minutes AGO UNTIL NOW"
+              }
+            ],
+            "platformOptions": {
+              "ignoreTimeRange": false
+            }
+          }
+        },
+        {
+          "title": "",
+          "layout": {
+            "column": 1,
+            "row": 4,
+            "width": 4,
+            "height": 3
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.billboard"
+          },
+          "rawConfiguration": {
+            "facet": {
+              "showOtherSeries": false
+            },
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  "${account_id}"
+                ],
+                "query": "SELECT derivative(head_epoch, 1 minute) AS `Tipsets Validated Per Minute` FROM Metric WHERE clusterName = '${name}' SINCE 1 day ago"
               }
             ],
             "platformOptions": {
@@ -128,40 +157,52 @@
           }
         },
         {
-          "title": "",
+          "title": "Forest Host Cpu Useage ",
           "layout": {
             "column": 1,
             "row": 7,
-            "width": 4,
+            "width": 6,
             "height": 3
           },
           "linkedEntityGuids": null,
           "visualization": {
-            "id": "viz.billboard"
+            "id": "viz.line"
           },
           "rawConfiguration": {
             "facet": {
               "showOtherSeries": false
+            },
+            "legend": {
+              "enabled": true
             },
             "nrqlQueries": [
               {
                 "accountIds": [
                   "${account_id}"
                 ],
-                "query": "SELECT derivative(head_epoch, 1 minute) AS `Tipsets Validated Per Minute` FROM Metric WHERE clusterName = '${name}' SINCE 1 day ago"
+                "query": "SELECT (average(host.cpuPercent)/ 100) AS 'Host Cpu Useage %' FROM Metric WHERE host.hostname = '${name}' TIMESERIES AUTO "
               }
             ],
+            "nullValues": {
+              "nullValue": "preserve"
+            },
             "platformOptions": {
               "ignoreTimeRange": false
+            },
+            "units": {
+              "unit": "PERCENTAGE"
+            },
+            "yAxisLeft": {
+              "zero": true
             }
           }
         },
         {
           "title": "Forest Host Disk Used",
           "layout": {
-            "column": 5,
+            "column": 7,
             "row": 7,
-            "width": 8,
+            "width": 6,
             "height": 3
           },
           "linkedEntityGuids": null,
@@ -177,36 +218,7 @@
                 "accountIds": [
                   "${account_id}"
                 ],
-                "query": "SELECT latest(host.disk.usedBytes / 1073741824) as 'Disk Usage GB' FROM Metric WHERE hostname = '${name}'"
-              }
-            ],
-            "platformOptions": {
-              "ignoreTimeRange": false
-            }
-          }
-        },
-        {
-          "title": "Forest Host Cpu Useage ",
-          "layout": {
-            "column": 1,
-            "row": 10,
-            "width": 4,
-            "height": 3
-          },
-          "linkedEntityGuids": null,
-          "visualization": {
-            "id": "viz.billboard"
-          },
-          "rawConfiguration": {
-            "facet": {
-              "showOtherSeries": false
-            },
-            "nrqlQueries": [
-              {
-                "accountIds": [
-                  "${account_id}"
-                ],
-                "query": "SELECT latest(host.cpuPercent) AS 'CPU used %' FROM Metric WHERE host.hostname = '${name}'"
+                "query": "SELECT latest(host.disk.usedBytes / 1073741824) as 'Host Disk Used GB' FROM Metric WHERE hostname = '${name}'"
               }
             ],
             "platformOptions": {
