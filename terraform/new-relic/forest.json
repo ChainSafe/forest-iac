@@ -4,7 +4,7 @@
   "permissions": "PUBLIC_READ_WRITE",
   "pages": [
     {
-      "name": "Overview",
+      "name": "Forest",
       "description": null,
       "widgets": [
         {
@@ -12,62 +12,6 @@
           "layout": {
             "column": 1,
             "row": 1,
-            "width": 6,
-            "height": 3
-          },
-          "linkedEntityGuids": null,
-          "visualization": {
-            "id": "viz.billboard"
-          },
-          "rawConfiguration": {
-            "facet": {
-              "showOtherSeries": false
-            },
-            "nrqlQueries": [
-              {
-                "accountIds": [
-                  "${account_id}"
-                ],
-                "query": "SELECT latest(head_epoch) FROM Metric WHERE clusterName = '${name}' SINCE 30 minutes ago"
-              }
-            ],
-            "platformOptions": {
-              "ignoreTimeRange": false
-            }
-          }
-        },
-        {
-          "title": "",
-          "layout": {
-            "column": 7,
-            "row": 1,
-            "width": 6,
-            "height": 3
-          },
-          "linkedEntityGuids": null,
-          "visualization": {
-            "id": "viz.billboard"
-          },
-          "rawConfiguration": {
-            "facet": {
-              "showOtherSeries": false
-            },
-            "nrqlQueries": [
-              {
-                "accountId": "${account_id}",
-                "query": "SELECT (((aggregationendtime() / 1000) - latest(process_start_time_seconds)) / 3600) as 'Process Uptime Hour' FROM Metric WHERE scrapedTargetURL = 'http://${name}:6116/metrics' SINCE 1440 minutes AGO UNTIL NOW"
-              }
-            ],
-            "platformOptions": {
-              "ignoreTimeRange": false
-            }
-          }
-        },
-        {
-          "title": "",
-          "layout": {
-            "column": 5,
-            "row": 4,
             "width": 4,
             "height": 3
           },
@@ -84,7 +28,7 @@
                 "accountIds": [
                   "${account_id}"
                 ],
-                "query": "SELECT latest(libp2p_messsage_total) as 'Connected Peers' FROM Metric WHERE (libp2p_message_kind = 'peer_connected' and clusterName = '${name}') SINCE 1 day ago UNTIL NOW"
+                "query": "SELECT latest(head_epoch) FROM Metric WHERE clusterName = '${name}' SINCE 60 MINUTES AGO UNTIL NOW"
               }
             ],
             "platformOptions": {
@@ -93,10 +37,39 @@
           }
         },
         {
-          "title": "Process Resident Memory",
+          "title": "Process Wall Time",
+          "layout": {
+            "column": 5,
+            "row": 1,
+            "width": 4,
+            "height": 3
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.billboard"
+          },
+          "rawConfiguration": {
+            "facet": {
+              "showOtherSeries": false
+            },
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  "${account_id}"
+                ],
+                "query": "SELECT ((((aggregationendtime() / 1000) - latest(process_start_time_seconds)) / 60) / 60) FROM Metric WHERE scrapedTargetURL = 'http://${name}:6116/metrics' SINCE 1440 minutes AGO UNTIL NOW"
+              }
+            ],
+            "platformOptions": {
+              "ignoreTimeRange": false
+            }
+          }
+        },
+        {
+          "title": "Database Size",
           "layout": {
             "column": 9,
-            "row": 4,
+            "row": 1,
             "width": 4,
             "height": 3
           },
@@ -116,7 +89,7 @@
                 "accountIds": [
                   "${account_id}"
                 ],
-                "query": "SELECT (latest(process_resident_memory_bytes) / 1073741824) as 'Process Resident Memory GB' FROM Metric WHERE scrapedTargetURL = 'http://${name}:6116/metrics' SINCE 1 day ago UNTIL NOW TIMESERIES auto"
+                "query": "SELECT (latest(forest_db_size) / 1073741824) FROM Metric WHERE clusterName = '${name}' SINCE 1 day ago UNTIL NOW FACET dimensions() LIMIT 100 TIMESERIES AUTO"
               }
             ],
             "platformOptions": {
@@ -128,27 +101,30 @@
           }
         },
         {
-          "title": "",
+          "title": "Process CPU Time",
           "layout": {
             "column": 1,
-            "row": 7,
+            "row": 4,
             "width": 4,
             "height": 3
           },
           "linkedEntityGuids": null,
           "visualization": {
-            "id": "viz.billboard"
+            "id": "viz.area"
           },
           "rawConfiguration": {
             "facet": {
               "showOtherSeries": false
+            },
+            "legend": {
+              "enabled": true
             },
             "nrqlQueries": [
               {
                 "accountIds": [
                   "${account_id}"
                 ],
-                "query": "SELECT derivative(head_epoch, 1 minute) AS `Tipsets Validated Per Minute` FROM Metric WHERE clusterName = '${name}' SINCE 1 day ago"
+                "query": "SELECT ((latest(process_cpu_seconds_total) / 60) / 60) FROM Metric WHERE scrapedTargetURL = 'http://${name}:6116/metrics' SINCE 1 day ago UNTIL NOW FACET dimensions() LIMIT 100 TIMESERIES AUTO"
               }
             ],
             "platformOptions": {
@@ -156,75 +132,11 @@
             }
           }
         },
-        {
-          "title": "Forest Host Disk Used",
-          "layout": {
-            "column": 5,
-            "row": 7,
-            "width": 8,
-            "height": 3
-          },
-          "linkedEntityGuids": null,
-          "visualization": {
-            "id": "viz.billboard"
-          },
-          "rawConfiguration": {
-            "facet": {
-              "showOtherSeries": false
-            },
-            "nrqlQueries": [
-              {
-                "accountIds": [
-                  "${account_id}"
-                ],
-                "query": "SELECT latest(host.disk.usedBytes / 1073741824) as 'Disk Usage GB' FROM Metric WHERE hostname = '${name}'"
-              }
-            ],
-            "platformOptions": {
-              "ignoreTimeRange": false
-            }
-          }
-        },
-        {
-          "title": "Forest Host Cpu Useage ",
-          "layout": {
-            "column": 1,
-            "row": 10,
-            "width": 4,
-            "height": 3
-          },
-          "linkedEntityGuids": null,
-          "visualization": {
-            "id": "viz.billboard"
-          },
-          "rawConfiguration": {
-            "facet": {
-              "showOtherSeries": false
-            },
-            "nrqlQueries": [
-              {
-                "accountIds": [
-                  "${account_id}"
-                ],
-                "query": "SELECT latest(host.cpuPercent) AS 'CPU used %' FROM Metric WHERE host.hostname = '${name}'"
-              }
-            ],
-            "platformOptions": {
-              "ignoreTimeRange": false
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Peers",
-      "description": null,
-      "widgets": [
         {
           "title": "Healthy Peers",
           "layout": {
-            "column": 1,
-            "row": 1,
+            "column": 5,
+            "row": 4,
             "width": 4,
             "height": 3
           },
@@ -250,10 +162,45 @@
           }
         },
         {
+          "title": "Open File Descriptors",
+          "layout": {
+            "column": 9,
+            "row": 4,
+            "width": 4,
+            "height": 3
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.line"
+          },
+          "rawConfiguration": {
+            "facet": {
+              "showOtherSeries": false
+            },
+            "legend": {
+              "enabled": true
+            },
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  "${account_id}"
+                ],
+                "query": "SELECT latest(process_open_fds) FROM Metric WHERE scrapedTargetURL = 'http://${name}:6116/metrics' SINCE 1 day ago UNTIL NOW FACET dimensions() LIMIT 100 TIMESERIES AUTO "
+              }
+            ],
+            "platformOptions": {
+              "ignoreTimeRange": false
+            },
+            "yAxisLeft": {
+              "zero": true
+            }
+          }
+        },
+        {
           "title": "Bad Peers",
           "layout": {
-            "column": 5,
-            "row": 1,
+            "column": 1,
+            "row": 7,
             "width": 4,
             "height": 3
           },
@@ -279,223 +226,10 @@
           }
         },
         {
-          "title": "Peer Disconnected P2P Events",
-          "layout": {
-            "column": 9,
-            "row": 1,
-            "width": 4,
-            "height": 3
-          },
-          "linkedEntityGuids": null,
-          "visualization": {
-            "id": "viz.line"
-          },
-          "rawConfiguration": {
-            "facet": {
-              "showOtherSeries": false
-            },
-            "legend": {
-              "enabled": true
-            },
-            "nrqlQueries": [
-              {
-                "accountIds": [
-                  "${account_id}"
-                ],
-                "query": "SELECT latest(libp2p_messsage_total) FROM Metric WHERE (libp2p_message_kind = 'peer_disconnected' and clusterName = '${name}' ) SINCE 1 day ago UNTIL NOW FACET dimensions() LIMIT 100 TIMESERIES AUTO "
-              }
-            ],
-            "platformOptions": {
-              "ignoreTimeRange": false
-            },
-            "yAxisLeft": {
-              "zero": true
-            }
-          }
-        },
-        {
-          "title": "Hello P2P Events",
-          "layout": {
-            "column": 1,
-            "row": 4,
-            "width": 6,
-            "height": 3
-          },
-          "linkedEntityGuids": null,
-          "visualization": {
-            "id": "viz.line"
-          },
-          "rawConfiguration": {
-            "facet": {
-              "showOtherSeries": false
-            },
-            "legend": {
-              "enabled": true
-            },
-            "nrqlQueries": [
-              {
-                "accountIds": [
-                  "${account_id}"
-                ],
-                "query": "SELECT latest(libp2p_messsage_total) FROM Metric WHERE clusterName = '${name}' SINCE 1 day ago UNTIL NOW TIMESERIES AUTO"
-              }
-            ],
-            "platformOptions": {
-              "ignoreTimeRange": false
-            },
-            "yAxisLeft": {
-              "zero": true
-            }
-          }
-        },
-        {
-          "title": "Block P2P Events",
-          "layout": {
-            "column": 7,
-            "row": 4,
-            "width": 6,
-            "height": 3
-          },
-          "linkedEntityGuids": null,
-          "visualization": {
-            "id": "viz.line"
-          },
-          "rawConfiguration": {
-            "facet": {
-              "showOtherSeries": false
-            },
-            "legend": {
-              "enabled": true
-            },
-            "nrqlQueries": [
-              {
-                "accountIds": [
-                  "${account_id}"
-                ],
-                "query": "SELECT latest(libp2p_messsage_total) FROM Metric WHERE (libp2p_message_kind = 'peer_disconnected' and clusterName = '${name}' ) SINCE 1 day ago UNTIL NOW FACET dimensions() LIMIT 100 TIMESERIES AUTO "
-              }
-            ],
-            "platformOptions": {
-              "ignoreTimeRange": false
-            },
-            "units": {
-              "unit": "MS"
-            },
-            "yAxisLeft": {
-              "zero": true
-            }
-          }
-        },
-        {
-          "title": "Peer Connected P2P Events",
-          "layout": {
-            "column": 1,
-            "row": 7,
-            "width": 4,
-            "height": 3
-          },
-          "linkedEntityGuids": null,
-          "visualization": {
-            "id": "viz.line"
-          },
-          "rawConfiguration": {
-            "facet": {
-              "showOtherSeries": false
-            },
-            "legend": {
-              "enabled": true
-            },
-            "nrqlQueries": [
-              {
-                "accountIds": [
-                  "${account_id}"
-                ],
-                "query": "SELECT latest(libp2p_messsage_total) FROM Metric WHERE (libp2p_message_kind = 'peer_connected' and clusterName = '${name}' ) SINCE 1 day ago UNTIL NOW FACET dimensions() LIMIT 100 TIMESERIES AUTO "
-              }
-            ],
-            "platformOptions": {
-              "ignoreTimeRange": false
-            },
-            "yAxisLeft": {
-              "zero": true
-            }
-          }
-        },
-        {
-          "title": "Message P2P Events",
-          "layout": {
-            "column": 5,
-            "row": 7,
-            "width": 8,
-            "height": 3
-          },
-          "linkedEntityGuids": null,
-          "visualization": {
-            "id": "viz.line"
-          },
-          "rawConfiguration": {
-            "facet": {
-              "showOtherSeries": false
-            },
-            "legend": {
-              "enabled": true
-            },
-            "nrqlQueries": [
-              {
-                "accountIds": [
-                  "${account_id}"
-                ],
-                "query": "SELECT latest(libp2p_messsage_total) FROM Metric WHERE (libp2p_message_kind = 'pubsub_message_message' and clusterName = '${name}' ) SINCE 1 day ago UNTIL NOW FACET dimensions() LIMIT 100 TIMESERIES AUTO"
-              }
-            ],
-            "platformOptions": {
-              "ignoreTimeRange": false
-            },
-            "yAxisLeft": {
-              "zero": true
-            }
-          }
-        },
-        {
-          "title": "Peer Disconnected P2P Events",
-          "layout": {
-            "column": 1,
-            "row": 10,
-            "width": 4,
-            "height": 3
-          },
-          "linkedEntityGuids": null,
-          "visualization": {
-            "id": "viz.line"
-          },
-          "rawConfiguration": {
-            "facet": {
-              "showOtherSeries": false
-            },
-            "legend": {
-              "enabled": true
-            },
-            "nrqlQueries": [
-              {
-                "accountIds": [
-                  "${account_id}"
-                ],
-                "query": "SELECT latest(libp2p_messsage_total) FROM Metric WHERE (libp2p_message_kind = 'peer_disconnected' and clusterName = '${name}' ) SINCE 24 hours ago UNTIL NOW FACET dimensions() LIMIT 100 TIMESERIES AUTO"
-              }
-            ],
-            "platformOptions": {
-              "ignoreTimeRange": false
-            },
-            "yAxisLeft": {
-              "zero": true
-            }
-          }
-        },
-        {
           "title": "Failed Peer Requests",
           "layout": {
             "column": 5,
-            "row": 10,
+            "row": 7,
             "width": 4,
             "height": 3
           },
@@ -530,10 +264,153 @@
           }
         },
         {
-          "title": "Bitswap Block P2P Events",
+          "title": "Process Virtual Memory",
+          "layout": {
+            "column": 9,
+            "row": 7,
+            "width": 4,
+            "height": 3
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.line"
+          },
+          "rawConfiguration": {
+            "facet": {
+              "showOtherSeries": false
+            },
+            "legend": {
+              "enabled": true
+            },
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  "${account_id}"
+                ],
+                "query": "SELECT (latest(process_virtual_memory_bytes) / 1073741824) FROM Metric WHERE  scrapedTargetURL = 'http://${name}:6116/metrics' SINCE 1 day ago UNTIL NOW FACET dimensions() LIMIT 100 TIMESERIES AUTO "
+              }
+            ],
+            "platformOptions": {
+              "ignoreTimeRange": false
+            },
+            "yAxisLeft": {
+              "zero": true
+            }
+          }
+        },
+        {
+          "title": "Process Resident Memory",
+          "layout": {
+            "column": 1,
+            "row": 10,
+            "width": 4,
+            "height": 3
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.line"
+          },
+          "rawConfiguration": {
+            "facet": {
+              "showOtherSeries": false
+            },
+            "legend": {
+              "enabled": true
+            },
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  "${account_id}"
+                ],
+                "query": "SELECT (latest(process_resident_memory_bytes) / 1073741824) FROM Metric WHERE scrapedTargetURL = 'http://forest-calibnet:6116/metrics' SINCE 1 day ago UNTIL NOW FACET dimensions() LIMIT 100 TIMESERIES AUTO "
+              }
+            ],
+            "nullValues": {
+              "nullValue": "default"
+            },
+            "platformOptions": {
+              "ignoreTimeRange": false
+            },
+            "yAxisLeft": {
+              "zero": true
+            }
+          }
+        },
+        {
+          "title": "Message P2P Events",
+          "layout": {
+            "column": 5,
+            "row": 10,
+            "width": 4,
+            "height": 3
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.line"
+          },
+          "rawConfiguration": {
+            "facet": {
+              "showOtherSeries": false
+            },
+            "legend": {
+              "enabled": true
+            },
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  "${account_id}"
+                ],
+                "query": "SELECT latest(libp2p_messsage_total) FROM Metric WHERE (libp2p_message_kind = 'pubsub_message_message' and clusterName = '${name}' ) SINCE 1 day ago UNTIL NOW FACET dimensions() LIMIT 100 TIMESERIES AUTO"
+              }
+            ],
+            "platformOptions": {
+              "ignoreTimeRange": false
+            },
+            "yAxisLeft": {
+              "zero": true
+            }
+          }
+        },
+        {
+          "title": "Peer Disconnected P2P Events",
           "layout": {
             "column": 9,
             "row": 10,
+            "width": 4,
+            "height": 3
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.line"
+          },
+          "rawConfiguration": {
+            "facet": {
+              "showOtherSeries": false
+            },
+            "legend": {
+              "enabled": true
+            },
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  "${account_id}"
+                ],
+                "query": "SELECT latest(libp2p_messsage_total) FROM Metric WHERE (libp2p_message_kind = 'peer_disconnected' and clusterName = '${name}' ) SINCE 1 day ago UNTIL NOW FACET dimensions() LIMIT 100 TIMESERIES AUTO "
+              }
+            ],
+            "platformOptions": {
+              "ignoreTimeRange": false
+            },
+            "yAxisLeft": {
+              "zero": true
+            }
+          }
+        },
+        {
+          "title": "Bitswap Block P2P Events",
+          "layout": {
+            "column": 1,
+            "row": 13,
             "width": 4,
             "height": 3
           },
@@ -563,50 +440,12 @@
               "zero": true
             }
           }
-        }
-      ]
-    },
-    {
-      "name": "Stats",
-      "description": null,
-      "widgets": [
-        {
-          "title": "Process CPU Time",
-          "layout": {
-            "column": 1,
-            "row": 1,
-            "width": 4,
-            "height": 3
-          },
-          "linkedEntityGuids": null,
-          "visualization": {
-            "id": "viz.area"
-          },
-          "rawConfiguration": {
-            "facet": {
-              "showOtherSeries": false
-            },
-            "legend": {
-              "enabled": true
-            },
-            "nrqlQueries": [
-              {
-                "accountIds": [
-                  "${account_id}"
-                ],
-                "query": "SELECT ((latest(process_cpu_seconds_total) / 60) / 60) FROM Metric WHERE scrapedTargetURL = 'http://${name}:6116/metrics' SINCE 1 day ago UNTIL NOW FACET dimensions() LIMIT 100 TIMESERIES AUTO"
-              }
-            ],
-            "platformOptions": {
-              "ignoreTimeRange": false
-            }
-          }
         },
         {
-          "title": "Process Virtual Memory",
+          "title": "Peer Connected P2P Events",
           "layout": {
             "column": 5,
-            "row": 1,
+            "row": 13,
             "width": 4,
             "height": 3
           },
@@ -626,42 +465,7 @@
                 "accountIds": [
                   "${account_id}"
                 ],
-                "query": "SELECT (latest(process_virtual_memory_bytes) / 1073741824) as 'Process Virtual Memory' FROM Metric WHERE scrapedTargetURL = 'http://${name}:6116/metrics' SINCE 1 day ago UNTIL NOW TIMESERIES AUTO"
-              }
-            ],
-            "platformOptions": {
-              "ignoreTimeRange": false
-            },
-            "yAxisLeft": {
-              "zero": true
-            }
-          }
-        },
-        {
-          "title": "Database Size",
-          "layout": {
-            "column": 9,
-            "row": 1,
-            "width": 4,
-            "height": 3
-          },
-          "linkedEntityGuids": null,
-          "visualization": {
-            "id": "viz.line"
-          },
-          "rawConfiguration": {
-            "facet": {
-              "showOtherSeries": false
-            },
-            "legend": {
-              "enabled": true
-            },
-            "nrqlQueries": [
-              {
-                "accountIds": [
-                  "${account_id}"
-                ],
-                "query": "SELECT (latest(forest_db_size) / 1073741824) as 'Forest Db Size GB ' FROM Metric WHERE clusterName = '${name}' SINCE 1 day ago UNTIL NOW TIMESERIES AUTO"
+                "query": "SELECT latest(libp2p_messsage_total) FROM Metric WHERE (libp2p_message_kind = 'peer_connected' and clusterName = '${name}' ) SINCE 1 day ago UNTIL NOW FACET dimensions() LIMIT 100 TIMESERIES AUTO "
               }
             ],
             "platformOptions": {
@@ -675,8 +479,8 @@
         {
           "title": "Range Sync Failure Count",
           "layout": {
-            "column": 1,
-            "row": 4,
+            "column": 9,
+            "row": 13,
             "width": 4,
             "height": 3
           },
@@ -708,11 +512,11 @@
           }
         },
         {
-          "title": "Open File Descriptors",
+          "title": "Peer Disconnected P2P Events",
           "layout": {
-            "column": 5,
-            "row": 4,
-            "width": 8,
+            "column": 1,
+            "row": 16,
+            "width": 4,
             "height": 3
           },
           "linkedEntityGuids": null,
@@ -731,7 +535,7 @@
                 "accountIds": [
                   "${account_id}"
                 ],
-                "query": "SELECT latest(process_open_fds) FROM Metric WHERE scrapedTargetURL = 'http://${name}:6116/metrics' SINCE 1 day ago UNTIL NOW FACET dimensions() LIMIT 100 TIMESERIES AUTO "
+                "query": "SELECT latest(libp2p_messsage_total) FROM Metric WHERE (libp2p_message_kind = 'peer_disconnected' and clusterName = '${name}' ) SINCE 24 hours ago UNTIL NOW FACET dimensions() LIMIT 100 TIMESERIES AUTO"
               }
             ],
             "platformOptions": {
@@ -743,11 +547,136 @@
           }
         },
         {
-          "title": "Forest logs",
+          "title": "Block P2P Events",
+          "layout": {
+            "column": 5,
+            "row": 16,
+            "width": 4,
+            "height": 3
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.line"
+          },
+          "rawConfiguration": {
+            "facet": {
+              "showOtherSeries": false
+            },
+            "legend": {
+              "enabled": true
+            },
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  "${account_id}"
+                ],
+                "query": "SELECT latest(libp2p_messsage_total) FROM Metric WHERE (libp2p_message_kind = 'peer_disconnected' and clusterName = '${name}' ) SINCE 1 day ago UNTIL NOW FACET dimensions() LIMIT 100 TIMESERIES AUTO "
+              }
+            ],
+            "platformOptions": {
+              "ignoreTimeRange": false
+            },
+            "units": {
+              "unit": "MS"
+            },
+            "yAxisLeft": {
+              "zero": true
+            }
+          }
+        },
+        {
+          "title": "Hello P2P Events",
+          "layout": {
+            "column": 9,
+            "row": 16,
+            "width": 4,
+            "height": 3
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.billboard"
+          },
+          "rawConfiguration": {
+            "facet": {
+              "showOtherSeries": false
+            },
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  "${account_id}"
+                ],
+                "query": "SELECT latest(libp2p_messsage_total) FROM Metric WHERE clusterName = '${name}' SINCE 1 day ago UNTIL NOW"
+              }
+            ],
+            "platformOptions": {
+              "ignoreTimeRange": false
+            }
+          }
+        },
+        {
+          "title": "Forest Host Cpu Useage ",
           "layout": {
             "column": 1,
-            "row": 7,
-            "width": 12,
+            "row": 19,
+            "width": 4,
+            "height": 3
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.billboard"
+          },
+          "rawConfiguration": {
+            "facet": {
+              "showOtherSeries": false
+            },
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  "${account_id}"
+                ],
+                "query": "SELECT latest(host.cpuPercent) FROM Metric WHERE host.hostname = '${name}'"
+              }
+            ],
+            "platformOptions": {
+              "ignoreTimeRange": false
+            }
+          }
+        },
+        {
+          "title": "Forest Host Disk Used",
+          "layout": {
+            "column": 5,
+            "row": 19,
+            "width": 4,
+            "height": 3
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.billboard"
+          },
+          "rawConfiguration": {
+            "facet": {
+              "showOtherSeries": false
+            },
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  "${account_id}"
+                ],
+                "query": "SELECT latest(diskUsedPercent) FROM StorageSample WHERE hostname = '${name}' FACET hostname, mountPoint"
+              }
+            ],
+            "platformOptions": {
+              "ignoreTimeRange": false
+            }
+          }
+        },
+        {
+          "title": "Forest logs",
+          "layout": {
+            "column": 9,
+            "row": 19,
+            "width": 4,
             "height": 3
           },
           "linkedEntityGuids": null,
@@ -757,7 +686,7 @@
           "rawConfiguration": {
             "nrqlQueries": [
               {
-                "accountId": "${account_id}",
+                "accountId": 3942575,
                 "query": "SELECT `log_severity`,`timestamp`,`message` FROM Log WHERE `hostname` = '${name}'"
               }
             ]
