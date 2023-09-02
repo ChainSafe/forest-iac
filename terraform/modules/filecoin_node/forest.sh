@@ -119,12 +119,11 @@ targets:
   - description: Forest "${CHAIN}" Prometheus Endpoint
     urls: ["forest-${CHAIN}:6116"]
 
-scrape_duration: 10m
 transformations:
   - description: "General processing rules"
     ignore_metrics:
-      - except:
-        - libp2p_messsage_total
+      - prefixes:
+        - "peer_tipset_epoch"
 
 EOF
   sudo --user="${NEW_USER}" -- \
