@@ -59,6 +59,11 @@ class ForestBenchmark < BenchmarkBase
     exec_command(%w[cargo clean])
   end
 
+  def fetch_actor_bundles
+    cmd = File.join('.', 'assets', 'ci_download.sh')
+    exec_command([cmd])
+  end
+
   def build_command
     exec_command(['cargo', 'build', '--release'])
   end
