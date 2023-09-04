@@ -52,3 +52,4 @@ apply_lt_main:
 
 destroy_lt_main:
 	@cd $(TF_LT_MAIN_DIR) && $(TF) destroy
+

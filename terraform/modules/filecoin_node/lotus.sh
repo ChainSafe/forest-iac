@@ -114,14 +114,15 @@ metrics_nfs_sample_rate: 600
 container_cache_metadata_limit: 600
 disable_zero_mem_process_filter: true
 disable_all_plugins: true
-disable_cloud_metadata: true
+disable_cloud_metadata: true 
 ignore_system_proxy: true
 EOF
 
-  sudo systemctl restart newrelic-infra
+  sudo systemctl restart newrelic-infra  
 fi
 
 #set-up fail2ban with the default configuration
 sudo DEBIAN_FRONTEND=noninteractive apt-get -qqq --yes -o DPkg::Lock::Timeout=-1 install -y fail2ban
 sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
 sudo systemctl enable fail2ban && sudo systemctl start fail2ban
+

@@ -19,3 +19,4 @@ variable "slack_channel_id" {
   type        = string
   default     = "C036TCEF0CU"
 }
+

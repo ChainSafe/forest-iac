@@ -104,11 +104,11 @@ metrics_nfs_sample_rate: 600
 container_cache_metadata_limit: 600
 disable_zero_mem_process_filter: true
 disable_all_plugins: true
-disable_cloud_metadata: true
-ignore_system_proxy: true
+disable_cloud_metadata: true 
+ignore_system_proxy: true 
 EOF
 
-  sudo systemctl restart newrelic-infra
+  sudo systemctl restart newrelic-infra  
 fi
 
 # If New Relic license key is provided, run OpenMetrics Prometheus integration container.

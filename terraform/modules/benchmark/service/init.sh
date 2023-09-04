@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ## Enable strict error handling
-set -eux
+set -eux 
 
 sudo docker build -t benchmark .
 

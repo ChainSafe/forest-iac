@@ -82,3 +82,4 @@ variable "NEW_RELIC_ACCOUNT_ID" {
   description = "The New Relic Account ID"
   type        = string
 }
+

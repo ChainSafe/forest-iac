@@ -30,8 +30,8 @@ metrics_nfs_sample_rate: 600
 container_cache_metadata_limit: 600
 disable_zero_mem_process_filter: true
 disable_all_plugins: true
-disable_cloud_metadata: true
-ignore_system_proxy: true
+disable_cloud_metadata: true 
+ignore_system_proxy: true 
 EOF
 
 cat > /etc/newrelic-infra/logging.d/logging.yml <<EOF
@@ -50,8 +50,8 @@ logs:
       newrelic-cli: true
       logtype: newrelic-cli
 EOF
-
-  sudo systemctl restart newrelic-infra
+  
+  sudo systemctl restart newrelic-infra 
 fi
 
 #set-up fail2ban with the default configuration
