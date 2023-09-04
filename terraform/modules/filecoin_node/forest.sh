@@ -118,11 +118,13 @@ cluster_name: forest-${CHAIN}
 targets:
   - description: Forest "${CHAIN}" Prometheus Endpoint
     urls: ["forest-${CHAIN}:6116"]
-scrape_interval: 600s
-max_concurrency: 10
-timeout: 15s
-retries: 3
-log_level: info
+
+transformations:
+  - description: "General processing rules"
+    ignore_metrics:
+      - prefixes:
+        - "peer_tipset_epoch"
+
 EOF
   sudo --user="${NEW_USER}" -- \
     docker run \
