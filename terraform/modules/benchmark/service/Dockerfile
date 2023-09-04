@@ -24,7 +24,7 @@ RUN curl -o /tmp/go.tar.gz -L https://go.dev/dl/go1.20.7.linux-amd64.tar.gz && \
 RUN echo "export PATH=\$PATH:/usr/local/go/bin" >> ~/.bashrc
 ENV PATH="/usr/local/go/bin:$PATH"
 
-# Initialize Git LFS 
+# Initialize Git LFS
 RUN git lfs install
 
 WORKDIR /chainsafe

@@ -6,15 +6,15 @@ on:
   pull_request:
     branches:
       - main
-    paths: 
-      - 'terraform/benchmark/**' 
-      - 'terraform/modules/benchmark/**' 
+    paths:
+      - 'terraform/benchmark/**'
+      - 'terraform/modules/benchmark/**'
   push:
     branches:
       - main
-    paths: 
-      - 'terraform/forest-calibnet/**' 
-      - 'terraform/modules/filecoin_node/**' 
+    paths:
+      - 'terraform/forest-calibnet/**'
+      - 'terraform/modules/filecoin_node/**'
 
 jobs:
   benchmark:
