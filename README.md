@@ -34,11 +34,16 @@ To use the pre-commit hooks in this repository, follow these steps:
     ```bash
     pip install pre-commit
     ```
-    
+
 - **Install the Pre-commit Hooks**: Run the following command in your project's directory to install the hooks:
 
     ```bash
     pre-commit install
+    ```
+
+- **(optional) Run against all the files**: it's usually a good idea to run the hooks against all of the files when adding new hooks (usually pre-commit will only run on the changed files during git hooks)
+    ```bash
+    pre-commit run --all-files
     ```
 
 That's it! From now on, every time you commit changes to your project, these hooks will automatically check your code.
