@@ -35,3 +35,4 @@ jobs:
           new_relic_account_id: ${{ secrets.NEW_RELIC_ACCOUNT_ID }}
           working_directory: terraform/new-relic
           environment: New Relic
+ 

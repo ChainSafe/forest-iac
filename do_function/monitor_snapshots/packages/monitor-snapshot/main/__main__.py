@@ -78,9 +78,9 @@ def main():
     checks_passed = True
 
     # Iterate over each folder and check the snapshots within.
-    for folder in folders:
+    for folder in folders:  
         # Get the snapshots in the current folder
-        snapshots = all_snapshots.get(folder, {})
+        snapshots = all_snapshots.get(folder, {}) 
 
         latest_snapshot_by_date = None
         latest_snapshot_filename = None
@@ -98,7 +98,7 @@ def main():
         if latest_snapshot_filename is None:
             checks_passed = False
             error_messages.append(f"No snapshots found in {folder} folder.")
-            continue
+            continue       
 
         # Check if the most recent snapshot is older than one day.
         current_date_utc = datetime.now(timezone.utc).date()
@@ -107,11 +107,11 @@ def main():
         if latest_snapshot_by_date.date() < yesterday_date_utc:
             checks_passed = False
             error_messages.append(f"⛔ The latest {folder} snapshot: {base_url}/{latest_snapshot_filename} is older than one day. Snapshot Date: {latest_snapshot_by_date}, Current Date: {current_date_utc}. 🔥🌲🔥")
-
+        
         # Checks for validity and integrity of each snapshot in the current folder.
         for snapshot_name, snapshot in snapshots.items():
             # Check if the snapshot size is less than 1GB.
-            if snapshot['Size'] < 1073741824 and snapshot_name.endswith(('.car', '.car.zst')):  # 1GB in bytes
+            if snapshot['Size'] < 1073741824 and snapshot_name.endswith(('.car', '.car.zst')):  # 1GB in bytes 
                 checks_passed = False
                 error_messages.append(f"🚫 Error! The snapshot {snapshot_name} is less than 1GB. Size anomalies detected. 📉")
 
@@ -130,7 +130,7 @@ def main():
 
             # Check if there are any sha256 checksum files without a corresponding snapshot file.
             elif snapshot_name.endswith('.sha256sum'):  # Check for stray shasum files
-                base_snapshot_file = snapshot_name.rsplit('.', 2)[0]
+                base_snapshot_file = snapshot_name.rsplit('.', 2)[0] 
                 snapshot_file = base_snapshot_file + '.car'
                 snapshot_file_zst = base_snapshot_file + '.car.zst'
                 if snapshot_file not in snapshots and snapshot_file_zst not in snapshots:
@@ -151,3 +151,4 @@ def main():
             "result": "✅ success",
             "message": "All checks passed successfully. All snapshots are valid and up-to-date. Lets keep up the good work!. 🌲🌳🌲🌳🌲"
         }
+

@@ -1,4 +1,4 @@
-environment:
+environment: 
   SLACK_TOKEN: ${SLACK_TOKEN}
 packages:
   - name: monitor-snapshot

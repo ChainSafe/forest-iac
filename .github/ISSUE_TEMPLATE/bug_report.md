@@ -24,11 +24,11 @@ Steps to reproduce the behavior:
 <!-- Please paste the log output derived from the error. -->
 <details>
   <summary>Log Output</summary>
-
+  
   ```Paste log output here
   paste log output...
   ```
-</details>
+</details> 
 
 
 
@@ -43,7 +43,7 @@ Steps to reproduce the behavior:
 
 
 **Environment (please complete the following information):**
- - OS:
+ - OS: 
  - Rust version(e.g. `rustc --version`)
  - Branch/commit
 
