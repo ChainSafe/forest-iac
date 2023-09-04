@@ -13,8 +13,8 @@ on:
     branches:
       - main
     paths: 
-      - 'terraform/forest-calibnet/**' 
-      - 'terraform/modules/filecoin_node/**' 
+      - 'terraform/benchmark/**' 
+      - 'terraform/modules/benchmark/**' 
 
 jobs:
   benchmark:
