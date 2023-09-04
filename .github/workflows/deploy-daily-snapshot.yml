@@ -23,7 +23,7 @@ jobs:
     permissions: write-all
     steps:
       - name: Checkout the code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Using Custom Composite action in ./composite-action/terraform folder
       - name: Composite Action for Deploying Terraform Resources
