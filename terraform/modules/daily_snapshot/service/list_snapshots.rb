@@ -25,10 +25,8 @@ class Snapshot
   end
 
   def check_for_nil_params(params)
-    unless params[:network].nil? || params[:date].nil? || params[:height].nil? || \
-           params[:file_name].nil? || params[:url_s3].nil? || params[:url].nil?
-      return
-    end
+    return unless params[:network].nil? || params[:date].nil? || params[:height].nil? || \
+                  params[:file_name].nil? || params[:url_s3].nil? || params[:url].nil?
 
     raise ArgumentError,
           'Missing argument'
@@ -38,7 +36,7 @@ class Snapshot
     return unless params[:network].downcase != 'mainnet' && params[:network].downcase != 'calibnet'
 
     raise ArgumentError,
-          'Invalid network'
+          "Invalid network: #{params[:network]}"
   end
 
   def to_s
@@ -56,6 +54,7 @@ class Snapshot
   end
 end
 
+# Define the line format to use in the file matching step and get the output of the `s3cmd ls` command
 def prepare_to_list_snapshots(chain_name, bucket)
   ls_format = %r{\d{4}-\d{2}-\d{2} \d{2}:\d{2}\s*\d*\s*s3://#{bucket}/#{chain_name}/(.+)}
 
@@ -64,6 +63,7 @@ def prepare_to_list_snapshots(chain_name, bucket)
   [ls_format, output]
 end
 
+# Define the snapshot format to use in the file matching step and create an empty snapshot list
 def prepare_to_update_snapshot_list
   snapshot_format = \
     /^(?:[^_]+?)_snapshot_(?<network>[^_]+?)_(?<date>\d{4}-\d{2}-\d{2})_height_(?<height>\d+)(?:\.forest)?\.car.zst$/
@@ -71,6 +71,7 @@ def prepare_to_update_snapshot_list
   [snapshot_format, snapshot_list]
 end
 
+# Populates the `params` Hash with the values obtained from the file matching step
 def match_assignments(bucket, chain_name, endpoint, file, match)
   params = {}
   params[:network] = match[:network]
@@ -82,6 +83,7 @@ def match_assignments(bucket, chain_name, endpoint, file, match)
   params
 end
 
+# Update the snapshot list with the snapshots found in the S3 space hosted by Forest
 def update_snapshot_list(ls_format, output, bucket, chain_name, endpoint)
   (snapshot_format, snapshot_list) = prepare_to_update_snapshot_list
   output.each_line do |line|
