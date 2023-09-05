@@ -130,6 +130,7 @@ module BuildCommands
     Dir.chdir(repository_name) do
       checkout_command
       clean_command
+      fetch_actor_bundles if repository_name == 'forest'
       build_command
     end
   end
