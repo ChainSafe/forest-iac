@@ -22,7 +22,7 @@ def create_consecutive_days_snapshots(start_date, count)
   end
 end
 
-# Helper function for `prune_snapshots`
+# Pruning logic when there are no snapshots
 def no_snapshots
   describe 'when there are no snapshots' do
     it 'returns an empty array' do
@@ -31,7 +31,7 @@ def no_snapshots
   end
 end
 
-# Helper function for `prune_snapshots`
+# Pruning logic when there is only one snapshot
 def one_snapshot
   describe 'when there is one snapshot' do
     let(:snapshot) { create_same_day_snapshots(Date.parse('2023-06-27'), 1).first }
@@ -42,7 +42,7 @@ def one_snapshot
   end
 end
 
-# Helper function for `delete_all_but_first_two`
+# Actual pruning step in `delete_all_but_first_two`.
 def one_day_pruning(snapshots)
   snapshots.each_with_index do |snapshot, index|
     if index < BUFFER_SIZE + DAILY_SNAPSHOTS
@@ -53,7 +53,7 @@ def one_day_pruning(snapshots)
   end
 end
 
-# Helper function for `multiple_snapshots_one_day`
+# Deletes all but first two snapshots if there are multiple snapshots in one day.
 def delete_all_but_first_two(snapshots)
   it 'deletes all but the first two (assumes snapshots are provided in descending height order)' do
     pruned_snapshots = prune_snapshots(snapshots)
@@ -63,7 +63,7 @@ def delete_all_but_first_two(snapshots)
   end
 end
 
-# Helper function for `prune_snapshots`
+# Pruning logic when there are multiple snapshots in a day
 def multiple_snapshots_one_day
   describe 'when are multiple snapshots for a single day' do
     snapshot_count = BUFFER_SIZE + 42
@@ -74,7 +74,7 @@ def multiple_snapshots_one_day
   end
 end
 
-# Helper function for `delete_all_but_first_of_each_week`
+# Logic before pruning in `delete_all_but_first_of_each_week`
 def snapshot_preprocessing(snapshots, days_in_test)
   snapshots_count = snapshots.length
   pruned_snapshots = prune_snapshots(snapshots)
@@ -85,7 +85,7 @@ def snapshot_preprocessing(snapshots, days_in_test)
   expect(pruned_snapshots.length).to eq(snapshots_count - expected_snapshots_keep_count)
 end
 
-# Helper function for `delete_all_but_first_of_each_week`
+# Actual pruning step after pre-processing in `delete_all_but_first_of_each_week`.
 def one_year_pruning(snapshots)
   # First 18 snapshots should not be deleted (day + buffer + week)
   # afterwards, only Sunday snapshots should be kept
@@ -99,7 +99,7 @@ def one_year_pruning(snapshots)
   end
 end
 
-# Helper function for `multiple_snapshots_one_year`
+# Deletes all snapshots except for the first one in each week.
 def delete_all_but_first_of_each_week(snapshots, days_in_test)
   it 'deletes all but the first one of each week' do
     snapshot_preprocessing(snapshots, days_in_test)
@@ -112,7 +112,7 @@ def delete_all_but_first_of_each_week(snapshots, days_in_test)
   end
 end
 
-# Helper function for `multiple_snapshots_one_year`
+# Define parameters for use in `multiple_snapshots_one_year`.
 def multiple_snapshots_one_year_assignments
   current_date = Date.parse('2023-06-27')
   days_in_test = 366
@@ -120,7 +120,7 @@ def multiple_snapshots_one_year_assignments
   [current_date, days_in_test, first_day_snapshots]
 end
 
-# Helper function for `prune_snapshots`
+# Pruning logic when there are multiple snapshots in a year.
 def multiple_snapshots_one_year
   describe 'when there are multiple snapshot over one year' do
     current_date, days_in_test, first_day_snapshots = multiple_snapshots_one_year_assignments
