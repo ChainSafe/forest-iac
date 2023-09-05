@@ -97,36 +97,7 @@
           "layout": {
             "column": 5,
             "row": 4,
-            "width": 4,
-            "height": 3
-          },
-          "linkedEntityGuids": null,
-          "visualization": {
-            "id": "viz.billboard"
-          },
-          "rawConfiguration": {
-            "facet": {
-              "showOtherSeries": false
-            },
-            "nrqlQueries": [
-              {
-                "accountIds": [
-                  "${account_id}"
-                ],
-                "query": "SELECT latest(libp2p_messsage_total) as 'Connected Peers' FROM Metric WHERE (libp2p_message_kind = 'peer_connected' and clusterName = '${name}') SINCE 1 day ago UNTIL NOW"
-              }
-            ],
-            "platformOptions": {
-              "ignoreTimeRange": false
-            }
-          }
-        },
-        {
-          "title": "Process Resident Memory",
-          "layout": {
-            "column": 9,
-            "row": 4,
-            "width": 4,
+            "width": 8,
             "height": 3
           },
           "linkedEntityGuids": null,
@@ -145,7 +116,7 @@
                 "accountIds": [
                   "${account_id}"
                 ],
-                "query": "SELECT (latest(process_resident_memory_bytes) / 1073741824) as 'Process Resident Memory GB' FROM Metric WHERE scrapedTargetURL = 'http://${name}:6116/metrics' SINCE 1 day ago UNTIL NOW TIMESERIES auto"
+                "query": "SELECT latest(full_peers) AS 'Full Peers' FROM Metric WHERE clusterName = '${name}' TIMESERIES AUTO "
               }
             ],
             "platformOptions": {
@@ -198,11 +169,113 @@
           }
         },
         {
-          "title": "Forest Host Disk Used",
+          "title": "Process Resident Memory",
           "layout": {
             "column": 7,
             "row": 7,
             "width": 6,
+            "height": 3
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.line"
+          },
+          "rawConfiguration": {
+            "facet": {
+              "showOtherSeries": false
+            },
+            "legend": {
+              "enabled": true
+            },
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  "${account_id}"
+                ],
+                "query": "SELECT (latest(process_resident_memory_bytes) / 1073741824) as 'Process Resident Memory GB' FROM Metric WHERE scrapedTargetURL = 'http://${name}:6116/metrics' SINCE 1 day ago UNTIL NOW TIMESERIES auto"
+              }
+            ],
+            "platformOptions": {
+              "ignoreTimeRange": false
+            },
+            "yAxisLeft": {
+              "zero": true
+            }
+          }
+        },
+        {
+          "title": "",
+          "layout": {
+            "column": 1,
+            "row": 10,
+            "width": 4,
+            "height": 3
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.billboard"
+          },
+          "rawConfiguration": {
+            "facet": {
+              "showOtherSeries": false
+            },
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  "${account_id}"
+                ],
+                "query": "SELECT latest(host.disk.totalBytes/ 1073741824) as 'Host Disk Size GB' FROM Metric WHERE hostname = '${name}' "
+              }
+            ],
+            "platformOptions": {
+              "ignoreTimeRange": false
+            }
+          }
+        },
+        {
+          "title": "",
+          "layout": {
+            "column": 5,
+            "row": 10,
+            "width": 4,
+            "height": 3
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.line"
+          },
+          "rawConfiguration": {
+            "facet": {
+              "showOtherSeries": false
+            },
+            "legend": {
+              "enabled": true
+            },
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  "${account_id}"
+                ],
+                "query": "SELECT (latest(host.disk.usedPercent) / 100) as 'Host Disk Used %' FROM Metric WHERE hostname = '${name}' TIMESERIES AUTO SINCE 1 day ago"
+              }
+            ],
+            "platformOptions": {
+              "ignoreTimeRange": false
+            },
+            "units": {
+              "unit": "PERCENTAGE"
+            },
+            "yAxisLeft": {
+              "zero": true
+            }
+          }
+        },
+        {
+          "title": "Forest Host Disk Used",
+          "layout": {
+            "column": 9,
+            "row": 10,
+            "width": 4,
             "height": 3
           },
           "linkedEntityGuids": null,
@@ -232,35 +305,6 @@
       "name": "Peers",
       "description": null,
       "widgets": [
-        {
-          "title": "Healthy Peers",
-          "layout": {
-            "column": 1,
-            "row": 1,
-            "width": 4,
-            "height": 3
-          },
-          "linkedEntityGuids": null,
-          "visualization": {
-            "id": "viz.billboard"
-          },
-          "rawConfiguration": {
-            "facet": {
-              "showOtherSeries": false
-            },
-            "nrqlQueries": [
-              {
-                "accountIds": [
-                  "${account_id}"
-                ],
-                "query": "SELECT latest(full_peers) FROM Metric WHERE clusterName = '${name}' SINCE 1 day ago UNTIL NOW"
-              }
-            ],
-            "platformOptions": {
-              "ignoreTimeRange": false
-            }
-          }
-        },
         {
           "title": "Bad Peers",
           "layout": {
@@ -769,7 +813,9 @@
           "rawConfiguration": {
             "nrqlQueries": [
               {
-                "accountId": "${account_id}",
+                "accountIds": [
+                  "${account_id}"
+                ],
                 "query": "SELECT `log_severity`,`timestamp`,`message` FROM Log WHERE `hostname` = '${name}'"
               }
             ]
