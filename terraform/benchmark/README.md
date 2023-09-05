@@ -1,7 +1,7 @@
 # Overview
 
-This folder contains an executable description of a benchmarking service that 
-compares the performance of Forest and Lotus latest releases. The benchmark results are 
+This folder contains an executable description of a benchmarking service that
+compares the performance of Forest and Lotus latest releases. The benchmark results are
 uploaded to an S3 bucket, where they are stored in both weekly file and `all_result` file.
 
 # Workflow
@@ -17,7 +17,7 @@ deployment plan is executed.
 The workflow has access to all the required secrets (DO token, slack token, S3
 credentials, etc) and none of them have to be provided when creating a new PR.
 However, the deployment workflow is not triggered automatically if you change
-the secrets. In this case, you have to trigger the workflow manually. 
+the secrets. In this case, you have to trigger the workflow manually.
 
 # Manual deployments
 

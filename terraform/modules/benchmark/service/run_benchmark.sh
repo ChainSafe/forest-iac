@@ -31,12 +31,12 @@ year_number=$(date +%Y)
 week_number=$(date +%W) # Week starting on Monday
 weekly_file="weekly-results-$year_number-$week_number.csv"
 
-s3cmd get s3://"$BENCHMARK_BUCKET"/benchmark-results/weekly-results/"$weekly_file" /tmp/"$weekly_file" --force || 
+s3cmd get s3://"$BENCHMARK_BUCKET"/benchmark-results/weekly-results/"$weekly_file" /tmp/"$weekly_file" --force ||
 echo "Timestamp,Forest Version,Lotus Version,Chain,Metric,Forest Value,Lotus Value" > /tmp/"$weekly_file"
 tail -n +2 -q /chainsafe/result_*.csv >> /tmp/"$weekly_file" && s3cmd --acl-public put /tmp/"$weekly_file" s3://"$BENCHMARK_BUCKET"/benchmark-results/weekly-results/"$weekly_file"
 rm /tmp/"$weekly_file" -f
 
-s3cmd get s3://"$BENCHMARK_BUCKET"/benchmark-results/all-results.csv /tmp/all-results.csv --force || 
+s3cmd get s3://"$BENCHMARK_BUCKET"/benchmark-results/all-results.csv /tmp/all-results.csv --force ||
 echo "Timestamp,Forest Version,Lotus Version,Chain,Metric,Forest Value,Lotus Value" > /tmp/all-results.csv
 tail -n +2 -q /chainsafe/result_*.csv >> /tmp/all-results.csv && s3cmd --acl-public put /tmp/all-results.csv s3://"$BENCHMARK_BUCKET"/benchmark-results/all-results.csv
 rm /tmp/all-results.csv -f

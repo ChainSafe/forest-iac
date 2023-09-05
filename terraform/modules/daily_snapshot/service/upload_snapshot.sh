@@ -107,4 +107,3 @@ s3cmd --acl-public put "$CHAIN_DB_DIR/forest_snapshot_$CHAIN_NAME"* s3://"$SNAPS
 
 # Delete snapshot files
 rm "$CHAIN_DB_DIR/forest_snapshot_$CHAIN_NAME"*
-
