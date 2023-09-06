@@ -1,13 +1,15 @@
 #!/bin/bash
 
-set -eux 
+set -eux
+
+DEBIAN_FRONTEND=noninteractive
 
 # Use APT specific mechanism to ensure non-interactive operation and wait for the lock
-sudo DEBIAN_FRONTEND=noninteractive apt-get -qqq --yes -o DPkg::Lock::Timeout=-1 update
-sudo DEBIAN_FRONTEND=noninteractive apt-get -qqq --yes -o DPkg::Lock::Timeout=-1 install -y ruby ruby-dev s3cmd anacron
+sudo  apt-get -qqq --yes -o DPkg::Lock::Timeout=30 update
+sudo  apt-get -qqq --yes -o DPkg::Lock::Timeout=30 install -y ruby ruby-dev s3cmd anacron
 
 # Install the gems
-gem install docker-api slack-ruby-client activesupport 
+gem install docker-api slack-ruby-client activesupport
 
 # 1. Configure s3cmd
 # 2. Create forest_db directory
