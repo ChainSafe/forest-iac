@@ -1,5 +1,8 @@
 export AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}"
 export AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}"
+export R2_ACCESS_KEY="${R2_ACCESS_KEY}"
+export R2_SECRET_KEY="${R2_SECRET_KEY}"
+export R2_ENDPOINT="${r2_endpoint}"
 export SLACK_API_TOKEN="${slack_token}"
 export SLACK_NOTIF_CHANNEL="${slack_channel}"
 export SNAPSHOT_BUCKET="${snapshot_bucket}"
