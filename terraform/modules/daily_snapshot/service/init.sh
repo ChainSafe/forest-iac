@@ -2,11 +2,9 @@
 
 set -eux
 
-DEBIAN_FRONTEND=noninteractive
-
 # Use APT specific mechanism to ensure non-interactive operation and wait for the lock
-sudo  apt-get -qqq --yes -o DPkg::Lock::Timeout=30 update
-sudo  apt-get -qqq --yes -o DPkg::Lock::Timeout=30 install -y ruby ruby-dev s3cmd anacron
+sudo DEBIAN_FRONTEND=noninteractive  apt-get -qqq --yes -o DPkg::Lock::Timeout=30 update
+sudo DEBIAN_FRONTEND=noninteractive  apt-get -qqq --yes -o DPkg::Lock::Timeout=30 install -y ruby ruby-dev s3cmd anacron
 
 # Install the gems
 gem install docker-api slack-ruby-client activesupport
