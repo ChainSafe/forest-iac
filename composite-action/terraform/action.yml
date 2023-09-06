@@ -61,6 +61,8 @@ runs:
         TF_VAR_do_token: ${{ inputs.do_token }}
         TF_VAR_AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
         TF_VAR_AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
+        TF_VAR_R2_ACCESS_KEY: ${{ inputs.r2_access_key }}
+        TF_VAR_R2_SECRET_KEY: ${{ inputs.r2_secret_key }}
         AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
         TF_VAR_slack_token: ${{ inputs.slack_token }}
