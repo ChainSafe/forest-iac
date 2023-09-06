@@ -23,8 +23,8 @@ s3cmd --dump-config \
 
 ## Configure aws
 aws configure set default.s3.multipart_chunksize 4GB
-aws configure set aws_access_key_id $R2_ACCESS_KEY
-aws configure set aws_secret_access_key $R2_SECRET_KEY
+aws configure set aws_access_key_id "$R2_ACCESS_KEY"
+aws configure set aws_secret_access_key "$R2_SECRET_KEY"
 
 ## Create forest data directory
 mkdir forest_db
