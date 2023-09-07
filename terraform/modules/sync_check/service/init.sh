@@ -4,8 +4,8 @@
 set -eux
 
 # Use APT specific mechanism to ensure non-interactive operation and wait for the lock
-sudo DEBIAN_FRONTEND=noninteractive apt-get -qqq --yes -o DPkg::Lock::Timeout=30 update
-sudo DEBIAN_FRONTEND=noninteractive apt-get -qqq --yes -o DPkg::Lock::Timeout=30 install -y ruby ruby-dev gcc make
+DEBIAN_FRONTEND=noninteractive apt-get -qqq --yes -o DPkg::Lock::Timeout=30 update
+DEBIAN_FRONTEND=noninteractive apt-get -qqq --yes -o DPkg::Lock::Timeout=30 install -y ruby ruby-dev gcc make
 
 gem install slack-ruby-client sys-filesystem
 
