@@ -4,7 +4,7 @@
 # 2. Start docker daemon and create required shared volumes
 # 3. Ensure watchtower is running
 # 4. Copy all relevant scripts to shared volumes
-# 5. Run health check for mainnet and calibnet 
+# 5. Run health check for mainnet and calibnet
 
 ## Enable strict error handling, command tracing, and pipefail
 set -euxo pipefail
