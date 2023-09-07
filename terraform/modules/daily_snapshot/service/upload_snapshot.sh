@@ -112,4 +112,3 @@ aws --endpoint "$R2_ENDPOINT" s3 cp "$CHAIN_DB_DIR/forest_snapshot_$CHAIN_NAME"*
 
 # Delete snapshot files
 rm "$CHAIN_DB_DIR/forest_snapshot_$CHAIN_NAME"*
-

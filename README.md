@@ -30,7 +30,7 @@ To use the pre-commit hooks in this repository, follow these steps:
 
 - **Install Pip**: If you don't have Pip installed on your system, you can find installation instructions [here](https://pip.pypa.io/en/stable/installation/).
 
-- **Install Pre-commit**: Run the following command to install Pre-commit 
+- **Install Pre-commit**: Run the following command to install Pre-commit
     ```bash
     pip install pre-commit
     ```
