@@ -38,6 +38,10 @@ export TF_VAR_AWS_SECRET_ACCESS_KEY=
 export AWS_ACCESS_KEY_ID=
 export AWS_SECRET_ACCESS_KEY=
 
+# Cloudflare R2 secret access keys used by the snapshot service.
+export TF_VAR_R2_ACCESS_KEY=
+export TF_VAR_R2_SECRET_KEY=
+
 # Optional, only if you want install new relic agent
 # New Relic License key, Can be generated here: https://one.eu.newrelic.com/admin-portal/api-keys/home
 export TF_VAR_NEW_RELIC_API_KEY=
