@@ -29,7 +29,10 @@ inputs:
     description: 'The New Relic Access Token'
   new_relic_account_id:
     description: 'The New Relic Platform Region'
-
+  r2_access_key:
+    description: 'CloudFlare R2 access key id'
+  r2_secret_key:
+    description: 'CloudFlare R2 private access key'
 
 runs:
   using: "composite"
@@ -127,6 +130,8 @@ runs:
         AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
         TF_VAR_slack_token: ${{ inputs.slack_token }}
+        TF_VAR_R2_ACCESS_KEY: ${{ inputs.r2_access_key }}
+        TF_VAR_R2_SECRET_KEY: ${{ inputs.r2_secret_key }}
         TF_VAR_NEW_RELIC_API_KEY: ${{ inputs.NEW_RELIC_API_KEY }}
         TF_VAR_NR_LICENSE_KEY: ${{ inputs.NR_LICENSE_KEY }}
         TF_VAR_NEW_RELIC_ACCOUNT_ID: ${{ inputs.new_relic_account_id }}
@@ -141,6 +146,8 @@ runs:
         TF_VAR_AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
         AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
+        TF_VAR_R2_ACCESS_KEY: ${{ inputs.r2_access_key }}
+        TF_VAR_R2_SECRET_KEY: ${{ inputs.r2_secret_key }}
         TF_VAR_slack_token: ${{ inputs.slack_token }}
         TF_VAR_NEW_RELIC_API_KEY: ${{ inputs.new_relic_api_key }}
         TF_VAR_NR_LICENSE_KEY: ${{ inputs.nr_license_key }}
