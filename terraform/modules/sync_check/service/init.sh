@@ -3,10 +3,12 @@
 ## Enable strict error handling, command tracing, and pipefail
 set -eux
 
+# Setting DEBIAN_FRONTEND to ensure non-interactive operations for APT
+export DEBIAN_FRONTEND=noninteractive
 
-# Use APT specific mechanism to ensure non-interactive operation and wait for the lock
-sudo DEBIAN_FRONTEND=noninteractive apt-get -qqq --yes -o DPkg::Lock::Timeout=-1 update
-sudo DEBIAN_FRONTEND=noninteractive apt-get -qqq --yes -o DPkg::Lock::Timeout=-1 install -y ruby ruby-dev gcc make
+# Use APT specific mechanism to wait for the lock
+apt-get -qqq --yes -o DPkg::Lock::Timeout=30 update
+apt-get -qqq --yes -o DPkg::Lock::Timeout=30 install -y ruby ruby-dev gcc make
 
 gem install slack-ruby-client sys-filesystem
 
@@ -30,8 +32,8 @@ metrics_nfs_sample_rate: 600
 container_cache_metadata_limit: 600
 disable_zero_mem_process_filter: true
 disable_all_plugins: true
-disable_cloud_metadata: true 
-ignore_system_proxy: true 
+disable_cloud_metadata: true
+ignore_system_proxy: true
 EOF
 
 cat > /etc/newrelic-infra/logging.d/logging.yml <<EOF
@@ -50,8 +52,8 @@ logs:
       newrelic-cli: true
       logtype: newrelic-cli
 EOF
-  
-  sudo systemctl restart newrelic-infra 
+
+  sudo systemctl restart newrelic-infra
 fi
 
 #set-up fail2ban with the default configuration

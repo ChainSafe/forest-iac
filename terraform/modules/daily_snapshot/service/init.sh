@@ -1,13 +1,16 @@
 #!/bin/bash
 
-set -eux 
+set -eux
 
-# Use APT specific mechanism to ensure non-interactive operation and wait for the lock
-sudo DEBIAN_FRONTEND=noninteractive apt-get -qqq --yes -o DPkg::Lock::Timeout=-1 update
-sudo DEBIAN_FRONTEND=noninteractive apt-get -qqq --yes -o DPkg::Lock::Timeout=-1 install -y ruby ruby-dev s3cmd anacron
+# Setting DEBIAN_FRONTEND to ensure non-interactive operations for APT
+export DEBIAN_FRONTEND=noninteractive
+
+# Use APT specific mechanism to wait for the lock
+apt-get -qqq --yes -o DPkg::Lock::Timeout=30 update
+apt-get -qqq --yes -o DPkg::Lock::Timeout=30 install -y ruby ruby-dev s3cmd anacron awscli
 
 # Install the gems
-gem install docker-api slack-ruby-client activesupport 
+gem install docker-api slack-ruby-client activesupport
 
 # 1. Configure s3cmd
 # 2. Create forest_db directory
@@ -20,6 +23,11 @@ s3cmd --dump-config \
     --access_key="$AWS_ACCESS_KEY_ID" \
     --secret_key="$AWS_SECRET_ACCESS_KEY" \
     --multipart-chunk-size-mb=4096 > ~/.s3cfg
+
+## Configure aws
+aws configure set default.s3.multipart_chunksize 4GB
+aws configure set aws_access_key_id "$R2_ACCESS_KEY"
+aws configure set aws_secret_access_key "$R2_SECRET_KEY"
 
 ## Create forest data directory
 mkdir forest_db

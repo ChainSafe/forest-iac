@@ -21,7 +21,7 @@ jobs:
     permissions: write-all
     steps:
       - name: Checkout the code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
     # Using Custom Composite action in ./composite-action/terraform folder
       - name: Composite Action for Deploying Terraform Resources
@@ -35,4 +35,3 @@ jobs:
           new_relic_account_id: ${{ secrets.NEW_RELIC_ACCOUNT_ID }}
           working_directory: terraform/new-relic
           environment: New Relic
- 

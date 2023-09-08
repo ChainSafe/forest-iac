@@ -6,15 +6,15 @@ on:
   pull_request:
     branches:
       - main
-    paths: 
-      - 'terraform/benchmark/**' 
-      - 'terraform/modules/benchmark/**' 
+    paths:
+      - 'terraform/benchmark/**'
+      - 'terraform/modules/benchmark/**'
   push:
     branches:
       - main
-    paths: 
-      - 'terraform/forest-calibnet/**' 
-      - 'terraform/modules/filecoin_node/**' 
+    paths:
+      - 'terraform/benchmark/**'
+      - 'terraform/modules/benchmark/**'
 
 jobs:
   benchmark:
@@ -23,7 +23,7 @@ jobs:
     permissions: write-all
     steps:
       - name: Checkout the code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
        # Using Custom Composite action in ./composite-action/terraform folder
       - name: Composite Action for Deploying Terraform Resources
