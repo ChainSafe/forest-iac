@@ -55,6 +55,11 @@ variable "destination_addresses" {
   type        = list(string)
 }
 
+variable "rpc_port" {
+  description = "RPC Port for nodes"
+  type        = string
+}
+
 variable "chain" {
   description = "The chain tag to apply to resources."
   type        = string

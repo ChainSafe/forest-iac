@@ -36,6 +36,7 @@ COMMANDS=$(cat << HEREDOC
 set -eux
 cd forest_db/filops && forest-tool snapshot fetch --vendor filops --chain $CHAIN
 
+
 # Get the most recently downloaded snapshot's name
 DOWNLOADED_SNAPSHOT_NAME=\$(basename \$(find . -name "filops_snapshot_$CHAIN*" -type f -print0 | xargs -r -0 ls -1 -t | head -1))
 

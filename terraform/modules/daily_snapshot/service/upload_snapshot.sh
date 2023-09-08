@@ -60,6 +60,7 @@ echo "Snapshot: $NEWEST_SNAPSHOT"
 write_metrics &
 
 forest-tool db destroy --force --config config.toml --chain "$CHAIN_NAME"
+
 forest --config config.toml --chain "$CHAIN_NAME" --import-snapshot "$NEWEST_SNAPSHOT" --halt-after-import
 forest --config config.toml --chain "$CHAIN_NAME" --no-gc --save-token=token.txt --detach
 timeout "$SYNC_TIMEOUT" forest-cli --chain "$CHAIN_NAME" sync wait

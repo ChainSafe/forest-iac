@@ -56,7 +56,7 @@ sudo --user="${NEW_USER}" -- \
   --name=forest-"${CHAIN}" \
   --env "FOREST_GC_TRIGGER_FACTOR=1.4" \
   --volume=/home/"${NEW_USER}"/forest_data:/home/"${NEW_USER}"/forest_data:z \
-  --publish=1234:1234 \
+  --publish=2345:2345 \
   --publish=6116:6116 \
   --restart=always \
   ghcr.io/chainsafe/forest:latest \
