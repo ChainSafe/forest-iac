@@ -4,7 +4,7 @@ on:
   pull_request:
     branches:
       - main
-    paths: 
+    paths:
       - daily_snapshot_terraform/**
   push:
     branches:
@@ -16,7 +16,7 @@ jobs:
     name: Tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.2'

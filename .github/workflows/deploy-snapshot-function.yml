@@ -1,4 +1,4 @@
-name: Forest Calibnet 
+name: Forest Calibnet
 concurrency: ci-${{ github.ref }}
 
 on:
@@ -23,7 +23,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install doctl
         uses: digitalocean/action-doctl@v2
@@ -51,7 +51,7 @@ jobs:
         working-directory: do_function/monitor_snapshots
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install doctl
         uses: digitalocean/action-doctl@v2
@@ -65,5 +65,4 @@ jobs:
 
       - name: Deploy Snapshot Checks function
         if: github.ref == 'refs/heads/main' && ( github.event_name == 'push' || github.event_name == 'workflow_dispatch' )
-        run: doctl serverless deploy . --remote-build 
-
+        run: doctl serverless deploy . --remote-build

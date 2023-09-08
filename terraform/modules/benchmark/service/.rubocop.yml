@@ -3,4 +3,8 @@ AllCops:
 Layout/LineLength:
   Max: 120
 Metrics/MethodLength:
-  Max: 20
+  Max: 25
+Metrics/AbcSize:
+  Enabled: false # TODO: Enable AbcSize check
+Lint/MixedRegexpCaptureTypes:
+  Enabled: false

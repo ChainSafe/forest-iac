@@ -8,7 +8,7 @@ require 'fileutils'
 
 # Retrieves an environmental variable, failing if its not set or empty.
 def get_and_assert_env_variable(name)
-  var = ENV[name]
+  var = ENV.fetch(name, nil)
   raise "Please set #{name} environmental variable" if var.nil? || var.empty?
 
   var
@@ -21,27 +21,27 @@ LOG_DIR = get_and_assert_env_variable 'BASE_FOLDER'
 
 loop do
   # Current datetime, to append to the log files
-  DATE = Time.new.strftime '%FT%H:%M:%S'
-  LOG_HEALTH = "#{LOG_DIR}/benchmark_#{DATE}_health"
-  LOG_SYNC = "#{LOG_DIR}/benchmark_#{DATE}_sync"
-  
+  datetime = Time.new.strftime '%FT%H:%M:%S'
+  run_log = "#{LOG_DIR}/benchmark_#{datetime}_run"
+  report_log = "#{LOG_DIR}/benchmark_#{datetime}_report"
+
   # Create log directory
   FileUtils.mkdir_p LOG_DIR
-  
-  logger = Logger.new(LOG_SYNC)
-  
+
+  logger = Logger.new(report_log)
+
   logger.info 'Running the benchmark...'
-  benchmark_check_passed = system("bash #{SCRIPTS_DIR}/run_benchmark.sh > #{LOG_HEALTH} 2>&1")
+  benchmark_check_passed = system("bash #{SCRIPTS_DIR}/run_benchmark.sh > #{run_log} 2>&1")
   logger.info 'Benchmark run completed'
-  
+
   client = SlackClient.new CHANNEL, SLACK_TOKEN
-  
+
   if benchmark_check_passed
-    client.post_message "✅ Benchmark run was successful. 🌲🌳🌲🌳🌲"
+    client.post_message '✅ Benchmark run was successful. 🌲🌳🌲🌳🌲'
   else
-    client.post_message "⛔ Benchmark run fiascoed. 🔥🌲🔥"
+    client.post_message '⛔ Benchmark run fiascoed. 🔥🌲🔥'
   end
-  client.attach_files(LOG_HEALTH, LOG_SYNC)
-  
+  client.attach_files(run_log, report_log)
+
   logger.info 'Benchmark finished'
 end

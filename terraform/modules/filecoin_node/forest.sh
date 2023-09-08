@@ -27,7 +27,7 @@ if [ -f "/root/.ssh/authorized_keys" ]; then
 fi
 
 #install NTP to synchronize the time differences
-apt-get install -y ntp
+sudo DEBIAN_FRONTEND=noninteractive apt-get -qqq --yes -o DPkg::Lock::Timeout=-1 install -y ntp
 
 systemctl restart sshd
 
@@ -104,11 +104,11 @@ metrics_nfs_sample_rate: 600
 container_cache_metadata_limit: 600
 disable_zero_mem_process_filter: true
 disable_all_plugins: true
-disable_cloud_metadata: true 
-ignore_system_proxy: true 
+disable_cloud_metadata: true
+ignore_system_proxy: true
 EOF
 
-  sudo systemctl restart newrelic-infra  
+  sudo systemctl restart newrelic-infra
 fi
 
 # If New Relic license key is provided, run OpenMetrics Prometheus integration container.
@@ -118,11 +118,13 @@ cluster_name: forest-${CHAIN}
 targets:
   - description: Forest "${CHAIN}" Prometheus Endpoint
     urls: ["forest-${CHAIN}:6116"]
-scrape_interval: 600s
-max_concurrency: 10
-timeout: 15s
-retries: 3
-log_level: info
+
+transformations:
+  - description: "General processing rules"
+    ignore_metrics:
+      - prefixes:
+        - "peer_tipset_epoch"
+
 EOF
   sudo --user="${NEW_USER}" -- \
     docker run \
@@ -137,6 +139,6 @@ EOF
 fi
 
 #set-up fail2ban with the default configuration
-sudo apt-get install fail2ban -y
+sudo DEBIAN_FRONTEND=noninteractive apt-get -qqq --yes -o DPkg::Lock::Timeout=-1 install -y fail2ban
 sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
 sudo systemctl enable fail2ban && sudo systemctl start fail2ban

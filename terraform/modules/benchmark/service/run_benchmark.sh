@@ -27,11 +27,16 @@ ruby bench.rb --chain calibnet --tempdir ./tmp --daily
 ruby bench.rb --chain mainnet --tempdir ./tmp --daily
 
 ## Upload benchmark result to s3 weekly file
+year_number=$(date +%Y)
 week_number=$(date +%W) # Week starting on Monday
-s3cmd get s3://"$BENCHMARK_BUCKET"/benchmark-results/weekly-results/weekly_result_"$week_number".csv /tmp/weekly_result_"$week_number".csv --force || 
-echo "Timestamp,Forest Version,Lotus Version,Chain,Metric,Forest Value,Lotus Value" > /tmp/weekly_result_"$week_number".csv
-tail -n +2 -q /chainsafe/result_*.csv >> /tmp/weekly_result_"$week_number".csv && s3cmd --acl-public put /tmp/weekly_result_"$week_number".csv s3://"$BENCHMARK_BUCKET"/benchmark-results/weekly-results/weekly_result_"$week_number".csv || exit 1
+weekly_file="weekly-results-$year_number-$week_number.csv"
 
-s3cmd get s3://"$BENCHMARK_BUCKET"/benchmark-results/all_results.csv /tmp/all_results.csv --force || 
-echo "Timestamp,Forest Version,Lotus Version,Chain,Metric,Forest Value,Lotus Value" > /tmp/all_results.csv
-tail -n +2 -q /chainsafe/result_*.csv >> /tmp/all_results.csv && s3cmd --acl-public put /tmp/all_results.csv s3://"$BENCHMARK_BUCKET"/benchmark-results/all_results.csv || exit 1
+s3cmd get s3://"$BENCHMARK_BUCKET"/benchmark-results/weekly-results/"$weekly_file" /tmp/"$weekly_file" --force ||
+echo "Timestamp,Forest Version,Lotus Version,Chain,Metric,Forest Value,Lotus Value" > /tmp/"$weekly_file"
+tail -n +2 -q /chainsafe/result_*.csv >> /tmp/"$weekly_file" && s3cmd --acl-public put /tmp/"$weekly_file" s3://"$BENCHMARK_BUCKET"/benchmark-results/weekly-results/"$weekly_file"
+rm /tmp/"$weekly_file" -f
+
+s3cmd get s3://"$BENCHMARK_BUCKET"/benchmark-results/all-results.csv /tmp/all-results.csv --force ||
+echo "Timestamp,Forest Version,Lotus Version,Chain,Metric,Forest Value,Lotus Value" > /tmp/all-results.csv
+tail -n +2 -q /chainsafe/result_*.csv >> /tmp/all-results.csv && s3cmd --acl-public put /tmp/all-results.csv s3://"$BENCHMARK_BUCKET"/benchmark-results/all-results.csv
+rm /tmp/all-results.csv -f

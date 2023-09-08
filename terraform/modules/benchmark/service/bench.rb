@@ -21,7 +21,7 @@ require_relative 'benchmark_base'
 
 # Define `regex` for capturing the snapshot height.
 SNAPSHOT_REGEXES = [
-  /_height_(?<height>\d+)(\.forest)?\.car/,
+  /_height_(?<height>\d+)\.car/,
   %r{/(?<height>\d+)_*}
 ].freeze
 
@@ -150,17 +150,14 @@ def write_csv(metrics, options)
     chain = options[:chain]
 
     results = { import_time: { forest: 'n/a', lotus: 'n/a' },
-                validation_time: { forest: 'n/a', lotus: 'n/a' },
-                peak_memory: { forest: 'n/a', lotus: 'n/a' } }
+                validation_time: { forest: 'n/a', lotus: 'n/a' } }
 
     metrics.each do |key, value|
       elapsed = value[:import][:elapsed] || 'n/a'
       tpm = value[:validate_online][:tpm] || 'n/a'
-      peak_memory = value[:peak_memory] || 'n/a'
 
       results[:import_time][key.to_sym] = "#{elapsed} sec"
       results[:validation_time][key.to_sym] = "#{tpm} tipsets/sec"
-      results[:peak_memory][key.to_sym] = "#{peak_memory} KB"
     end
 
     results.each do |key, value|
@@ -193,9 +190,9 @@ end
 # Helper function to create assignments for `download_and_move` function.
 def download_and_move_assignments(url)
   filename = url.match(/(\d+_.+)/)[1]
-  checksum_url = url.sub(/\.car\.zst/, '.sha256sum')
+  checksum_url = url.sub('.car.zst', '.sha256sum')
   checksum_filename = checksum_url.match(/(\d+_.+)/)[1]
-  decompressed_filename = filename.sub(/\.car\.zst/, '.car')
+  decompressed_filename = filename.sub('.car.zst', '.car')
   [filename, checksum_url, checksum_filename, decompressed_filename]
 end
 

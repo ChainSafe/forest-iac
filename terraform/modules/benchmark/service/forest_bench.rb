@@ -15,7 +15,7 @@ class ForestBenchmark < BenchmarkBase
   def db_size
     config_path = "#{data_dir}/#{@name}.toml"
 
-    line = syscall(target_cli, '-c', config_path, 'db', 'stats').split("\n")[1]
+    line = syscall(target_tool, 'db', 'stats', '-c', config_path).split("\n")[1]
     match = line.match(/Database size: (.+)/)
     match[1]
   end
@@ -48,7 +48,7 @@ class ForestBenchmark < BenchmarkBase
   end
 
   def clone_command
-    exec_command(['git', 'clone', '--recursive', 'https://github.com/ChainSafe/forest.git', repository_name])
+    exec_command(['git', 'clone', 'https://github.com/ChainSafe/forest.git', repository_name])
   end
 
   def checkout_command
@@ -57,6 +57,11 @@ class ForestBenchmark < BenchmarkBase
 
   def clean_command
     exec_command(%w[cargo clean])
+  end
+
+  def fetch_actor_bundles
+    cmd = File.join('.', 'assets', 'ci_download.sh')
+    exec_command([cmd])
   end
 
   def build_command

@@ -105,6 +105,10 @@ docker run \
 # Upload snapshot to s3
 s3cmd --acl-public put "$CHAIN_DB_DIR/forest_snapshot_$CHAIN_NAME"* s3://"$SNAPSHOT_BUCKET"/"$CHAIN_NAME"/ || exit 1
 
+# Upload snapshot to CF
+unset AWS_SECRET_ACCESS_KEY
+unset AWS_ACCESS_KEY_ID
+aws --endpoint "$R2_ENDPOINT" s3 cp "$CHAIN_DB_DIR/forest_snapshot_$CHAIN_NAME"*.forest.car.zst s3://forest-archive/"$CHAIN_NAME"/latest/ || exit 1
+
 # Delete snapshot files
 rm "$CHAIN_DB_DIR/forest_snapshot_$CHAIN_NAME"*
-
