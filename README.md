@@ -20,6 +20,34 @@ This repository contains machine-readable specifications for the auxillilary ser
 - [ ] Sync testing for PRs.
 - [ ] Export testing for PRs.
 
+## Pre-commit Hooks
+
+We've integrated several pre-commit hooks to enhance code quality and security. These hooks automatically analyze your code before each commit, ensuring it adheres to best practices and doesn't contain any sensitive secrets, especially important as you plan to run the forest-iac service in this repository.
+
+## Installation
+
+To use the pre-commit hooks in this repository, follow these steps:
+
+- **Install Pip**: If you don't have Pip installed on your system, you can find installation instructions [here](https://pip.pypa.io/en/stable/installation/).
+
+- **Install Pre-commit**: Run the following command to install Pre-commit
+    ```bash
+    pip install pre-commit
+    ```
+
+- **Install the Pre-commit Hooks**: Run the following command in your project's directory to install the hooks:
+
+    ```bash
+    pre-commit install
+    ```
+
+- **(optional) Run against all the files**: it's usually a good idea to run the hooks against all of the files when adding new hooks (usually pre-commit will only run on the changed files during git hooks)
+    ```bash
+    pre-commit run --all-files
+    ```
+
+That's it! From now on, every time you commit changes to your project, these hooks will automatically check your code.
+
 # 🛠️ Forest Cloud Infrastructure In DigitalOcean
 
 ## Overview

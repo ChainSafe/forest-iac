@@ -40,7 +40,7 @@ data "local_file" "sources" {
 
 // Note: The init.sh file is also included in the sources.zip such that the hash
 // of the archive captures the entire state of the machine.
-// This is a workaround, and because of this, we need to suppress the tflint warning here 
+// This is a workaround, and because of this, we need to suppress the tflint warning here
 // for unused declarations related to the 'init.sh' file.
 // tflint-ignore: terraform_unused_declarations
 data "local_file" "init" {

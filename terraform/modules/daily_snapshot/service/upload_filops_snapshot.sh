@@ -11,7 +11,7 @@ URL="https://forest.chainsafe.io/$CHAIN/snapshot-latest.car.zst"
 SNAPSHOT_URL=$(wget --spider -S "$URL" 2>&1 | grep "Location" | awk '{print $2}' | tr -d '\r' | tail -1)
 SNAPSHOT_NAME=$(basename "${SNAPSHOT_URL}")
 
-# Extract the date from the snapshot file name and 
+# Extract the date from the snapshot file name and
 # Convert the snapshot date to Unix timestamp (at start of the day)
 SNAPSHOT_DATE=$(echo "${SNAPSHOT_NAME}" | cut -d'_' -f4)
 
@@ -34,14 +34,15 @@ send_slack_alert() {
 
 COMMANDS=$(cat << HEREDOC
 set -eux
-cd forest_db/filops && forest-tool snapshot fetch --chain $CHAIN --vendor filops
+cd forest_db/filops && forest-tool snapshot fetch --vendor filops --chain $CHAIN
+
 
 # Get the most recently downloaded snapshot's name
 DOWNLOADED_SNAPSHOT_NAME=\$(basename \$(find . -name "filops_snapshot_$CHAIN*" -type f -print0 | xargs -r -0 ls -1 -t | head -1))
 
 # Remove the '.zst' part from the filename
 BASE_SNAPSHOT_NAME=\${DOWNLOADED_SNAPSHOT_NAME%.zst}
-    
+
 # Generate SHA-256 checksum
 sha256sum ./\$DOWNLOADED_SNAPSHOT_NAME > \$BASE_SNAPSHOT_NAME.sha256sum
 HEREDOC
@@ -68,7 +69,7 @@ if [ ${DIFF} -gt 1 ]; then
     else
         echo "Failed to upload the snapshot."
         # Send alert to Slack for failed upload
-        send_slack_alert "Old $CHAIN snapshot detected. 🔥🌲🔥. Filops Snapshot upload failed:🔥" 
+        send_slack_alert "Old $CHAIN snapshot detected. 🔥🌲🔥. Filops Snapshot upload failed:🔥"
         exit 1
     fi
 else

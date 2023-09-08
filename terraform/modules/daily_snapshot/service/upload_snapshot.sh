@@ -59,7 +59,8 @@ echo "Snapshot: $NEWEST_SNAPSHOT"
 # spawn a task in the background to periodically write Prometheus metrics to a file
 write_metrics &
 
-forest-tool db destroy --config config.toml --chain "$CHAIN_NAME" --force
+forest-tool db destroy --force --config config.toml --chain "$CHAIN_NAME"
+
 forest --config config.toml --chain "$CHAIN_NAME" --import-snapshot "$NEWEST_SNAPSHOT" --halt-after-import
 forest --config config.toml --chain "$CHAIN_NAME" --no-gc --save-token=token.txt --detach
 timeout "$SYNC_TIMEOUT" forest-cli --chain "$CHAIN_NAME" sync wait
@@ -105,6 +106,10 @@ docker run \
 # Upload snapshot to s3
 s3cmd --acl-public put "$CHAIN_DB_DIR/forest_snapshot_$CHAIN_NAME"* s3://"$SNAPSHOT_BUCKET"/"$CHAIN_NAME"/ || exit 1
 
+# Upload snapshot to CF
+unset AWS_SECRET_ACCESS_KEY
+unset AWS_ACCESS_KEY_ID
+aws --endpoint "$R2_ENDPOINT" s3 cp "$CHAIN_DB_DIR/forest_snapshot_$CHAIN_NAME"*.forest.car.zst s3://forest-archive/"$CHAIN_NAME"/latest/ || exit 1
+
 # Delete snapshot files
 rm "$CHAIN_DB_DIR/forest_snapshot_$CHAIN_NAME"*
-

@@ -110,4 +110,3 @@ variable "script" {
   type        = string
   default     = "forest.sh"
 }
-

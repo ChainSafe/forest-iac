@@ -6,7 +6,7 @@ ENV DEBIAN_FRONTEND noninteractive
 # Install necessary forest and lotus packages
 RUN apt-get update && \
     apt-get install --no-install-recommends -y \
-    ruby ruby-dev make gcc git git-lfs curl wget pkg-config clang build-essential \
+    ruby ruby-dev make gcc git curl wget pkg-config clang build-essential \
     mesa-opencl-icd ocl-icd-opencl-dev hwloc libhwloc-dev s3cmd aria2 zstd time bzr jq pkg-config && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
@@ -23,9 +23,6 @@ RUN curl -o /tmp/go.tar.gz -L https://go.dev/dl/go1.20.7.linux-amd64.tar.gz && \
 # Set the Go environment variables
 RUN echo "export PATH=\$PATH:/usr/local/go/bin" >> ~/.bashrc
 ENV PATH="/usr/local/go/bin:$PATH"
-
-# Initialize Git LFS 
-RUN git lfs install
 
 WORKDIR /chainsafe
 

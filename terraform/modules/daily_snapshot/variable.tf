@@ -33,10 +33,25 @@ variable "AWS_SECRET_ACCESS_KEY" {
   type        = string
 }
 
+variable "R2_ACCESS_KEY" {
+  description = "S3 access key id"
+  type        = string
+}
+
+variable "R2_SECRET_KEY" {
+  description = "S3 private access key"
+  type        = string
+}
+
 variable "snapshot_bucket" {
   description = "S3 bucket containing the snapshots"
   type        = string
   default     = "forest-snapshots"
+}
+
+variable "r2_endpoint" {
+  description = "R2 endpoint for the snapshots"
+  type        = string
 }
 
 variable "snapshot_endpoint" {

@@ -2,7 +2,7 @@
 This tool will generate lite and diff snapshots provided a full snapshot.
 
 # Installation
-Install it with `cargo install --path .`. This tool also requires `forest-cli` in PATH. See more [here](https://github.com/ChainSafe/forest#installation).
+Install it with `cargo install --path .`. This tool also requires `forest-tool` in PATH. See more [here](https://github.com/ChainSafe/forest#installation).
 
 ```
 Usage: archival-snapshots-generate [OPTIONS] <SNAPSHOT_FILE>

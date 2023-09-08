@@ -16,7 +16,7 @@ deployment plan is executed.
 The workflow has access to all the required secrets (DO token, slack token, S3
 credentials, etc) and none of them have to be provided when creating a new PR.
 However, the deployment workflow is not triggered automatically if you change
-the secrets. In this case, you have to trigger the workflow manually. 
+the secrets. In this case, you have to trigger the workflow manually.
 
 # Manual deployments
 
@@ -37,6 +37,10 @@ export TF_VAR_AWS_SECRET_ACCESS_KEY=
 # S3 access keys used by terraform, use the same values as above
 export AWS_ACCESS_KEY_ID=
 export AWS_SECRET_ACCESS_KEY=
+
+# Cloudflare R2 secret access keys used by the snapshot service.
+export TF_VAR_R2_ACCESS_KEY=
+export TF_VAR_R2_SECRET_KEY=
 
 # Optional, only if you want install new relic agent
 # New Relic License key, Can be generated here: https://one.eu.newrelic.com/admin-portal/api-keys/home

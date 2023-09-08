@@ -41,7 +41,7 @@ data "local_file" "sources" {
 
 // Note: The init.sh file is also included in the sources.zip such that the hash
 // of the archive captures the entire state of the machine.
-// This is a workaround, and because of this, we need to suppress the tflint warning here 
+// This is a workaround, and because of this, we need to suppress the tflint warning here
 // for unused declarations related to the 'init.sh' file.
 // tflint-ignore: terraform_unused_declarations
 data "local_file" "init" {
@@ -60,6 +60,9 @@ locals {
   env_content = templatefile("${path.module}/service/forest-env.tpl", {
     AWS_ACCESS_KEY_ID     = var.AWS_ACCESS_KEY_ID,
     AWS_SECRET_ACCESS_KEY = var.AWS_SECRET_ACCESS_KEY,
+    R2_ACCESS_KEY         = var.R2_ACCESS_KEY,
+    R2_SECRET_KEY         = var.R2_SECRET_KEY,
+    r2_endpoint           = var.r2_endpoint,
     slack_token           = var.slack_token,
     slack_channel         = var.slack_channel,
     snapshot_bucket       = var.snapshot_bucket,

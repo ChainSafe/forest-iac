@@ -1,6 +1,6 @@
 ---
 name: Task requirement
-about: Required tasks to complete 
+about: Required tasks to complete
 title: ''
 labels: 'Status: Needs Triage'
 assignees: ''
@@ -14,7 +14,7 @@ assignees: ''
 
 **Specification reference**
 <!-- Provide a reference to the specification as to what is being implemented. -->
-- 
+-
 
 
 
