@@ -150,10 +150,10 @@ def write_csv(metrics, options)
     chain = options[:chain]
 
     results = {
-                import_time: { forest: 'n/a', lotus: 'n/a' },
-                validation_time: { forest: 'n/a', lotus: 'n/a' },
-                peak_memory: { forest: 'n/a', lotus: 'n/a' }
-              }
+      import_time: { forest: 'n/a', lotus: 'n/a' },
+      validation_time: { forest: 'n/a', lotus: 'n/a' },
+      peak_memory: { forest: 'n/a', lotus: 'n/a' }
+    }
 
     metrics.each do |key, value|
       elapsed = value[:import][:elapsed] || 'n/a'
