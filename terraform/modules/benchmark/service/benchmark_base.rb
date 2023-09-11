@@ -75,7 +75,7 @@ module ExecCommands
   # Helper function for measuring execution time; passes process ID to online
   # validation and process monitor.
   def exec_command_aux(command, metrics, benchmark)
-    command_with_time = ["/usr/bin/time", "-v"] + command
+    command_with_time = ['/usr/bin/time', '-v'] + command
 
     Open3.popen2e(*command_with_time) do |i, o_and_err, t|
       pid = t.pid
@@ -88,7 +88,6 @@ module ExecCommands
 
       # Extract only the peak memory usage from the captured output
       metrics[:peak_memory] = extract_memory_usage(output.join("\n"))
-
       # Run proc_monitor (or any other logic you have) if needed
       handle, proc_metrics = proc_monitor(pid, benchmark)
       handle.join
@@ -225,7 +224,7 @@ module RunCommands
 
       @metrics = import_and_validation(daily, args, metrics)
     rescue StandardError, Interrupt
-      @logger.error('Fiasco during benchmark run #{e.message}. Deleting downloaded files and stopping process...')
+      @logger.error('Fiasco during benchmark run "#{e.message}". Deleting downloaded files and stopping process...')
       FileUtils.rm_f(@snapshot_path) if @snapshot_downloaded
       FileUtils.rm_rf(repository_name) if @created_repository
       exit(1)
