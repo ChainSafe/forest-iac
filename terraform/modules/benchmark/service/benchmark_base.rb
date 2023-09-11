@@ -34,9 +34,8 @@ module ExecCommands
     end
   end
 
-  # Measure Peak Memeory Usage
-  def measure_memory_usage
-    output = `/usr/bin/time -v ls 2>&1`
+  # Extracts Peak Memory Usage from the output of `/usr/bin/time -v`
+  def extract_memory_usage(output)
     match = output.match(/Maximum resident set size \(kbytes\): (\d+)/)
     match ? match[1].to_i : nil
   end
@@ -76,15 +75,22 @@ module ExecCommands
   # Helper function for measuring execution time; passes process ID to online
   # validation and process monitor.
   def exec_command_aux(command, metrics, benchmark)
-    Open3.popen2(*command) do |i, o, t|
+    command_with_time = ["/usr/bin/time", "-v"] + command
+
+    Open3.popen2e(*command_with_time) do |i, o_and_err, t|
       pid = t.pid
       i.close
+      output = []
 
-      handle, proc_metrics = proc_monitor(pid, benchmark)
-      o.each_line do |l|
-        print l
+      o_and_err.each_line do |l|
+        output << l
       end
 
+      # Extract only the peak memory usage from the captured output
+      metrics[:peak_memory] = extract_memory_usage(output.join("\n"))
+
+      # Run proc_monitor (or any other logic you have) if needed
+      handle, proc_metrics = proc_monitor(pid, benchmark)
       handle.join
       metrics.merge!(proc_metrics)
     end
@@ -219,7 +225,7 @@ module RunCommands
 
       @metrics = import_and_validation(daily, args, metrics)
     rescue StandardError, Interrupt
-      @logger.error('Fiasco during benchmark run. Deleting downloaded files and stopping process...')
+      @logger.error('Fiasco during benchmark run #{e.message}. Deleting downloaded files and stopping process...')
       FileUtils.rm_f(@snapshot_path) if @snapshot_downloaded
       FileUtils.rm_rf(repository_name) if @created_repository
       exit(1)
