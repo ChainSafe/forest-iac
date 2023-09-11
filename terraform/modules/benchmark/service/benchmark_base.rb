@@ -34,7 +34,7 @@ module ExecCommands
     end
   end
 
-  # measure peak memeory usage
+  # Measure Peak Memeory Usage
   def measure_memory_usage
     output = `/usr/bin/time -v ls 2>&1`
     match = output.match(/Maximum resident set size \(kbytes\): (\d+)/)
@@ -50,9 +50,8 @@ module ExecCommands
     peak_memory = measure_memory_usage
     if peak_memory
       metrics[:peak_memory] = peak_memory
-      @logger.info "Peak memory usage captured: #{peak_memory} kB"
     else
-      @logger.warn "Unable to capture peak memory usage."
+      @logger.warn 'Unable to capture peak memory usage.'
     end
     handle = Thread.new do
       loop do

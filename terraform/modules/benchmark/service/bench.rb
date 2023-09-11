@@ -181,7 +181,6 @@ def write_csv(metrics, options)
       csv << [timestamp, FOREST_VERSION, LOTUS_VERSION, chain, key, value[:forest], value[:lotus]]
     end
   end
-
   @logger.info "Wrote #{filename}"
 end
 
