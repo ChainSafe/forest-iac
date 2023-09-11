@@ -149,21 +149,39 @@ def write_csv(metrics, options)
     timestamp = Time.now.strftime('%Y-%m-%d %H:%M:%S')
     chain = options[:chain]
 
-    results = { import_time: { forest: 'n/a', lotus: 'n/a' },
-                validation_time: { forest: 'n/a', lotus: 'n/a' } }
+    results = {
+      import_time: { forest: 'n/a', lotus: 'n/a' },
+      validation_time: { forest: 'n/a', lotus: 'n/a' },
+      peak_memory: { forest: 'n/a', lotus: 'n/a' }
+    }
 
-    metrics.each do |key, value|
-      elapsed = value[:import][:elapsed] || 'n/a'
-      tpm = value[:validate_online][:tpm] || 'n/a'
+    # Update metrics for Forest
+    if metrics['forest']
+      if metrics['forest'][:import]
+        results[:import_time][:forest] = "#{metrics['forest'][:import][:elapsed] || 'n/a'} sec"
+        results[:peak_memory][:forest] = "#{metrics['forest'][:import][:peak_memory] || 'n/a'} KB"
+      end
+      if metrics['forest'][:validate_online]
+        results[:validation_time][:forest] = "#{metrics['forest'][:validate_online][:tpm] || 'n/a'} tipsets/sec"
+      end
+    end
 
-      results[:import_time][key.to_sym] = "#{elapsed} sec"
-      results[:validation_time][key.to_sym] = "#{tpm} tipsets/sec"
+    # Update metrics for Lotus
+    if metrics['lotus']
+      if metrics['lotus'][:import]
+        results[:import_time][:lotus] = "#{metrics['lotus'][:import][:elapsed] || 'n/a'} sec"
+        results[:peak_memory][:lotus] = "#{metrics['lotus'][:import][:peak_memory] || 'n/a'} KB"
+      end
+      if metrics['lotus'][:validate_online]
+        results[:validation_time][:lotus] = "#{metrics['lotus'][:validate_online][:tpm] || 'n/a'} tipsets/sec"
+      end
     end
 
     results.each do |key, value|
       csv << [timestamp, FOREST_VERSION, LOTUS_VERSION, chain, key, value[:forest], value[:lotus]]
     end
   end
+
   @logger.info "Wrote #{filename}"
 end
 

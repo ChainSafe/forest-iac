@@ -34,12 +34,26 @@ module ExecCommands
     end
   end
 
+  # measure peak memeory usage
+  def measure_memory_usage
+    output = `/usr/bin/time -v ls 2>&1`
+    match = output.match(/Maximum resident set size \(kbytes\): (\d+)/)
+    match ? match[1].to_i : nil
+  end
+
   # Calls online validation function and runs monitor to measure memory usage.
   def proc_monitor(pid, benchmark)
     metrics = Concurrent::Hash.new
     metrics[:rss] = []
     metrics[:vsz] = []
     measure_online_validation(benchmark, pid, metrics) if benchmark
+    peak_memory = measure_memory_usage
+    if peak_memory
+      metrics[:peak_memory] = peak_memory
+      @logger.info "Peak memory usage captured: #{peak_memory} kB"
+    else
+      @logger.warn "Unable to capture peak memory usage."
+    end
     handle = Thread.new do
       loop do
         sample_proc(pid, metrics)
