@@ -45,16 +45,7 @@ module ExecCommands
     metrics = Concurrent::Hash.new
     metrics[:rss] = []
     metrics[:vsz] = []
-    metrics[:peak_memory] = 0
     measure_online_validation(benchmark, pid, metrics) if benchmark
-
-    current_memory = measure_memory_usage
-    if current_memory
-      # Update peak_memory only when current_memory is greater than previous peak_memory.
-      metrics[:peak_memory] = [metrics[:peak_memory], current_memory].max
-    else
-      @logger.warn 'Unable to capture peak memory usage.'
-    end
     handle = Thread.new do
       loop do
         sample_proc(pid, metrics)
