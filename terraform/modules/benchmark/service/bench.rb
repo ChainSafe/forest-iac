@@ -150,31 +150,21 @@ def write_csv(metrics, options)
     chain = options[:chain]
 
     results = {
-      import_time: { forest: 'n/a', lotus: 'n/a' },
-      validation_time: { forest: 'n/a', lotus: 'n/a' },
-      peak_memory: { forest: 'n/a', lotus: 'n/a' }
-    }
+                import_time: { forest: 'n/a', lotus: 'n/a' },
+                validation_time: { forest: 'n/a', lotus: 'n/a' },
+                peak_memory: { forest: 'n/a', lotus: 'n/a' }
+              }
 
-    # Update metrics for Forest
-    if metrics['forest']
-      if metrics['forest'][:import]
-        results[:import_time][:forest] = "#{metrics['forest'][:import][:elapsed] || 'n/a'} sec"
-        results[:peak_memory][:forest] = "#{metrics['forest'][:import][:peak_memory] || 'n/a'} KB"
-      end
-      if metrics['forest'][:validate_online]
-        results[:validation_time][:forest] = "#{metrics['forest'][:validate_online][:tpm] || 'n/a'} tipsets/sec"
-      end
-    end
+    metrics.each do |key, value|
+      elapsed = value[:import][:elapsed] || 'n/a'
+      tpm = value[:validate_online][:tpm] || 'n/a'
+      peak_memory_import = value[:import][:peak_memory] || 'n/a'
+      peak_memory_validate = value[:validate_online][:peak_memory] || 'n/a'
+      peak_memory = [peak_memory_import, peak_memory_validate].max
 
-    # Update metrics for Lotus
-    if metrics['lotus']
-      if metrics['lotus'][:import]
-        results[:import_time][:lotus] = "#{metrics['lotus'][:import][:elapsed] || 'n/a'} sec"
-        results[:peak_memory][:lotus] = "#{metrics['lotus'][:import][:peak_memory] || 'n/a'} KB"
-      end
-      if metrics['lotus'][:validate_online]
-        results[:validation_time][:lotus] = "#{metrics['lotus'][:validate_online][:tpm] || 'n/a'} tipsets/sec"
-      end
+      results[:import_time][key.to_sym] = "#{elapsed} sec"
+      results[:validation_time][key.to_sym] = "#{tpm} tipsets/sec"
+      results[:peak_memory][key.to_sym] = "#{peak_memory} KB"
     end
 
     results.each do |key, value|
