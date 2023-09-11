@@ -224,7 +224,7 @@ module RunCommands
 
       @metrics = import_and_validation(daily, args, metrics)
     rescue StandardError, Interrupt
-      @logger.error('Fiasco during benchmark run "#{e.message}". Deleting downloaded files and stopping process...')
+      @logger.error('Fiasco during benchmark run. Deleting downloaded files and stopping process...')
       FileUtils.rm_f(@snapshot_path) if @snapshot_downloaded
       FileUtils.rm_rf(repository_name) if @created_repository
       exit(1)
