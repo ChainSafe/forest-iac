@@ -41,16 +41,15 @@ module ExecCommands
       # Identify and stop the child process
       child_pid = `pgrep -P #{pid}`.strip.to_i
       if child_pid.zero?
-        @logger.error "Failed to find child PID for parent PID: #{pid}"
+        @logger.error 'Failed to find child PID for parent PID: #{pid}'
         benchmark.stop_command(pid)
       else
-        @logger.info "Identified child PID: #{child_pid}"
+        @logger.info 'Identified child PID: #{child_pid}'
         benchmark.stop_command(pid)
         benchmark.stop_command(child_pid)
       end
     end
   end
-
 
   # Extracts Peak Memory Usage from the output of `/usr/bin/time -v`
   def extract_memory_usage(output)
@@ -87,20 +86,21 @@ module ExecCommands
     command_with_time = ['/usr/bin/time', '-v'] + command
 
     Open3.popen2e(*command_with_time) do |i, o_and_err, t|
-        pid = t.pid
-        i.close
+      pid = t.pid
+      i.close
 
-        # Start the process monitor immediately after starting the process, as in the original.
-        handle, proc_metrics = proc_monitor(pid, benchmark)
-        output = []
-        o_and_err.each_line do |l|
-          output << l
-        end
+      # Start the process monitor immediately after starting the process, as in the original.
+      handle, proc_metrics = proc_monitor(pid, benchmark)
+      output = []
+      o_and_err.each_line do |l|
+        output << l
+      end
 
-        # Extract the memory usage and update the metrics.
-        metrics[:peak_memory] = extract_memory_usage(output.join("\n"))
-        handle.join # Ensure the thread completes.
-        metrics.merge!(proc_metrics) # Merge the metrics.
+      # Extract the memory usage and update the metrics.
+      metrics[:peak_memory] = extract_memory_usage(output.join("\n"))
+      @logger.info "Current saved Peak memory usage: #{metrics[:peak_memory]} kB"
+      handle.join # Ensure the thread completes.
+      metrics.merge!(proc_metrics) # Merge the metrics.
     end
   end
 
