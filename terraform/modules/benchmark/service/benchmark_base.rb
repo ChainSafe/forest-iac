@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# encoding: UTF-8
 
 # Mixin module for base benchmark class exec (and exec helper) commands.
 module ExecCommands
@@ -15,8 +16,11 @@ module ExecCommands
 
   # Measures validation time for daily metrics.
   def measure_online_validation(benchmark, pid, metrics)
+    # Start a new thread
     Thread.new do
       first_epoch = nil
+
+      # Wait for the start of online validation
       loop do
         start, first_epoch = benchmark.start_online_validation_command
         if start
@@ -25,14 +29,28 @@ module ExecCommands
         end
         sleep 0.1
       end
+
+      # Sleep for the specified validation duration
       sleep benchmark.online_validation_secs
+
+      # Calculate the number of epochs
       last_epoch = get_last_epoch(benchmark)
       metrics[:num_epochs] = last_epoch - first_epoch
-
       @logger.info 'Stopping process...'
-      benchmark.stop_command(pid)
+
+      # Identify and stop the child process
+      child_pid = `pgrep -P #{pid}`.strip.to_i
+      if child_pid.zero?
+        @logger.error "Failed to find child PID for parent PID: #{pid}"
+        benchmark.stop_command(pid)
+      else
+        @logger.info "Identified child PID: #{child_pid}"
+        benchmark.stop_command(pid)
+        benchmark.stop_command(child_pid)
+      end
     end
   end
+
 
   # Extracts Peak Memory Usage from the output of `/usr/bin/time -v`
   def extract_memory_usage(output)
@@ -64,25 +82,25 @@ module ExecCommands
   end
 
   # Helper function for measuring execution time; passes process ID to online
-  # validation and process monitor.
+  # validation and process monitor and Measure Peak Memory.
   def exec_command_aux(command, metrics, benchmark)
     command_with_time = ['/usr/bin/time', '-v'] + command
 
     Open3.popen2e(*command_with_time) do |i, o_and_err, t|
-      pid = t.pid
-      i.close
-      output = []
+        pid = t.pid
+        i.close
 
-      o_and_err.each_line do |l|
-        output << l
-      end
+        # Start the process monitor immediately after starting the process, as in the original.
+        handle, proc_metrics = proc_monitor(pid, benchmark)
+        output = []
+        o_and_err.each_line do |l|
+          output << l
+        end
 
-      # Extract only the peak memory usage from the captured output
-      metrics[:peak_memory] = extract_memory_usage(output.join("\n"))
-      # Run proc_monitor (or any other logic you have) if needed
-      handle, proc_metrics = proc_monitor(pid, benchmark)
-      handle.join
-      metrics.merge!(proc_metrics)
+        # Extract the memory usage and update the metrics.
+        metrics[:peak_memory] = extract_memory_usage(output.join("\n"))
+        handle.join # Ensure the thread completes.
+        metrics.merge!(proc_metrics) # Merge the metrics.
     end
   end
 
