@@ -41,10 +41,10 @@ module ExecCommands
       # Identify and stop the child process
       child_pid = `pgrep -P #{pid}`.strip.to_i
       if child_pid.zero?
-        @logger.error 'Failed to find child PID for parent PID: #{pid}'
+        @logger.error "Failed to find child PID for parent PID: #{pid}"
         benchmark.stop_command(pid)
       else
-        @logger.info 'Identified child PID: #{child_pid}'
+        @logger.info "Identified child PID: #{child_pid}"
         benchmark.stop_command(pid)
         benchmark.stop_command(child_pid)
       end
