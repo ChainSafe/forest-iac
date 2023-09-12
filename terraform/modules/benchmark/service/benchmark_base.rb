@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: UTF-8
 
 # Mixin module for base benchmark class exec (and exec helper) commands.
 module ExecCommands
@@ -93,12 +92,12 @@ module ExecCommands
       handle, proc_metrics = proc_monitor(pid, benchmark)
       output = []
       o_and_err.each_line do |l|
-        output << l
+        output << l.force_encoding('UTF-8')
+        print l
       end
 
       # Extract the memory usage and update the metrics.
       metrics[:peak_memory] = extract_memory_usage(output.join("\n"))
-      @logger.info "Current saved Peak memory usage: #{metrics[:peak_memory]} kB"
       handle.join # Ensure the thread completes.
       metrics.merge!(proc_metrics) # Merge the metrics.
     end
@@ -111,7 +110,12 @@ module ExecCommands
 
     metrics = Concurrent::Hash.new
     t0 = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-    exec_command_aux(command, metrics, benchmark)
+    begin
+      @logger.info "Invoking exec_command_aux"
+      exec_command_aux(command, metrics, benchmark)
+    rescue => e
+      @logger.error "Error encountered in exec_command_aux: #{e.message}"
+    end
     t1 = Process.clock_gettime(Process::CLOCK_MONOTONIC)
     metrics[:elapsed] = trunc_seconds(t1 - t0)
     metrics
