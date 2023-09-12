@@ -110,12 +110,7 @@ module ExecCommands
 
     metrics = Concurrent::Hash.new
     t0 = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-    begin
-      @logger.info "Invoking exec_command_aux"
-      exec_command_aux(command, metrics, benchmark)
-    rescue => e
-      @logger.error "Error encountered in exec_command_aux: #{e.message}"
-    end
+    exec_command_aux(command, metrics, benchmark)
     t1 = Process.clock_gettime(Process::CLOCK_MONOTONIC)
     metrics[:elapsed] = trunc_seconds(t1 - t0)
     metrics
