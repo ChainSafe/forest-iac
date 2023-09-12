@@ -267,7 +267,7 @@ def run_benchmarks(benchmarks, options)
   Dir.chdir(WORKING_DIR) do
     benchmarks_loop(benchmarks, options, bench_metrics)
   end
-  handle_exception(nil) do
+  handle_exception(false) do
     if options[:daily]
       write_csv(bench_metrics, options)
     else
@@ -291,7 +291,7 @@ raise "The file '#{@snapshot_path}' does not exist" if @snapshot_path && !File.f
 @snapshot_downloaded = false
 
 # Download snapshot if a snapshot path is not specified by the user.
-handle_exception(nil) do
+handle_exception(false) do
   if @snapshot_path.nil?
     @logger.info 'No snapshot provided, downloading one'
     download_snapshot(chain: options[:chain])
