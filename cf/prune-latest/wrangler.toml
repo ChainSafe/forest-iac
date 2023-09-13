@@ -1,0 +1,13 @@
+name = "forest-prune-latest"
+main = "./src/index.ts"
+
+compatibility_date = "2022-06-30"
+
+routes = [
+    { pattern = "forest-archive.chainsafe.dev/prune/", zone_name = "chainsafe.dev" },
+]
+
+[[r2_buckets]]
+binding = 'FOREST_ARCHIVE'                 # can be any valid JavaScript variable name
+bucket_name = 'forest-archive'
+preview_bucket_name = 'forest-archive-dev'
