@@ -1,0 +1,17 @@
+name = "forest-snapshot-listing"
+main = "src/index.ts"
+compatibility_date = "2023-09-13"
+usage_model = "bundled"
+env = { }
+
+[route]
+pattern = "forest-archive.chainsafe.dev/list/"
+zone_name = ""
+script = "forest-snapshot-listing"
+
+[triggers]
+crons = [ ]
+
+[[r2_buckets]]
+binding = "FOREST_ARCHIVE"
+bucket_name = "forest-archive"
