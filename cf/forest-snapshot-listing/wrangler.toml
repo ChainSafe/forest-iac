@@ -1,16 +1,16 @@
 name = "forest-snapshot-listing"
-main = "src/index.ts"
+main = "src/worker.ts"
 compatibility_date = "2023-09-13"
 usage_model = "bundled"
-env = { }
+env = {}
 
 [route]
-pattern = "forest-archive.chainsafe.dev/list/"
-zone_name = ""
-script = "forest-snapshot-listing"
+pattern = "forest-archive.chainsafe.dev/list*"
+zone_name = "chainsafe.dev"
+#script = "forest-snapshot-listing"
 
 [triggers]
-crons = [ ]
+crons = []
 
 [[r2_buckets]]
 binding = "FOREST_ARCHIVE"
