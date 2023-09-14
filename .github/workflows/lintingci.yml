@@ -49,3 +49,13 @@ jobs:
 
       - name: Check formatting
         run: terraform fmt -check -diff -recursive
+
+  pre_commit:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout source code
+          uses: actions/checkout@v4
+
+          # Check for trailing whitespace, YAML syntax, etc.
+        - name: Setup terraform
+          uses: pre-commit/action@v2.0.0
