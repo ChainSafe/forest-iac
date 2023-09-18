@@ -163,10 +163,8 @@ def write_csv(metrics, options)
     metrics.each do |key, value|
       elapsed = value[:import][:elapsed] || 'n/a'
       tpm = value[:validate_online][:tpm] || 'n/a'
-      peak_memory_import = value[:import][:peak_memory] || 'n/a'
-      peak_memory_validate = value[:validate_online][:peak_memory] || 'n/a'
-
       peak_memory = calculate_peak_memory(value.dig(:import, :peak_memory), value.dig(:validate_online, :peak_memory))
+
       results[:import_time][key.to_sym] = "#{elapsed} sec"
       results[:validation_time][key.to_sym] = "#{tpm} tipsets/sec"
       results[:peak_memory][key.to_sym] = "#{peak_memory} KB"
