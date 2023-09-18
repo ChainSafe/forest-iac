@@ -23,7 +23,7 @@ folders = ["mainnet", "calibnet"]
 def slack_alert(message, thread_ts=None):
     # Instantiate a Slack client with token from environment variables.
     client = WebClient(token=os.environ['SLACK_TOKEN'])
-    CHANNEL_NAME = '#forest-dump'
+    CHANNEL_NAME = '#forest-notifications'
 
     # Try sending message, catch and print any errors.
     try:
