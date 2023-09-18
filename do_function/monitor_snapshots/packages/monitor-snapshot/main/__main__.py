@@ -101,7 +101,7 @@ def main():
         current_date_utc = datetime.now(timezone.utc).date()
         yesterday_date_utc = current_date_utc - timedelta(days=1)
 
-        if latest_snapshot_by_date.date() > yesterday_date_utc:
+        if latest_snapshot_by_date.date() < yesterday_date_utc:
             checks_passed = False
             error_messages.append(f"⛔ The latest {folder} snapshot: {base_url}/{latest_snapshot_filename} is older than one day. Snapshot Date: {latest_snapshot_by_date}, Current Date: {current_date_utc}. 🔥🌲🔥")
 
