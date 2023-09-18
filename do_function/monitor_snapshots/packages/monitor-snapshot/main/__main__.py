@@ -23,10 +23,7 @@ folders = ["mainnet", "calibnet"]
 def slack_alert(message, thread_ts=None):
     # Instantiate a Slack client with token from environment variables.
     client = WebClient(token=os.environ['SLACK_TOKEN'])
-    CHANNEL_NAME = '#forest-notifications'
-
-    # Format message as a JSON-like string for better readability.
-    message = f'```{json.dumps(message, indent=4, ensure_ascii=False)}```'
+    CHANNEL_NAME = '#forest-dump'
 
     # Try sending message, catch and print any errors.
     try:
@@ -104,7 +101,7 @@ def main():
         current_date_utc = datetime.now(timezone.utc).date()
         yesterday_date_utc = current_date_utc - timedelta(days=1)
 
-        if latest_snapshot_by_date.date() < yesterday_date_utc:
+        if latest_snapshot_by_date.date() > yesterday_date_utc:
             checks_passed = False
             error_messages.append(f"⛔ The latest {folder} snapshot: {base_url}/{latest_snapshot_filename} is older than one day. Snapshot Date: {latest_snapshot_by_date}, Current Date: {current_date_utc}. 🔥🌲🔥")
 
@@ -141,7 +138,7 @@ def main():
     if not checks_passed:
         thread = slack_alert("⛔ Snapshot check failed. 🔥🌲🔥")
         for error_message in error_messages:
-            slack_alert({"error": error_message}, thread_ts=thread)
+            slack_alert(error_message, thread_ts=thread)
         return {
             "result": "⛔ failure",
             "message": "Some checks did not pass. Please review the issues reported. Let's fix them and keep the forest green!. 🔥🌲🔥"
