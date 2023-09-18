@@ -15,11 +15,9 @@ module ExecCommands
 
   # Measures validation time for daily metrics.
   def measure_online_validation(benchmark, pid, metrics)
-    # Start a new thread
     Thread.new do
       first_epoch = nil
 
-      # Wait for the start of online validation
       loop do
         start, first_epoch = benchmark.start_online_validation_command
         if start
@@ -29,10 +27,8 @@ module ExecCommands
         sleep 0.1
       end
 
-      # Sleep for the specified validation duration
       sleep benchmark.online_validation_secs
 
-      # Calculate the number of epochs
       last_epoch = get_last_epoch(benchmark)
       metrics[:num_epochs] = last_epoch - first_epoch
       @logger.info 'Stopping process...'
@@ -80,7 +76,7 @@ module ExecCommands
   end
 
   # Helper function for measuring execution time; passes process ID to online
-  # validation and process monitor and Measure Peak Memory.
+  # validation and process monitor and measure Peak Memory.
   def exec_command_aux(command, metrics, benchmark)
     command_with_time = ['/usr/bin/time', '-v'] + command
 
@@ -88,7 +84,6 @@ module ExecCommands
       pid = t.pid
       i.close
 
-      # Start the process monitor immediately after starting the process, as in the original.
       handle, proc_metrics = proc_monitor(pid, benchmark)
       output = []
       o_and_err.each_line do |l|
@@ -98,8 +93,8 @@ module ExecCommands
 
       # Extract the memory usage and update the metrics.
       metrics[:peak_memory] = extract_memory_usage(output.join("\n"))
-      handle.join # Ensure the thread completes.
-      metrics.merge!(proc_metrics) # Merge the metrics.
+      handle.join
+      metrics.merge!(proc_metrics)
     end
   end
 
