@@ -140,6 +140,11 @@ def write_markdown(metrics)
   @logger.info "Wrote #{filename}"
 end
 
+def calculate_peak_memory(peak_memory_import, peak_memory_validate)
+  peak_memory_values = [peak_memory_import, peak_memory_validate].select { |v| v.is_a?(Numeric) }
+  peak_memory_values.empty? ? 'n/a' : peak_memory_values.max
+end
+
 # Output daily benchmark metrics to comma-separated value file.
 def write_csv(metrics, options)
   filename = "result_#{Time.now.to_i}.csv"
@@ -161,9 +166,7 @@ def write_csv(metrics, options)
       peak_memory_import = value[:import][:peak_memory] || 'n/a'
       peak_memory_validate = value[:validate_online][:peak_memory] || 'n/a'
 
-      peak_memory_values = [peak_memory_import, peak_memory_validate].select { |v| v.is_a?(Numeric) }
-      peak_memory = peak_memory_values.empty? ? 'n/a' : peak_memory_values.max
-
+      peak_memory = calculate_peak_memory(value.dig(:import, :peak_memory), value.dig(:validate_online, :peak_memory))
       results[:import_time][key.to_sym] = "#{elapsed} sec"
       results[:validation_time][key.to_sym] = "#{tpm} tipsets/sec"
       results[:peak_memory][key.to_sym] = "#{peak_memory} KB"

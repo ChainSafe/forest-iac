@@ -78,7 +78,7 @@ module ExecCommands
   # Helper function for measuring execution time; passes process ID to online
   # validation and process monitor and measures the peak memory usage of the commands.
   def exec_command_aux(command, metrics, benchmark)
-    command_with_time = ['/usr/bin/time', '-v', command]
+    command_with_time = ['/usr/bin/time', '-v'] + command
 
     Open3.popen2e(*command_with_time) do |i, o_and_err, t|
       pid = t.pid
