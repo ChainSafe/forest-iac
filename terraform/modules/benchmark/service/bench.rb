@@ -160,7 +160,9 @@ def write_csv(metrics, options)
       tpm = value[:validate_online][:tpm] || 'n/a'
       peak_memory_import = value[:import][:peak_memory] || 'n/a'
       peak_memory_validate = value[:validate_online][:peak_memory] || 'n/a'
-      peak_memory = [peak_memory_import, peak_memory_validate].select { |val| val.is_a?(Numeric) }.max || 'n/a'
+
+      peak_memory_values = [peak_memory_import, peak_memory_validate].select { |v| v.is_a?(Numeric) }
+      peak_memory = peak_memory_values.empty? ? 'n/a' : peak_memory_values.max
 
       results[:import_time][key.to_sym] = "#{elapsed} sec"
       results[:validation_time][key.to_sym] = "#{tpm} tipsets/sec"
