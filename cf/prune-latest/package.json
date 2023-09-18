@@ -1,0 +1,14 @@
+{
+	"name": "template-worker-r2",
+	"version": "0.0.0",
+	"private": true,
+	"scripts": {
+		"deploy": "wrangler deploy src/index.ts",
+		"dev": "wrangler dev src/index.ts --local",
+		"start-stackblitz": "WRANGLER_SEND_METRICS=false wrangler dev src/index.ts --local"
+	},
+	"devDependencies": {
+		"@cloudflare/workers-types": "^4.20230904.0",
+		"wrangler": "^3.0.0"
+	}
+}
