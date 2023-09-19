@@ -241,17 +241,14 @@ end
 # run metrics, and assign metrics for each benchmark.
 def benchmarks_loop(benchmarks, options, bench_metrics)
   benchmarks.each do |bench|
-    bench.dry_run, bench.snapshot_path, bench.heights, bench.chain = bench_loop_assignments(options)
-    bench.run(options[:daily], @snapshot_downloaded)
+    handle_exception(true) do
+      bench.dry_run, bench.snapshot_path, bench.heights, bench.chain = bench_loop_assignments(options)
+      bench.run(options[:daily], @snapshot_downloaded)
 
-    bench_metrics[bench.name] = bench.metrics
+      bench_metrics[bench.name] = bench.metrics
 
-    puts "\n"
-  rescue StandardError, Interrupt
-    @logger.error('Fiasco during benchmark run. Exiting...')
-    # Delete snapshot if downloaded, but not if user-provided.
-    FileUtils.rm_f(@snapshot_path) if @snapshot_downloaded
-    exit(1)
+      puts "\n"
+    end
   end
 end
 
@@ -270,10 +267,12 @@ def run_benchmarks(benchmarks, options)
   Dir.chdir(WORKING_DIR) do
     benchmarks_loop(benchmarks, options, bench_metrics)
   end
-  if options[:daily]
-    write_csv(bench_metrics, options)
-  else
-    write_markdown(bench_metrics)
+  handle_exception(false) do
+    if options[:daily]
+      write_csv(bench_metrics, options)
+    else
+      write_markdown(bench_metrics)
+    end
   end
 end
 
@@ -292,7 +291,7 @@ raise "The file '#{@snapshot_path}' does not exist" if @snapshot_path && !File.f
 @snapshot_downloaded = false
 
 # Download snapshot if a snapshot path is not specified by the user.
-begin
+handle_exception(false) do
   if @snapshot_path.nil?
     @logger.info 'No snapshot provided, downloading one'
     download_snapshot(chain: options[:chain])
@@ -305,12 +304,6 @@ begin
       sleep 300
     end
   end
-rescue StandardError, Interrupt
-  @logger.error('Fiasco during snapshot download. Deleting snapshot and exiting...')
-  # Delete downloaded snapshot if it exists.
-  FileUtils.rm_f(@snapshot_path) unless @snapshot_path.nil?
-  FileUtils.rm_rf("#{WORKING_DIR}/snapshot_dl_files")
-  exit(1)
 end
 
 # Define snapshot path in options to pass to the benchmark run.
