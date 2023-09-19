@@ -140,7 +140,9 @@ def write_markdown(metrics)
   @logger.info "Wrote #{filename}"
 end
 
-def calculate_peak_memory(peak_memory_import, peak_memory_validate)
+# Determines the maximum memory value between two given values.
+# If neither are numeric, returns 'n/a'.
+def determine_maximum_memory(peak_memory_import, peak_memory_validate)
   peak_memory_values = [peak_memory_import, peak_memory_validate].select { |v| v.is_a?(Numeric) }
   peak_memory_values.empty? ? 'n/a' : peak_memory_values.max
 end
@@ -163,7 +165,9 @@ def write_csv(metrics, options)
     metrics.each do |key, value|
       elapsed = value[:import][:elapsed] || 'n/a'
       tpm = value[:validate_online][:tpm] || 'n/a'
-      peak_memory = calculate_peak_memory(value.dig(:import, :peak_memory), value.dig(:validate_online, :peak_memory))
+
+      # Determine the peak memory by comparing both values
+      peak_memory = determine_maximum_memory(value.dig(:import, :peak_memory), value.dig(:validate_online, :peak_memory))
 
       results[:import_time][key.to_sym] = "#{elapsed} sec"
       results[:validation_time][key.to_sym] = "#{tpm} tipsets/sec"
