@@ -24,6 +24,7 @@ module "mainnet" {
   initial_filesystem_type = var.initial_filesystem_type
   volume_size             = var.volume_size
   attach_volume           = false
+  rpc_port                = "2345"
   destination_addresses   = var.destination_addresses
   chain                   = var.chain
   volume_name             = var.volume_name

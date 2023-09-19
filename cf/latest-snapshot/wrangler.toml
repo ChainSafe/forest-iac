@@ -1,0 +1,13 @@
+name = "forest-latest-snapshot"
+main = "./src/index.ts"
+
+compatibility_date = "2022-06-30"
+
+routes = [
+    { pattern = "forest-archive.chainsafe.dev/latest/calibnet/", zone_name = "chainsafe.dev" },
+    { pattern = "forest-archive.chainsafe.dev/latest/mainnet/", zone_name = "chainsafe.dev" },
+]
+
+[[r2_buckets]]
+binding = 'FOREST_ARCHIVE'     # can be any valid JavaScript variable name
+bucket_name = 'forest-archive'

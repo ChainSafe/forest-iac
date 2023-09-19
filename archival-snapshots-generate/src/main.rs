@@ -35,9 +35,6 @@ struct Args {
 }
 
 fn main() -> anyhow::Result<()> {
-    if which::which("forest-cli").is_err() {
-        bail!("forest-cli is not installed");
-    }
     if which::which("forest-tool").is_err() {
         bail!("forest-tool is not installed");
     }
@@ -129,7 +126,7 @@ fn generate_lite_snapshot(
     snapshot_file: &Path,
 ) -> anyhow::Result<()> {
     debug!("Generating lite snapshot for epoch {epoch}");
-    std::process::Command::new("forest-cli")
+    std::process::Command::new("forest-tool")
         .args([
             "archive",
             "export",
@@ -168,7 +165,7 @@ fn generate_diff_snapshot(
         return Ok(());
     }
 
-    std::process::Command::new("forest-cli")
+    std::process::Command::new("forest-tool")
         .args([
             "archive",
             "export",
