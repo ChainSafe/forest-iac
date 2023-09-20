@@ -2,7 +2,6 @@
 
 This directory contains an infrastructure configuration for the Forest service, which generates daily snapshots. This configuration ensures the continuous verification of Forest's ability to export snapshots. Once a day, the service synchronizes with Calibnet and creates a new snapshot. If the previous snapshot is older than one day, the new snapshot is uploaded to Digital Ocean Spaces. Additionally, the New Relic Infrastructure agent is installed to facilitate monitoring
 
-
 # Workflow
 
 Changing any of the settings (such as the size of the droplet or the operating
@@ -48,45 +47,53 @@ export TF_VAR_NEW_RELIC_API_KEY=
 export TF_VAR_NEW_RELIC_ACCOUNT_ID=
 ```
 
-Forest tokens can be found on 1password.
+Forest tokens can be found on 1password (for production deployments only; for non-production deployments, generate your own secrets).
 
 you'll also need to link your public key with Digital Ocean. To do this, visit https://cloud.digitalocean.com/account/security. Additionally, set up your SSH key by following the commands provided below:
 
 ```bash
 eval $(ssh-agent)
 
-ssh-add <path_to_your_ssh_key>
+ssh-add <path_to_your_private_ssh_key>
 ```
 
 To ensure the production Snapshot service remains intact, modify certain variables in the `Main.tf` file:
 
 - Change `key = "daily_snapshot.tfstate"` to `key = "<your_custom_name>.tfstate"`.
 - Replace `name = "forest-snapshot"` with `name = "<your_desired_name>"`.
-- Replace ` slack_channel     = "#forest-notifications"` with  `slack_channel     = "#forest-dump"`
+- Replace ` slack_channel     = "#forest-notifications"` with `slack_channel     = "#forest-dump"`
+- Replace `snapshot_bucket = "forest-snapshots"` with `snapshot_bucket = "<your_custom_bucket>"`
 
-Remember to replace `<path_to_your_ssh_key>`, `<your_custom_name>`, and `<your_desired_name>` with appropriate values.
+Remember to replace `<path_to_your_private_ssh_key>`, `<your_custom_name>`, `<your_desired_name>`, and `<your_custom_bucket>` with appropriate values.
+
+Note that there is conditional logic for the Slack messages (i.e., only report a successful snapshot upload if this is the first new snapshot of the day), so--depending on how you populated your custom snapshot bucket and when you are running the deployment--you may or may not see a success message in the `#forest-dump` channel without manually modifying this logic.
 
 To prepare terraform for other commands:
+
 ```bash
 $ terraform init
 ```
 
 To inspect a new deployment plan (it'll tell you which servers will be removed,
 added, etc.):
+
 ```bash
 $ terraform plan
 ```
+
 For Mac users, if you encounter the `Error: External Program Execution Failed`, you'll need to adjust the `prep_sources.sh` file located in the `../modules/daily_snapshot` directory. Make the following changes:
 
 - Replace `--archive` with `-Rp`.
 - Install `gnu-tar` using the command `brew install gnu-tar`. Afterward, switch `tar cf ../sources.tar` to `gtar cf ../sources.tar`
 
 To deploy the service:
+
 ```bash
 $ terraform apply
 ```
 
 To shutdown the service:
+
 ```bash
 $ terraform destroy
 ```
