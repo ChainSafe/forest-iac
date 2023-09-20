@@ -83,7 +83,11 @@ class ForestBenchmark < BenchmarkBase
   end
 
   def stop_command(pid)
-    syscall('kill', '-SIGINT', pid.to_s)
+    # Fetch the PGID for the given PID
+    pgid = Process.getpgid(pid)
+
+    # Send SIGINT to the entire process group
+    Process.kill('SIGINT', -pgid)
   end
 
   def initialize(name:, config: {})
