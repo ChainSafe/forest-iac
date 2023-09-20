@@ -42,7 +42,7 @@ variable "project" {
 }
 
 variable "NEW_RELIC_REGION" {
-  description = "The New Relic Plathom Region"
+  description = "The New Relic Platform Region"
   type        = string
   default     = "EU"
 }
