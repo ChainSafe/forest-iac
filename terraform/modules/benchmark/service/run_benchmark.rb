@@ -5,6 +5,7 @@ require_relative 'ruby_common/utils'
 
 require 'logger'
 require 'fileutils'
+require 'date'
 
 # Retrieves an environmental variable, failing if its not set or empty.
 def get_and_assert_env_variable(name)
@@ -18,6 +19,8 @@ SLACK_TOKEN = get_and_assert_env_variable 'SLACK_API_TOKEN'
 CHANNEL = get_and_assert_env_variable 'SLACK_NOTIF_CHANNEL'
 SCRIPTS_DIR = get_and_assert_env_variable 'BASE_FOLDER'
 LOG_DIR = get_and_assert_env_variable 'BASE_FOLDER'
+
+last_notification_date = nil
 
 loop do
   # Current datetime, to append to the log files
@@ -37,7 +40,11 @@ loop do
   client = SlackClient.new CHANNEL, SLACK_TOKEN
 
   if benchmark_check_passed
-    client.post_message '✅ Benchmark run was successful. 🌲🌳🌲🌳🌲'
+    # Send Slack notification only if today's date differs from the last notification date
+    unless last_notification_date == Date.today
+      client.post_message '✅ Benchmark run was successful. 🌲🌳🌲🌳🌲'
+      last_notification_date = Date.today
+    end
   else
     client.post_message '⛔ Benchmark run fiascoed. 🔥🌲🔥'
   end
