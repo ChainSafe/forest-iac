@@ -38,7 +38,6 @@ module ExecCommands
   def measure_online_validation(benchmark, pid, metrics)
     Thread.new do
       first_epoch = nil
-
       loop do
         start, first_epoch = benchmark.start_online_validation_command
         if start
@@ -47,23 +46,12 @@ module ExecCommands
         end
         sleep 0.1
       end
-
       sleep benchmark.online_validation_secs
-
       last_epoch = get_last_epoch(benchmark)
       metrics[:num_epochs] = last_epoch - first_epoch
-      @logger.info 'Stopping process...'
 
-      # Identify and stop the child process
-      child_pid = `pgrep -P #{pid}`.strip.to_i
-      if child_pid.zero?
-        @logger.error "Failed to find child PID for parent PID: #{pid}"
-        benchmark.stop_command(pid)
-      else
-        @logger.info "Identified child PID: #{child_pid}"
-        benchmark.stop_command(pid)
-        benchmark.stop_command(child_pid)
-      end
+      @logger.info 'Stopping process...'
+      benchmark.stop_command(pid)
     end
   end
 
