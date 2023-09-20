@@ -11,3 +11,4 @@ routes = [
 [[r2_buckets]]
 binding = 'FOREST_ARCHIVE'     # can be any valid JavaScript variable name
 bucket_name = 'forest-archive'
+preview_bucket_name = 'forest-archive-dev'

@@ -55,6 +55,12 @@ module ExecCommands
     end
   end
 
+  # Extracts Peak Memory Usage from the output of `/usr/bin/time -v`
+  def extract_memory_usage(output)
+    match = output.match(/Maximum resident set size \(kbytes\): (\d+)/)
+    match ? match[1].to_i : nil
+  end
+
   # Calls online validation function and runs monitor to measure memory usage.
   def proc_monitor(pid, benchmark)
     metrics = Concurrent::Hash.new
@@ -79,17 +85,23 @@ module ExecCommands
   end
 
   # Helper function for measuring execution time; passes process ID to online
-  # validation and process monitor.
+  # validation and process monitor and measures the peak memory usage of the commands.
   def exec_command_aux(command, metrics, benchmark)
-    Open3.popen2(*command) do |i, o, t|
+    command_with_time = ['/usr/bin/time', '-v'] + command
+
+    Open3.popen2e(*command_with_time) do |i, o_and_err, t|
       pid = t.pid
       i.close
 
       handle, proc_metrics = proc_monitor(pid, benchmark)
-      o.each_line do |l|
+      output = []
+      o_and_err.each_line do |l|
+        output << l.force_encoding('UTF-8')
         print l
       end
 
+      # Extract the memory usage and update the metrics.
+      metrics[:peak_memory] = extract_memory_usage(output.join("\n"))
       handle.join
       metrics.merge!(proc_metrics)
     end

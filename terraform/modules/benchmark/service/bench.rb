@@ -140,6 +140,13 @@ def write_markdown(metrics)
   @logger.info "Wrote #{filename}"
 end
 
+# Determines the maximum memory value between two given values.
+# If neither are numeric, returns 'n/a'.
+def determine_max_memory(peak_memory_import, peak_memory_validate)
+  peak_memory_values = [peak_memory_import, peak_memory_validate].select { |v| v.is_a?(Numeric) }
+  peak_memory_values.empty? ? 'n/a' : peak_memory_values.max
+end
+
 # Output daily benchmark metrics to comma-separated value file.
 def write_csv(metrics, options)
   filename = "result_#{Time.now.to_i}.csv"
@@ -149,15 +156,22 @@ def write_csv(metrics, options)
     timestamp = Time.now.strftime('%Y-%m-%d %H:%M:%S')
     chain = options[:chain]
 
-    results = { import_time: { forest: 'n/a', lotus: 'n/a' },
-                validation_time: { forest: 'n/a', lotus: 'n/a' } }
+    results = {
+      import_time: { forest: 'n/a', lotus: 'n/a' },
+      validation_time: { forest: 'n/a', lotus: 'n/a' },
+      peak_memory: { forest: 'n/a', lotus: 'n/a' }
+    }
 
     metrics.each do |key, value|
       elapsed = value[:import][:elapsed] || 'n/a'
       tpm = value[:validate_online][:tpm] || 'n/a'
 
+      # Determine the peak memory by comparing both values
+      peak_memory = determine_max_memory(value.dig(:import, :peak_memory), value.dig(:validate_online, :peak_memory))
+
       results[:import_time][key.to_sym] = "#{elapsed} sec"
       results[:validation_time][key.to_sym] = "#{tpm} tipsets/sec"
+      results[:peak_memory][key.to_sym] = "#{peak_memory} KB"
     end
 
     results.each do |key, value|
