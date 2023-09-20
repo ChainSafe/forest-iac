@@ -36,10 +36,17 @@ async function get_latest(req_headers: Headers, env: Env, chain: string): Promis
 		let status = 200;
 		let range = parseRange(object.size, req_headers.get("range") || "");
 		if (Array.isArray(range)) {
+			// R2Object doesn't support multiple ranges, so we only use the first one.
+			// Throw an error if there are more than one range.
+			if (range.length > 1) {
+				return new Response('Multiple ranges are not supported', {
+					status: 416, // Range Not Satisfiable
+				});
+			}
+
+			let r = range[0];
+			headers.set("Content-Range", `${r.type} ${r.start}-${r.end}/${object.size}`);
 			status = 206; // Partial Content
-			range.forEach(function (r) {
-				headers.append("Content-Range", `${range.type} ${r.start}-${r.end}/${object.size}`);
-			})
 		}
 
 		object.writeHttpMetadata(headers);
