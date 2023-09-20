@@ -34,5 +34,7 @@ jobs:
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
           slack_token: ${{ secrets.SLACK_TOKEN }}
+          new_relic_account_id: ${{ secrets.NEW_RELIC_ACCOUNT_ID }}
+          new_relic_api_key: ${{ secrets.NEW_RELIC_API_KEY }}
           working_directory: terraform/benchmark
           environment: Benchmark Service

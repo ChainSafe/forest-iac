@@ -1,3 +1,15 @@
+ci:
+    autofix_commit_msg: |
+        [pre-commit.ci] auto fixes from pre-commit.com hooks
+
+        for more information, see https://pre-commit.ci
+    autofix_prs: true
+    autoupdate_branch: ''
+    autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
+    autoupdate_schedule: weekly
+    skip: []
+    submodules: false
+
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0
@@ -8,6 +20,8 @@ repos:
     -   id: check-added-large-files
     -   id: detect-private-key
     -   id: detect-aws-credentials
+        # This is allowed due to the CI environment where no credentials are set.
+        args: ['--allow-missing-credentials']
 
 -   repo: https://github.com/Yelp/detect-secrets
     rev: v1.4.0
