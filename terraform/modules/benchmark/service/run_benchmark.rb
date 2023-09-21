@@ -21,9 +21,7 @@ def prune_logs(dir)
 
   all_logs = Dir["#{dir}/*"]
   all_logs.each do |path|
-    if (Time.now - File.stat(path).mtime) > seven_days_in_secs
-      File.delete(path)
-    end
+    File.delete(path) if (Time.now - File.stat(path).mtime) > seven_days_in_secs
   end
 end
 
