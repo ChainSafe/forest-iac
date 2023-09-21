@@ -43,9 +43,7 @@ loop do
 
   if benchmark_check_passed
     # Send Slack notification only if today's date differs from the last notification date
-    unless Date.today == file_last_modified_date
-      client.post_message '✅ Benchmark run was successful. 🌲🌳🌲🌳🌲'
-    end
+    client.post_message '✅ Benchmark run was successful. 🌲🌳🌲🌳🌲' unless Date.today == file_last_modified_date
   else
     client.post_message '⛔ Benchmark run fiascoed. 🔥🌲🔥'
   end
