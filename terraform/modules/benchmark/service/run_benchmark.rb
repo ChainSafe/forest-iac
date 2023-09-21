@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
+require 'net/http'
+require 'time'
 require_relative 'ruby_common/slack_client'
 require_relative 'ruby_common/utils'
-
 require 'logger'
 require 'fileutils'
 require 'date'
 
-# Retrieves an environmental variable, failing if its not set or empty.
 def get_and_assert_env_variable(name)
   var = ENV.fetch(name, nil)
   raise "Please set #{name} environmental variable" if var.nil? || var.empty?
@@ -15,20 +15,24 @@ def get_and_assert_env_variable(name)
   var
 end
 
+def file_last_modified_date
+  file_url = 'https://forest-benchmarks.fra1.digitaloceanspaces.com/benchmark-results/all-results.csv'
+  response = Net::HTTP.get_response(URI(file_url))
+  last_modified = Time.parse(response['last-modified']).to_date
+
+  last_modified
+end
+
 SLACK_TOKEN = get_and_assert_env_variable 'SLACK_API_TOKEN'
 CHANNEL = get_and_assert_env_variable 'SLACK_NOTIF_CHANNEL'
 SCRIPTS_DIR = get_and_assert_env_variable 'BASE_FOLDER'
 LOG_DIR = get_and_assert_env_variable 'BASE_FOLDER'
 
-last_notification_date = nil
-
 loop do
-  # Current datetime, to append to the log files
   datetime = Time.new.strftime '%FT%H:%M:%S'
   run_log = "#{LOG_DIR}/benchmark_#{datetime}_run"
   report_log = "#{LOG_DIR}/benchmark_#{datetime}_report"
 
-  # Create log directory
   FileUtils.mkdir_p LOG_DIR
 
   logger = Logger.new(report_log)
@@ -41,14 +45,13 @@ loop do
 
   if benchmark_check_passed
     # Send Slack notification only if today's date differs from the last notification date
-    unless last_notification_date == Date.today
+    unless Date.today == file_last_modified_date
       client.post_message '✅ Benchmark run was successful. 🌲🌳🌲🌳🌲'
-      last_notification_date = Date.today
     end
   else
     client.post_message '⛔ Benchmark run fiascoed. 🔥🌲🔥'
   end
-  client.attach_files(run_log, report_log)
 
+  client.attach_files(run_log, report_log)
   logger.info 'Benchmark finished'
 end
