@@ -15,10 +15,21 @@ def get_and_assert_env_variable(name)
   var
 end
 
+def prune_logs(dir)
+  # Time in seconds for retaining a log file
+  seven_days_in_secs = (24 * 3600) * 7
+
+  all_logs = Dir["#{dir}/*"]
+  all_logs.each do |path|
+    File.delete(path) if (Time.now - File.stat(path).mtime) > seven_days_in_secs
+  end
+end
+
 SLACK_TOKEN = get_and_assert_env_variable 'SLACK_API_TOKEN'
 CHANNEL = get_and_assert_env_variable 'SLACK_NOTIF_CHANNEL'
+BASE_FOLDER = get_and_assert_env_variable 'BASE_FOLDER'
 SCRIPTS_DIR = get_and_assert_env_variable 'BASE_FOLDER'
-LOG_DIR = get_and_assert_env_variable 'BASE_FOLDER'
+LOG_DIR = "#{BASE_FOLDER}/logs"
 
 last_notification_date = nil
 
@@ -51,4 +62,5 @@ loop do
   client.attach_files(run_log, report_log)
 
   logger.info 'Benchmark finished'
+  prune_logs(LOG_DIR)
 end
