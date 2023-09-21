@@ -18,9 +18,7 @@ end
 def file_last_modified_date
   file_url = 'https://forest-benchmarks.fra1.digitaloceanspaces.com/benchmark-results/all-results.csv'
   response = Net::HTTP.get_response(URI(file_url))
-  last_modified = Time.parse(response['last-modified']).to_date
-
-  last_modified
+  Time.parse(response['last-modified']).to_date
 end
 
 SLACK_TOKEN = get_and_assert_env_variable 'SLACK_API_TOKEN'
