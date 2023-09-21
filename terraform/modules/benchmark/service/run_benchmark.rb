@@ -8,6 +8,7 @@ require 'logger'
 require 'fileutils'
 require 'date'
 
+# Retrieves an environmental variable, failing if its not set or empty.
 def get_and_assert_env_variable(name)
   var = ENV.fetch(name, nil)
   raise "Please set #{name} environmental variable" if var.nil? || var.empty?
@@ -27,10 +28,12 @@ SCRIPTS_DIR = get_and_assert_env_variable 'BASE_FOLDER'
 LOG_DIR = get_and_assert_env_variable 'BASE_FOLDER'
 
 loop do
+  # Current datetime, to append to the log files
   datetime = Time.new.strftime '%FT%H:%M:%S'
   run_log = "#{LOG_DIR}/benchmark_#{datetime}_run"
   report_log = "#{LOG_DIR}/benchmark_#{datetime}_report"
 
+  # Create log directory
   FileUtils.mkdir_p LOG_DIR
 
   logger = Logger.new(report_log)
