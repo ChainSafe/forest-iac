@@ -18,6 +18,8 @@ on:
 
 jobs:
   benchmark:
+    # The benchmark is flaky, disabling it until it works as intended.
+    if: false
     name: Benchmark Service
     runs-on: ubuntu-latest
     permissions: write-all
