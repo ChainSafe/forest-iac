@@ -206,14 +206,13 @@ def download_and_move_assignments(url)
   filename = url.match(/(\d+_.+)/)[1]
   checksum_url = url.sub('.car.zst', '.sha256sum')
   checksum_filename = checksum_url.match(/(\d+_.+)/)[1]
-  decompressed_filename = filename.sub('.car.zst', '.car')
-  [filename, checksum_url, checksum_filename, decompressed_filename]
+  [filename, checksum_url, checksum_filename]
 end
 
 # Create snapshot directory; download checksum and compressed snapshot;
 # decompress and verify snapshot; clean up helper files and return path to snapshot.
 def download_and_move(url, output_dir)
-  filename, checksum_url, checksum_filename, decompressed_filename = download_and_move_assignments(url)
+  filename, checksum_url, checksum_filename = download_and_move_assignments(url)
 
   # Must move to `WORKING_DIR` and create temporary folder for temp snapshot
   # files, as filesystem `tmp` partition may not be large enough for this task.
@@ -221,20 +220,18 @@ def download_and_move(url, output_dir)
   snapshot_dir = Dir.pwd
   FileUtils.mkdir_p('snapshot_dl_files')
   Dir.chdir('snapshot_dl_files') do
-    # Download, decompress and verify checksums.
+    # Download and verify checksum.
     @logger.info 'Downloading checksum...'
     syscall('aria2c', checksum_url)
     @logger.info 'Downloading snapshot...'
     syscall('aria2c', '-x5', url)
-    @logger.info "Decompressing #{filename}..."
-    syscall('zstd', '-d', filename)
     @logger.info 'Verifying...'
     syscall('sha256sum', '--check', '--status', checksum_filename)
 
-    FileUtils.mv(decompressed_filename.to_s, snapshot_dir)
+    FileUtils.mv(filename.to_s, snapshot_dir)
   end
   FileUtils.rm_rf('snapshot_dl_files')
-  "#{output_dir}/#{decompressed_filename}"
+  "#{output_dir}/#{filename}"
 end
 
 # Get proper snapshot download URL based on chain value and download to
