@@ -86,6 +86,7 @@ resource "digitalocean_droplet" "forest" {
   user_data = join("-", [data.local_file.sources.content_sha256, sha256(join("", local.init_commands))])
   tags      = ["iac"]
   ssh_keys  = data.digitalocean_ssh_keys.keys.ssh_keys[*].fingerprint
+  monitoring = true
 
   graceful_shutdown = false
 
