@@ -69,6 +69,7 @@ locals {
     "echo 'export NEW_RELIC_ACCOUNT_ID=\"${var.NEW_RELIC_ACCOUNT_ID}\"' >> .forest_env",
     "echo 'export NEW_RELIC_REGION=\"${var.NEW_RELIC_REGION}\"' >> .forest_env",
     "echo 'export BASE_FOLDER=\"/chainsafe\"' >> .forest_env",
+    "echo 'export LOTUS_LATEST_TAG=\"${var.lotus_latest_tag}\"' >> .forest_env",
     "echo '. ~/.forest_env' >> .bashrc",
     ". ~/.forest_env",
     "nohup sh ./init.sh > init_log.txt &",
