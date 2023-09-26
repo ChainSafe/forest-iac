@@ -3,13 +3,12 @@
 # If Forest hasn't synced to the network after 8 hours, something has gone wrong.
 SYNC_TIMEOUT=8h
 
-if [[ $# != 2 ]]; then
-  echo "Usage: bash $0 CHAIN_NAME SNAPSHOT_PATH"
+if [[ $# != 1 ]]; then
+  echo "Usage: bash $0 CHAIN_NAME"
   exit 1
 fi
 
 CHAIN_NAME=$1
-NEWEST_SNAPSHOT=$2
 
 # Make sure we have the most recent Forest image
 docker pull ghcr.io/chainsafe/forest:"${FOREST_TAG}"
@@ -54,14 +53,13 @@ if [ "$CHAIN_NAME" = "calibnet" ]; then
 fi
 
 echo "Chain: $CHAIN_NAME"
-echo "Snapshot: $NEWEST_SNAPSHOT"
 
 # spawn a task in the background to periodically write Prometheus metrics to a file
 write_metrics &
 
 forest-tool db destroy --force --config config.toml --chain "$CHAIN_NAME"
 
-forest --config config.toml --chain "$CHAIN_NAME" --import-snapshot "$NEWEST_SNAPSHOT" --halt-after-import
+forest --config config.toml --chain "$CHAIN_NAME" --auto-download-snapshot --halt-after-import
 forest --config config.toml --chain "$CHAIN_NAME" --no-gc --save-token=token.txt --detach
 timeout "$SYNC_TIMEOUT" forest-cli --chain "$CHAIN_NAME" sync wait
 forest-cli --chain "$CHAIN_NAME" snapshot export -o forest_db/
