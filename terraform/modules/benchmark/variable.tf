@@ -84,7 +84,7 @@ variable "NEW_RELIC_REGION" {
 variable "lotus_latest_tag" {
   description = "The git tag of Lotus client for the benchmark"
   type        = string
-  # If you change from default do not forget to update the Go version in the Dockerfile.
   # Go version v1.19.12 or higher is needed for this version. Go version 1.20 is also supported, but 1.21 is NOT.
-  default     = "release/v1.23.3"
+  # If you change from default do not forget to update the Go version in the Dockerfile.
+  default = "release/v1.23.3"
 }

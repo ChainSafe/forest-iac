@@ -41,7 +41,7 @@ class LotusBenchmark < BenchmarkBase
   end
 
   def checkout_command
-    exec_command(['git', 'checkout', ENV["LOTUS_LATEST_TAG"]])
+    exec_command(['git', 'checkout', ENV.fetch('LOTUS_LATEST_TAG')])
   end
 
   def clean_command
