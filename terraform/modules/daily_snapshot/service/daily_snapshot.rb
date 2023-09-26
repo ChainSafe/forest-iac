@@ -29,8 +29,6 @@ client = SlackClient.new CHANNEL, SLACK_TOKEN
 # Find the snapshot with the most recent modification date
 all_snapshots = list_snapshots(CHAIN_NAME, BUCKET, ENDPOINT)
 unless all_snapshots.empty?
-  latest = all_snapshots.first
-
   # Sync and export snapshot
   snapshot_uploaded = system("bash -c 'timeout --signal=KILL 24h ./upload_snapshot.sh #{CHAIN_NAME}' > #{LOG_EXPORT} 2>&1")
 
