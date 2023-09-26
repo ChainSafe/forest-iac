@@ -44,14 +44,6 @@ echo "[client]" > config.toml
 echo 'data_dir = "/home/forest/forest_db"' >> config.toml
 echo 'encrypt_keystore = false' >> config.toml
 
-# In case of failures, more elaborate logging may
-# help with debugging. We are doing this only for calibnet
-# because enabling this for mainnet might result in a huge
-# log file and bad performance.
-if [ "$CHAIN_NAME" = "calibnet" ]; then
-  export RUST_LOG=debug
-fi
-
 echo "Chain: $CHAIN_NAME"
 
 # spawn a task in the background to periodically write Prometheus metrics to a file
