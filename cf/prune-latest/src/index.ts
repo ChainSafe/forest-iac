@@ -18,6 +18,10 @@ async function prune(env: Env, chain: string): Promise<String> {
 }
 
 export default {
+        async scheduled(event, env, ctx) {
+		await prune(env, 'calibnet');
+		await prune(env, 'mainnet');
+        },
 	async fetch(request: Request, env: Env): Promise<Response> {
 		const calibnet = await prune(env, 'calibnet');
 		const mainnet = await prune(env, 'mainnet');
