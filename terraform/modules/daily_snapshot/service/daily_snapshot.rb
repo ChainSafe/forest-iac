@@ -27,8 +27,8 @@ LOG_EXPORT = "#{CHAIN_NAME}_#{DATE}_export.txt"
 client = SlackClient.new CHANNEL, SLACK_TOKEN
 
 # upload debug logs to digital ocean
-def upload_debug_logs(LOG_EXPORT, CHAIN_NAME)
-  debug_upload = system("bash -c 'timeout --signal=KILL 24h ./upload_debug.sh #{LOG_EXPORT} #{CHAIN_NAME}")
+def upload_debug_logs(log_export, chain_name)
+  debug_upload = system("bash -c 'timeout --signal=KILL 24h ./upload_debug.sh #{log_export} #{chain_name}' > debug_logs_#{chain_name}.txt 2>&1")
 end
 
 # Find the snapshot with the most recent modification date
