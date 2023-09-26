@@ -220,7 +220,6 @@ def download_and_move(url, output_dir)
   snapshot_dir = Dir.pwd
   FileUtils.mkdir_p('snapshot_dl_files')
   Dir.chdir('snapshot_dl_files') do
-    # Download and verify checksum.
     @logger.info 'Downloading checksum...'
     syscall('aria2c', checksum_url)
     @logger.info 'Downloading snapshot...'
