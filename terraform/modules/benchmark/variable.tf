@@ -62,3 +62,29 @@ variable "project" {
   type        = string
   default     = "Forest-DEV" # Alternative: "Default"
 }
+
+variable "NEW_RELIC_API_KEY" {
+  description = "New Relic API KEY"
+  default     = ""
+  type        = string
+}
+
+variable "NEW_RELIC_ACCOUNT_ID" {
+  description = "New Relic Account ID"
+  default     = ""
+  type        = string
+}
+
+variable "NEW_RELIC_REGION" {
+  description = "The New Relic Platform Region"
+  type        = string
+  default     = "EU"
+}
+
+variable "lotus_latest_tag" {
+  description = "The git tag of Lotus client for the benchmark"
+  type        = string
+  # Go version v1.19.12 or higher is needed for this version. Go version 1.20 is also supported, but 1.21 is NOT.
+  # If you change from default do not forget to update the Go version in the Dockerfile.
+  default = "release/v1.23.3"
+}

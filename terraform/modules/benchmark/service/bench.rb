@@ -140,6 +140,13 @@ def write_markdown(metrics)
   @logger.info "Wrote #{filename}"
 end
 
+# Determines the maximum memory value between two given values.
+# If neither are numeric, returns 'n/a'.
+def determine_max_memory(peak_memory_import, peak_memory_validate)
+  peak_memory_values = [peak_memory_import, peak_memory_validate].select { |v| v.is_a?(Numeric) }
+  peak_memory_values.empty? ? 'n/a' : peak_memory_values.max
+end
+
 # Output daily benchmark metrics to comma-separated value file.
 def write_csv(metrics, options)
   filename = "result_#{Time.now.to_i}.csv"
@@ -149,15 +156,22 @@ def write_csv(metrics, options)
     timestamp = Time.now.strftime('%Y-%m-%d %H:%M:%S')
     chain = options[:chain]
 
-    results = { import_time: { forest: 'n/a', lotus: 'n/a' },
-                validation_time: { forest: 'n/a', lotus: 'n/a' } }
+    results = {
+      import_time: { forest: 'n/a', lotus: 'n/a' },
+      validation_time: { forest: 'n/a', lotus: 'n/a' },
+      peak_memory: { forest: 'n/a', lotus: 'n/a' }
+    }
 
     metrics.each do |key, value|
       elapsed = value[:import][:elapsed] || 'n/a'
       tpm = value[:validate_online][:tpm] || 'n/a'
 
+      # Determine the peak memory by comparing both values
+      peak_memory = determine_max_memory(value.dig(:import, :peak_memory), value.dig(:validate_online, :peak_memory))
+
       results[:import_time][key.to_sym] = "#{elapsed} sec"
       results[:validation_time][key.to_sym] = "#{tpm} tipsets/sec"
+      results[:peak_memory][key.to_sym] = "#{peak_memory} KB"
     end
 
     results.each do |key, value|
@@ -192,14 +206,13 @@ def download_and_move_assignments(url)
   filename = url.match(/(\d+_.+)/)[1]
   checksum_url = url.sub('.car.zst', '.sha256sum')
   checksum_filename = checksum_url.match(/(\d+_.+)/)[1]
-  decompressed_filename = filename.sub('.car.zst', '.car')
-  [filename, checksum_url, checksum_filename, decompressed_filename]
+  [filename, checksum_url, checksum_filename]
 end
 
 # Create snapshot directory; download checksum and compressed snapshot;
 # decompress and verify snapshot; clean up helper files and return path to snapshot.
 def download_and_move(url, output_dir)
-  filename, checksum_url, checksum_filename, decompressed_filename = download_and_move_assignments(url)
+  filename, checksum_url, checksum_filename = download_and_move_assignments(url)
 
   # Must move to `WORKING_DIR` and create temporary folder for temp snapshot
   # files, as filesystem `tmp` partition may not be large enough for this task.
@@ -207,20 +220,17 @@ def download_and_move(url, output_dir)
   snapshot_dir = Dir.pwd
   FileUtils.mkdir_p('snapshot_dl_files')
   Dir.chdir('snapshot_dl_files') do
-    # Download, decompress and verify checksums.
     @logger.info 'Downloading checksum...'
     syscall('aria2c', checksum_url)
     @logger.info 'Downloading snapshot...'
     syscall('aria2c', '-x5', url)
-    @logger.info "Decompressing #{filename}..."
-    syscall('zstd', '-d', filename)
     @logger.info 'Verifying...'
     syscall('sha256sum', '--check', '--status', checksum_filename)
 
-    FileUtils.mv(decompressed_filename.to_s, snapshot_dir)
+    FileUtils.mv(filename.to_s, snapshot_dir)
   end
   FileUtils.rm_rf('snapshot_dl_files')
-  "#{output_dir}/#{decompressed_filename}"
+  "#{output_dir}/#{filename}"
 end
 
 # Get proper snapshot download URL based on chain value and download to
@@ -241,17 +251,14 @@ end
 # run metrics, and assign metrics for each benchmark.
 def benchmarks_loop(benchmarks, options, bench_metrics)
   benchmarks.each do |bench|
-    bench.dry_run, bench.snapshot_path, bench.heights, bench.chain = bench_loop_assignments(options)
-    bench.run(options[:daily], @snapshot_downloaded)
+    handle_exception(true) do
+      bench.dry_run, bench.snapshot_path, bench.heights, bench.chain = bench_loop_assignments(options)
+      bench.run(options[:daily], @snapshot_downloaded)
 
-    bench_metrics[bench.name] = bench.metrics
+      bench_metrics[bench.name] = bench.metrics
 
-    puts "\n"
-  rescue StandardError, Interrupt
-    @logger.error('Fiasco during benchmark run. Exiting...')
-    # Delete snapshot if downloaded, but not if user-provided.
-    FileUtils.rm_f(@snapshot_path) if @snapshot_downloaded
-    exit(1)
+      puts "\n"
+    end
   end
 end
 
@@ -270,10 +277,12 @@ def run_benchmarks(benchmarks, options)
   Dir.chdir(WORKING_DIR) do
     benchmarks_loop(benchmarks, options, bench_metrics)
   end
-  if options[:daily]
-    write_csv(bench_metrics, options)
-  else
-    write_markdown(bench_metrics)
+  handle_exception(false) do
+    if options[:daily]
+      write_csv(bench_metrics, options)
+    else
+      write_markdown(bench_metrics)
+    end
   end
 end
 
@@ -292,7 +301,7 @@ raise "The file '#{@snapshot_path}' does not exist" if @snapshot_path && !File.f
 @snapshot_downloaded = false
 
 # Download snapshot if a snapshot path is not specified by the user.
-begin
+handle_exception(false) do
   if @snapshot_path.nil?
     @logger.info 'No snapshot provided, downloading one'
     download_snapshot(chain: options[:chain])
@@ -305,12 +314,6 @@ begin
       sleep 300
     end
   end
-rescue StandardError, Interrupt
-  @logger.error('Fiasco during snapshot download. Deleting snapshot and exiting...')
-  # Delete downloaded snapshot if it exists.
-  FileUtils.rm_f(@snapshot_path) unless @snapshot_path.nil?
-  FileUtils.rm_rf("#{WORKING_DIR}/snapshot_dl_files")
-  exit(1)
 end
 
 # Define snapshot path in options to pass to the benchmark run.

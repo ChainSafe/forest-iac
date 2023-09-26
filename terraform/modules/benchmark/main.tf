@@ -65,7 +65,11 @@ locals {
     "echo 'export SLACK_NOTIF_CHANNEL=\"${var.slack_channel}\"' >> .forest_env",
     "echo 'export BENCHMARK_BUCKET=\"${var.benchmark_bucket}\"' >> .forest_env",
     "echo 'export BENCHMARK_ENDPOINT=\"${var.benchmark_endpoint}\"' >> .forest_env",
+    "echo 'export NEW_RELIC_API_KEY=\"${var.NEW_RELIC_API_KEY}\"' >> .forest_env",
+    "echo 'export NEW_RELIC_ACCOUNT_ID=\"${var.NEW_RELIC_ACCOUNT_ID}\"' >> .forest_env",
+    "echo 'export NEW_RELIC_REGION=\"${var.NEW_RELIC_REGION}\"' >> .forest_env",
     "echo 'export BASE_FOLDER=\"/chainsafe\"' >> .forest_env",
+    "echo 'export LOTUS_LATEST_TAG=\"${var.lotus_latest_tag}\"' >> .forest_env",
     "echo '. ~/.forest_env' >> .bashrc",
     ". ~/.forest_env",
     "nohup sh ./init.sh > init_log.txt &",
@@ -80,9 +84,10 @@ resource "digitalocean_droplet" "forest" {
   region = var.region
   size   = var.size
   # Re-initialize resource if this hash changes:
-  user_data = join("-", [data.local_file.sources.content_sha256, sha256(join("", local.init_commands))])
-  tags      = ["iac"]
-  ssh_keys  = data.digitalocean_ssh_keys.keys.ssh_keys[*].fingerprint
+  user_data  = join("-", [data.local_file.sources.content_sha256, sha256(join("", local.init_commands))])
+  tags       = ["iac"]
+  ssh_keys   = data.digitalocean_ssh_keys.keys.ssh_keys[*].fingerprint
+  monitoring = true
 
   graceful_shutdown = false
 

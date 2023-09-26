@@ -1,5 +1,26 @@
 # frozen_string_literal: true
 
+def cleanup(db_created)
+  # Delete downloaded snapshot if it exists.
+  FileUtils.rm_f(@snapshot_path) unless !@snapshot_downloaded || @snapshot_path.nil?
+  FileUtils.rm_rf("#{WORKING_DIR}/snapshot_dl_files")
+  FileUtils.rm_rf("#{WORKING_DIR}/.#{repository_name}") if @created_repository
+  clean_db if db_created
+  FileUtils.rm_rf(repository_name) if @created_repository
+  FileUtils.rm_rf(".#{repository_name}") if @created_repository
+  exit(1)
+end
+
+def handle_exception(db_created)
+  yield
+rescue StandardError => e
+  @logger.error("Fiasco during script execution: #{e}. Cleaning up and exiting...")
+  cleanup(db_created)
+rescue Interrupt
+  @logger.error('Interrupt received. Cleaning up and exiting...')
+  cleanup(db_created)
+end
+
 # Mixin module for base benchmark class exec (and exec helper) commands.
 module ExecCommands
   # Helper function used in calculation of number of epochs.
@@ -34,6 +55,12 @@ module ExecCommands
     end
   end
 
+  # Extracts Peak Memory Usage from the output of `/usr/bin/time -v`
+  def extract_memory_usage(output)
+    match = output.match(/Maximum resident set size \(kbytes\): (\d+)/)
+    match ? match[1].to_i : nil
+  end
+
   # Calls online validation function and runs monitor to measure memory usage.
   def proc_monitor(pid, benchmark)
     metrics = Concurrent::Hash.new
@@ -58,17 +85,23 @@ module ExecCommands
   end
 
   # Helper function for measuring execution time; passes process ID to online
-  # validation and process monitor.
+  # validation and process monitor and measures the peak memory usage of the commands.
   def exec_command_aux(command, metrics, benchmark)
-    Open3.popen2(*command) do |i, o, t|
+    command_with_time = ['/usr/bin/time', '-v'] + command
+
+    Open3.popen2e(*command_with_time) do |i, o_and_err, t|
       pid = t.pid
       i.close
 
       handle, proc_metrics = proc_monitor(pid, benchmark)
-      o.each_line do |l|
+      output = []
+      o_and_err.each_line do |l|
+        output << l.force_encoding('UTF-8')
         print l
       end
 
+      # Extract the memory usage and update the metrics.
+      metrics[:peak_memory] = extract_memory_usage(output.join("\n"))
       handle.join
       metrics.merge!(proc_metrics)
     end
@@ -166,20 +199,16 @@ module RunCommands
 
   # Import snapshot, write metrics, and call validation function, returning metrics.
   def import_and_validation(daily, args, metrics)
-    import_command = splice_args(@import_command, args)
-    metrics[:import] = exec_command(import_command)
+    handle_exception(true) do
+      import_command = splice_args(@import_command, args)
+      metrics[:import] = exec_command(import_command)
 
-    # Save db size just after import.
-    metrics[:import][:db_size] = db_size unless @dry_run
+      # Save db size just after import.
+      metrics[:import][:db_size] = db_size unless @dry_run
 
-    run_validation_step(daily, args, metrics)
-    metrics
-  rescue StandardError, Interrupt
-    @logger.error('Fiasco during benchmark run. Deleting downloaded files, cleaning DB and stopping process...')
-    FileUtils.rm_f(@snapshot_path) if @snapshot_downloaded
-    clean_db
-    FileUtils.rm_rf(repository_name) if @created_repository
-    exit(1)
+      run_validation_step(daily, args, metrics)
+      metrics
+    end
   end
 
   def forest_init(args)
@@ -190,23 +219,19 @@ module RunCommands
   # This is the primary function called in `bench.rb` to run the metrics for
   # each benchmark.
   def run(daily, snapshot_downloaded)
-    begin
+    handle_exception(@db_created = false) do
       @snapshot_downloaded = snapshot_downloaded
       @logger.info "Running bench: #{@name}"
 
       metrics = Concurrent::Hash.new
       args = build_artefacts
+      @db_created = true
       set_version
       @sync_status_command = splice_args(@sync_status_command, args)
 
       forest_init(args) if @name == 'forest'
 
       @metrics = import_and_validation(daily, args, metrics)
-    rescue StandardError, Interrupt
-      @logger.error('Fiasco during benchmark run. Deleting downloaded files and stopping process...')
-      FileUtils.rm_f(@snapshot_path) if @snapshot_downloaded
-      FileUtils.rm_rf(repository_name) if @created_repository
-      exit(1)
     end
 
     @logger.info 'Cleaning database'
