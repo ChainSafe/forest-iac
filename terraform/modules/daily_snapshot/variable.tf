@@ -113,3 +113,9 @@ variable "NEW_RELIC_ACCOUNT_ID" {
   default     = ""
   type        = string
 }
+
+variable "debug_bucket" {
+  description = "Digital Ocean bucket for storing forest debugging files"
+  default     = ""
+  type        = string
+}

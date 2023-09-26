@@ -26,6 +26,11 @@ LOG_EXPORT = "#{CHAIN_NAME}_#{DATE}_export.txt"
 
 client = SlackClient.new CHANNEL, SLACK_TOKEN
 
+# upload debug logs to digital ocean
+def upload_debug_logs(LOG_EXPORT, CHAIN_NAME)
+  debug_upload = system("bash -c 'timeout --signal=KILL 24h ./upload_debug.sh #{LOG_EXPORT} #{CHAIN_NAME}")
+end
+
 # Find the snapshot with the most recent modification date
 all_snapshots = list_snapshots(CHAIN_NAME, BUCKET, ENDPOINT)
 unless all_snapshots.empty?
@@ -46,6 +51,7 @@ unless all_snapshots.empty?
     client.post_message "⛔ Snapshot failed for #{CHAIN_NAME}. 🔥🌲🔥 "
     # attach the log file and print the contents to STDOUT
     client.attach_files(LOG_EXPORT)
+    upload_debug_logs(LOG_EXPORT, CHAIN_NAME)
   end
 
   puts "Snapshot export log:\n#{File.read(LOG_EXPORT)}"
