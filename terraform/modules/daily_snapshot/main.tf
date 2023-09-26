@@ -66,7 +66,6 @@ locals {
     slack_token           = var.slack_token,
     slack_channel         = var.slack_channel,
     snapshot_bucket       = var.snapshot_bucket,
-    debug_bucket          = var.debug_bucket,
     snapshot_endpoint     = var.snapshot_endpoint,
     NEW_RELIC_API_KEY     = var.NEW_RELIC_API_KEY,
     NEW_RELIC_ACCOUNT_ID  = var.NEW_RELIC_ACCOUNT_ID,
