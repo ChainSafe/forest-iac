@@ -3,8 +3,6 @@
 require_relative 'ruby_common/slack_client'
 require_relative 'ruby_common/docker_utils'
 require_relative 'ruby_common/utils'
-require_relative 'snapshots_prune'
-require_relative 'list_snapshots'
 
 require 'date'
 require 'logger'
@@ -26,26 +24,21 @@ LOG_EXPORT = "#{CHAIN_NAME}_#{DATE}_export.txt"
 
 client = SlackClient.new CHANNEL, SLACK_TOKEN
 
-# Find the snapshot with the most recent modification date
+# Sync and export snapshot
+snapshot_uploaded = system("bash -c 'timeout --signal=KILL 24h ./upload_snapshot.sh #{CHAIN_NAME}' > #{LOG_EXPORT} 2>&1")
+
+# Update our list of snapshots
 all_snapshots = list_snapshots(CHAIN_NAME, BUCKET, ENDPOINT)
-unless all_snapshots.empty?
-  # Sync and export snapshot
-  snapshot_uploaded = system("bash -c 'timeout --signal=KILL 24h ./upload_snapshot.sh #{CHAIN_NAME}' > #{LOG_EXPORT} 2>&1")
 
-  # Update our list of snapshots
-  all_snapshots = list_snapshots(CHAIN_NAME, BUCKET, ENDPOINT)
-
-  if snapshot_uploaded
-    # If this is the first new snapshot of the day, send a victory message to slack
-    unless all_snapshots[0].date == all_snapshots[1].date
-      client.post_message "✅ Snapshot uploaded for #{CHAIN_NAME}. 🌲🌳🌲🌳🌲"
-    end
-  else
-    client.post_message "⛔ Snapshot failed for #{CHAIN_NAME}. 🔥🌲🔥 "
-    # attach the log file and print the contents to STDOUT
-    client.attach_files(LOG_EXPORT)
+if snapshot_uploaded
+  # If this is the first new snapshot of the day, send a victory message to slack
+  unless all_snapshots[0].date == all_snapshots[1].date
+    client.post_message "✅ Snapshot uploaded for #{CHAIN_NAME}. 🌲🌳🌲🌳🌲"
   end
-
-  puts "Snapshot export log:\n#{File.read(LOG_EXPORT)}"
-  prune_snapshots(all_snapshots)
+else
+  client.post_message "⛔ Snapshot failed for #{CHAIN_NAME}. 🔥🌲🔥 "
+  # attach the log file and print the contents to STDOUT
+  client.attach_files(LOG_EXPORT)
 end
+
+puts "Snapshot export log:\n#{File.read(LOG_EXPORT)}"

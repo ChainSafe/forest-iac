@@ -93,9 +93,6 @@ docker run \
   ghcr.io/chainsafe/forest:"${FOREST_TAG}" \
   -c "$COMMANDS" || exit 1
 
-# Upload snapshot to s3
-s3cmd --acl-public put "$CHAIN_DB_DIR/forest_snapshot_$CHAIN_NAME"* s3://"$SNAPSHOT_BUCKET"/"$CHAIN_NAME"/ || exit 1
-
 # Upload snapshot to CF
 unset AWS_SECRET_ACCESS_KEY
 unset AWS_ACCESS_KEY_ID
