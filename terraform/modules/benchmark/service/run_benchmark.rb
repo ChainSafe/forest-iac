@@ -30,6 +30,7 @@ SLACK_TOKEN = get_and_assert_env_variable 'SLACK_API_TOKEN'
 CHANNEL = get_and_assert_env_variable 'SLACK_NOTIF_CHANNEL'
 BASE_FOLDER = get_and_assert_env_variable 'BASE_FOLDER'
 SCRIPTS_DIR = get_and_assert_env_variable 'BASE_FOLDER'
+LOTUS_LATEST_TAG = get_and_assert_env_variable 'LOTUS_LATEST_TAG'
 LOG_DIR = "#{BASE_FOLDER}/logs"
 BENCHMARK_BUCKET = get_and_assert_env_variable 'BENCHMARK_BUCKET'
 BENCHMARK_ENDPOINT = get_and_assert_env_variable 'BENCHMARK_ENDPOINT'
