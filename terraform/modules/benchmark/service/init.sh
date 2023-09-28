@@ -15,6 +15,7 @@ sudo docker run --detach \
   --env BASE_FOLDER="$BASE_FOLDER" \
   --env SLACK_API_TOKEN="$SLACK_API_TOKEN" \
   --env SLACK_NOTIF_CHANNEL="$SLACK_NOTIF_CHANNEL" \
+  --env LOTUS_LATEST_TAG="$LOTUS_LATEST_TAG" \
   --restart unless-stopped \
   benchmark \
   /bin/bash -c "ruby run_benchmark.rb"
