@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
+require 'net/http'
+require 'time'
 require_relative 'ruby_common/slack_client'
 require_relative 'ruby_common/utils'
-
 require 'logger'
 require 'fileutils'
 require 'date'
@@ -31,8 +32,14 @@ BASE_FOLDER = get_and_assert_env_variable 'BASE_FOLDER'
 SCRIPTS_DIR = get_and_assert_env_variable 'BASE_FOLDER'
 LOTUS_LATEST_TAG = get_and_assert_env_variable 'LOTUS_LATEST_TAG'
 LOG_DIR = "#{BASE_FOLDER}/logs"
+BENCHMARK_BUCKET = get_and_assert_env_variable 'BENCHMARK_BUCKET'
+BENCHMARK_ENDPOINT = get_and_assert_env_variable 'BENCHMARK_ENDPOINT'
 
-last_notification_date = nil
+def file_last_modified_date
+  file_url = "https://#{BENCHMARK_BUCKET}.#{BENCHMARK_ENDPOINT}/benchmark-results/all-results.csv"
+  response = Net::HTTP.get_response(URI(file_url))
+  Time.parse(response['last-modified']).to_date
+end
 
 loop do
   # Current datetime, to append to the log files
@@ -53,15 +60,12 @@ loop do
 
   if benchmark_check_passed
     # Send Slack notification only if today's date differs from the last notification date
-    unless last_notification_date == Date.today
-      client.post_message '✅ Benchmark run was successful. 🌲🌳🌲🌳🌲'
-      last_notification_date = Date.today
-    end
+    client.post_message '✅ Benchmark run was successful. 🌲🌳🌲🌳🌲' unless Date.today == file_last_modified_date
   else
     client.post_message '⛔ Benchmark run fiascoed. 🔥🌲🔥'
   end
-  client.attach_files(run_log, report_log)
 
+  client.attach_files(run_log, report_log)
   logger.info 'Benchmark finished'
   prune_logs(LOG_DIR)
 end
