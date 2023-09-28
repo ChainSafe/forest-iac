@@ -16,12 +16,6 @@ def get_and_assert_env_variable(name)
   var
 end
 
-def file_last_modified_date
-  file_url = 'https://forest-benchmarks.fra1.digitaloceanspaces.com/benchmark-results/all-results.csv'
-  response = Net::HTTP.get_response(URI(file_url))
-  Time.parse(response['last-modified']).to_date
-end
-
 def prune_logs(dir)
   # Time in seconds for retaining a log file
   seven_days_in_secs = (24 * 3600) * 7
@@ -37,6 +31,14 @@ CHANNEL = get_and_assert_env_variable 'SLACK_NOTIF_CHANNEL'
 BASE_FOLDER = get_and_assert_env_variable 'BASE_FOLDER'
 SCRIPTS_DIR = get_and_assert_env_variable 'BASE_FOLDER'
 LOG_DIR = "#{BASE_FOLDER}/logs"
+BENCHMARK_BUCKET = get_and_assert_env_variable 'BENCHMARK_BUCKET'
+BENCHMARK_ENDPOINT = get_and_assert_env_variable 'BENCHMARK_ENDPOINT'
+
+def file_last_modified_date
+  file_url = "https://#{BENCHMARK_BUCKET}.#{BENCHMARK_ENDPOINT}/benchmark-results/all-results.csv"
+  response = Net::HTTP.get_response(URI(file_url))
+  Time.parse(response['last-modified']).to_date
+end
 
 loop do
   # Current datetime, to append to the log files
