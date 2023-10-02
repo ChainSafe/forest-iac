@@ -30,8 +30,8 @@ aws configure set aws_access_key_id "$R2_ACCESS_KEY"
 aws configure set aws_secret_access_key "$R2_SECRET_KEY"
 
 ## Create forest data directory
-mkdir forest_db
-chmod 777 forest_db
+mkdir forest_db logs
+chmod 777 forest_db logs
 mkdir --parents -- "$BASE_FOLDER/forest_db/filops"
 
 # Make the scripts executable
