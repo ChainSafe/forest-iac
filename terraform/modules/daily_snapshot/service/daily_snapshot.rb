@@ -42,6 +42,7 @@ client = SlackClient.new CHANNEL, SLACK_TOKEN
 # of victory messages to 1/day even if we upload multiple snapshots per day.
 date_before_export = latest_snapshot_date(CHAIN_NAME)
 
+# conditionally add timestamps to logs without timestamps
 add_timestamps_cmd = "awk '{ if ($0 !~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{6}Z/) print strftime(\"[%Y-%m-%d %H:%M:%S]\"), $0; else print $0; fflush(); }'"
 
 # Sync and export snapshot
@@ -56,9 +57,9 @@ if snapshot_uploaded
   end
 else
   client.post_message "⛔ Snapshot failed for #{CHAIN_NAME}. 🔥🌲🔥 "
-    # attach the log file and print the contents to STDOUT
-    [LOG_EXPORT_SCRIPT_RUN, LOG_EXPORT_DAEMON, LOG_EXPORT_METRICS].each do |log_file|
-      client.attach_files(log_file) if File.exist?(log_file)
+  # attach the log file and print the contents to STDOUT
+  [LOG_EXPORT_SCRIPT_RUN, LOG_EXPORT_DAEMON, LOG_EXPORT_METRICS].each do |log_file|
+    client.attach_files(log_file) if File.exist?(log_file)
   end
 end
 
