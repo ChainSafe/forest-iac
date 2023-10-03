@@ -54,12 +54,7 @@ unless all_snapshots.empty?
   end
 
   [LOG_EXPORT_SCRIPT_RUN, LOG_EXPORT_DAEMON, LOG_EXPORT_METRICS].each do |log_file|
-    if File.exist?(log_file)
-      puts "#{log_file} content:\n#{File.read(log_file)}\n\n"
-    else
-      puts "#{log_file} does not exist or wasn't created."
-    end
+    puts "Snapshot export log:\n#{File.read(log_file)}\n\n" if File.exist?(log_file)
   end
-
   prune_snapshots(all_snapshots)
 end
