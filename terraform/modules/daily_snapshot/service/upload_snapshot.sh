@@ -55,7 +55,7 @@ forest --config config.toml --chain "$CHAIN_NAME" --auto-download-snapshot --hal
 forest --config config.toml --chain "$CHAIN_NAME" --no-gc --save-token=token.txt --detach
 timeout "$SYNC_TIMEOUT" forest-cli --chain "$CHAIN_NAME" sync wait
 # Forest isn't waiting until fully synced. Tracking issue: https://github.com/ChainSafe/forest/issues/3540
-# Calling `sync wait` multiple times is a work-around.
+# Calling 'sync wait' multiple times is a work-around.
 timeout "$SYNC_TIMEOUT" forest-cli --chain "$CHAIN_NAME" sync wait
 timeout "$SYNC_TIMEOUT" forest-cli --chain "$CHAIN_NAME" sync wait
 timeout "$SYNC_TIMEOUT" forest-cli --chain "$CHAIN_NAME" sync wait
