@@ -3,8 +3,6 @@
 require_relative 'ruby_common/slack_client'
 require_relative 'ruby_common/docker_utils'
 require_relative 'ruby_common/utils'
-require_relative 'snapshots_prune'
-require_relative 'list_snapshots'
 
 require 'date'
 require 'logger'
@@ -67,3 +65,4 @@ end
 [LOG_EXPORT_SCRIPT_RUN, LOG_EXPORT_DAEMON, LOG_EXPORT_METRICS].each do |log_file|
   puts "Snapshot export log:\n#{File.read(log_file)}\n\n" if File.exist?(log_file)
 end
+
