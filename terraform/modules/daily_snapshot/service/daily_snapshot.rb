@@ -39,16 +39,16 @@ client = SlackClient.new CHANNEL, SLACK_TOKEN
 
 # Query the date of the most recent snapshot. This is used to limit the number
 # of victory messages to 1/day even if we upload multiple snapshots per day.
-before_export = latest_snapshot_date(CHAIN_NAME)
+date_before_export = latest_snapshot_date(CHAIN_NAME)
 
 # Sync and export snapshot
 snapshot_uploaded = system("bash -c 'timeout --signal=KILL 24h ./upload_snapshot.sh #{CHAIN_NAME}' > #{LOG_EXPORT} 2>&1")
 
 if snapshot_uploaded
-  after_export = latest_snapshot_date(CHAIN_NAME)
+  date_after_export = latest_snapshot_date(CHAIN_NAME)
 
   # If this is the first new snapshot of the day, send a victory message to slack
-  unless before_export == after_export
+  unless date_before_export == date_after_export
     client.post_message "✅ Snapshot uploaded for #{CHAIN_NAME}. 🌲🌳🌲🌳🌲"
   end
 else
