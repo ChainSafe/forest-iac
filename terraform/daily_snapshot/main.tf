@@ -8,7 +8,7 @@ terraform {
     # This key uniquely identifies the service. To create a new service (instead
     # of modifying this one), use a new key. Unfortunately, variables may not be
     # used here.
-    key = "daily_snapshot-sam.tfstate"
+    key = "daily_snapshot.tfstate"
 
     # This value is completely unused by DO but _must_ be a known AWS region.
     region = "us-west-1"
@@ -28,10 +28,10 @@ module "daily_snapshot" {
   source = "../modules/daily_snapshot"
 
   # Configure service:
-  name              = "forest-snapshot-sam"       # droplet name
+  name              = "forest-snapshot"       # droplet name
   size              = "so-2vcpu-16gb"         # droplet size
-  slack_channel     = "#forest-dump" # slack channel for notifications
-  snapshot_bucket   = "test-forest-snapshots"
+  slack_channel     = "#forest-notifications" # slack channel for notifications
+  snapshot_bucket   = "forest-snapshots"
   snapshot_endpoint = "fra1.digitaloceanspaces.com"
   forest_tag        = "latest"
   r2_endpoint       = "https://2238a825c5aca59233eab1f221f7aefb.r2.cloudflarestorage.com/"
