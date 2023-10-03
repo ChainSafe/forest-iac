@@ -51,6 +51,7 @@ async function get_latest(req_headers: Headers, env: Env, chain: string): Promis
 
 		object.writeHttpMetadata(headers);
 		headers.set('etag', object.httpEtag);
+		headers.set('Accept-Ranges', 'bytes');
 		const encoded_name = encodeURIComponent(basename(object.key));
 		// Tell browsers and aria2c which filename to use. For 'wget', you have to use `--trust-server-names`.
 		headers.set(
