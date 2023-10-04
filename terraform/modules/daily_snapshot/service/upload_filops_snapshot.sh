@@ -50,9 +50,6 @@ if [ ${DIFF} -gt 1 ]; then
       ghcr.io/chainsafe/forest:"${FOREST_TAG}" \
       -c "$COMMANDS" || exit 1
 
-    # Unset DO keys to avoid clashes with R2 keys.
-    unset AWS_SECRET_ACCESS_KEY
-    unset AWS_ACCESS_KEY_ID
     if aws --endpoint "$R2_ENDPOINT" s3 cp "$BASE_FOLDER/forest_db/filops/filops_snapshot_$CHAIN"* s3://forest-archive/"$CHAIN_NAME"/latest/; then
         # Send alert to Slack only if upload is successful
         send_slack_alert "Old $CHAIN snapshot detected. 🔥🌲🔥. Filops Snapshot upload successful:✅"
