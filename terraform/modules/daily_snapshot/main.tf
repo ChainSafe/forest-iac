@@ -58,8 +58,6 @@ data "digitalocean_ssh_keys" "keys" {
 # Set required environment variables
 locals {
   env_content = templatefile("${path.module}/service/forest-env.tpl", {
-    AWS_ACCESS_KEY_ID     = var.AWS_ACCESS_KEY_ID,
-    AWS_SECRET_ACCESS_KEY = var.AWS_SECRET_ACCESS_KEY,
     R2_ACCESS_KEY         = var.R2_ACCESS_KEY,
     R2_SECRET_KEY         = var.R2_SECRET_KEY,
     r2_endpoint           = var.r2_endpoint,

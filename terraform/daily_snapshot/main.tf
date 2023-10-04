@@ -38,8 +38,6 @@ module "daily_snapshot" {
 
   # Variable passthrough:
   slack_token           = var.slack_token
-  AWS_ACCESS_KEY_ID     = var.AWS_ACCESS_KEY_ID
-  AWS_SECRET_ACCESS_KEY = var.AWS_SECRET_ACCESS_KEY
   R2_ACCESS_KEY         = var.R2_ACCESS_KEY
   R2_SECRET_KEY         = var.R2_SECRET_KEY
   digitalocean_token    = var.do_token
