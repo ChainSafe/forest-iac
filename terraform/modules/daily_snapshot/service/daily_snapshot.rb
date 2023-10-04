@@ -32,9 +32,9 @@ raise 'No chain name supplied. Please provide chain identifier, e.g. calibnet or
 
 # Current datetime, to append to the log files
 DATE = Time.new.strftime '%FT%H:%M:%S'
-LOG_EXPORT_SCRIPT_RUN = "logs/#{CHAIN_NAME}_#{DATE}_script_run.txt"
-LOG_EXPORT_DAEMON = "logs/#{CHAIN_NAME}_#{DATE}_daemon.txt"
-LOG_EXPORT_METRICS = "logs/#{CHAIN_NAME}_#{DATE}_metrics.txt"
+LOG_EXPORT_SCRIPT_RUN = "#{BASE_FOLDER}/logs/#{CHAIN_NAME}_#{DATE}_script_run.txt"
+LOG_EXPORT_DAEMON = "#{BASE_FOLDER}/logs/#{CHAIN_NAME}_#{DATE}_daemon.txt"
+LOG_EXPORT_METRICS = "#{BASE_FOLDER}/logs/#{CHAIN_NAME}_#{DATE}_metrics.txt"
 
 client = SlackClient.new CHANNEL, SLACK_TOKEN
 

@@ -40,13 +40,13 @@ function write_metrics {
   while true; do
     {
       curl --silent --fail --max-time 5 --retry 5 --retry-delay 2 --retry-max-time 10 http://localhost:6116/metrics || true
-    } | add_timestamps >> "/home/$LOG_EXPORT_METRICS"
+    } | add_timestamps >> "$LOG_EXPORT_METRICS"
     sleep 5
   done
 }
 
 function print_forest_logs {
-  cat forest.err forest.out > /home/$LOG_EXPORT_DAEMON
+  cat forest.err forest.out > $LOG_EXPORT_DAEMON
 }
 trap print_forest_logs EXIT
 
@@ -100,7 +100,7 @@ docker run \
   --rm \
   --user root \
   -v "$CHAIN_DB_DIR:/home/forest/forest_db":z \
-  -v "$CHAIN_LOGS_DIR:/home/logs":z \
+  -v "$CHAIN_LOGS_DIR:$CHAIN_LOGS_DIR":z \
   --entrypoint /bin/bash \
   ghcr.io/chainsafe/forest:"${FOREST_TAG}" \
   -c "$COMMANDS" || exit 1
