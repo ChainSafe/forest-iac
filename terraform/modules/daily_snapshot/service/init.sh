@@ -6,8 +6,8 @@ set -eux
 export DEBIAN_FRONTEND=noninteractive
 
 # Use APT specific mechanism to wait for the lock
-apt-get -qqq --yes -o DPkg::Lock::Timeout=30 update
-apt-get -qqq --yes -o DPkg::Lock::Timeout=30 install -y ruby ruby-dev s3cmd anacron awscli
+apt-get -qqq --yes -o DPkg::Lock::Timeout=90 update
+apt-get -qqq --yes -o DPkg::Lock::Timeout=90 install -y ruby ruby-dev s3cmd anacron awscli
 
 # Install the gems
 gem install docker-api slack-ruby-client activesupport
