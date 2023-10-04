@@ -7,22 +7,14 @@ export DEBIAN_FRONTEND=noninteractive
 
 # Use APT specific mechanism to wait for the lock
 apt-get -qqq --yes -o DPkg::Lock::Timeout=90 update
-apt-get -qqq --yes -o DPkg::Lock::Timeout=90 install -y ruby ruby-dev s3cmd anacron awscli
+apt-get -qqq --yes -o DPkg::Lock::Timeout=90 install -y ruby ruby-dev anacron awscli
 
 # Install the gems
 gem install docker-api slack-ruby-client activesupport
 
-# 1. Configure s3cmd
+# 1. Configure aws
 # 2. Create forest_db directory
 # 3. Copy scripts to /etc/cron.hourly
-
-## Configure s3cmd
-s3cmd --dump-config \
-    --host="$SNAPSHOT_ENDPOINT" \
-    --host-bucket="%(bucket)s.$SNAPSHOT_ENDPOINT" \
-    --access_key="$AWS_ACCESS_KEY_ID" \
-    --secret_key="$AWS_SECRET_ACCESS_KEY" \
-    --multipart-chunk-size-mb=4096 > ~/.s3cfg
 
 ## Configure aws
 aws configure set default.s3.multipart_chunksize 4GB

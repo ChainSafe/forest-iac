@@ -3,16 +3,6 @@ variable "do_token" {
   type        = string
 }
 
-variable "AWS_ACCESS_KEY_ID" {
-  description = "S3 access key id"
-  type        = string
-}
-
-variable "AWS_SECRET_ACCESS_KEY" {
-  description = "S3 private access key"
-  type        = string
-}
-
 variable "R2_ACCESS_KEY" {
   description = "S3 access key id"
   type        = string

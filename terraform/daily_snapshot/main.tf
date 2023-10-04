@@ -37,14 +37,12 @@ module "daily_snapshot" {
   r2_endpoint       = "https://2238a825c5aca59233eab1f221f7aefb.r2.cloudflarestorage.com/"
 
   # Variable passthrough:
-  slack_token           = var.slack_token
-  AWS_ACCESS_KEY_ID     = var.AWS_ACCESS_KEY_ID
-  AWS_SECRET_ACCESS_KEY = var.AWS_SECRET_ACCESS_KEY
-  R2_ACCESS_KEY         = var.R2_ACCESS_KEY
-  R2_SECRET_KEY         = var.R2_SECRET_KEY
-  digitalocean_token    = var.do_token
-  NEW_RELIC_API_KEY     = var.NEW_RELIC_API_KEY
-  NEW_RELIC_ACCOUNT_ID  = var.NEW_RELIC_ACCOUNT_ID
+  slack_token          = var.slack_token
+  R2_ACCESS_KEY        = var.R2_ACCESS_KEY
+  R2_SECRET_KEY        = var.R2_SECRET_KEY
+  digitalocean_token   = var.do_token
+  NEW_RELIC_API_KEY    = var.NEW_RELIC_API_KEY
+  NEW_RELIC_ACCOUNT_ID = var.NEW_RELIC_ACCOUNT_ID
 }
 
 # This ip address may be used in the future by monitoring software
