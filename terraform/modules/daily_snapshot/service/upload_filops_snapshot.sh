@@ -5,7 +5,7 @@ set -euo pipefail
 CHAIN="$1"
 
 # Ask curl for the filename of the snapshot
-SNAPSHOT_NAME=$(curl --remote-name --remote-header-name --write-out "%{filename_effective}" --silent https://forest-archive.chainsafe.dev/latest/$CHAIN/ -H "Range: bytes=0-0")
+SNAPSHOT_NAME=$(curl --remote-name --remote-header-name --write-out "%{filename_effective}" --silent https://forest-archive.chainsafe.dev/latest/"$CHAIN"/ -H "Range: bytes=0-0")
 rm -f "$SNAPSHOT_NAME"
 
 # Extract the date from the snapshot file name and
