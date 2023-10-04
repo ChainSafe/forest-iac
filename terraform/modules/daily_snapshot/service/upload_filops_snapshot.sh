@@ -4,12 +4,9 @@ set -euo pipefail
 
 CHAIN="$1"
 
-# Forest snapshot url
-URL="https://forest.chainsafe.io/$CHAIN/snapshot-latest.car.zst"
-
-# Fetch the actual URL after following redirection and Extract the file name
-SNAPSHOT_URL=$(wget --spider -S "$URL" 2>&1 | grep "Location" | awk '{print $2}' | tr -d '\r' | tail -1)
-SNAPSHOT_NAME=$(basename "${SNAPSHOT_URL}")
+# Ask curl for the filename of the snapshot
+SNAPSHOT_NAME=$(curl --remote-name --remote-header-name --write-out "%{filename_effective}" --silent https://forest-archive.chainsafe.dev/latest/$CHAIN/ -H "Range: bytes=0-0")
+rm -f "$SNAPSHOT_NAME"
 
 # Extract the date from the snapshot file name and
 # Convert the snapshot date to Unix timestamp (at start of the day)
@@ -34,17 +31,8 @@ send_slack_alert() {
 
 COMMANDS=$(cat << HEREDOC
 set -eux
-cd forest_db/filops && forest-tool snapshot fetch --vendor filops --chain $CHAIN
-
-
-# Get the most recently downloaded snapshot's name
-DOWNLOADED_SNAPSHOT_NAME=\$(basename \$(find . -name "filops_snapshot_$CHAIN*" -type f -print0 | xargs -r -0 ls -1 -t | head -1))
-
-# Remove the '.zst' part from the filename
-BASE_SNAPSHOT_NAME=\${DOWNLOADED_SNAPSHOT_NAME%.zst}
-
-# Generate SHA-256 checksum
-sha256sum ./\$DOWNLOADED_SNAPSHOT_NAME > \$BASE_SNAPSHOT_NAME.sha256sum
+cd forest_db/filops
+forest-tool snapshot fetch --vendor filops --chain $CHAIN
 HEREDOC
 )
 
@@ -62,7 +50,10 @@ if [ ${DIFF} -gt 1 ]; then
       ghcr.io/chainsafe/forest:"${FOREST_TAG}" \
       -c "$COMMANDS" || exit 1
 
-    if s3cmd --acl-public put "$BASE_FOLDER/forest_db/filops/filops_snapshot_$CHAIN"* s3://"$SNAPSHOT_BUCKET/$CHAIN/"; then
+    # Unset DO keys to avoid clashes with R2 keys.
+    unset AWS_SECRET_ACCESS_KEY
+    unset AWS_ACCESS_KEY_ID
+    if aws --endpoint "$R2_ENDPOINT" s3 cp "$BASE_FOLDER/forest_db/filops/filops_snapshot_$CHAIN"* s3://forest-archive/"$CHAIN_NAME"/latest/; then
         # Send alert to Slack only if upload is successful
         send_slack_alert "Old $CHAIN snapshot detected. 🔥🌲🔥. Filops Snapshot upload successful:✅"
         rm "$BASE_FOLDER/forest_db/filops/filops_snapshot_$CHAIN"*
