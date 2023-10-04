@@ -105,7 +105,7 @@ docker run \
   --rm \
   --user root \
   -v "$CHAIN_DB_DIR:/home/forest/forest_db":z \
-  -v "$CHAIN_LOGS_DIR:$CHAIN_LOGS_DIR":z \
+  -v "$CHAIN_LOGS_DIR:/home/forest/logs":z \
   --entrypoint /bin/bash \
   ghcr.io/chainsafe/forest:"${FOREST_TAG}" \
   -c "$COMMANDS" || exit 1
