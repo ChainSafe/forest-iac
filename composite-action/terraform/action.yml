@@ -126,8 +126,8 @@ runs:
           echo "No changes detected."
         else
           echo "Changes detected. Redeploying everything..."
-          terraform destroy -auto-approve
-          terraform apply -auto-approve
+          terraform destroy -auto-approve -input=false
+          terraform apply -auto-approve -input=false
         fi
       shell: bash
       working-directory: ${{ inputs.working_directory }}
