@@ -57,7 +57,8 @@ runs:
       shell: bash
       if: github.event_name == 'pull_request'
       id: plan
-      run: terraform plan -no-color -input=false
+      run: |
+        terraform plan -detailed-exitcode -out=tfplan -input=false || echo "Terraform plan exit code: $?"
       continue-on-error: true
       working-directory: ${{ inputs.working_directory }}
       env:
@@ -120,7 +121,14 @@ runs:
 
     - name: Terraform Apply
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      run: terraform apply -auto-approve -input=false
+      run: |
+        if grep -q 'No changes.' tfplan; then
+          echo "No changes detected."
+        else
+          echo "Changes detected. Redeploying everything..."
+          terraform destroy -auto-approve
+          terraform apply -auto-approve
+        fi
       shell: bash
       working-directory: ${{ inputs.working_directory }}
       env:
