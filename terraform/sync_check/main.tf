@@ -29,7 +29,7 @@ module "sync_check" {
 
   # Configure service:
   name          = "forest-sync-check"     # droplet name
-  size          = "so-2vcpu-16gb"         # droplet size
+  size          = "s-4vcpu-16gb-amd"      # droplet size
   slack_channel = "#forest-notifications" # slack channel for notifications
 
   # Variable passthrough:
