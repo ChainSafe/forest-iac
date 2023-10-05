@@ -10,7 +10,8 @@ apt-get -qqq --yes -o DPkg::Lock::Timeout=90 update
 apt-get -qqq --yes -o DPkg::Lock::Timeout=90 install -y ruby ruby-dev anacron awscli
 
 # Install the gems
-gem install docker-api slack-ruby-client activesupport
+gem install docker-api slack-ruby-client
+gem install activesupport -v 7.0.8
 
 # 1. Configure aws
 # 2. Create forest_db directory
