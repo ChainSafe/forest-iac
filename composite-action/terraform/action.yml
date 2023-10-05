@@ -60,7 +60,7 @@ runs:
       if: github.event_name == 'pull_request'
       id: plan
       run: |
-        terraform plan -detailed-exitcode -out=tfplan -input=false || echo "Terraform plan exit code: $?"
+        terraform plan -detailed-exitcode -out=tfplan -no-color -input=false || echo "Terraform plan exit code: $?"
       continue-on-error: true
       working-directory: ${{ inputs.working_directory }}
       env:
