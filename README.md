@@ -95,11 +95,11 @@ export TF_VAR_NR_LICENSE_KEY=
 ```
 Then save the file and restart the terminal for the changes to take effect.
 
-- Navigate to the terraform directory and run `make init_calib` for calibnet, `make init_main` for mainnet, or `make init_lt_main` for lotus mainnet to initialize and verify variables.
+- Navigate to the terraform directory and run `make init_calib` for calibnet or `make init_main` for mainnet to initialize and verify variables.
 
-- Run `make plan_calib` for calibnet, `make plan_main` for mainnet, or `make plan_lt_main` for lotus mainnet in the terraform directory to view all the configured resources.
+- Run `make plan_calib` for calibnet, or `make plan_main` for mainnet, or `make plan_lt_main` in the terraform directory to view all the configured resources.
 
-- To create the infrastructure, run `make apply_calib` for calibnet, `make apply_main` for mainnet, or `make apply_lt_main` for lotus mainnet in the terraform directory.
+- To create the infrastructure, run `make apply_calib` for calibnet, or `make apply_main` for mainnet, or `make apply_lt_main` in the terraform directory.
 
 ## Collaborators
 Feel free to contribute to the codebase by resolving any open issues, refactoring, adding new features, writing test cases, or any other way to make the project better and helpful to the community. Feel free to fork and send pull requests.
