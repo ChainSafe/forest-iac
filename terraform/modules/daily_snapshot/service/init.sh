@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# dummy change
 set -eux
 
 # Setting DEBIAN_FRONTEND to ensure non-interactive operations for APT
