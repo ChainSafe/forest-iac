@@ -40,4 +40,3 @@ apply_main:
 
 destroy_main:
 	@cd $(TF_MAIN_DIR) && $(TF) destroy
-
