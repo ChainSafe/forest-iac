@@ -73,6 +73,7 @@ locals {
   })
 }
 
+# Innocent change.
 locals {
   init_commands = ["cd /root/",
     "tar xf sources.tar",
