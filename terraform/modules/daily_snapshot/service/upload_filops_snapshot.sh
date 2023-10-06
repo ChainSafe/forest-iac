@@ -50,7 +50,7 @@ if [ ${DIFF} -gt 1 ]; then
       ghcr.io/chainsafe/forest:"${FOREST_TAG}" \
       -c "$COMMANDS" || exit 1
 
-    if aws --endpoint "$R2_ENDPOINT" s3 cp "$BASE_FOLDER/forest_db/filops/filops_snapshot_$CHAIN"* s3://$SNAPSHOT_BUCKET/"$CHAIN_NAME"/latest/; then
+    if aws --endpoint "$R2_ENDPOINT" s3 cp "$BASE_FOLDER/forest_db/filops/filops_snapshot_$CHAIN"* s3://"$SNAPSHOT_BUCKET"/"$CHAIN_NAME"/latest/; then
         # Send alert to Slack only if upload is successful
         send_slack_alert "Old $CHAIN snapshot detected. 🔥🌲🔥. Filops Snapshot upload successful:✅"
         rm "$BASE_FOLDER/forest_db/filops/filops_snapshot_$CHAIN"*

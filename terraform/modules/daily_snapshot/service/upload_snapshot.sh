@@ -98,7 +98,7 @@ docker run \
   ghcr.io/chainsafe/forest:"${FOREST_TAG}" \
   -c "$COMMANDS" || exit 1
 
-aws --endpoint "$R2_ENDPOINT" s3 cp "$CHAIN_DB_DIR/forest_snapshot_$CHAIN_NAME"*.forest.car.zst s3://$SNAPSHOT_BUCKET/"$CHAIN_NAME"/latest/ || exit 1
+aws --endpoint "$R2_ENDPOINT" s3 cp "$CHAIN_DB_DIR/forest_snapshot_$CHAIN_NAME"*.forest.car.zst s3://"$SNAPSHOT_BUCKET"/"$CHAIN_NAME"/latest/ || exit 1
 
 # Delete snapshot files
 rm "$CHAIN_DB_DIR/forest_snapshot_$CHAIN_NAME"*
