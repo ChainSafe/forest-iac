@@ -28,12 +28,12 @@ module "daily_snapshot" {
   source = "../../modules/daily_snapshot"
 
   # Configure service:
-  name              = "forest-snapshot"       # droplet name
-  size              = "s-4vcpu-16gb-amd"      # droplet size
-  slack_channel     = "#forest-notifications" # slack channel for notifications
-  snapshot_bucket   = "forest-archive"
-  forest_tag        = "latest"
-  r2_endpoint       = "https://2238a825c5aca59233eab1f221f7aefb.r2.cloudflarestorage.com/"
+  name            = "forest-snapshot"       # droplet name
+  size            = "s-4vcpu-16gb-amd"      # droplet size
+  slack_channel   = "#forest-notifications" # slack channel for notifications
+  snapshot_bucket = "forest-archive"
+  forest_tag      = "latest"
+  r2_endpoint     = "https://2238a825c5aca59233eab1f221f7aefb.r2.cloudflarestorage.com/"
 
   # Variable passthrough:
   slack_token          = var.slack_token
