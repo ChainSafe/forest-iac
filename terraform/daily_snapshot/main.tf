@@ -28,9 +28,9 @@ module "daily_snapshot" {
   source = "../modules/daily_snapshot"
 
   # Configure service:
-  name              = "forest-snapshot-dev"       # droplet name
-  size              = "s-4vcpu-16gb-amd"          # droplet size
-  slack_channel     = "#forest-dump"              # slack channel for notifications
+  name              = "forest-snapshot-dev" # droplet name
+  size              = "s-4vcpu-16gb-amd"    # droplet size
+  slack_channel     = "#forest-dump"        # slack channel for notifications
   snapshot_bucket   = "forest-archive-dev"
   snapshot_endpoint = "fra1.digitaloceanspaces.com"
   forest_tag        = "latest"
