@@ -3,12 +3,15 @@
 ## Enable strict error handling, command tracing, and pipefail
 set -eux
 
+# Wait for cloud-init to finish initializing the machine
+cloud-init status --wait
+
 # Setting DEBIAN_FRONTEND to ensure non-interactive operations for APT
 export DEBIAN_FRONTEND=noninteractive
 
 # Use APT specific mechanism to wait for the lock
-apt-get -qqq --yes -o DPkg::Lock::Timeout=30 update
-apt-get -qqq --yes -o DPkg::Lock::Timeout=30 install -y ruby ruby-dev gcc make
+apt-get -qqq --yes update
+apt-get -qqq --yes install -y ruby ruby-dev gcc make
 
 gem install slack-ruby-client sys-filesystem
 
