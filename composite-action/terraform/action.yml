@@ -77,17 +77,20 @@ runs:
         TF_VAR_NEW_RELIC_ACCOUNT_ID: ${{ inputs.new_relic_account_id }}
 
     - name: Find Comment
-      if: github.event_name == 'pull_request'
+      if: github.event.pull_request.draft == false &&
+          github.event_name == 'pull_request'
       uses: peter-evans/find-comment@v2
       id: fc
       with:
         issue-number: ${{ github.event.pull_request.number }}
         comment-author: 'github-actions[bot]'
-        body-regex: "^### Forest ${{ inputs.environment }} Infrastructure Plan"
+        body-regex: "^### Forest: ${{ inputs.environment }} Infrastructure Plan"
 
 
     - name: Create or Update Comment
-      if: github.event_name == 'pull_request' && !contains(steps.plan.outputs.stdout, 'No changes. Your infrastructure matches the configuration.')
+      if: github.event.pull_request.draft == false &&
+          github.event_name == 'pull_request' &&
+          !contains(steps.plan.outputs.stdout, 'No changes. Your infrastructure matches the configuration.')
       uses: peter-evans/create-or-update-comment@v2
       with:
         comment-id: ${{ steps.fc.outputs.comment-id }}
@@ -106,7 +109,9 @@ runs:
 
     - name: Delete Comment
       uses: detomarco/delete-comments@v1.0.4
-      if: github.event_name == 'pull_request' && contains(steps.plan.outputs.stdout, 'No changes. Your infrastructure matches the configuration.')
+      if: github.event.pull_request.draft == false &&
+          github.event_name == 'pull_request' &&
+          contains(steps.plan.outputs.stdout, 'No changes. Your infrastructure matches the configuration.')
       with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
 
