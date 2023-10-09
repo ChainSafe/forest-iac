@@ -27,13 +27,14 @@ def latest_snapshot_date(chain_name = 'calibnet')
   end
 end
 
-
 CHAIN_NAME = ARGV[0]
 raise 'No chain name supplied. Please provide chain identifier, e.g. calibnet or mainnet' if ARGV.empty?
 
 # Current datetime, to append to the log files
 DATE = Time.new.strftime '%FT%H:%M:%S'
-LOG_EXPORT = "#{CHAIN_NAME}_#{DATE}_export.txt"
+LOG_EXPORT_SCRIPT_RUN = "logs/#{CHAIN_NAME}_#{DATE}_script_run.txt"
+LOG_EXPORT_DAEMON = "logs/#{CHAIN_NAME}_#{DATE}_daemon.txt"
+LOG_EXPORT_METRICS = "logs/#{CHAIN_NAME}_#{DATE}_metrics.txt"
 
 client = SlackClient.new CHANNEL, SLACK_TOKEN
 
@@ -41,8 +42,11 @@ client = SlackClient.new CHANNEL, SLACK_TOKEN
 # of victory messages to 1/day even if we upload multiple snapshots per day.
 date_before_export = latest_snapshot_date(CHAIN_NAME)
 
+# conditionally add timestamps to logs without timestamps
+add_timestamps_cmd = "awk '{ if ($0 !~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{6}Z/) print strftime(\"[%Y-%m-%d %H:%M:%S]\"), $0; else print $0; fflush(); }'"
+
 # Sync and export snapshot
-snapshot_uploaded = system("bash -c 'timeout --signal=KILL 24h ./upload_snapshot.sh #{CHAIN_NAME}' > #{LOG_EXPORT} 2>&1")
+snapshot_uploaded = system("bash -c 'timeout --signal=KILL 24h ./upload_snapshot.sh #{CHAIN_NAME} #{LOG_EXPORT_DAEMON} #{LOG_EXPORT_METRICS}' | #{add_timestamps_cmd} > #{LOG_EXPORT_SCRIPT_RUN} 2>&1")
 
 if snapshot_uploaded
   date_after_export = latest_snapshot_date(CHAIN_NAME)
@@ -54,7 +58,11 @@ if snapshot_uploaded
 else
   client.post_message "⛔ Snapshot failed for #{CHAIN_NAME}. 🔥🌲🔥 "
   # attach the log file and print the contents to STDOUT
-  client.attach_files(LOG_EXPORT)
+  [LOG_EXPORT_SCRIPT_RUN, LOG_EXPORT_DAEMON, LOG_EXPORT_METRICS].each do |log_file|
+    client.attach_files(log_file) if File.exist?(log_file)
+  end
 end
 
-puts "Snapshot export log:\n#{File.read(LOG_EXPORT)}"
+[LOG_EXPORT_SCRIPT_RUN, LOG_EXPORT_DAEMON, LOG_EXPORT_METRICS].each do |log_file|
+  puts "Snapshot export log:\n#{File.read(log_file)}\n\n" if File.exist?(log_file)
+end
