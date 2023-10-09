@@ -3,12 +3,14 @@
 # If Forest hasn't synced to the network after 8 hours, something has gone wrong.
 SYNC_TIMEOUT=8h
 
-if [[ $# != 1 ]]; then
-  echo "Usage: bash $0 CHAIN_NAME"
+if [[ $# != 3 ]]; then
+  echo "Usage: bash $0 CHAIN_NAME LOG_EXPORT_DAEMON LOG_EXPORT_METRICS"
   exit 1
 fi
 
 CHAIN_NAME=$1
+LOG_EXPORT_DAEMON=$2
+LOG_EXPORT_METRICS=$3
 
 # Make sure we have the most recent Forest image
 docker pull ghcr.io/chainsafe/forest:"${FOREST_TAG}"
@@ -25,18 +27,26 @@ apt-get update && apt-get install -y curl
 # Switch back to the service user for other service commands.
 su - forest
 
+function add_timestamps {
+  while IFS= read -r line; do
+    echo "\$(date +'%Y-%m-%d %H:%M:%S') \$line"
+  done
+}
+
 # periodically write metrics to a file
 # this is done in a separate process to avoid blocking the sync process
 # and to ensure that the metrics are written even if it crashes
 function write_metrics {
   while true; do
-    curl --silent --fail --output metrics.txt --max-time 5 --retry 5 --retry-delay 2 --retry-max-time 10 http://localhost:6116/metrics || true
+    {
+      curl --silent --fail --max-time 5 --retry 5 --retry-delay 2 --retry-max-time 10 http://localhost:6116/metrics || true
+    } | add_timestamps >> "$LOG_EXPORT_METRICS"
     sleep 5
   done
 }
 
 function print_forest_logs {
-  cat forest.err forest.out metrics.txt
+  cat forest.err forest.out > $LOG_EXPORT_DAEMON
 }
 trap print_forest_logs EXIT
 
@@ -83,6 +93,7 @@ docker stop "$CONTAINER_NAME" || true
 docker rm --force "$CONTAINER_NAME"
 
 CHAIN_DB_DIR="$BASE_FOLDER/forest_db/$CHAIN_NAME"
+CHAIN_LOGS_DIR="$BASE_FOLDER/logs"
 
 # Delete any existing snapshot files. It may be that the previous run failed
 # before deleting those.
@@ -94,6 +105,7 @@ docker run \
   --rm \
   --user root \
   -v "$CHAIN_DB_DIR:/home/forest/forest_db":z \
+  -v "$CHAIN_LOGS_DIR:/home/forest/logs":z \
   --entrypoint /bin/bash \
   ghcr.io/chainsafe/forest:"${FOREST_TAG}" \
   -c "$COMMANDS" || exit 1

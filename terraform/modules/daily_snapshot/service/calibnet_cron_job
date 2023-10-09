@@ -3,5 +3,5 @@
 # shellcheck source=/dev/null
 source ~/.forest_env
 cd "$BASE_FOLDER" || exit
-flock -n /tmp/calibnet.lock -c "ruby daily_snapshot.rb calibnet > calibnet_log.txt 2>&1"
-flock -n /tmp/calibnet_filops.lock -c "./upload_filops_snapshot.sh calibnet > filops_calibnet_log.txt 2>&1"
+flock -n /tmp/calibnet.lock -c "ruby daily_snapshot.rb calibnet > logs/calibnet_log.txt 2>&1"
+flock -n /tmp/calibnet_filops.lock -c "./upload_filops_snapshot.sh calibnet > logs/filops_calibnet_log.txt 2>&1"
