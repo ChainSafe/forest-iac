@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# shellcheck source=/dev/null
+source ~/.forest_env
+cd "$BASE_FOLDER" || exit
+flock -n /tmp/mainnet.lock -c "ruby verify_snapshot.rb > verify_log.txt 2>&1" || exit

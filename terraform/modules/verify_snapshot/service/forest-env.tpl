@@ -1,0 +1,6 @@
+export FOREST_SLACK_API_TOKEN="${slack_token}"
+export FOREST_SLACK_NOTIF_CHANNEL="${slack_channel}"
+export NEW_RELIC_API_KEY="${NEW_RELIC_API_KEY}"
+export NEW_RELIC_ACCOUNT_ID="${NEW_RELIC_ACCOUNT_ID}"
+export NEW_RELIC_REGION="${NEW_RELIC_REGION}"
+export FOREST_TAG="${forest_tag}"
