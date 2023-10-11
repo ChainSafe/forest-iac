@@ -39,8 +39,6 @@ runs:
   steps:
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v2
-      with:
-        terraform_version: v1.5.7
 
     - name: Terraform Init
       run: terraform init
