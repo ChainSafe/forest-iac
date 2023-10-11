@@ -10,13 +10,11 @@ export DEBIAN_FRONTEND=noninteractive
 
 # Use APT specific mechanism to wait for the lock
 apt-get -qqq --yes update
-apt-get -qqq --yes install -y ruby ruby-dev anacron awscli zstd
+apt-get -qqq --yes install -y ruby ruby-dev anacron zstd
 
 # Install the gems
 gem install docker-api slack-ruby-client
 gem install activesupport -v 7.0.8
-
-apt-get update && apt-get install -y zstd
 
 mkdir snapshot
 chmod 777 snapshot

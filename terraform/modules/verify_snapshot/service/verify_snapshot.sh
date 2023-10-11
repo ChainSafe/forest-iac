@@ -13,10 +13,9 @@ send_slack_alert() {
 COMMANDS=$(cat << HEREDOC
 set -eux
 apt-get update && apt-get install -y zstd
-cd snapshot/
+cd snapshot
 
 forest-tool snapshot fetch --vendor filops --chain mainnet
-forest-tool snapshot fetch --vendor forest --chain mainnet
 zstd -d filops_*.car.zst
 forest-tool archive export filops_*.car -o exported_snapshot.car.zst
 HEREDOC
