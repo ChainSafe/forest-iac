@@ -2,12 +2,15 @@ terraform {
   required_version = ">= 1.2"
 
   backend "s3" {
-    bucket                      = "forest-iac"
-    key                         = "forest-calibnet/terraform.tfstate"
-    region                      = "us-west-1"
-    endpoint                    = "fra1.digitaloceanspaces.com"
+    bucket = "forest-iac"
+    key    = "forest-calibnet/terraform.tfstate"
+    region = "us-west-1"
+    endpoints = {
+      s3 = "https://fra1.digitaloceanspaces.com"
+    }
     skip_credentials_validation = true
     skip_metadata_api_check     = true
+    skip_requesting_account_id  = true
   }
 }
 
