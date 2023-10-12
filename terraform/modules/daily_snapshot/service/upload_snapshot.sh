@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# If Forest hasn't synced to the network after 8 hours, something has gone wrong.
-SYNC_TIMEOUT=8h
+# If Forest hasn't synced to the network after 3 hours, something has gone wrong.
+SYNC_TIMEOUT=3h
 
 if [[ $# != 3 ]]; then
   echo "Usage: bash $0 CHAIN_NAME LOG_EXPORT_DAEMON LOG_EXPORT_METRICS"
