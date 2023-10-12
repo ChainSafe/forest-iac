@@ -43,10 +43,12 @@ client = SlackClient.new CHANNEL, SLACK_TOKEN
 date_before_export = latest_snapshot_date(CHAIN_NAME)
 
 # conditionally add timestamps to logs without timestamps
-add_timestamps_cmd = "awk '{ if ($0 !~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{6}Z/) print strftime(\"[%Y-%m-%d %H:%M:%S]\"), $0; else print $0; fflush(); }'"
+add_timestamps_cmd = %q[awk '{ if ($0 !~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{6}Z/) print strftime("[%Y-%m-%d %H:%M:%S]"), $0; else print $0; fflush(); }']
+upload_cmd = "set -o pipefail && \
+timeout --signal=KILL 8h ./upload_snapshot.sh #{CHAIN_NAME} #{LOG_EXPORT_DAEMON} #{LOG_EXPORT_METRICS} | #{add_timestamps_cmd}"
 
-# Sync and export snapshot
-snapshot_uploaded = system("bash -c 'timeout --signal=KILL 8h ./upload_snapshot.sh #{CHAIN_NAME} #{LOG_EXPORT_DAEMON} #{LOG_EXPORT_METRICS} | #{add_timestamps_cmd} > #{LOG_EXPORT_SCRIPT_RUN} 2>&1'")
+# The command needs to be run indirectly to avoid syntax errors in the shell.
+snapshot_uploaded = system('bash', '-c', upload_cmd, %i[out err] => LOG_EXPORT_SCRIPT_RUN)
 
 if snapshot_uploaded
   date_after_export = latest_snapshot_date(CHAIN_NAME)
