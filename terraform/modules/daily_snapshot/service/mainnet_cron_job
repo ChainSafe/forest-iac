@@ -3,8 +3,5 @@
 # shellcheck source=/dev/null
 source ~/.forest_env
 cd "$BASE_FOLDER" || exit
-while :
-do
-    flock -n /tmp/mainnet.lock -c "ruby daily_snapshot.rb mainnet > mainnet_log.txt 2>&1" || exit
-    flock -n /tmp/mainnet_filops.lock -c "./upload_filops_snapshot.sh mainnet > filops_mainnet_log.txt 2>&1" || exit
-done
+flock -n /tmp/mainnet.lock -c "ruby daily_snapshot.rb mainnet > mainnet_log.txt 2>&1" || exit
+flock -n /tmp/mainnet_filops.lock -c "./upload_filops_snapshot.sh mainnet > filops_mainnet_log.txt 2>&1" || exit
