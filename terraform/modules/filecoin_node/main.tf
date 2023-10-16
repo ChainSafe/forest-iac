@@ -1,7 +1,7 @@
 # This terraform script executes the following steps:
 #  - Boot a New droplet for the Mainnet or Calibnet chain
 #  - Attach a volume to the droplet if Attach volume is set to true
-#  - Run the user-data.sh or lotus.sh script at the initialization of the new droplet
+#  - Run the user-data.sh at initialization of the new droplet
 
 terraform {
   required_version = "~> 1.3"
