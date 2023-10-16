@@ -52,16 +52,16 @@ That's it! From now on, every time you commit changes to your project, these hoo
 
 ## Overview
 
-The Terraform folder contains terraform scripts to automate the setup of droplets on DigitalOcean. These scripts enable the configuration of essential infrastructure required for running Forest Mainnet, Calibnet, or Lotus Mainnet nodes. The script automates several steps, including:
+The Terraform folder contains terraform scripts to automate the setup of droplets on DigitalOcean. These scripts enable the configuration of essential infrastructure required for running Forest Mainnet or Calibnet Filecoin node. The script automates several steps, including:
 
 - Booting up a New Droplet: It initializes a new droplet with specified parameters such as image, name, region, and size.
 
-- Volume Attachment (optional): The script can optionally attach a storage volume to the droplet if the user specifies so (attach_volume variable set to true). This feature primarily runs on the Mainnet but can also be applied to the Calibnet if set to true. To ensure compliance with device identifier restrictions on DigitalOcean, any "-" characters in the volume name are automatically replaced with "_" when mounting the volume on the droplet.
+- Volume Attachment (optional): The script can optionally attach a storage volume to the droplet if the user specifies so (attach_volume variable set to false). To ensure compliance with device identifier restrictions on DigitalOcean, any "-" characters in the volume name are automatically replaced with "_" when mounting the volume on the droplet.
 
-- Running Initialization Script: The `user-data.sh` or `lotus.sh` script is executed during the droplet's initialization. This script is powered by the Terraform engine and allows dynamic insertion of variables from the `terraform.tfvars` file. It handles crucial tasks such as creating a new user, configuring SSH settings, restricting SSH access, and managing Docker-related setups. Its purpose is to specifically run the Mainnet or Calibnet chain based on the specifications provided in the Terraform script. Additionally, it initializes Watchtower to ensure the Forest images are up to date and configures the New Relic infrastructure agent and Openmetrics New Relic container exclusively on the forest nodes.
+- Running Initialization Script: The `user-data.sh` script is executed during the droplet's initialization. This script is powered by the Terraform engine and allows dynamic insertion of variables from the `terraform.tfvars` file. It handles crucial tasks such as creating a new user, configuring SSH settings, restricting SSH access, and managing Docker-related setups. Its purpose is to specifically run the Mainnet or Calibnet chain based on the specifications provided in the Terraform script. Additionally, it initializes Watchtower to ensure the Forest images are up to date and configures the New Relic infrastructure agent and Openmetrics New Relic container exclusively on the forest nodes.
 
 ## Requirements
-The droplet requirements to run Forest Mainnet, Calibnet or lotus mainnet nodes include:
+The droplet requirements to run Forest Mainnet or Calibnet nodes include:
 - RAM: 8GB
 - VCPU: 1
 - Disk Size: >100 GB
@@ -74,7 +74,7 @@ The user's local machine requirements include the following:
 To implement the infrastructure, run the following:
 - Create an `ssh-key` to be added to the DigitalOcean list and store the fingerprint for use in the next few steps; you can check more details [here](https://docs.digitalocean.com/products/droplets/how-to/add-ssh-keys/to-team/)
 
-- Create a space on DigitalOcean with any preferred unique name, then add the bucket name and endpoint to the `backend.tf` file located in the `forest-mainnet`, `forest-calibnet` or `lotus-mainnet` directory, depending on which one you plan to run.
+- Create a space on DigitalOcean with any preferred unique name, then add the bucket name and endpoint to the `backend.tf` file located in the `forest-mainnet` or `forest-calibnet` directory, depending on which one you plan to run.
 
 - Generate `digitalocean_api_token` from DigitalOcean console; you can check [here](https://docs.digitalocean.com/reference/api/create-personal-access-token/) for more details.
 
@@ -95,11 +95,11 @@ export TF_VAR_NR_LICENSE_KEY=
 ```
 Then save the file and restart the terminal for the changes to take effect.
 
-- Navigate to the terraform directory and run `make init_calib` for calibnet, `make init_main` for mainnet, or `make init_lt_main` for lotus mainnet to initialize and verify variables.
+- Navigate to the terraform directory and run `make init_calib` for calibnet or `make init_main` for mainnet to initialize and verify variables.
 
-- Run `make plan_calib` for calibnet, `make plan_main` for mainnet, or `make plan_lt_main` for lotus mainnet in the terraform directory to view all the configured resources.
+- Run `make plan_calib` for calibnet, or `make plan_main` for mainnet, or `make plan_lt_main` in the terraform directory to view all the configured resources.
 
-- To create the infrastructure, run `make apply_calib` for calibnet, `make apply_main` for mainnet, or `make apply_lt_main` for lotus mainnet in the terraform directory.
+- To create the infrastructure, run `make apply_calib` for calibnet, or `make apply_main` for mainnet in the terraform directory.
 
 ## Collaborators
 Feel free to contribute to the codebase by resolving any open issues, refactoring, adding new features, writing test cases, or any other way to make the project better and helpful to the community. Feel free to fork and send pull requests.
