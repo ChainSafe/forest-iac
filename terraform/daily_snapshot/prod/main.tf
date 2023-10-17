@@ -8,7 +8,7 @@ terraform {
     # This key uniquely identifies the service. To create a new service (instead
     # of modifying this one), use a new key. Unfortunately, variables may not be
     # used here.
-    key = "daily_snapshot_dev.tfstate"
+    key = "daily_snapshot.tfstate"
 
     # This value is completely unused by DO but _must_ be a known AWS region.
     region = "us-west-1"
@@ -25,24 +25,23 @@ terraform {
 
 module "daily_snapshot" {
   # Import the daily_snapshot module
-  source = "../modules/daily_snapshot"
+  source = "../../modules/daily_snapshot"
 
   # Configure service:
-  name              = "forest-snapshot-dev" # droplet name
-  size              = "s-4vcpu-16gb-amd"    # droplet size
-  slack_channel     = "#forest-dump"        # slack channel for notifications
-  snapshot_bucket   = "forest-archive-dev"
-  snapshot_endpoint = "fra1.digitaloceanspaces.com"
-  forest_tag        = "latest"
-  r2_endpoint       = "https://2238a825c5aca59233eab1f221f7aefb.r2.cloudflarestorage.com/"
+  name            = "forest-snapshot"       # droplet name
+  size            = "s-4vcpu-16gb-amd"      # droplet size
+  slack_channel   = "#forest-notifications" # slack channel for notifications
+  snapshot_bucket = "forest-archive"
+  forest_tag      = "latest"
+  r2_endpoint     = "https://2238a825c5aca59233eab1f221f7aefb.r2.cloudflarestorage.com/"
 
   # Variable passthrough:
   slack_token          = var.slack_token
   R2_ACCESS_KEY        = var.R2_ACCESS_KEY
   R2_SECRET_KEY        = var.R2_SECRET_KEY
   digitalocean_token   = var.do_token
-  NEW_RELIC_API_KEY    = ""
-  NEW_RELIC_ACCOUNT_ID = ""
+  NEW_RELIC_API_KEY    = var.NEW_RELIC_API_KEY
+  NEW_RELIC_ACCOUNT_ID = var.NEW_RELIC_ACCOUNT_ID
 }
 
 # This ip address may be used in the future by monitoring software

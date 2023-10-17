@@ -39,7 +39,7 @@ jobs:
           r2_access_key: ${{ secrets.R2_ACCESS_KEY }}
           r2_secret_key: ${{ secrets.R2_SECRET_KEY }}
           slack_token: ${{ secrets.SLACK_TOKEN }}
-          working_directory: terraform/daily_snapshot
+          working_directory: terraform/daily_snapshot/prod
           environment: Snapshot Service
           new_relic_account_id: ${{ secrets.NEW_RELIC_ACCOUNT_ID }}
           new_relic_api_key: ${{ secrets.NEW_RELIC_API_KEY }}
