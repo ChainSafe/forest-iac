@@ -1,6 +1,7 @@
 variable "digitalocean_token" {
   description = "Token for authentication."
   type        = string
+  sensitive   = true
 }
 
 variable "name" {
@@ -21,6 +22,7 @@ variable "slack_channel" {
 variable "slack_token" {
   description = "slack access token"
   type        = string
+  sensitive   = true
 }
 
 variable "image" {
@@ -51,10 +53,12 @@ variable "NEW_RELIC_API_KEY" {
   description = "New Relic API KEY"
   default     = ""
   type        = string
+  sensitive   = true
 }
 
 variable "NEW_RELIC_ACCOUNT_ID" {
   description = "The New Relic Account ID"
   default     = ""
   type        = string
+  sensitive   = true
 }
