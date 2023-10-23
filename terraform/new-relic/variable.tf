@@ -1,11 +1,13 @@
 variable "NEW_RELIC_ACCOUNT_ID" {
   type        = string
   description = "The New Relic Account ID"
+  sensitive   = true
 }
 
 variable "NEW_RELIC_API_KEY" {
   description = "The New Relic API KEY"
   type        = string
+  sensitive   = true
 }
 
 variable "slack_destination_id" {
