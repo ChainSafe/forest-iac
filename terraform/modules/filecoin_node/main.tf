@@ -62,6 +62,10 @@ resource "digitalocean_droplet" "forest" {
   })
 
   tags = [var.chain]
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "digitalocean_volume" "forest_volume" {
