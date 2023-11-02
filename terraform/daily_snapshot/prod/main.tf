@@ -32,7 +32,7 @@ module "daily_snapshot" {
   size            = "s-4vcpu-16gb-amd"      # droplet size
   slack_channel   = "#forest-notifications" # slack channel for notifications
   snapshot_bucket = "forest-archive"
-  forest_tag      = "latest"
+  forest_tag      = "v0.15.0"
   r2_endpoint     = "https://2238a825c5aca59233eab1f221f7aefb.r2.cloudflarestorage.com/"
 
   # Variable passthrough:
