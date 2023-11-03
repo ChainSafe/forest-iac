@@ -8,6 +8,7 @@ on:
     paths:
       - 'cf/latest-snapshot'
       - '.github/workflows/deploy-cf-latest-snapshot.yml'
+  workflow_dispatch:
 
 jobs:
   check-and-deploy:
@@ -17,12 +18,12 @@ jobs:
       - name: Deployment check
         uses: cloudflare/wrangler-action@v3
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           workingDirectory: "cf/latest-snapshot"
           command: deploy --dry-run
       - name: Deploy
         if: github.ref == 'refs/heads/main' && ( github.event_name == 'push' || github.event_name == 'workflow_dispatch' )
         uses: cloudflare/wrangler-action@v3
         with:
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           workingDirectory: "cf/latest-snapshot"
