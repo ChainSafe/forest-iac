@@ -1,0 +1,29 @@
+name: Deploy CF prune-latest
+on:
+  pull_request:
+    paths:
+      - 'cf/prune-latest'
+      - '.github/workflows/deploy-cf-prune-latest.yml'
+  push:
+    paths:
+      - 'cf/prune-latest'
+      - '.github/workflows/deploy-cf-prune-latest.yml'
+  workflow_dispatch:
+
+jobs:
+  check-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deployment check
+        uses: cloudflare/wrangler-action@v3
+        with:
+          workingDirectory: "cf/prune-latest"
+          command: deploy --dry-run
+      - name: Deploy
+        if: github.ref == 'refs/heads/main' && ( github.event_name == 'push' || github.event_name == 'workflow_dispatch' )
+        uses: cloudflare/wrangler-action@v3
+        with:
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          workingDirectory: "cf/prune-latest"
