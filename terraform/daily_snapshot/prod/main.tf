@@ -20,6 +20,7 @@ terraform {
     # Unfortunately, DigitalOcean does not support STS so we have to skip the
     # validation.
     skip_credentials_validation = "true"
+    skip_s3_checksum            = "true"
   }
 }
 
