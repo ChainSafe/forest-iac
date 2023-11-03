@@ -8,6 +8,7 @@ on:
     paths:
       - 'cf/prune-latest'
       - '.github/workflows/deploy-cf-prune-latest.yml'
+  workflow_dispatch:
 
 jobs:
   check-and-deploy:

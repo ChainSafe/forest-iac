@@ -8,6 +8,7 @@ on:
     paths:
       - 'cf/latest-snapshot'
       - '.github/workflows/deploy-cf-latest-snapshot.yml'
+  workflow_dispatch:
 
 jobs:
   check-and-deploy:
