@@ -46,7 +46,10 @@ async function get_latest(req_headers: Headers, env: Env, chain: string): Promis
 
 			const r = range[0];
 			headers.set('Content-Range', `${r.type} ${r.start}-${r.end}/${object.size}`);
+			headers.set('Content-Length', `${r.end - r.start + 1}`);
 			status = 206; // Partial Content
+		} else {
+			headers.set('Content-Length', object.size.toString());
 		}
 
 		object.writeHttpMetadata(headers);
@@ -78,16 +81,19 @@ export default {
 		const url = new URL(request.url);
 		const chain = (url.pathname.match(/\/latest\/(\w*)/) || ['undefined'])[1];
 
-		// Disallow any other request method except GET, they are not sensible in the context
+		// Disallow any other request method except HEAD and GET, they are not sensible in the context
 		// of fetching a snapshot.
-		if (request.method !== 'GET') {
-			return new Response('Method not allowed', {
-				status: 405,
-				headers: {
-					Allow: 'GET',
-				},
-			});
+		switch (request.method) {
+			case 'HEAD':
+			case 'GET':
+				return await get_latest(request.headers, env, chain);
+			default:
+				return new Response('Method not allowed', {
+					status: 405,
+					headers: {
+						Allow: 'GET, HEAD',
+					},
+				});
 		}
-		return await get_latest(request.headers, env, chain);
 	},
 };
