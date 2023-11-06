@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This is simple basic script to install new relic infrastruture agent
+# This is simple basic script to install new relic infrastructure agent
 # for basic monitoring set-up on ubuntu instances, to use this script all you need
 # to setp `export NR_LICENSE_KEY=your NR_LICENSE_KEY`
 
