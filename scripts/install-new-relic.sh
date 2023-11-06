@@ -1,13 +1,15 @@
 #!/bin/bash
+
 # This is simple basic script to install new relic infrastruture agent
+# for basic monitoring set-up on ubuntu instances, to use this script all you need
+# to setp `export NR_LICENSE_KEY=your NR_LICENSE_KEY`
 
 set -euo pipefail
 
 # Setting DEBIAN_FRONTEND to ensure non-interactive operations for APT
 export DEBIAN_FRONTEND=noninteractive
 
-
-# Add New Relic's repository
+# Add New Relic's apt repository
 curl -fsSL https://download.newrelic.com/infrastructure_agent/gpg/newrelic-infra.gpg | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/newrelic-infra.gpg
 echo "deb https://download.newrelic.com/infrastructure_agent/linux/apt focal main" | sudo tee -a /etc/apt/sources.list.d/newrelic-infra.list
 
