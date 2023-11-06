@@ -28,10 +28,16 @@ apt-get update && apt-get install -y curl
 su - forest
 
 function add_timestamps {
+  set +x  # Turn off debugging
   while IFS= read -r line; do
-    echo "\$(date +'%Y-%m-%d %H:%M:%S') \$line"
+    # Only add timestamp if it doesn't already exist
+    if [[ ! $line =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2} ]]; then
+      echo "$(date +'%Y-%m-%d %H:%M:%S') $line"
+    else
+      echo "$line"
+    fi
+    set -x  # Turn debugging back on
   done
-}
 
 # periodically write metrics to a file
 # this is done in a separate process to avoid blocking the sync process
