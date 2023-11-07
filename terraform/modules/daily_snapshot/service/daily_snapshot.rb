@@ -66,3 +66,6 @@ end
 [LOG_EXPORT_SCRIPT_RUN, LOG_EXPORT_DAEMON, LOG_EXPORT_METRICS].each do |log_file|
   puts "Snapshot export log:\n#{File.read(log_file)}\n\n" if File.exist?(log_file)
 end
+
+# Clean up daemon logs after everything is done
+File.delete(LOG_EXPORT_DAEMON) if File.exist?(LOG_EXPORT_DAEMON)

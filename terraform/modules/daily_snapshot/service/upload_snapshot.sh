@@ -27,13 +27,11 @@ apt-get update && apt-get install -y curl
 # Switch back to the service user for other service commands.
 su - forest
 
-set +x
 function add_timestamps {
   while IFS= read -r line; do
     echo "\$(date +'%Y-%m-%d %H:%M:%S') \$line"
   done
 }
-set +x
 
 # periodically write metrics to a file
 # this is done in a separate process to avoid blocking the sync process
@@ -43,7 +41,7 @@ function write_metrics {
     {
       curl --silent --fail --max-time 5 --retry 5 --retry-delay 2 --retry-max-time 10 http://localhost:6116/metrics || true
     } | add_timestamps >> "$LOG_EXPORT_METRICS"
-    sleep 5
+    sleep 15
   done
 }
 
@@ -59,7 +57,10 @@ echo 'encrypt_keystore = false' >> config.toml
 echo "Chain: $CHAIN_NAME"
 
 # spawn a task in the background to periodically write Prometheus metrics to a file
-write_metrics &
+(
+  set +x  # Disable debugging for this subshell to keep the logs clean.
+  write_metrics
+) &
 
 forest-tool db destroy --force --config config.toml --chain "$CHAIN_NAME"
 
