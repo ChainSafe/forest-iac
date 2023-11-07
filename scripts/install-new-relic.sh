@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# This is simple basic script to install new relic infrastructure agent
-# for basic monitoring set-up on ubuntu instances, to use this script all you need
-# to setp `export NR_LICENSE_KEY=your NR_LICENSE_KEY`
+# This script offers an easy way to install the New Relic infrastructure agent for
+# basic monitoring on Ubuntu systems, without needing administrative privileges.
+# To get started, simply set your New Relic license key with the command export NR_LICENSE_KEY=your_license_key_here.
 
 set -euo pipefail
 
