@@ -6,6 +6,22 @@ set -eux
 # Wait for cloud-init to finish initializing the machine
 cloud-init status --wait
 
+# Use an active loop to wait for the apt package system to become available.
+# This is done to handle any ongoing system boot operations, especially apt tasks,
+# and ensure that the initialization doesn't collide with other apt processes.
+timeout=15 # Set a maximum waiting time of 5 seconds
+interval=5  # Check the apt lock status every 5 seconds
+
+while sudo fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do
+    sleep $interval
+    timeout=$((timeout - interval))
+
+    if [ $timeout -le 0 ]; then
+        echo "Timed out waiting for apt to become available."
+        exit 1
+    fi
+done
+
 # Setting DEBIAN_FRONTEND to ensure non-interactive operations for APT
 export DEBIAN_FRONTEND=noninteractive
 
