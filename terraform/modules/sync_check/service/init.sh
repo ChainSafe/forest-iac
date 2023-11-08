@@ -9,7 +9,7 @@ cloud-init status --wait
 # Use an active loop to wait for the apt package system to become available.
 # This is done to handle any ongoing system boot operations, especially apt tasks,
 # and ensure that the initialization doesn't collide with other apt processes.
-timeout=15 # Set a maximum waiting time of 5 seconds
+timeout=60 # Set a maximum waiting time of 60 seconds
 interval=5  # Check the apt lock status every 5 seconds
 
 while sudo fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do
@@ -27,7 +27,7 @@ export DEBIAN_FRONTEND=noninteractive
 
 # Use APT specific mechanism to wait for the lock
 apt-get -qqq --yes update
-apt-get -qqq --yes install -y ruby ruby-dev gcc make
+apt-get -qqq --yes install ruby ruby-dev gcc make
 
 gem install slack-ruby-client sys-filesystem
 
