@@ -41,7 +41,7 @@ function write_metrics {
     {
       curl --silent --fail --max-time 5 --retry 5 --retry-delay 2 --retry-max-time 10 http://localhost:6116/metrics || true
     } | add_timestamps >> "$LOG_EXPORT_METRICS"
-    sleep 5
+    sleep 15
   done
 }
 
@@ -57,7 +57,10 @@ echo 'encrypt_keystore = false' >> config.toml
 echo "Chain: $CHAIN_NAME"
 
 # spawn a task in the background to periodically write Prometheus metrics to a file
-write_metrics &
+(
+  set +x  # Disable debugging for this subshell to keep the logs clean.
+  write_metrics
+) &
 
 forest-tool db destroy --force --config config.toml --chain "$CHAIN_NAME"
 
