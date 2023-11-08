@@ -2,6 +2,7 @@ name = "forest-latest-snapshot"
 main = "./src/index.ts"
 
 compatibility_date = "2022-06-30"
+logpush = true
 
 routes = [
     { pattern = "forest-archive.chainsafe.dev/latest/calibnet", zone_name = "chainsafe.dev" },
