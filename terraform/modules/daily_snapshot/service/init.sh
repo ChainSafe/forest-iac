@@ -8,25 +8,10 @@ cloud-init status --wait
 # Setting DEBIAN_FRONTEND to ensure non-interactive operations for APT
 export DEBIAN_FRONTEND=noninteractive
 
-# Use an active loop to wait for the apt package system to become available.
-# This is done to handle any ongoing system boot operations, especially apt tasks,
-# and ensure that the initialization doesn't collide with other apt processes.
-timeout=60 # Set a maximum waiting time of 60 seconds
-interval=5  # Check the apt lock status every 5 seconds
-
-while sudo fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do
-    sleep $interval
-    timeout=$((timeout - interval))
-
-    if [ $timeout -le 0 ]; then
-        echo "Timed out waiting for apt to become available."
-        exit 1
-    fi
-done
-
-# Use APT specific mechanism to wait for the lock
-apt-get -qqq --yes update
-apt-get -qqq --yes install ruby ruby-dev anacron awscli
+# Using timeout to ensure the script retries if the APT servers are temporarily unavailable.
+timeout 10m bash -c 'until apt-get -qqq --yes update && \
+ apt-get -qqq --yes install ruby ruby-dev anacron awscli; do sleep 10; \
+done'
 
 # Install the gems
 gem install docker-api slack-ruby-client
