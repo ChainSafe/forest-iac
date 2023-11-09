@@ -9,9 +9,10 @@ cloud-init status --wait
 # Setting DEBIAN_FRONTEND to ensure non-interactive operations for APT
 export DEBIAN_FRONTEND=noninteractive
 
-# Use APT specific mechanism to wait for the lock
-apt-get -qqq --yes update
-apt-get -qqq --yes install -y ruby ruby-dev gcc make
+# Using timeout to ensure the script retries if the APT servers are temporarily unavailable.
+timeout 10m bash -c 'until apt-get -qqq --yes update && \
+ apt-get -qqq --yes install ruby ruby-dev gcc make; do sleep 10; \
+done'
 
 gem install slack-ruby-client sys-filesystem
 
