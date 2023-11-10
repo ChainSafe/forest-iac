@@ -9,7 +9,8 @@ function basename(path: string) {
 }
 
 // Directly fetch the data for the given R2 path
-async function get_R2(req_headers: Headers, env: Env, r2_path: string): Promise<Response> {
+async function get_archive(req_headers: Headers, env: Env, r2_path: string): Promise<Response> {
+		console.log("inside of get_archive---"+ r2_path)
 		const object = await env.FOREST_ARCHIVE.get(r2_path, {
 				range: req_headers,
 				onlyIf: req_headers,
@@ -71,13 +72,18 @@ async function get_R2(req_headers: Headers, env: Env, r2_path: string): Promise<
 
 export default {
 		async fetch(request: Request, env: Env): Promise<Response> {
+				console.log("request.url: " + request.url);
 				const url = new URL(request.url);
+
+				const path = url.pathname.split('/archive').pop() || 'undefined';
+
 				// Disallow any other request method except HEAD and GET, they are not sensible in the context
 				// of fetching a snapshot.
 				switch (request.method) {
 						case 'HEAD':
 						case 'GET':
-								return await get_R2(request.headers, env, url.pathname);
+								console.log("inside of get")
+								return await get_archive(request.headers, env, path);
 						default:
 								return new Response('Method not allowed', {
 										status: 405,
@@ -88,3 +94,4 @@ export default {
 				}
 		},
 };
+
