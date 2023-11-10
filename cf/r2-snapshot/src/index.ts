@@ -72,10 +72,8 @@ async function get_archive(req_headers: Headers, env: Env, r2_path: string): Pro
 
 export default {
 		async fetch(request: Request, env: Env): Promise<Response> {
-				console.log("request.url: " + request.url);
 				const url = new URL(request.url);
-
-				const path = url.pathname.split('/archive').pop() || 'undefined';
+				const path = url.pathname.split('/archive/').pop() || 'undefined';
 
 				// Disallow any other request method except HEAD and GET, they are not sensible in the context
 				// of fetching a snapshot.
