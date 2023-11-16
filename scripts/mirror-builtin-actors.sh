@@ -8,11 +8,11 @@ set -eo pipefail
 
 export DEBIAN_FRONTEND=noninteractive
 
-BASE_FOLDER="releases/actors"
+RELEASE_FOLDER="releases/actors"
 
 # Move to the base folder
-mkdir -p "$BASE_FOLDER"
-cd "$BASE_FOLDER"
+mkdir -p "$RELEASE_FOLDER"
+cd "$RELEASE_FOLDER"
 
 # Set the GitHub API URL for the latest release
 API_URL="https://api.github.com/repos/filecoin-project/builtin-actors/releases/latest"
@@ -63,7 +63,7 @@ for file in *; do
         # Download the file from S3 to the temporary location
         s3cmd get --no-progress "s3://$BUCKET_NAME/$file" "$TEMP_S3_DIR/$file" --region auto || true
 
-        # Compare the local FILE with the downloaded FILE
+        # Compare the local file with the downloaded file
         if cmp --silent "$file" "$TEMP_S3_DIR/$file"; then
             echo "$file is the same in S3, skipping..."
             rm -rf "$file"
