@@ -1,0 +1,51 @@
+name: Mirror Builtin Actors Releases
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # Runs every hour
+  pull_request:
+    paths:
+      - 'script/mirror-builtin-actors.sh'
+  push:
+    paths:
+      - 'script/mirror-builtin-actors.sh'
+  workflow_dispatch:
+
+jobs:
+  mirror-releases-do:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up S3cmd cli tool for DigitalOcean
+        uses: s3-actions/s3cmd@v1.5.0
+        with:
+          provider: digitalocean
+          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Run mirroring script to DigitalOcean
+        working-directory: script
+        if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+        run: bash ./mirror-builtin-actors.sh
+
+  mirror-releases-cf:
+    needs: mirror-releases-do
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+
+      - name: Set up S3cmd cli tool for Cloudflare
+        uses: s3-actions/s3cmd@v1.5.0
+        with:
+          provider: cloudflare
+          access_key: ${{ secrets.R2_ACCESS_KEY }}
+          secret_key: ${{ secrets.R2_SECRET_KEY }}
+          account_id: 2238a825c5aca59233eab1f221f7aefb
+
+      - name: Run mirroring script to Cloudflare
+        working-directory: script
+        if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+        run: bash ./mirror-builtin-actors.sh filecoin-builtin-actors
