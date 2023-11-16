@@ -61,7 +61,7 @@ for file in *; do
         TEMP_S3_DIR=$(mktemp -d)
 
         # Download the file from S3 to the temporary location
-        s3cmd get --no-progress "s3://$BUCKET_NAME/$file" "$TEMP_S3_DIR/$file" --region auto || true
+        s3cmd get --no-progress "s3://$BUCKET_NAME/$file" "$TEMP_S3_DIR/$file" || true
 
         # Compare the local file with the downloaded file
         if cmp --silent "$file" "$TEMP_S3_DIR/$file"; then
