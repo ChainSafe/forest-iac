@@ -86,5 +86,5 @@ done
 if [ ${#successful_uploads[@]} -ne 0 ] || [ ${#failed_uploads[@]} -ne 0 ]; then
     send_slack_alert_with_summary
 else
-    echo "No new mirroring uploads or failures, no Slack alert needed."
+    echo "No new mirroring uploads or failures"
 fi
