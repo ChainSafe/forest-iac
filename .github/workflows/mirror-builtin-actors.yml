@@ -4,9 +4,13 @@ on:
   schedule:
     - cron: '0 * * * *'  # Runs every hour
   pull_request:
+    branches:
+        - main
     paths:
       - 'script/mirror-builtin-actors.sh'
   push:
+    branches:
+        - main
     paths:
       - 'script/mirror-builtin-actors.sh'
   workflow_dispatch:
