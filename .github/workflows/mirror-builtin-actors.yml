@@ -1,8 +1,8 @@
 name: Mirror Builtin Actors Releases
 
 on:
-  schedule:
-    - cron: '0 * * * *'  # Runs every hour
+#   schedule:
+#     - cron: '0 * * * *'  # Runs every hour
   pull_request:
     branches:
         - main
