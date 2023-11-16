@@ -28,7 +28,7 @@ jobs:
       - name: Run mirroring script to DigitalOcean
         working-directory: script
         if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
-        run: bash ./mirror-builtin-actors.sh
+        run: bash ./mirror-builtin-actors.sh filecoin-builtin-actors/actors
 
   mirror-releases-cf:
     needs: mirror-releases-do
@@ -48,4 +48,4 @@ jobs:
       - name: Run mirroring script to Cloudflare
         working-directory: script
         if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
-        run: bash ./mirror-builtin-actors.sh filecoin-builtin-actors
+        run: bash ./mirror-builtin-actors.sh filecoin-builtin-actors/actors

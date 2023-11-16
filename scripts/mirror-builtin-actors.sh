@@ -10,7 +10,7 @@ export DEBIAN_FRONTEND=noninteractive
 
 apt-get -qqq --yes install wget
 
-S3_BUCKET="filecoin-builtin-actors"
+S3_BUCKET="$1"
 BASE_FOLDER="releases/actors"
 
 # Move to the base folder
