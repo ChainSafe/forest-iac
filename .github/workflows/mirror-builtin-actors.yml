@@ -21,6 +21,7 @@ jobs:
         uses: s3-actions/s3cmd@v1.5.0
         with:
           provider: digitalocean
+          region: fra1
           access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
@@ -43,6 +44,7 @@ jobs:
         uses: s3-actions/s3cmd@v1.5.0
         with:
           provider: cloudflare
+          region: auto
           access_key: ${{ secrets.R2_ACCESS_KEY }}
           secret_key: ${{ secrets.R2_SECRET_KEY }}
           account_id: "2238a825c5aca59233eab1f221f7aefb"
@@ -53,4 +55,4 @@ jobs:
         run: bash ./mirror-builtin-actors.sh filecoin-builtin-actors/actors
         env:
             SLACK_API_TOKEN: ${{ secrets.SLACK_TOKEN }}
-            SLACK_CHANNEL: "#forest-dump"
+            SLACK_CHANNEL: "#orest-dumps"

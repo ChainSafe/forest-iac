@@ -49,7 +49,7 @@ send_slack_alert_with_summary() {
     local message="Builtin-actors assets upload summary:\n✅ Successful: $success_list\n🔥 Failed: $failure_list"
 
     curl -X POST -H 'Content-type: application/json' -H "Authorization: Bearer $SLACK_API_TOKEN" \
-    --data "{\"channel\":\"#SLACK_CHANNEL\",\"text\":\"${message}\"}" \
+    --data "{\"channel\":\"$SLACK_CHANNEL\",\"text\":\"${message}\"}" \
     https://slack.com/api/chat.postMessage
 }
 
@@ -62,7 +62,7 @@ for file in *; do
         TEMP_S3_DIR=$(mktemp -d)
 
         # Download the file from S3 to the temporary location
-        s3cmd get --no-progress "s3://$S3_BUCKET/actors/$file" "$TEMP_S3_DIR/$file" || true
+        s3cmd get --no-progress "s3://$S3_BUCKET/$file" "$TEMP_S3_DIR/$file" --region auto || true
 
         # Compare the local FILE with the downloaded FILE
         if cmp --silent "$file" "$TEMP_S3_DIR/$file"; then
@@ -70,8 +70,8 @@ for file in *; do
             rm -rf "$file"
         else
             echo "Local $file is different. Uploading to S3..."
-            if s3cmd --acl-public put --no-progress "$file" "s3://$S3_BUCKET/actors/$file"; then
-                echo "Uploaded $file to s3://$S3_BUCKET/actors/$file"
+            if s3cmd --acl-public put --no-progress "$file" "s3://$S3_BUCKET/$file"; then
+                echo "Uploaded $file to s3://$S3_BUCKET/$file"
                 successful_uploads+=("$file")
             else
                 echo "Failed to upload $file."
