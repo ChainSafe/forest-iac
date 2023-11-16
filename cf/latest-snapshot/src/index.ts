@@ -1,4 +1,5 @@
 import parseRange from 'range-parser';
+import {R2ObjectBody} from "@cloudflare/workers-types";
 
 interface Env {
 	FOREST_ARCHIVE: R2Bucket;
@@ -8,24 +9,53 @@ function basename(path: string) {
 	return path.split('/').reverse()[0];
 }
 
-// Directly fetch the data for the latest snapshot of a given chain (eg. calibnet or mainnet)
-async function get_latest(req_headers: Headers, env: Env, chain: string): Promise<Response> {
-	const listed = await env.FOREST_ARCHIVE.list({ prefix: chain + '/latest/' });
-	const latest = listed.objects.at(-1);
-	if (latest == null) {
-		return new Response(`No latest snapshot found ${chain}`, {
-			status: 404,
-		});
-	} else {
-		const object = await env.FOREST_ARCHIVE.get(latest.key, {
-			range: req_headers,
-			onlyIf: req_headers,
-		});
+enum SnapshotType {
+	latest = 'latest',
+	archive = 'archive',
+}
 
-		if (object === null) {
-			return new Response('No latest snapshot found', {
-				status: 404,
-			});
+// Directly fetch the data for the latest snapshot of a given chain (eg. calibnet or mainnet)
+async function get_latest(req_headers: Headers, env: Env, path: string, type: SnapshotType): Promise<Response> {
+		let object: R2ObjectBody|null = null;
+
+		switch (type) {
+				case SnapshotType.latest: {
+						const listed = await env.FOREST_ARCHIVE.list({prefix: path + '/latest/'});
+						const latest = listed.objects.at(-1);
+						if (latest == undefined) {
+								return new Response(`No latest snapshot found ${path}`, {
+										status: 404,
+								});
+						}
+
+						object = await env.FOREST_ARCHIVE.get(latest.key, {
+								range: req_headers,
+								onlyIf: req_headers,
+						});
+						if (object === null) {
+								return new Response('No latest snapshot found', {
+										status: 404,
+								});
+						}
+						break;
+				}
+				case SnapshotType.archive: {
+						object = await env.FOREST_ARCHIVE.get(path, {
+								range: req_headers,
+								onlyIf: req_headers,
+						});
+						if (object === null) {
+								return new Response(`No archive snapshot found ${path}`, {
+										status: 404,
+								});
+						}
+						break;
+				}
+				default: {
+						return new Response('Invalid Snapshot Type. Only archive OR latest is supported', {
+								status: 400,
+						});
+				}
 		}
 
 		const headers = new Headers();
@@ -73,27 +103,40 @@ async function get_latest(req_headers: Headers, env: Env, chain: string): Promis
 				status,
 			});
 		}
-	}
 }
 
 export default {
 	async fetch(request: Request, env: Env): Promise<Response> {
-		const url = new URL(request.url);
-		const chain = (url.pathname.match(/\/latest\/(\w*)/) || ['undefined'])[1];
-
 		// Disallow any other request method except HEAD and GET, they are not sensible in the context
 		// of fetching a snapshot.
 		switch (request.method) {
-			case 'HEAD':
-			case 'GET':
-				return await get_latest(request.headers, env, chain);
-			default:
-				return new Response('Method not allowed', {
-					status: 405,
-					headers: {
-						Allow: 'GET, HEAD',
-					},
+				case 'HEAD':{
+						break;
+				}
+				case 'GET':{
+					const url = new URL(request.url);
+					const path = url.pathname.match(/\/archive\/(\S*)/);
+					if (path != null && path.length > 1) {
+							return await get_latest(request.headers, env, path[1], SnapshotType.archive);
+					}
+
+					const chain = url.pathname.match(/\/latest\/(\w*)/);
+					if (chain != null && chain.length > 1) {
+							return await get_latest(request.headers, env, chain[1], SnapshotType.latest);
+					}
+
+				return new Response('path not found', {
+						status: 404,
 				});
+			}
+			default: {
+					return new Response('Method not allowed', {
+							status: 405,
+							headers: {
+									Allow: 'GET, HEAD',
+							},
+					});
+			}
 		}
 	},
 };
