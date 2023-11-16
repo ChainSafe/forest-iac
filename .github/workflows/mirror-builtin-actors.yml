@@ -25,15 +25,15 @@ jobs:
           secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Run mirroring script to DigitalOcean
-        working-directory: script
+        working-directory: scripts
         #if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
         run: bash ./mirror-builtin-actors.sh filecoin-builtin-actors/actors
         env:
             SLACK_API_TOKEN: ${{ secrets.SLACK_TOKEN }}
+            SLACK_CHANNEL: "#forest-dump"
 
 
   mirror-releases-cf:
-    needs: mirror-releases-do
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
@@ -48,7 +48,7 @@ jobs:
           account_id: "2238a825c5aca59233eab1f221f7aefb"
 
       - name: Run mirroring script to Cloudflare
-        working-directory: script
+        working-directory: scripts
         #if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
         run: bash ./mirror-builtin-actors.sh filecoin-builtin-actors/actors
         env:
