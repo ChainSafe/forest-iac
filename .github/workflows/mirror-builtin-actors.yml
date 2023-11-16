@@ -1,16 +1,11 @@
 name: Mirror Builtin Actors Releases
-
 on:
 #   schedule:
 #     - cron: '0 * * * *'  # Runs every hour
   pull_request:
-    branches:
-        - main
     paths:
       - 'script/mirror-builtin-actors.sh'
   push:
-    branches:
-        - main
     paths:
       - 'script/mirror-builtin-actors.sh'
   workflow_dispatch:
@@ -33,6 +28,9 @@ jobs:
         working-directory: script
         if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
         run: bash ./mirror-builtin-actors.sh filecoin-builtin-actors/actors
+        env:
+            SLACK_API_TOKEN: ${{ secrets.SLACK_TOKEN }}
+
 
   mirror-releases-cf:
     needs: mirror-releases-do
@@ -47,9 +45,12 @@ jobs:
           provider: cloudflare
           access_key: ${{ secrets.R2_ACCESS_KEY }}
           secret_key: ${{ secrets.R2_SECRET_KEY }}
-          account_id: 2238a825c5aca59233eab1f221f7aefb
+          account_id: "2238a825c5aca59233eab1f221f7aefb"
 
       - name: Run mirroring script to Cloudflare
         working-directory: script
         if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
         run: bash ./mirror-builtin-actors.sh filecoin-builtin-actors/actors
+        env:
+            SLACK_API_TOKEN: ${{ secrets.SLACK_TOKEN }}
+            SLACK_CHANNEL: "#forest-dump"

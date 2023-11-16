@@ -51,7 +51,7 @@ send_slack_alert_with_summary() {
     local message="Builtin-actors assets upload summary:\n✅ Successful: $success_list\n🔥 Failed: $failure_list"
 
     curl -X POST -H 'Content-type: application/json' -H "Authorization: Bearer $SLACK_API_TOKEN" \
-    --data "{\"channel\":\"#forest-dump\",\"text\":\"${message}\"}" \
+    --data "{\"channel\":\"#SLACK_CHANNEL\",\"text\":\"${message}\"}" \
     https://slack.com/api/chat.postMessage
 }
 
