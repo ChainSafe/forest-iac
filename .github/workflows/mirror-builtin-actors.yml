@@ -4,10 +4,10 @@ on:
 #     - cron: '0 * * * *'  # Runs every hour
   pull_request:
     paths:
-      - 'script/mirror-builtin-actors.sh'
+      - 'scripts/mirror-builtin-actors.sh'
   push:
     paths:
-      - 'script/mirror-builtin-actors.sh'
+      - 'scripts/mirror-builtin-actors.sh'
   workflow_dispatch:
 
 jobs:
