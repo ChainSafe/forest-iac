@@ -21,7 +21,7 @@ async function get_latest(
 	path: string,
 	type: SnapshotType
 ): Promise<Response> {
-	let object: R2ObjectBody | null = null;
+	let object: R2ObjectBody | R2Object | null = null;
 
 	switch (type) {
 		case SnapshotType.latest: {
@@ -115,9 +115,7 @@ export default {
 		// Disallow any other request method except HEAD and GET, they are not sensible in the context
 		// of fetching a snapshot.
 		switch (request.method) {
-			case 'HEAD': {
-				break;
-			}
+			case 'HEAD':
 			case 'GET': {
 				const url = new URL(request.url);
 				const path = url.pathname.match(/\/archive\/(\S*)/);
