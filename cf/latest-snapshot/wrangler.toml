@@ -9,6 +9,11 @@ routes = [
     { pattern = "forest-archive.chainsafe.dev/latest/mainnet", zone_name = "chainsafe.dev" },
     { pattern = "forest-archive.chainsafe.dev/latest/calibnet/", zone_name = "chainsafe.dev" },
     { pattern = "forest-archive.chainsafe.dev/latest/mainnet/", zone_name = "chainsafe.dev" },
+
+#		below endpoints are for the archive
+		{ pattern = "forest-archive.chainsafe.dev/archive/calibnet/*", zone_name = "chainsafe.dev" },
+		{ pattern = "forest-archive.chainsafe.dev/archive/mainnet/*", zone_name = "chainsafe.dev" },
+		{ pattern = "forest-archive.chainsafe.dev/archive/historical/*", zone_name = "chainsafe.dev" }
 ]
 
 [[r2_buckets]]
