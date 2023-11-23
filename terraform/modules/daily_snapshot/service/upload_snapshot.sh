@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# If Forest hasn't synced to the network after 3 hours, something has gone wrong.
-SYNC_TIMEOUT=3h
+# If Forest hasn't synced to the network after 6 hours, something has gone wrong.
+SYNC_TIMEOUT=6h
 
 if [[ $# != 3 ]]; then
   echo "Usage: bash $0 CHAIN_NAME LOG_EXPORT_DAEMON LOG_EXPORT_METRICS"
@@ -66,11 +66,6 @@ forest-tool db destroy --force --config config.toml --chain "$CHAIN_NAME"
 
 forest --config config.toml --chain "$CHAIN_NAME" --auto-download-snapshot --halt-after-import
 forest --config config.toml --chain "$CHAIN_NAME" --no-gc --save-token=token.txt --detach
-timeout "$SYNC_TIMEOUT" forest-cli sync wait
-# Forest isn't waiting until fully synced. Tracking issue: https://github.com/ChainSafe/forest/issues/3540
-# Calling 'sync wait' multiple times is a work-around.
-timeout "$SYNC_TIMEOUT" forest-cli sync wait
-timeout "$SYNC_TIMEOUT" forest-cli sync wait
 timeout "$SYNC_TIMEOUT" forest-cli sync wait
 forest-cli snapshot export -o forest_db/
 forest-cli --token=\$(cat token.txt) shutdown --force
