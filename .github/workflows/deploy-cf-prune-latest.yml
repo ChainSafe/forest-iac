@@ -2,11 +2,11 @@ name: Deploy CF prune-latest
 on:
   pull_request:
     paths:
-      - 'cf/prune-latest'
+      - 'cf/prune-latest/**'
       - '.github/workflows/deploy-cf-prune-latest.yml'
   push:
     paths:
-      - 'cf/prune-latest'
+      - 'cf/prune-latest/**'
       - '.github/workflows/deploy-cf-prune-latest.yml'
   workflow_dispatch:
 
