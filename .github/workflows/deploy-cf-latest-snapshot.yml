@@ -2,11 +2,11 @@ name: Deploy CF latest-snapshot
 on:
   pull_request:
     paths:
-      - 'cf/latest-snapshot'
+      - 'cf/latest-snapshot/**'
       - '.github/workflows/deploy-cf-latest-snapshot.yml'
   push:
     paths:
-      - 'cf/latest-snapshot'
+      - 'cf/latest-snapshot/**'
       - '.github/workflows/deploy-cf-latest-snapshot.yml'
   workflow_dispatch:
 
