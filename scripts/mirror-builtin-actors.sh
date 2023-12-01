@@ -3,7 +3,7 @@
 # This script mirrors all releases of Filecoin's builtin-actors, properly versioned.
 # It downloads release assets from GitHub, compares them with the existing ones in an S3 bucket,
 # uploads new or updated assets, and sends alerts to Slack if there are failures.
-# It only processes releases updated within the past week.
+# It only processes releases updated within the past weeks.
 
 set -eo pipefail
 
@@ -80,14 +80,17 @@ while IFS= read -r version_dir; do
 
                 if cmp --silent "$FILE_NAME" "$TEMP_S3_DIR/$FILE_NAME"; then
                     echo "$FILE_NAME is the same in S3, skipping..."
+                    rm "$FILE_NAME" "$TEMP_S3_DIR/$FILE_NAME"
                 else
                     echo "Local $FILE_NAME is different. Uploading to S3..."
                     if s3cmd --acl-public put "$FILE_NAME" "s3://$BUCKET_NAME/$TAG_NAME/$FILE_NAME"; then
                         echo "Uploaded $FILE_NAME to s3://$BUCKET_NAME/$TAG_NAME/$FILE_NAME"
+                        rm "$FILE_NAME" "$TEMP_S3_DIR/$FILE_NAME"
                     else
                         echo "Failed to upload $FILE_NAME. Logging to $FAILED_LOG"
                         echo "$TAG_NAME/$FILE_NAME" >> "$FAILED_LOG"
                         failed_uploads+=("$TAG_NAME/$FILE_NAME")
+                        rm "$FILE_NAME" "$TEMP_S3_DIR/$FILE_NAME"
                     fi
                 fi
                 rm -rf "$TEMP_S3_DIR"
@@ -100,4 +103,6 @@ done < <(find "$BASE_FOLDER" -mindepth 1 -type d)
 # Send summary alert only if there were failed uploads
 if [ ${#failed_uploads[@]} -ne 0 ]; then
     send_slack_alert_with_failed
+else
+    echo "No new mirroring failures"
 fi
