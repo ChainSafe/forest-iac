@@ -15,34 +15,31 @@ FAILED_LOG="$(pwd)/failed_uploads.log"
 
 # Create base directory and log file
 mkdir -p "$BASE_FOLDER"
-> "$FAILED_LOG" # Clear previous log content
 
 # Get the date 1 week ago in YYYY-MM-DD format
-#ONE_WEEK_AGO=$(date -d '1 week ago' +%F) # For Linux
-ONE_WEEK_AGO=$(date -v-1w +%F) # For macOS
-echo "one_week_age - $ONE_WEEK_AGO"
+ONE_WEEK_AGO=$(date -d '2 week ago' +%s)
 
-# Fetch all releases and create directories for those updated in the last week
+# Fetch all releases and create directories for those published in the last week
 curl -sS $API_URL | jq -c '.[]' | while read -r release; do
     TAG_NAME=$(echo "$release" | jq -r '.tag_name')
-    UPDATE_DATE=$(echo "$release" | jq -r '.updated_at')
-    echo "updated_at - $UPDATE_DATE"
-    PUBLISHED_DATE=$(echo "$release" | jq -r '.published_at' | cut -c 1-10)
+    PUBLISHED_DATE=$(echo "$release" | jq -r '.published_at')
 
-    echo "published_date - $PUBLISHED_DATE" # Debugging line
+    # Convert PUBLISHED_DATE to seconds since the epoch for comparison
+    PUBLISHED_DATE_SEC=$(date -d "$PUBLISHED_DATE" +%s) # For Linux
 
-   # Check if PUBLISHED_DATE is equal to or more recent than ONE_WEEK_AGO
-    if [[ "$PUBLISHED_DATE" < "$ONE_WEEK_AGO" ]]; then
+    # Check if PUBLISHED_DATE_SEC is equal to or more recent than ONE_WEEK_AGO
+    if [[ "$PUBLISHED_DATE_SEC" -ge "$TWO_WEEK_AGO" ]]; then
         mkdir -p "$BASE_FOLDER/$TAG_NAME"
     fi
 done
+
 # Initialize array for tracking failed uploads
 declare -a failed_uploads
 
 # Function to send Slack alert with failed uploads
 send_slack_alert_with_failed() {
     local failure_count=${#failed_uploads[@]}
-    local message="🚨 FILEcoin Actors Mirror Update:\n🔥 Failed"
+    local message="🚨 FILEcoin Actors Mirror Update:\n🔥 Failed Uploads: $failure_count"
 
     # Attach the log file with failed uploads
     curl -F file=@"$FAILED_LOG" -F "initial_comment=$message" -F channels="$SLACK_CHANNEL" \
@@ -52,7 +49,7 @@ send_slack_alert_with_failed() {
 
 # Loop through all version directories for downloading assets and S3 upload
 while IFS= read -r version_dir; do
-    TAG_NAME=${version_dir#$BASE_FOLDER/}
+    TAG_NAME=${version_dir#"$BASE_FOLDER"/}
     VERSION_DIR="$version_dir"
     if [ -d "$VERSION_DIR" ]; then
         echo "Entering directory: $VERSION_DIR"
