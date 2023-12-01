@@ -50,7 +50,7 @@ jobs:
           secret_key: ${{ secrets.R2_SECRET_KEY }}
           account_id: "2238a825c5aca59233eab1f221f7aefb"
 
-      - name: Run mirroring script to Cloudflare
+      - name: Run script to mirror to Cloudflare
         working-directory: scripts
         if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
         run: bash ./mirror-builtin-actors.sh

@@ -1,90 +1,106 @@
 #!/bin/bash
 
-# This script automates the process of mirroring the latest releases of FILEcoin's builtin-actors.
-# It downloads the latest release assets from GitHub and compares them with the existing ones in an S3 bucket.
-# If there are new or updated assets, the script uploads them to the bucket and send alerts to Slack.
+# This script mirrors all releases of FILEcoin's builtin-actors, properly versioned.
+# It downloads release assets from GitHub, compares them with the existing ones in an S3 bucket,
+# uploads new or updated assets, and sends alerts to Slack if there are failures.
+# It only processes releases updated within the past week.
 
 set -eo pipefail
 
 export DEBIAN_FRONTEND=noninteractive
 
-RELEASE_FOLDER="releases/actors"
+BASE_FOLDER="$(pwd)/releases/actors"
+API_URL="https://api.github.com/repos/filecoin-project/builtin-actors/releases"
+FAILED_LOG="$(pwd)/failed_uploads.log"
 
-# Move to the base folder
-mkdir -p "$RELEASE_FOLDER"
-cd "$RELEASE_FOLDER"
+# Create base directory and log file
+mkdir -p "$BASE_FOLDER"
+> "$FAILED_LOG" # Clear previous log content
 
-# Set the GitHub API URL for the latest release
-API_URL="https://api.github.com/repos/filecoin-project/builtin-actors/releases/latest"
+# Get the date 1 week ago in YYYY-MM-DD format
+#ONE_WEEK_AGO=$(date -d '1 week ago' +%F) # For Linux
+ONE_WEEK_AGO=$(date -v-1w +%F) # For macOS
+echo "one_week_age - $ONE_WEEK_AGO"
 
-# Use curl to fetch the latest release data
-ASSETS=$(curl -sS $API_URL | jq -c '.assets[]')
+# Fetch all releases and create directories for those updated in the last week
+curl -sS $API_URL | jq -c '.[]' | while read -r release; do
+    TAG_NAME=$(echo "$release" | jq -r '.tag_name')
+    UPDATE_DATE=$(echo "$release" | jq -r '.updated_at')
+    echo "updated_at - $UPDATE_DATE"
+    PUBLISHED_DATE=$(echo "$release" | jq -r '.published_at' | cut -c 1-10)
 
-# Check if assets are available
-if [ -z "$ASSETS" ]; then
-    echo "No assets found for the latest release."
-    exit 1
-fi
+    echo "published_date - $PUBLISHED_DATE" # Debugging line
 
-# Download ASSETS from GitHub
-echo "$ASSETS" | while read -r asset; do
-    DOWNLOAD_URL=$(echo "$asset" | jq -r '.browser_download_url')
-    FILE_NAME=$(echo "$asset" | jq -r '.name')
-
-    if [ ! -f "$FILE_NAME" ]; then
-        echo "Downloading $FILE_NAME..."
-        wget -q "$DOWNLOAD_URL" -O "$FILE_NAME"
+   # Check if PUBLISHED_DATE is equal to or more recent than ONE_WEEK_AGO
+    if [[ "$PUBLISHED_DATE" < "$ONE_WEEK_AGO" ]]; then
+        mkdir -p "$BASE_FOLDER/$TAG_NAME"
     fi
 done
-
-# Initialize arrays for tracking uploads
-declare -a successful_uploads
+# Initialize array for tracking failed uploads
 declare -a failed_uploads
 
-# Function to send Slack alert with summary
-send_slack_alert_with_summary() {
-    local success_list="${successful_uploads[*]}"
-    local failure_list="${failed_uploads[*]}"
-    local message="$ENVIROMENT builtin-actors assets upload summary:\n✅ Successful: $success_list\n🔥 Failed: $failure_list"
+# Function to send Slack alert with failed uploads
+send_slack_alert_with_failed() {
+    local failure_count=${#failed_uploads[@]}
+    local message="🚨 FILEcoin Actors Mirror Update:\n🔥 Failed"
 
-    curl -X POST -H 'Content-type: application/json' -H "Authorization: Bearer $SLACK_API_TOKEN" \
-    --data "{\"channel\":\"$SLACK_CHANNEL\",\"text\":\"${message}\"}" \
-    https://slack.com/api/chat.postMessage
+    # Attach the log file with failed uploads
+    curl -F file=@"$FAILED_LOG" -F "initial_comment=$message" -F channels="$SLACK_CHANNEL" \
+         -H "Authorization: Bearer $SLACK_API_TOKEN" \
+         https://slack.com/api/files.upload
 }
 
-# Loop through all files in the current directory
-for file in *; do
-    if [ -f "$file" ]; then
-        echo "Checking $file against S3 version..."
+# Loop through all version directories for downloading assets and S3 upload
+while IFS= read -r version_dir; do
+    TAG_NAME=${version_dir#$BASE_FOLDER/}
+    VERSION_DIR="$version_dir"
+    if [ -d "$VERSION_DIR" ]; then
+        echo "Entering directory: $VERSION_DIR"
 
-        # Create a temporary directory for the S3 download
-        TEMP_S3_DIR=$(mktemp -d)
+        release=$(curl -sS $API_URL | jq -c --arg TAG_NAME "$TAG_NAME" '.[] | select(.tag_name==$TAG_NAME)')
+        ASSETS=$(echo "$release" | jq -c '.assets[]')
 
-        # Download the file from S3 to the temporary location
-        s3cmd get --no-progress "s3://$BUCKET_NAME/$file" "$TEMP_S3_DIR/$file" || true
-
-        # Compare the local file with the downloaded file
-        if cmp --silent "$file" "$TEMP_S3_DIR/$file"; then
-            echo "$file is the same in S3, skipping..."
-            rm -rf "$file"
+        # Download assets for this release
+        pushd "$VERSION_DIR" > /dev/null
+        echo "Processing assets for $TAG_NAME..."
+        if [ -z "$ASSETS" ]; then
+            echo "No assets found for $TAG_NAME."
         else
-            echo "Local $file is different. Uploading to S3..."
-            if s3cmd --acl-public put --no-progress "$file" "s3://$BUCKET_NAME/$file"; then
-                echo "Uploaded $file to s3://$BUCKET_NAME/$file"
-                successful_uploads+=("$file")
-            else
-                echo "Failed to upload $file."
-                failed_uploads+=("$file")
-            fi
+            echo "$ASSETS" | while IFS= read -r asset; do
+                DOWNLOAD_URL=$(echo "$asset" | jq -r '.browser_download_url')
+                FILE_NAME=$(echo "$asset" | jq -r '.name')
+
+                echo "Checking asset: $FILE_NAME"
+                if [ ! -f "$FILE_NAME" ]; then
+                    echo "Downloading $FILE_NAME..."
+                    wget -q "$DOWNLOAD_URL" -O "$FILE_NAME" || echo "Failed to download $FILE_NAME"
+                fi
+
+                # S3 upload logic for each file
+                echo "Checking $FILE_NAME against S3 version..."
+                TEMP_S3_DIR=$(mktemp -d)
+                s3cmd get --no-progress "s3://$BUCKET_NAME/$TAG_NAME/$FILE_NAME" "$TEMP_S3_DIR/$FILE_NAME" || true
+
+                if cmp --silent "$FILE_NAME" "$TEMP_S3_DIR/$FILE_NAME"; then
+                    echo "$FILE_NAME is the same in S3, skipping..."
+                else
+                    echo "Local $FILE_NAME is different. Uploading to S3..."
+                    if s3cmd --acl-public put "$FILE_NAME" "s3://$BUCKET_NAME/$TAG_NAME/$FILE_NAME"; then
+                        echo "Uploaded $FILE_NAME to s3://$BUCKET_NAME/$TAG_NAME/$FILE_NAME"
+                    else
+                        echo "Failed to upload $FILE_NAME. Logging to $FAILED_LOG"
+                        echo "$TAG_NAME/$FILE_NAME" >> "$FAILED_LOG"
+                        failed_uploads+=("$TAG_NAME/$FILE_NAME")
+                    fi
+                fi
+                rm -rf "$TEMP_S3_DIR"
+            done
         fi
-
-        rm -rf "$TEMP_S3_DIR"
+        popd > /dev/null
     fi
-done
+done < <(find "$BASE_FOLDER" -mindepth 1 -type d)
 
-# Send summary alert at the end only if there were uploads or failures
-if [ ${#successful_uploads[@]} -ne 0 ] || [ ${#failed_uploads[@]} -ne 0 ]; then
-    send_slack_alert_with_summary
-else
-    echo "No new mirroring uploads or failures"
+# Send summary alert only if there were failed uploads
+if [ ${#failed_uploads[@]} -ne 0 ]; then
+    send_slack_alert_with_failed
 fi
