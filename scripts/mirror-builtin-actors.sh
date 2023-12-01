@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This script mirrors all releases of FILEcoin's builtin-actors, properly versioned.
+# This script mirrors all releases of Filecoin's builtin-actors, properly versioned.
 # It downloads release assets from GitHub, compares them with the existing ones in an S3 bucket,
 # uploads new or updated assets, and sends alerts to Slack if there are failures.
 # It only processes releases updated within the past week.
@@ -16,8 +16,8 @@ FAILED_LOG="$(pwd)/failed_uploads.log"
 # Create base directory and log file
 mkdir -p "$BASE_FOLDER"
 
-# Get the date 1 week ago in YYYY-MM-DD format
-ONE_WEEK_AGO=$(date -d '2 week ago' +%s)
+# Get the date 2 week ago in YYYY-MM-DD format
+TWO_WEEK_AGO=$(date -d '2 week ago' +%s)
 
 # Fetch all releases and create directories for those published in the last week
 curl -sS $API_URL | jq -c '.[]' | while read -r release; do
@@ -39,7 +39,7 @@ declare -a failed_uploads
 # Function to send Slack alert with failed uploads
 send_slack_alert_with_failed() {
     local failure_count=${#failed_uploads[@]}
-    local message="🚨 FILEcoin Actors Mirror Update:\n🔥 Failed Uploads: $failure_count"
+    local message="🚨 Fileoin Actors Mirror Update:\n🔥 Failed Uploads: $failure_count"
 
     # Attach the log file with failed uploads
     curl -F file=@"$FAILED_LOG" -F "initial_comment=$message" -F channels="$SLACK_CHANNEL" \
