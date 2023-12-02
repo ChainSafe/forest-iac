@@ -5,6 +5,10 @@ This worker acts on two endpoints:
 - `https://forest-archive.chainsafe.dev/latest/calibnet/`
 - `https://forest-archive.chainsafe.dev/latest/mainnet/`
 
+- `https://forest-archive.chainsafe.dev/archive/calibnet/*`
+- `https://forest-archive.chainsafe.dev/archive/mainnet/*`
+- `https://forest-archive.chainsafe.dev/archive/historical/*`
+
 These links will download the latest available snapshot for calibnet and mainnet, respectively.
 
 # Local deployment
