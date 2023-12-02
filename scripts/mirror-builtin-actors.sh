@@ -25,9 +25,9 @@ curl -sS $API_URL | jq -c '.[]' | while read -r release; do
     PUBLISHED_DATE=$(echo "$release" | jq -r '.published_at')
 
     # Convert PUBLISHED_DATE to seconds since the epoch for comparison
-    PUBLISHED_DATE_SEC=$(date -d "$PUBLISHED_DATE" +%s) # For Linux
+    PUBLISHED_DATE_SEC=$(date -d "$PUBLISHED_DATE" +%s)
 
-    # Check if PUBLISHED_DATE_SEC is equal to or more recent than ONE_WEEK_AGO
+    # Check if PUBLISHED_DATE_SEC is equal to or more recent than TWO_WEEK_AGO
     if [[ "$PUBLISHED_DATE_SEC" -ge "$TWO_WEEK_AGO" ]]; then
         mkdir -p "$BASE_FOLDER/$TAG_NAME"
     fi
@@ -41,7 +41,6 @@ send_slack_alert_with_failed() {
     local failure_count=${#failed_uploads[@]}
     local message="🚨 Fileoin Actors Mirror Update:\n🔥 Failed Uploads: $failure_count"
 
-    # Attach the log file with failed uploads
     curl -F file=@"$FAILED_LOG" -F "initial_comment=$message" -F channels="$SLACK_CHANNEL" \
          -H "Authorization: Bearer $SLACK_API_TOKEN" \
          https://slack.com/api/files.upload
