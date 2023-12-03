@@ -1,9 +1,11 @@
 #!/bin/bash
 
-# This script mirrors all releases of Filecoin's builtin-actors, properly versioned.
-# It downloads release assets from GitHub, compares them with the existing ones in an S3 bucket,
-# uploads new or updated assets, and sends alerts to Slack if there are failures.
-# It only processes releases updated within the past weeks.
+# This script mirrors all releases of Filecoin's builtin-actors that have been updated in the past two weeks.
+# It performs the following operations:
+# - Downloads release assets from GitHub.
+# - Compares these assets with the existing ones in an S3 bucket.
+# - Uploads new or updated assets to the S3 bucket.
+# - Sends an alert to Slack if any uploads fail.
 
 set -eo pipefail
 
@@ -13,13 +15,13 @@ BASE_FOLDER="$(pwd)/releases/actors"
 API_URL="https://api.github.com/repos/filecoin-project/builtin-actors/releases"
 FAILED_LOG="$(pwd)/failed_uploads.log"
 
-# Create base directory and log file
+ : 'Create base directory and log file'
 mkdir -p "$BASE_FOLDER"
 
-# Get the date 2 week ago in YYYY-MM-DD format
+: 'Calculate the date two weeks ago in Unix timestamp format'
 TWO_WEEK_AGO=$(date -d '2 week ago' +%s)
 
-# Fetch all releases and create directories for those published in the last week
+: 'Fetch all releases and create directories for those published in the last week'
 curl -sS $API_URL | jq -c '.[]' | while read -r release; do
     TAG_NAME=$(echo "$release" | jq -r '.tag_name')
     PUBLISHED_DATE=$(echo "$release" | jq -r '.published_at')
@@ -33,10 +35,10 @@ curl -sS $API_URL | jq -c '.[]' | while read -r release; do
     fi
 done
 
-# Initialize array for tracking failed uploads
+: 'Initialize array for tracking failed uploads'
 declare -a failed_uploads
 
-# Function to send Slack alert with failed uploads
+: 'Function to send Slack alert with failed uploads'
 send_slack_alert_with_failed() {
     local failure_count=${#failed_uploads[@]}
     local message="🚨 Fileoin Actors Mirror Update:\n🔥 Failed Uploads: $failure_count"
@@ -46,7 +48,7 @@ send_slack_alert_with_failed() {
          https://slack.com/api/files.upload
 }
 
-# Loop through all version directories for downloading assets and S3 upload
+: 'Loop through each version directory to process and upload assets'
 while IFS= read -r version_dir; do
     TAG_NAME=${version_dir#"$BASE_FOLDER"/}
     VERSION_DIR="$version_dir"
@@ -56,7 +58,7 @@ while IFS= read -r version_dir; do
         release=$(curl -sS $API_URL | jq -c --arg TAG_NAME "$TAG_NAME" '.[] | select(.tag_name==$TAG_NAME)')
         ASSETS=$(echo "$release" | jq -c '.assets[]')
 
-        # Download assets for this release
+        : 'Download assets for this release'
         pushd "$VERSION_DIR" > /dev/null
         echo "Processing assets for $TAG_NAME..."
         if [ -z "$ASSETS" ]; then
@@ -72,7 +74,7 @@ while IFS= read -r version_dir; do
                     wget -q "$DOWNLOAD_URL" -O "$FILE_NAME" || echo "Failed to download $FILE_NAME"
                 fi
 
-                # S3 upload logic for each file
+                : 'Compare the downloaded file with the one in S3; upload if different'
                 echo "Checking $FILE_NAME against S3 version..."
                 TEMP_S3_DIR=$(mktemp -d)
                 s3cmd get --no-progress "s3://$BUCKET_NAME/$TAG_NAME/$FILE_NAME" "$TEMP_S3_DIR/$FILE_NAME" || true
@@ -99,7 +101,7 @@ while IFS= read -r version_dir; do
     fi
 done < <(find "$BASE_FOLDER" -mindepth 1 -type d)
 
-# Send summary alert only if there were failed uploads
+: 'Send summary alert only if there were failed uploads'
 if [ ${#failed_uploads[@]} -ne 0 ]; then
     send_slack_alert_with_failed
 else
