@@ -1,6 +1,6 @@
 locals {
-  # Parse the file path we're in to read the env name: e.g., env 
-  # will be "dev" in the dev folder, "stage" in the stage folder, 
+  # Parse the file path we're in to read the env name: e.g., env
+  # will be "dev" in the dev folder, "stage" in the stage folder,
   # etc.
   parsed = regex(".*/environments/(?P<env>.*?)/.*", get_terragrunt_dir())
   env    = local.parsed.env
@@ -15,7 +15,7 @@ remote_state {
   }
   config = {
     // if the environment is dev, use the dev bucket, otherwise use the prod bucket
-    bucket = (local.env == "prod" 
+    bucket = (local.env == "prod"
              ? "hubert-bucket-prod"
              : "hubert-bucket-dev"
              )

@@ -124,4 +124,3 @@ resource "digitalocean_project_resources" "connect_forest_project" {
   project   = data.digitalocean_project.forest_project.id
   resources = [digitalocean_droplet.forest.urn]
 }
-
