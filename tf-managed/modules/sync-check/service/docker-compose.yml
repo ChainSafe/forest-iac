@@ -1,0 +1,118 @@
+# Docker compose file to run continuous Forest sync on both mainnet and calibnet.
+
+version: "3.7"
+
+services:
+  forest_mainnet:
+    image: ghcr.io/chainsafe/forest:${FOREST_TAG}
+    hostname: forest-mainnet
+    container_name: forest-mainnet
+    networks:
+      - mainnet
+    volumes:
+      - type: volume
+        source: forest-data
+        target: ${FOREST_TARGET_DATA}
+      - type: volume
+        source: sync-check
+        target: ${FOREST_TARGET_SCRIPTS}
+    command:
+      - '--chain'
+      - 'mainnet'
+      - '--config'
+      - ${FOREST_TARGET_SCRIPTS}/sync_check.toml
+      - '--auto-download-snapshot'
+      - '--save-token'
+      - '/tmp/admin_token'
+    environment:
+      FOREST_GC_TRIGGER_FACTOR: "1.4"
+    restart: unless-stopped
+    labels:
+      com.centurylinklabs.watchtower.enable: true
+  forest_calibnet:
+    image: ghcr.io/chainsafe/forest:${FOREST_TAG}
+    hostname: forest-calibnet
+    container_name: forest-calibnet
+    networks:
+      - calibnet
+    volumes:
+      - type: volume
+        source: forest-data
+        target: ${FOREST_TARGET_DATA}
+      - type: volume
+        source: sync-check
+        target: ${FOREST_TARGET_SCRIPTS}
+    command:
+      - '--chain'
+      - 'calibnet'
+      - '--config'
+      - ${FOREST_TARGET_SCRIPTS}/sync_check.toml
+      - '--auto-download-snapshot'
+      - '--save-token'
+      - '/tmp/admin_token'
+    environment:
+      FOREST_GC_TRIGGER_FACTOR: "1.2"
+    restart: unless-stopped
+    labels:
+      com.centurylinklabs.watchtower.enable: true
+  # Probe container to validate Forest syncing. Needs to be on the same network.
+  forest_tester:
+    build:
+      context: .
+      dockerfile: Dockerfile-tester
+    container_name: forest-tester
+    privileged: true
+    networks:
+      - mainnet
+      - calibnet
+    volumes:
+      - type: volume
+        source: forest-data
+        target: ${FOREST_TARGET_DATA}
+      - type: volume
+        read_only: true
+        source: sync-check
+        target: ${FOREST_TARGET_SCRIPTS}
+      # Put common Ruby utils into a path that should be by default in Ruby PATH
+      - type: volume
+        read_only: true
+        source: ruby-common
+        target: /usr/local/share/ruby/site_ruby/cs_utils
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - LOG_DIR=${FOREST_TARGET_DATA}
+      - SCRIPTS_DIR=${FOREST_TARGET_SCRIPTS}
+      - FOREST_SLACK_API_TOKEN=${FOREST_SLACK_API_TOKEN}
+      - FOREST_SLACK_NOTIF_CHANNEL=${FOREST_SLACK_NOTIF_CHANNEL}
+      - FOREST_TARGET_DATA=${FOREST_TARGET_DATA}
+      - FOREST_TARGET_SCRIPTS=${FOREST_TARGET_SCRIPTS}
+      - FOREST_TAG=${FOREST_TAG}
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - |
+        ruby ${FOREST_TARGET_SCRIPTS}/sync_check.rb forest-mainnet &
+        ruby ${FOREST_TARGET_SCRIPTS}/sync_check.rb forest-calibnet &
+        wait
+        sleep infinity
+    depends_on:
+      - forest_mainnet
+      - forest_calibnet
+    restart: unless-stopped
+    labels:
+      com.centurylinklabs.watchtower.enable: true
+      com.centurylinklabs.watchtower.depends-on: "forest-mainnet,forest-calibnet"
+
+volumes:
+  forest-data:
+    external: true
+    name: forest-data
+  sync-check:
+    external: true
+    name: sync-check
+  ruby-common:
+    external: true
+    name: ruby-common
+
+networks:
+  mainnet:
+  calibnet:
