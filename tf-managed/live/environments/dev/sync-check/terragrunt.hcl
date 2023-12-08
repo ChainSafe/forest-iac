@@ -10,6 +10,6 @@ terraform {
 }
 
 inputs = {
-  name          = "hubert-sync-check-dev" # TODO get environment from terragrunt
+  name          = "hubert-sync-check"
   size          = "s-4vcpu-16gb-amd"
 }

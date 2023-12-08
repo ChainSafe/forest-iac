@@ -42,4 +42,5 @@ remote_state {
 inputs = {
   common_resources_dir = format("%s/../common", get_parent_terragrunt_dir())
   slack_channel        = (local.env == "prod" ? "#forest-notifications" : "#forest-dump")
+  env                  = local.env
 }

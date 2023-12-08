@@ -10,7 +10,6 @@ terraform {
 }
 
 inputs = {
-  # Configure service:
-  name          = "hubert-sync-check-prod" # TODO get environment from terragrunt
-  size          = "s-4vcpu-16gb-amd"      # droplet size
+  name          = "hubert-sync-check"
+  size          = "s-4vcpu-16gb-amd"
 }
