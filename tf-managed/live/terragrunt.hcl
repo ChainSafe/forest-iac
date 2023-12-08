@@ -22,9 +22,6 @@ remote_state {
     key    = "${local.env}-terraform.tfstate"
     region = "eu-west-1"
     endpoint = "https://fra1.digitaloceanspaces.com"
-    //endpoints = {
-    //  s3 = "https://fra1.digitaloceanspaces.com"
-    //}
     skip_bucket_versioning = true
     skip_bucket_ssencryption = true
     skip_bucket_root_access = true
