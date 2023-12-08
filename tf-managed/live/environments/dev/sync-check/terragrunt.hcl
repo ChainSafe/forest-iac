@@ -10,6 +10,6 @@ terraform {
 }
 
 inputs = {
-  name          = "hubert-sync-check"
-  size          = "s-4vcpu-16gb-amd"
+  name = "hubert-sync-check"
+  size = "s-4vcpu-16gb-amd"
 }
