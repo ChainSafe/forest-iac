@@ -65,7 +65,7 @@ echo "Chain: $CHAIN_NAME"
 forest-tool db destroy --force --config config.toml --chain "$CHAIN_NAME"
 
 forest --config config.toml --chain "$CHAIN_NAME" --auto-download-snapshot --halt-after-import
-forest --config config.toml --chain "$CHAIN_NAME" --no-gc --save-token=token.txt --detach
+forest --config config.toml --chain "$CHAIN_NAME" --no-gc --save-token=token.txt --target-peer-count 500 --detach
 timeout "$SYNC_TIMEOUT" forest-cli sync wait
 forest-cli snapshot export -o forest_db/
 forest-cli --token=\$(cat token.txt) shutdown --force
