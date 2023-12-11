@@ -36,7 +36,7 @@ async function get_latest(
 			// Response.redirect requires an absolute URL. Manually create the response to get around this.
 			return new Response('Found!', {
 				status: 302,
-				headers: { 'Location': '/archive/' + latest.key }
+				headers: { Location: '/archive/' + latest.key },
 			});
 		}
 		case SnapshotType.archive: {
