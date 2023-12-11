@@ -65,7 +65,7 @@ export default {
           <li><a href="/list/calibnet/latest">Calibnet Latest</a></li>
           <li><a href="/list/mainnet/diff">Mainnet Diffs</a></li>
           <li><a href="/list/mainnet/lite">Mainnet Lite</a></li>
-          <li><a href="/list/mainnet/lite">Mainnet Latest</a></li>
+          <li><a href="/list/mainnet/latest">Mainnet Latest</a></li>
           </ul>
           </body>`;
 				return new Response(html, {
