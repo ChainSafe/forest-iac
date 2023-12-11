@@ -38,7 +38,7 @@ async function do_listing(env, prefix) {
 		<body>
 		  <h1>Forest Archive</h1>
       <ul>`;
-  for (let obj of listed.objects) {
+  for (const obj of listed.objects) {
     html += `<li><a href="${BASE_URL}/${obj.key}">${obj.key}</a></li>\n`;
   }
   html += `</ul></body>`;
@@ -51,10 +51,10 @@ async function do_listing(env, prefix) {
 }
 
 export default {
-  async fetch(request, env, ctx) {
+  async fetch(request, env) {
 
     const url = new URL(request.url);
-    const { pathname, search } = url;
+    const { pathname } = url;
 
     switch (pathname) {
       case '/list/':
