@@ -57,7 +57,7 @@ export default {
     const { pathname } = url;
 
     switch (pathname) {
-      case '/list/':
+      case '/list/': {
         const html = `<!DOCTYPE html>
 		      <body>
 		      <h1>Forest Archive</h1>
@@ -75,16 +75,17 @@ export default {
             "content-type": "text/html;charset=UTF-8",
           },
         });
+      }
       case '/list/mainnet/diff':
         return do_listing(env, 'mainnet/diff');
       case '/list/calibnet/diff':
         return do_listing(env, 'calibnet/diff');
-      case '/list/calibnet/latest':
-        return do_listing(env, 'calibnet/latest');
       case '/list/mainnet/lite':
         return do_listing(env, 'mainnet/lite');
       case '/list/calibnet/lite':
         return do_listing(env, 'calibnet/lite');
+      case '/list/mainnet/latest':
+        return do_listing(env, 'mainnet/latest');
       case '/list/calibnet/latest':
         return do_listing(env, 'calibnet/latest');
       default:
