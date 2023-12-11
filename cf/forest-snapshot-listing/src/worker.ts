@@ -45,6 +45,7 @@ export default {
 		const { pathname } = url;
 
 		switch (pathname) {
+			case '/list':
 			case '/list/': {
 				const html = `<!DOCTYPE html>
 		      <body>
