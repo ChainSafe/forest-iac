@@ -31,6 +31,7 @@ variable "source_addresses" {
 variable "do_token" {
   description = "Token for authentication."
   type        = string
+  sensitive   = true
 }
 
 variable "volume_size" {
@@ -85,22 +86,25 @@ variable "NR_LICENSE_KEY" {
   description = "New Relic Access Token"
   default     = ""
   type        = string
+  sensitive   = true
 }
 
 variable "NEW_RELIC_API_KEY" {
   description = "New Relic API KEY"
   default     = ""
   type        = string
+  sensitive   = true
 }
 
 variable "NEW_RELIC_ACCOUNT_ID" {
   description = "New Relic Account ID"
   default     = ""
   type        = string
+  sensitive   = true
 }
 
 variable "NEW_RELIC_REGION" {
-  description = "The New Relic Plathom Region"
+  description = "The New Relic Platform Region"
   type        = string
   default     = "EU"
 }

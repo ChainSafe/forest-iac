@@ -14,12 +14,16 @@ terraform {
     region = "us-west-1"
     # The S3 region is determined by the endpoint. fra1 = Frankfurt.
     # This region does not have to be shared by the droplet.
-    endpoint = "https://fra1.digitaloceanspaces.com"
+    endpoints = {
+      s3 = "https://fra1.digitaloceanspaces.com"
+    }
 
     # Credentially can be validated through the Security Token Service (STS).
     # Unfortunately, DigitalOcean does not support STS so we have to skip the
     # validation.
     skip_credentials_validation = "true"
+    skip_requesting_account_id  = "true"
+    skip_s3_checksum            = "true"
   }
 }
 
@@ -29,7 +33,7 @@ module "sync_check" {
 
   # Configure service:
   name          = "forest-sync-check"     # droplet name
-  size          = "so-2vcpu-16gb"         # droplet size
+  size          = "s-4vcpu-16gb-amd"      # droplet size
   slack_channel = "#forest-notifications" # slack channel for notifications
 
   # Variable passthrough:

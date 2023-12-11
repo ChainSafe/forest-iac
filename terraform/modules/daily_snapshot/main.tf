@@ -58,20 +58,18 @@ data "digitalocean_ssh_keys" "keys" {
 # Set required environment variables
 locals {
   env_content = templatefile("${path.module}/service/forest-env.tpl", {
-    AWS_ACCESS_KEY_ID     = var.AWS_ACCESS_KEY_ID,
-    AWS_SECRET_ACCESS_KEY = var.AWS_SECRET_ACCESS_KEY,
-    R2_ACCESS_KEY         = var.R2_ACCESS_KEY,
-    R2_SECRET_KEY         = var.R2_SECRET_KEY,
-    r2_endpoint           = var.r2_endpoint,
-    slack_token           = var.slack_token,
-    slack_channel         = var.slack_channel,
-    snapshot_bucket       = var.snapshot_bucket,
-    snapshot_endpoint     = var.snapshot_endpoint,
-    NEW_RELIC_API_KEY     = var.NEW_RELIC_API_KEY,
-    NEW_RELIC_ACCOUNT_ID  = var.NEW_RELIC_ACCOUNT_ID,
-    NEW_RELIC_REGION      = var.NEW_RELIC_REGION,
-    BASE_FOLDER           = "/root",
-    forest_tag            = var.forest_tag
+    R2_ACCESS_KEY        = var.R2_ACCESS_KEY,
+    R2_SECRET_KEY        = var.R2_SECRET_KEY,
+    r2_endpoint          = var.r2_endpoint,
+    slack_token          = var.slack_token,
+    slack_channel        = var.slack_channel,
+    snapshot_bucket      = var.snapshot_bucket,
+    snapshot_endpoint    = var.snapshot_endpoint,
+    NEW_RELIC_API_KEY    = var.NEW_RELIC_API_KEY,
+    NEW_RELIC_ACCOUNT_ID = var.NEW_RELIC_ACCOUNT_ID,
+    NEW_RELIC_REGION     = var.NEW_RELIC_REGION,
+    BASE_FOLDER          = "/root",
+    forest_tag           = var.forest_tag
   })
 }
 

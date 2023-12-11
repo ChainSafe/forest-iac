@@ -1,15 +1,16 @@
 #!/bin/bash
 
-# If Forest hasn't synced to the network after 8 hours, something has gone wrong.
-SYNC_TIMEOUT=8h
+# If Forest hasn't synced to the network after 6 hours, something has gone wrong.
+SYNC_TIMEOUT=6h
 
-if [[ $# != 2 ]]; then
-  echo "Usage: bash $0 CHAIN_NAME SNAPSHOT_PATH"
+if [[ $# != 3 ]]; then
+  echo "Usage: bash $0 CHAIN_NAME LOG_EXPORT_DAEMON LOG_EXPORT_METRICS"
   exit 1
 fi
 
 CHAIN_NAME=$1
-NEWEST_SNAPSHOT=$2
+LOG_EXPORT_DAEMON=$2
+LOG_EXPORT_METRICS=$3
 
 # Make sure we have the most recent Forest image
 docker pull ghcr.io/chainsafe/forest:"${FOREST_TAG}"
@@ -26,18 +27,26 @@ apt-get update && apt-get install -y curl
 # Switch back to the service user for other service commands.
 su - forest
 
+function add_timestamps {
+  while IFS= read -r line; do
+    echo "\$(date +'%Y-%m-%d %H:%M:%S') \$line"
+  done
+}
+
 # periodically write metrics to a file
 # this is done in a separate process to avoid blocking the sync process
 # and to ensure that the metrics are written even if it crashes
 function write_metrics {
   while true; do
-    curl --silent --fail --output metrics.txt --max-time 5 --retry 5 --retry-delay 2 --retry-max-time 10 http://localhost:6116/metrics || true
-    sleep 5
+    {
+      curl --silent --fail --max-time 5 --retry 5 --retry-delay 2 --retry-max-time 10 http://localhost:6116/metrics || true
+    } | add_timestamps >> "$LOG_EXPORT_METRICS"
+    sleep 15
   done
 }
 
 function print_forest_logs {
-  cat forest.err forest.out metrics.txt
+  cat forest.err forest.out > $LOG_EXPORT_DAEMON
 }
 trap print_forest_logs EXIT
 
@@ -45,26 +54,20 @@ echo "[client]" > config.toml
 echo 'data_dir = "/home/forest/forest_db"' >> config.toml
 echo 'encrypt_keystore = false' >> config.toml
 
-# In case of failures, more elaborate logging may
-# help with debugging. We are doing this only for calibnet
-# because enabling this for mainnet might result in a huge
-# log file and bad performance.
-if [ "$CHAIN_NAME" = "calibnet" ]; then
-  export RUST_LOG=debug
-fi
-
 echo "Chain: $CHAIN_NAME"
-echo "Snapshot: $NEWEST_SNAPSHOT"
 
 # spawn a task in the background to periodically write Prometheus metrics to a file
-write_metrics &
+(
+  set +x  # Disable debugging for this subshell to keep the logs clean.
+  write_metrics
+) &
 
 forest-tool db destroy --force --config config.toml --chain "$CHAIN_NAME"
 
-forest --config config.toml --chain "$CHAIN_NAME" --import-snapshot "$NEWEST_SNAPSHOT" --halt-after-import
-forest --config config.toml --chain "$CHAIN_NAME" --no-gc --save-token=token.txt --detach
-timeout "$SYNC_TIMEOUT" forest-cli --chain "$CHAIN_NAME" sync wait
-forest-cli --chain "$CHAIN_NAME" snapshot export -o forest_db/
+forest --config config.toml --chain "$CHAIN_NAME" --auto-download-snapshot --halt-after-import
+forest --config config.toml --chain "$CHAIN_NAME" --no-gc --save-token=token.txt --target-peer-count 500 --detach
+timeout "$SYNC_TIMEOUT" forest-cli sync wait
+forest-cli snapshot export -o forest_db/
 forest-cli --token=\$(cat token.txt) shutdown --force
 
 # Run full checks only for calibnet, given that it takes too long for mainnet.
@@ -88,6 +91,7 @@ docker stop "$CONTAINER_NAME" || true
 docker rm --force "$CONTAINER_NAME"
 
 CHAIN_DB_DIR="$BASE_FOLDER/forest_db/$CHAIN_NAME"
+CHAIN_LOGS_DIR="$BASE_FOLDER/logs"
 
 # Delete any existing snapshot files. It may be that the previous run failed
 # before deleting those.
@@ -99,17 +103,12 @@ docker run \
   --rm \
   --user root \
   -v "$CHAIN_DB_DIR:/home/forest/forest_db":z \
+  -v "$CHAIN_LOGS_DIR:/home/forest/logs":z \
   --entrypoint /bin/bash \
   ghcr.io/chainsafe/forest:"${FOREST_TAG}" \
   -c "$COMMANDS" || exit 1
 
-# Upload snapshot to s3
-s3cmd --acl-public put "$CHAIN_DB_DIR/forest_snapshot_$CHAIN_NAME"* s3://"$SNAPSHOT_BUCKET"/"$CHAIN_NAME"/ || exit 1
-
-# Upload snapshot to CF
-unset AWS_SECRET_ACCESS_KEY
-unset AWS_ACCESS_KEY_ID
-aws --endpoint "$R2_ENDPOINT" s3 cp "$CHAIN_DB_DIR/forest_snapshot_$CHAIN_NAME"*.forest.car.zst s3://forest-archive/"$CHAIN_NAME"/latest/ || exit 1
+aws --endpoint "$R2_ENDPOINT" s3 cp --no-progress "$CHAIN_DB_DIR/forest_snapshot_$CHAIN_NAME"*.forest.car.zst s3://forest-archive/"$CHAIN_NAME"/latest/ || exit 1
 
 # Delete snapshot files
 rm "$CHAIN_DB_DIR/forest_snapshot_$CHAIN_NAME"*
