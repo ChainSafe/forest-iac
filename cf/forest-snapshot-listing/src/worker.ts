@@ -64,8 +64,10 @@ export default {
           <ul>
           <li><a href="/list/calibnet/diff">Calibnet Diffs</a></li>
           <li><a href="/list/calibnet/lite">Calibnet Lite</a></li>
+          <li><a href="/list/calibnet/lite">Calibnet Latest</a></li>
           <li><a href="/list/mainnet/diff">Mainnet Diffs</a></li>
           <li><a href="/list/mainnet/lite">Mainnet Lite</a></li>
+          <li><a href="/list/mainnet/lite">Mainnet Latest</a></li>
           </ul>
           </body>`;
         return new Response(html, {
@@ -77,10 +79,14 @@ export default {
         return do_listing(env, 'mainnet/diff');
       case '/list/calibnet/diff':
         return do_listing(env, 'calibnet/diff');
+      case '/list/calibnet/latest':
+        return do_listing(env, 'calibnet/latest');
       case '/list/mainnet/lite':
         return do_listing(env, 'mainnet/lite');
       case '/list/calibnet/lite':
         return do_listing(env, 'calibnet/lite');
+      case '/list/calibnet/latest':
+        return do_listing(env, 'calibnet/latest');
       default:
         return new Response(`url: ${pathname}`);
     }
