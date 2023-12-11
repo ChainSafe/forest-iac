@@ -62,7 +62,7 @@ export default {
           <ul>
           <li><a href="/list/calibnet/diff">Calibnet Diffs</a></li>
           <li><a href="/list/calibnet/lite">Calibnet Lite</a></li>
-          <li><a href="/list/calibnet/lite">Calibnet Latest</a></li>
+          <li><a href="/list/calibnet/latest">Calibnet Latest</a></li>
           <li><a href="/list/mainnet/diff">Mainnet Diffs</a></li>
           <li><a href="/list/mainnet/lite">Mainnet Lite</a></li>
           <li><a href="/list/mainnet/lite">Mainnet Latest</a></li>
