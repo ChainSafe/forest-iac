@@ -33,7 +33,7 @@ module "daily_snapshot" {
 
   # Configure service:
   name            = "forest-snapshot"       # droplet name
-  size            = "c2-8vcpu-16gb"         # droplet size
+  size            = "gd-8vcpu-32gb-intel"   # droplet size
   slack_channel   = "#forest-notifications" # slack channel for notifications
   snapshot_bucket = "forest-archive"
   forest_tag      = "v0.16.4"
