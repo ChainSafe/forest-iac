@@ -1,6 +1,6 @@
 # Automatically find the root terragrunt.hcl and inherit its
 # configuration
-include {
+include "root" {
   path = find_in_parent_folders()
 }
 
@@ -10,6 +10,6 @@ terraform {
 }
 
 inputs = {
-  name          = "hubert-sync-check"
-  size          = "s-4vcpu-16gb-amd"
+  name = "sync-check"
+  size = "s-4vcpu-16gb-amd"
 }
