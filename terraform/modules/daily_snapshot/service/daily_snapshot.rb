@@ -16,7 +16,7 @@ CHANNEL = get_and_assert_env_variable 'SLACK_NOTIF_CHANNEL'
 # Query the date of the most recent snapshot.
 def latest_snapshot_date(chain_name = 'calibnet')
   # We do not support HEAD requests but we _do_ support empty ranges.
-  filename = `curl --remote-name --remote-header-name --write-out "%{filename_effective}" --silent https://forest-archive.chainsafe.dev/latest/#{chain_name}/ -H "Range: bytes=0-0"`
+  filename = `curl --remote-name --remote-header-name --location --write-out "%{filename_effective}" --silent https://forest-archive.chainsafe.dev/latest/#{chain_name}/ -H "Range: bytes=0-0"`
   # Curl will create a file with a single byte in it. Let's clean it up.
   File.delete(filename)
   snapshot_format = /^([^_]+?)_snapshot_(?<network>[^_]+?)_(?<date>\d{4}-\d{2}-\d{2})_height_(?<height>\d+)(\.forest)?\.car.zst$/
