@@ -17,9 +17,9 @@ FOREST_TAG = get_and_assert_env_variable 'FOREST_TAG'
 
 # Sync check class encompassing all required methods and fields
 class SyncCheck
-  def initialize
+  def initialize(slack_client = nil)
     @logger = Logger.new($stdout)
-    @client = SlackClient.new CHANNEL, SLACK_TOKEN
+    @client = slack_client || SlackClient.new(CHANNEL, SLACK_TOKEN)
   end
 
   # Runs a command with an arbitrary binary available in the chainsafe/forest image

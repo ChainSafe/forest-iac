@@ -19,6 +19,7 @@ SLACK_TOKEN = get_and_assert_env_variable 'FOREST_SLACK_API_TOKEN'
 CHANNEL = get_and_assert_env_variable 'FOREST_SLACK_NOTIF_CHANNEL'
 SCRIPTS_DIR = get_and_assert_env_variable 'SCRIPTS_DIR'
 LOG_DIR = get_and_assert_env_variable 'LOG_DIR'
+TARGET_DATA = get_and_assert_env_variable 'FOREST_TARGET_DATA'
 
 hostname = ARGV[0]
 raise 'No arguments supplied. Please provide Forest hostname, e.g. forest-mainnet' if ARGV.empty?
@@ -36,24 +37,26 @@ FileUtils.mkdir_p LOG_DIR
 
 logger = Logger.new(LOG_SYNC)
 
-# Run the actual health check
-logger.info 'Running the health check...'
-health_check_passed = system("bash #{SCRIPTS_DIR}/health_check.sh #{hostname} > #{LOG_HEALTH} 2>&1")
-logger.info 'Health check finished'
+begin
+  # Run the actual health check
+  logger.info 'Running the health check...'
+  health_check_passed = system("bash #{SCRIPTS_DIR}/health_check.sh #{hostname} > #{LOG_HEALTH} 2>&1")
+  logger.info 'Health check finished'
 
-# Save the log capture from the Forest container
-container_logs = DockerUtils.get_container_logs hostname
-File.write(LOG_FOREST, container_logs)
+  # Save the log capture from the Forest container
+  container_logs = DockerUtils.get_container_logs hostname
+  File.write(LOG_FOREST, container_logs)
+ensure
+  client = SlackClient.new CHANNEL, SLACK_TOKEN
 
-client = SlackClient.new CHANNEL, SLACK_TOKEN
-
-if health_check_passed
-  client.post_message "✅ Sync check for #{hostname} passed. 🌲🌳🌲🌳🌲"
-else
-  client.post_message "⛔ Sync check for #{hostname} fiascoed. 🔥🌲🔥"
-  SyncCheck.new.run_forest_tool("db destroy --chain #{network} --force")
-  logger.info 'DB Destroyed'
+  if health_check_passed
+    client.post_message "✅ Sync check for #{hostname} passed. 🌲🌳🌲🌳🌲"
+  else
+    client.post_message "⛔ Sync check for #{hostname} fiascoed. 🔥🌲🔥"
+    FileUtils.rm_rf("#{TARGET_DATA}/#{network}")
+    logger.info 'DB Destroyed'
+  end
+  client.attach_files(LOG_HEALTH, LOG_SYNC, LOG_FOREST)
 end
-client.attach_files(LOG_HEALTH, LOG_SYNC, LOG_FOREST)
 
 logger.info 'Sync check finished'
