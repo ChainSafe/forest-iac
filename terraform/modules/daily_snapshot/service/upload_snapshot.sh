@@ -22,7 +22,7 @@ set -eux
 
 # Install utility binaries that do not come with the image.
 # This assumes the container was started as a superuser.
-apt-get update && apt-get install -y curl
+apt-get update && apt-get install -y curl aria2
 
 # Switch back to the service user for other service commands.
 su - forest
@@ -64,7 +64,12 @@ echo "Chain: $CHAIN_NAME"
 
 forest-tool db destroy --force --config config.toml --chain "$CHAIN_NAME"
 
-forest --config config.toml --chain "$CHAIN_NAME" --auto-download-snapshot --halt-after-import
+# Workaround for https://github.com/ChainSafe/forest/issues/3715
+# Normally, Forest should automatically download the latest snapshot. However, the performance
+# of the download gets randomly bad, and the download times out.
+aria2c -x5 https://forest-archive.chainsafe.dev/latest/$CHAIN_NAME/
+forest --config config.toml --chain "$CHAIN_NAME" --consume-snapshot *.car.zst --halt-after-import
+
 forest --config config.toml --chain "$CHAIN_NAME" --no-gc --save-token=token.txt --target-peer-count 500 --detach
 timeout "$SYNC_TIMEOUT" forest-cli sync wait
 forest-cli snapshot export -o forest_db/
