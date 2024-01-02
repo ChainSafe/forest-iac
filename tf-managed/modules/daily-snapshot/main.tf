@@ -31,7 +31,7 @@ provider "digitalocean" {
 
 // Ugly hack because 'archive_file' cannot mix files and folders.
 data "external" "sources_tar" {
-  program = ["sh", "${path.module}/prep_sources.sh", path.module]
+  program = ["sh", "${path.module}/prep_sources.sh", path.module, var.common_resources_dir]
 }
 
 
@@ -129,7 +129,7 @@ resource "digitalocean_project_resources" "connect_forest_project" {
 }
 
 resource "digitalocean_firewall" "forest-firewall" {
-  name = var.name
+  name = format("%s-%s", var.environment, var.name)
 
   inbound_rule {
     protocol         = "tcp"

@@ -110,6 +110,10 @@ variable "NEW_RELIC_ACCOUNT_ID" {
   sensitive   = true
 }
 
+variable "common_resources_dir" {
+  type        = string
+}
+
 variable "environment" {
   description = "The environment name"
   type        = string
