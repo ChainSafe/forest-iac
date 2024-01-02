@@ -14,12 +14,10 @@ export DEBIAN_FRONTEND=noninteractive
 
 BASE_FOLDER="$(pwd)/releases/actors"
 API_URL="https://api.github.com/repos/filecoin-project/builtin-actors/releases"
-LIST_FILE="$(pwd)/release_list_for_review.txt"
 FAILED_LOG="$(pwd)/failed_uploads.log"
-TWO_YEARS_AGO=$(date -d '2 years ago' +%s)
+TWO_YEARS_AGO=$(date -d '3 years ago' +%s)
 
 mkdir -p "$BASE_FOLDER"
-true > "$LIST_FILE"
 
 # Function to extract the next page URL from GitHub API response headers for pagination.
 get_next_page_url() {
@@ -44,7 +42,6 @@ fetch_and_process_releases() {
 
             if echo "$TAG_NAME" | grep -qE '^v[0-9]+\.[0-9]+\.[0-9]+.*$' && [[ "$PUBLISHED_DATE_SEC" -ge "$TWO_YEARS_AGO" ]]; then
                 mkdir -p "$BASE_FOLDER/$TAG_NAME"
-                echo "$TAG_NAME" >> "$LIST_FILE"
             fi
         done
 
