@@ -5,30 +5,6 @@
 #  - Copy over the zip file
 #  - Run the init.sh script in the background
 
-terraform {
-  required_version = "~> 1.3"
-
-  required_providers {
-    digitalocean = {
-      source  = "digitalocean/digitalocean"
-      version = "~> 2.0"
-    }
-    external = {
-      source  = "hashicorp/external"
-      version = "~> 2.1"
-    }
-    local = {
-      source  = "hashicorp/local"
-      version = "~> 2.1"
-    }
-
-  }
-}
-
-provider "digitalocean" {
-  token = var.digitalocean_token
-}
-
 // Ugly hack because 'archive_file' cannot mix files and folders.
 data "external" "sources_tar" {
   program = ["sh", "${path.module}/prep_sources.sh", path.module, var.common_resources_dir]
@@ -126,51 +102,4 @@ data "digitalocean_project" "forest_project" {
 resource "digitalocean_project_resources" "connect_forest_project" {
   project   = data.digitalocean_project.forest_project.id
   resources = [digitalocean_droplet.forest.urn]
-}
-
-resource "digitalocean_firewall" "forest-firewall" {
-  name = format("%s-%s", var.environment, var.name)
-
-  inbound_rule {
-    protocol         = "tcp"
-    port_range       = "22"
-    source_addresses = var.source_addresses
-  }
-
-  inbound_rule {
-    protocol         = "tcp"
-    port_range       = "2345"
-    source_addresses = var.source_addresses
-  }
-
-  inbound_rule {
-    protocol         = "tcp"
-    port_range       = "80"
-    source_addresses = var.source_addresses
-  }
-
-  inbound_rule {
-    protocol         = "udp"
-    port_range       = "53"
-    source_addresses = var.source_addresses
-  }
-
-  outbound_rule {
-    protocol              = "tcp"
-    port_range            = "all"
-    destination_addresses = var.destination_addresses
-  }
-
-  outbound_rule {
-    protocol              = "udp"
-    port_range            = "53"
-    destination_addresses = var.destination_addresses
-  }
-
-  droplet_ids = [digitalocean_droplet.forest.id]
-}
-
-# This ip address may be used in the future by monitoring software
-output "ip" {
-  value = [digitalocean_droplet.forest.ipv4_address]
 }
