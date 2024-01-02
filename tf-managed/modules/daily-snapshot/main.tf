@@ -18,8 +18,7 @@ data "local_file" "sources" {
 // Note: The init.sh file is also included in the sources.zip such that the hash
 // of the archive captures the entire state of the machine.
 // This is a workaround, and because of this, we need to suppress the tflint warning here
-// for unused declarations related to the 'init.sh' file.
-// tflint-ignore: terraform_unused_declarations
+// for unused declarations related to the 'init.sh' file. tflint-ignore: terraform_unused_declarations
 data "local_file" "init" {
   filename = "${path.module}/service/init.sh"
 }
@@ -41,9 +40,9 @@ locals {
     slack_channel        = var.slack_channel,
     snapshot_bucket      = var.snapshot_bucket,
     snapshot_endpoint    = var.snapshot_endpoint,
-    NEW_RELIC_API_KEY    = var.NEW_RELIC_API_KEY,
-    NEW_RELIC_ACCOUNT_ID = var.NEW_RELIC_ACCOUNT_ID,
-    NEW_RELIC_REGION     = var.NEW_RELIC_REGION,
+    NEW_RELIC_API_KEY    = var.new_relic_api_key,
+    NEW_RELIC_ACCOUNT_ID = var.new_relic_account_id,
+    NEW_RELIC_REGION     = var.new_relic_region,
     BASE_FOLDER          = "/root",
     forest_tag           = var.forest_tag
   })
@@ -60,11 +59,13 @@ locals {
     # Exiting without a sleep sometimes kills the script :-/
     "sleep 60s"
   ]
+
+  service_name = format("%s-%s", var.environment, var.name)
 }
 
 resource "digitalocean_droplet" "forest" {
   image  = var.image
-  name   = format("%s-%s", var.environment, var.name)
+  name   = local.service_name
   region = var.region
   size   = var.size
   # Re-initialize resource if this hash changes:
@@ -102,4 +103,10 @@ data "digitalocean_project" "forest_project" {
 resource "digitalocean_project_resources" "connect_forest_project" {
   project   = data.digitalocean_project.forest_project.id
   resources = [digitalocean_droplet.forest.urn]
+}
+
+module "monitoring" {
+  count = var.monitoring ? 1 : 0
+  source = "./monitoring"
+  service_name = local.service_name
 }

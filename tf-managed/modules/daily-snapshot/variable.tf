@@ -90,23 +90,23 @@ variable "destination_addresses" {
   default     = ["0.0.0.0/0", "::/0"]
 }
 
-variable "NEW_RELIC_REGION" {
+variable "new_relic_region" {
   description = "The New Relic Platform Region"
   type        = string
   default     = "EU"
 }
 
-variable "NEW_RELIC_API_KEY" {
+variable "new_relic_api_key" {
   description = "New Relic API KEY"
   default     = ""
   type        = string
   sensitive   = true
 }
 
-variable "NEW_RELIC_ACCOUNT_ID" {
+variable "new_relic_account_id" {
   description = "The New Relic Account ID"
-  default     = ""
-  type        = string
+  default     = 0
+  type        = number
   sensitive   = true
 }
 
@@ -117,4 +117,10 @@ variable "common_resources_dir" {
 variable "environment" {
   description = "The environment name"
   type        = string
+}
+
+variable "monitoring" {
+  description = "Enable monitoring"
+  type        = bool
+  default     = false
 }
