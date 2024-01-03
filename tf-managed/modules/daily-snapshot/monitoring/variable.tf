@@ -8,3 +8,9 @@ variable "enable_slack_notifications" {
   type        = bool
   default     = false
 }
+
+variable "alert_email" {
+  description = "Email address to send alerts to"
+  type        = string
+  default     = ""
+}

@@ -120,7 +120,14 @@ variable "environment" {
 }
 
 variable "monitoring" {
-  description = "Enable monitoring"
-  type        = bool
-  default     = false
+  description = "Service monitoring"
+  type = object({
+    enable = optional(bool, false)
+    alert_email = optional(string, "")
+  })
+
+  default = {
+      enable = false,
+      alert_email = ""
+  }
 }

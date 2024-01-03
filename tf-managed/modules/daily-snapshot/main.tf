@@ -106,7 +106,8 @@ resource "digitalocean_project_resources" "connect_forest_project" {
 }
 
 module "monitoring" {
-  count = var.monitoring ? 1 : 0
+  count = var.monitoring.enable ? 1 : 0
   source = "./monitoring"
   service_name = local.service_name
+  alert_email = var.monitoring.alert_email
 }
