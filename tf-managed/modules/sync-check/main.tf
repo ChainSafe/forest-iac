@@ -5,30 +5,6 @@
 #  - Copy over the zip file
 #  - Run calibnet and mainnet sync check in the background
 
-terraform {
-  required_version = "~> 1.3"
-
-  required_providers {
-    digitalocean = {
-      source  = "digitalocean/digitalocean"
-      version = "~> 2.0"
-    }
-    external = {
-      source  = "hashicorp/external"
-      version = "~> 2.1"
-    }
-    local = {
-      source  = "hashicorp/local"
-      version = "~> 2.1"
-    }
-
-  }
-}
-
-provider "digitalocean" {
-  token = var.digitalocean_token
-}
-
 // Ugly hack because 'archive_file' cannot mix files and folders.
 data "external" "sources_tar" {
   program = ["sh", "${path.module}/prep_sources.sh", path.module, var.common_resources_dir]
