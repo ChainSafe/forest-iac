@@ -119,15 +119,30 @@ variable "environment" {
   type        = string
 }
 
+# Monitoring properties of the service. Can be declared partially.
 variable "monitoring" {
-  description = "Service monitoring"
+  description = "Service monitoring properties"
   type = object({
+    # Whether to enable monitoring on the service.
     enable = optional(bool, false)
+    # Email (or comma-separated emails) to send alerts to in case of incidents. If empty, disabled email alerts.
     alert_email = optional(string, "")
+    # Whether to enable Slack notifications on the given channel.
+    slack_enable = optional(bool, false)
+    # Due to the limitations of NewRelic, this needs to be manually created via UI.
+    # See Slack section in:
+    # https://registry.terraform.io/providers/newrelic/newrelic/latest/docs/resources/notification_destination
+    # https://docs.newrelic.com/docs/alerts-applied-intelligence/notifications/notification-integrations/#slack
+    slack_destination_id = optional(string, "")
+    # Unique Slack channel ID - can be obtained at the bottom of the channel properties.
+    slack_channel_id = optional(string, "")
   })
 
   default = {
       enable = false,
       alert_email = ""
+      slack_enable = false,
+      slack_destination_id = ""
+      slack_channel_id = ""
   }
 }

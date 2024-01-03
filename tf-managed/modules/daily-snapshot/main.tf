@@ -110,4 +110,7 @@ module "monitoring" {
   source = "./monitoring"
   service_name = local.service_name
   alert_email = var.monitoring.alert_email
+  slack_enable = var.monitoring.slack_enable
+  slack_destination_id = var.monitoring.slack_destination_id
+  slack_channel_id = var.monitoring.slack_channel_id
 }

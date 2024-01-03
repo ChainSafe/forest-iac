@@ -12,7 +12,6 @@ resource "newrelic_nrql_alert_condition" "disk_space" {
   name                         = "High Disk Utilization"
   description                  = "Alert when disk space usage is high on an the service host"
   enabled                      = true
-  # violation_time_limit_seconds = 3600
 
   nrql {
     query = "SELECT latest(diskUsedPercent) FROM StorageSample where entityName = '${var.service_name}'"
@@ -59,10 +58,28 @@ resource "newrelic_notification_channel" "email-channel" {
   }
 }
 
+resource "newrelic_notification_channel" "slack-channel" {
+  count = var.slack_enable ? 1 : 0
+  name = format("%s slack", var.service_name)
+  type = "SLACK"
+  destination_id = var.slack_destination_id
+  product = "IINT"
 
-resource "newrelic_workflow" "alerting-workflow" {
+  property {
+    key = "channelId"
+    value = var.slack_channel_id
+  }
+
+  property {
+    key = "customDetailsSlack"
+    value = "issue id - {{issueId}}"
+  }
+}
+
+
+resource "newrelic_workflow" "alerting-workflow-mails" {
   count = local.enable_email ? 1 : 0
-  name = format("%s alerting workflow", var.service_name)
+  name = format("%s mail alerting workflow", var.service_name)
   muting_rules_handling = "NOTIFY_ALL_ISSUES"
 
   issues_filter {
@@ -78,5 +95,28 @@ resource "newrelic_workflow" "alerting-workflow" {
 
   destination {
     channel_id = newrelic_notification_channel.email-channel[0].id
+  }
+}
+
+# Limitation of NR provider - only one workflow can be created per channel. Might be resolved in the future.
+# https://registry.terraform.io/providers/newrelic/newrelic/latest/docs/resources/workflow#nested-destination-blocks
+resource "newrelic_workflow" "alerting-workflow-slack" {
+  count = var.slack_enable ? 1 : 0
+  name = format("%s slack alerting workflow", var.service_name)
+  muting_rules_handling = "NOTIFY_ALL_ISSUES"
+
+  issues_filter {
+    name = format("%s alerting workflow filter", var.service_name)
+    type = "FILTER"
+
+    predicate {
+      attribute = "labels.policyIds"
+      operator = "EXACTLY_MATCHES"
+      values = [ newrelic_alert_policy.alert.id ]
+    }
+  }
+
+  destination {
+    channel_id = newrelic_notification_channel.slack-channel[0].id
   }
 }
