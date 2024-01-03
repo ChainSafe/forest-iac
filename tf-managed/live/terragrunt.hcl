@@ -19,7 +19,7 @@ remote_state {
              ? "hubert-bucket-prod"
              : "hubert-bucket-dev"
              )
-    key    = "${local.env}-terraform.tfstate"
+    key    = "${path_relative_to_include()}/terraform.tfstate"
     region = "eu-west-1"
     endpoint = "https://fra1.digitaloceanspaces.com"
     skip_bucket_versioning = true
