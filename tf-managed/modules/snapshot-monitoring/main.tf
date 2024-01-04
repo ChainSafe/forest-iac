@@ -9,6 +9,10 @@ resource "newrelic_synthetics_script_monitor" "snapshot-age-monitor" {
   period               = "EVERY_HOUR"
   script               = file("snapshot-age-monitor.js")
 
+  script_language      = "JAVASCRIPT"
+  runtime_type         = "NODE_API"
+  runtime_type_version = "16.10"
+
   tag {
     key    = "service"
     values = ["forest-snapshot"]
