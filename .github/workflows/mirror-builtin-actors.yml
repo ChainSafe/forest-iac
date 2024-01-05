@@ -31,8 +31,7 @@ jobs:
         run: bash ./mirror-builtin-actors.sh
         env:
             SLACK_API_TOKEN: ${{ secrets.SLACK_TOKEN }}
-            SLACK_CHANNEL: "#forest-dump"
-            ENVIROMENT: digitalocean
+            SLACK_CHANNEL: "#forest-notifications"
             BUCKET_NAME: filecoin-builtin-actors
 
   mirror-releases-cf:
@@ -56,6 +55,5 @@ jobs:
         run: bash ./mirror-builtin-actors.sh
         env:
             SLACK_API_TOKEN: ${{ secrets.SLACK_TOKEN }}
-            SLACK_CHANNEL: "#forest-dump"
-            ENVIROMENT: cloudflare
+            SLACK_CHANNEL: "#forest-notifications"
             BUCKET_NAME: filecoin-builtin-actors
