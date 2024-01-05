@@ -35,7 +35,7 @@ mkdir --parents -- "$BASE_FOLDER/forest_db/filops"
 chmod +x ./upload_filops_snapshot.sh
 
 # Run new_relic and fail2ban scripts
-bash newrelic_fail2ban.sh &
+bash newrelic_fail2ban.sh
 
 # Setup cron jobs
 cp calibnet_cron_job mainnet_cron_job /etc/cron.hourly/

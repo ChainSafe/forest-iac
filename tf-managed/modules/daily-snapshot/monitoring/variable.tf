@@ -24,3 +24,8 @@ variable "slack_channel_id" {
   description = "Slack channel id"
   type        = string
 }
+
+variable "new_relic_account_id" {
+  description = "New Relic account id"
+  type        = number
+}

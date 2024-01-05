@@ -22,6 +22,7 @@ LOG_EXPORT_DAEMON = "logs/#{CHAIN_NAME}_#{DATE}_daemon.txt"
 LOG_EXPORT_METRICS = "logs/#{CHAIN_NAME}_#{DATE}_metrics.txt"
 
 client = SlackClient.new CHANNEL, SLACK_TOKEN
+logger = Logger.new($stdout)
 
 # conditionally add timestamps to logs without timestamps
 add_timestamps_cmd = %q[awk '{ if ($0 !~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{6}Z/) print strftime("[%Y-%m-%d %H:%M:%S]"), $0; else print $0; fflush(); }']
@@ -29,9 +30,16 @@ upload_cmd = "set -o pipefail && \
 timeout --signal=KILL 8h ./upload_snapshot.sh #{CHAIN_NAME} #{LOG_EXPORT_DAEMON} #{LOG_EXPORT_METRICS} | #{add_timestamps_cmd}"
 
 # The command needs to be run indirectly to avoid syntax errors in the shell.
+logger.info "Running snapshot export script for #{CHAIN_NAME}..."
 snapshot_uploaded = system('bash', '-c', upload_cmd, %i[out err] => LOG_EXPORT_SCRIPT_RUN)
+logger.info "Snapshot export script finished for #{CHAIN_NAME}."
 
-unless snapshot_uploaded
+if snapshot_uploaded
+  # This log message is important, as it is used by the monitoring tools to determine whether the snapshot was
+  # successfully uploaded.
+  logger.info "Snapshot uploaded for #{CHAIN_NAME}."
+else
+  logger.error "Snapshot upload failed for #{CHAIN_NAME}."
   client.post_message "⛔ Snapshot failed for #{CHAIN_NAME}. 🔥🌲🔥 "
   # attach the log file and print the contents to STDOUT
   [LOG_EXPORT_SCRIPT_RUN, LOG_EXPORT_DAEMON, LOG_EXPORT_METRICS].each do |log_file|
@@ -40,5 +48,5 @@ unless snapshot_uploaded
 end
 
 [LOG_EXPORT_SCRIPT_RUN, LOG_EXPORT_DAEMON, LOG_EXPORT_METRICS].each do |log_file|
-  puts "Snapshot export log:\n#{File.read(log_file)}\n\n" if File.exist?(log_file)
+  logger.info "Snapshot export log:\n#{File.read(log_file)}\n\n" if File.exist?(log_file)
 end
