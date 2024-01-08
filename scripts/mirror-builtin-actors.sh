@@ -46,7 +46,7 @@ fetch_and_process_releases() {
         next_page_url=$(get_next_page_url "$response")
 
         echo "$body" | jq --compact-output '.[]' | while read -r release; do
-            TAG_NAME=$(echo "$release" | jq --raw-output '.tag_name')
+            TAG_NAME=$(echo "$release" | jq --raw-output '.tag_name') || echo "Error: $release, could not get tag name"
             PUBLISHED_DATE=$(echo "$release" | jq --raw-output '.published_at')
             PUBLISHED_DATE_SEC=$(date --date="$PUBLISHED_DATE" +%s)
 
@@ -62,6 +62,7 @@ fetch_and_process_releases() {
 fetch_and_process_releases
 
 declare -a failed_uploads
+failed_uploads=()
 
 : 'Loop through each version directory to process and upload assets'
 while IFS= read -r version_dir; do
@@ -114,7 +115,7 @@ while IFS= read -r version_dir; do
             echo "No assets found for $TAG_NAME."
         fi
     fi
-done < <(find "$BASE_FOLDER" --mindepth 1 --type d)
+done < <(find "$BASE_FOLDER" -mindepth 1 -type d)
 
 : 'Send summary alert only if there were failed uploads'
 if [ ${#failed_uploads[@]} -ne 0 ]; then
