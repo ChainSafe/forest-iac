@@ -88,7 +88,8 @@ while IFS= read -r version_dir; do
                 echo "Checking asset: $FILE_NAME"
                 if [ ! -f "$FILE_NAME" ]; then
                     echo "Downloading $FILE_NAME..."
-                    curl --silent --output "$FILE_NAME" "$DOWNLOAD_URL" || echo "Failed to download $FILE_NAME"
+                    curl --location --silent --show-error --output "$FILE_NAME" "$DOWNLOAD_URL" || echo "Failed to download $FILE_NAME"
+
                 fi
 
                 echo "Checking $FILE_NAME against S3 version..."
