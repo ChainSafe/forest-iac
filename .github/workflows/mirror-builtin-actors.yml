@@ -47,7 +47,7 @@ jobs:
           region: auto
           access_key: ${{ secrets.R2_ACCESS_KEY }}
           secret_key: ${{ secrets.R2_SECRET_KEY }}
-          account_id: "2238a825c5aca59233eab1f221f7aefb"
+          account_id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
       - name: Run script to mirror to Cloudflare
         working-directory: scripts
