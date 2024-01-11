@@ -12,11 +12,11 @@ locals {
 #   name                         = "High Disk Utilization"
 #   description                  = "Alert when disk space usage is high on an the service host"
 #   enabled                      = true
-# 
+#
 #   nrql {
 #     query = "SELECT latest(diskUsedPercent) FROM StorageSample where entityName = '${var.service_name}'"
 #   }
-# 
+#
 #   critical {
 #     operator              = "above"
 #     # threshold             = 85.0
@@ -24,7 +24,7 @@ locals {
 #     threshold_duration    = 300
 #     threshold_occurrences = "ALL"
 #   }
-# 
+#
 #   warning {
 #     operator              = "above"
 #     # threshold             = 70.0
