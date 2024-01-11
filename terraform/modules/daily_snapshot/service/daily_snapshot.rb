@@ -25,7 +25,7 @@ def latest_snapshot_date(chain_name = 'calibnet')
   end
 end
 
-# Prune logs other 2 weeks
+# Prune logs older than 2 weeks
 def prune_logs(logs_folder = "logs")
   cutoff_date = Date.today - 14 # set the cutoff date to 14 days ago
 
@@ -74,7 +74,7 @@ else
   end
 end
 
-# Prune logs in the logs directory other 2 weeks
+# Prune logs in the logs directory older than 2 weeks
 prune_logs
 
 [LOG_EXPORT_SCRIPT_RUN, LOG_EXPORT_DAEMON, LOG_EXPORT_METRICS].each do |log_file|
