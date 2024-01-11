@@ -106,12 +106,12 @@ resource "digitalocean_project_resources" "connect_forest_project" {
 }
 
 module "monitoring" {
-  count = var.monitoring.enable ? 1 : 0
-  source = "./monitoring"
-  service_name = local.service_name
-  alert_email = var.monitoring.alert_email
-  slack_enable = var.monitoring.slack_enable
+  count                = var.monitoring.enable ? 1 : 0
+  source               = "./monitoring"
+  service_name         = local.service_name
+  alert_email          = var.monitoring.alert_email
+  slack_enable         = var.monitoring.slack_enable
   slack_destination_id = var.monitoring.slack_destination_id
-  slack_channel_id = var.monitoring.slack_channel_id
+  slack_channel_id     = var.monitoring.slack_channel_id
   new_relic_account_id = var.new_relic_account_id
 }

@@ -62,7 +62,7 @@ locals {
 
 resource "digitalocean_droplet" "forest" {
   image  = var.image
-  name = format("%s-%s", var.environment, var.name)
+  name   = format("%s-%s", var.environment, var.name)
   region = var.region
   size   = var.size
   # Re-initialize resource if this hash changes:

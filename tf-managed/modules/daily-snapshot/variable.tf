@@ -111,7 +111,7 @@ variable "new_relic_account_id" {
 }
 
 variable "common_resources_dir" {
-  type        = string
+  type = string
 }
 
 variable "environment" {
@@ -139,10 +139,10 @@ variable "monitoring" {
   })
 
   default = {
-      enable = false,
-      alert_email = ""
-      slack_enable = false,
-      slack_destination_id = ""
-      slack_channel_id = ""
+    enable               = false,
+    alert_email          = ""
+    slack_enable         = false,
+    slack_destination_id = ""
+    slack_channel_id     = ""
   }
 }

@@ -10,28 +10,28 @@ locals {
 remote_state {
   backend = "s3"
   generate = {
-    path = "backend.tf"
+    path      = "backend.tf"
     if_exists = "overwrite_terragrunt"
   }
   config = {
     // if the environment is dev, use the dev bucket, otherwise use the prod bucket
     bucket = (local.env == "prod"
-             ? "hubert-bucket-prod"
-             : "hubert-bucket-dev"
-             )
-    key    = "${path_relative_to_include()}/terraform.tfstate"
-    region = "eu-west-1"
-    endpoint = "https://fra1.digitaloceanspaces.com"
-    skip_bucket_versioning = true
-    skip_bucket_ssencryption = true
-    skip_bucket_root_access = true
+      ? "hubert-bucket-prod"
+      : "hubert-bucket-dev"
+    )
+    key                                = "${path_relative_to_include()}/terraform.tfstate"
+    region                             = "eu-west-1"
+    endpoint                           = "https://fra1.digitaloceanspaces.com"
+    skip_bucket_versioning             = true
+    skip_bucket_ssencryption           = true
+    skip_bucket_root_access            = true
     skip_bucket_public_access_blocking = true
-    skip_bucket_enforced_tls = true
-    skip_credentials_validation = true
-    skip_metadata_api_check     = true
-    skip_requesting_account_id  = true
-    skip_s3_checksum            = true
-    skip_region_validation      = true
+    skip_bucket_enforced_tls           = true
+    skip_credentials_validation        = true
+    skip_metadata_api_check            = true
+    skip_requesting_account_id         = true
+    skip_s3_checksum                   = true
+    skip_region_validation             = true
   }
 }
 

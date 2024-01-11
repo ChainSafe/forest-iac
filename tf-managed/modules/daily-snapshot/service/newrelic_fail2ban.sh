@@ -17,11 +17,11 @@ if [ -n "$NEW_RELIC_API_KEY" ] ; then
 # https://docs.newrelic.com/docs/infrastructure/install-infrastructure-agent/configuration/infrastructure-agent-configuration-settings/#offline-time-to-reset
 cat >> /etc/newrelic-infra.yml <<EOF
 metrics_network_sample_rate: -1
-metrics_process_sample_rate: -1
-metrics_system_sample_rate: 600
-metrics_storage_sample_rate: 600
-metrics_nfs_sample_rate: 600
-container_cache_metadata_limit: 600
+metrics_process_sample_rate: 60
+metrics_system_sample_rate: 60
+metrics_storage_sample_rate: 60
+metrics_nfs_sample_rate: 60
+container_cache_metadata_limit: 60
 disable_zero_mem_process_filter: true
 disable_all_plugins: true
 disable_cloud_metadata: true
@@ -43,8 +43,9 @@ logs:
     attributes:
       newrelic-cli: true
       logtype: newrelic-cli
+  - name: snapshot_logs
+    file: /root/logs/*_log.txt
 EOF
-
 
   sudo systemctl restart newrelic-infra
 fi
