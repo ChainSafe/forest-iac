@@ -25,6 +25,17 @@ def latest_snapshot_date(chain_name = 'calibnet')
   end
 end
 
+# Prune logs other 2 weeks
+def prune_logs(logs_folder = "logs")
+  cutoff_date = Date.today - 14 # set the cutoff date to 14 days ago
+
+  Dir.glob("#{logs_folder}/*").each do |file|
+    if File.file?(file) && File.mtime(file).to_date < cutoff_date
+      File.delete(file)
+    end
+  end
+end
+
 CHAIN_NAME = ARGV[0]
 raise 'No chain name supplied. Please provide chain identifier, e.g. calibnet or mainnet' if ARGV.empty?
 
@@ -62,6 +73,9 @@ else
     client.attach_files(log_file) if File.exist?(log_file)
   end
 end
+
+# Prune logs in the logs directory other 2 weeks
+prune_logs
 
 [LOG_EXPORT_SCRIPT_RUN, LOG_EXPORT_DAEMON, LOG_EXPORT_METRICS].each do |log_file|
   puts "Snapshot export log:\n#{File.read(log_file)}\n\n" if File.exist?(log_file)
