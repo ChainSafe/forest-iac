@@ -74,9 +74,9 @@ else
   end
 end
 
-# Prune logs files(txt) in the logs directory older than 2 weeks
-prune_logs
-
 [LOG_EXPORT_SCRIPT_RUN, LOG_EXPORT_DAEMON, LOG_EXPORT_METRICS].each do |log_file|
   puts "Snapshot export log:\n#{File.read(log_file)}\n\n" if File.exist?(log_file)
 end
+
+# Prune logs files(txt) in the logs directory older than 2 weeks
+prune_logs
