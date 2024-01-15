@@ -1,3 +1,6 @@
+# This is the root terragrunt file. It is used to define the remote state
+# and the common inputs for all the services.
+
 locals {
   # Parse the file path we're in to read the env name: e.g., env
   # will be "dev" in the dev folder, "stage" in the stage folder,
@@ -16,8 +19,8 @@ remote_state {
   config = {
     // if the environment is dev, use the dev bucket, otherwise use the prod bucket
     bucket = (local.env == "prod"
-      ? "hubert-bucket-prod"
-      : "hubert-bucket-dev"
+      ? "forest-iac-bucket-prod"
+      : "forest-iac-bucket-dev"
     )
     key                                = "${path_relative_to_include()}/terraform.tfstate"
     region                             = "eu-west-1"
@@ -37,6 +40,9 @@ remote_state {
 
 # Common inputs for all the services.
 inputs = {
+  # The common resources dir contains common code that we want to share across all services.
+  # This is a legacy from the previous version of the infrastructure, and this will be removed
+  # in the future.
   common_resources_dir = format("%s/../common", get_parent_terragrunt_dir())
   slack_channel        = (local.env == "prod" ? "#forest-notifications" : "#forest-dump")
   environment          = local.env

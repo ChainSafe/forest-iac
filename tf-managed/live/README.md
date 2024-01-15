@@ -1,7 +1,6 @@
 All Terragrunt configurations live here. To edit Terraform files, go to `../modules`.
 
 # Summary
-
 The Terragrunt configurations manage the actual environments and, in principle, should reflect the current state of the given environment.
 
 # Development
@@ -12,7 +11,19 @@ As a developer, you should create your own environment, separated from the other
 Environment: dev-7zryf85r. Happy hacking!
 ```
 
+Inside the specific application in the environment, run:
+```
+❯ terragrunt plan
+```
+
+This should show you the resources to be changed/created/destroyed.
+```
+❯ terragrunt apply
+```
+
 After ensuring the changes work correctly, merge the changes from your development environment to the base one and, possibly, `prod`.
+
+Remember to cleanup your environment. Use `terragrunt destroy`.
 
 
 # Conventions
@@ -81,3 +92,4 @@ export TF_VAR_R2_SECRET_KEY=
 export TF_VAR_new_relic_api_key=
 export TF_VAR_new_relic_account_id=
 ```
+
