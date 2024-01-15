@@ -33,16 +33,11 @@ async function get_latest(
 				});
 			}
 
-			object = await env.FOREST_ARCHIVE.get(latest.key, {
-				range: req_headers,
-				onlyIf: req_headers,
+			// Response.redirect requires an absolute URL. Manually create the response to get around this.
+			return new Response('Found!', {
+				status: 302,
+				headers: { Location: '/archive/' + latest.key },
 			});
-			if (object === null) {
-				return new Response('No latest snapshot found', {
-					status: 404,
-				});
-			}
-			break;
 		}
 		case SnapshotType.archive: {
 			object = await env.FOREST_ARCHIVE.get(path, {

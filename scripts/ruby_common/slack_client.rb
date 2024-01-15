@@ -42,7 +42,7 @@ class SlackClient
 
   # Attaches a file to the latest posted thread.
   def attach_file(file)
-    raise "No such file #{file}" unless File.exist? file
+    return unless File.exist? file
     raise 'Need to create a thread before attaching a file.' if @last_thread.nil?
 
     @client.files_upload(
