@@ -13,3 +13,6 @@ vendor
 .ruby-version
 .terraform.lock.hcl
 .DS_Store
+
+# Personal development environments
+environments/dev-*
