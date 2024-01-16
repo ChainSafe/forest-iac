@@ -1,26 +1,28 @@
-name: Snapshot Service
+name: Deploy Snapshot Service
 concurrency: ci-${{ github.ref }}
 
 on:
   pull_request:
     branches:
       - main
-    paths:
-      - 'terraform/daily_snapshot/**'
-      - 'terraform/modules/daily_snapshot/**'
+        #    paths:
+        #      - 'tf-managed/modules/daily_snapshot/**'
+        #      - 'tf-managed/scripts/**'
+        #      - 'tf-managed/live/environments/prod/applications/snapshot-service'
     # This needs to be declared explicitly so that the job is actually
     # run when moved out of draft.
     types: [opened, synchronize, reopened, ready_for_review]
   push:
     branches:
       - main
-    paths:
-      - 'terraform/daily_snapshot/**'
-      - 'terraform/modules/daily_snapshot/**'
+        #    paths:
+        #      - 'tf-managed/modules/daily_snapshot/**'
+        #      - 'tf-managed/scripts/**'
+        #      - 'tf-managed/live/environments/prod/applications/snapshot-service'
   workflow_dispatch:
 
 jobs:
-  deploy-daily-snapshot-calibnet:
+  deploy-daily-snapshot:
     name: Deploy
     runs-on: ubuntu-latest
     permissions: write-all
@@ -28,18 +30,17 @@ jobs:
       - name: Checkout the code
         uses: actions/checkout@v4
 
-      # Using Custom Composite action in ./composite-action/terraform folder
-      - name: Composite Action for Deploying Terraform Resources
-        uses: ./composite-action/terraform
+      # Using Custom Composite action in ./composite-action/terragrunt folder
+      - name: Composite Action for Deploying Terragrunt Resources
+        uses: ./composite-action/terragrunt
         with:
           do_token: ${{ secrets.DO_TOKEN }}
           aws_access_key_id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
           r2_access_key: ${{ secrets.R2_ACCESS_KEY }}
           r2_secret_key: ${{ secrets.R2_SECRET_KEY }}
           slack_token: ${{ secrets.SLACK_TOKEN }}
-          working_directory: terraform/daily_snapshot/prod
+          working_directory: tf-managed/live/environments/prod/applications/snapshot-service
           environment: Snapshot Service
           new_relic_account_id: ${{ secrets.NEW_RELIC_ACCOUNT_ID }}
           new_relic_api_key: ${{ secrets.NEW_RELIC_API_KEY }}

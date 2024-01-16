@@ -10,10 +10,10 @@ terraform {
 }
 
 inputs = {
-  name = "forest-snapshot"
-  size = "s-4vcpu-16gb-amd"
-  r2_endpoint = "https://2238a825c5aca59233eab1f221f7aefb.r2.cloudflarestorage.com/"
-  forest_tag = "latest"
+  name            = "forest-snapshot"
+  size            = "s-4vcpu-16gb-amd"
+  r2_endpoint     = "https://2238a825c5aca59233eab1f221f7aefb.r2.cloudflarestorage.com/"
+  forest_tag      = "latest"
   snapshot_bucket = "forest-archive-dev"
 
   monitoring = {

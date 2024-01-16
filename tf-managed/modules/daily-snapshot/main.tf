@@ -7,7 +7,7 @@
 
 // Ugly hack because 'archive_file' cannot mix files and folders.
 data "external" "sources_tar" {
-  program = ["sh", "${path.module}/prep_sources.sh", path.module, var.common_resources_dir]
+  program = ["bash", "${path.module}/prep_sources.sh", path.module, var.common_resources_dir]
 }
 
 
