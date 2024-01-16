@@ -9,7 +9,7 @@ locals {
   env    = local.parsed.env
 }
 
-# Remote state, separate for each environment
+# Remote state, separate for each environment and service.
 remote_state {
   backend = "s3"
   generate = {
@@ -17,7 +17,9 @@ remote_state {
     if_exists = "overwrite_terragrunt"
   }
   config = {
-    // if the environment is dev, use the dev bucket, otherwise use the prod bucket
+    // Provide some basic separation between development and production environments.
+    // Ideally, we'd use separate accounts for each environment, but that's not
+    // feasible at the moment.
     bucket = (local.env == "prod"
       ? "forest-iac-bucket-prod"
       : "forest-iac-bucket-dev"
@@ -41,9 +43,9 @@ remote_state {
 # Common inputs for all the services.
 inputs = {
   # The common resources dir contains common code that we want to share across all services.
-  # This is a legacy from the previous version of the infrastructure, and this will be removed
+  # This is a legacy from the previous version of the infrastructure, and will be removed
   # in the future.
-  common_resources_dir = format("%s/../common", get_parent_terragrunt_dir())
+  common_resources_dir = format("%s/../scripts", get_parent_terragrunt_dir())
   slack_channel        = (local.env == "prod" ? "#forest-notifications" : "#forest-dump")
   environment          = local.env
 }
