@@ -7,7 +7,7 @@ The Terragrunt configurations manage the actual environments and, in principle, 
 As a developer, you should create your own environment, separated from the others. In this directory, execute `make environment` and one will be created for you. Do not work on the `dev` environment directly as others may be working on it as well.
 
 ```
-❯ make environment
+❯ make create-environment
 Environment: dev-7zryf85r. Happy hacking!
 ```
 
@@ -23,7 +23,7 @@ This should show you the resources to be changed/created/destroyed.
 
 After ensuring the changes work correctly, merge the changes from your development environment to the base one and, possibly, `prod`.
 
-Remember to cleanup your environment. Use `terragrunt destroy`.
+Remember to cleanup your environment. Use `terragrunt destroy` or use `make destroy-dev`. Refer to the [Makefile](./Makefile) for details.
 
 
 # Conventions

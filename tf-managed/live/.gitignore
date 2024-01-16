@@ -16,3 +16,4 @@ vendor
 
 # Personal development environments
 environments/dev-*
+.dev_environment
