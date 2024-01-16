@@ -6,10 +6,5 @@ include "root" {
 
 # Load the actual Terraform module
 terraform {
-  source = format("%s/../modules/sync-check", get_parent_terragrunt_dir())
-}
-
-inputs = {
-  name = "sync-check"
-  size = "s-4vcpu-16gb-amd"
+  source = format("%s/../modules/snapshot-monitoring", get_parent_terragrunt_dir())
 }
