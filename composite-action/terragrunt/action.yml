@@ -90,12 +90,12 @@ runs:
         TF_VAR_new_relic_account_id: ${{ inputs.new_relic_account_id }}
       run: |
         terragrunt plan -no-color --terragrunt-non-interactive -out ${{ github.workspace }}/tfplan | tee output
-        echo 'plan<<EOF' >> $GITHUB_OUTPUT
+        echo 'stdout<<EOF' >> $GITHUB_OUTPUT
         cat output >> $GITHUB_OUTPUT
         echo 'EOF' >> $GITHUB_OUTPUT
 
     - name: Find Comment
-      if: github.event.pull_request.draft == false &&
+      if: github.event.pull_request.draft == true &&
           github.event_name == 'pull_request'
       uses: peter-evans/find-comment@v2
       id: fc
@@ -108,7 +108,7 @@ runs:
     - name: Create or Update Comment
       if: github.event.pull_request.draft == true &&
           github.event_name == 'pull_request' &&
-          !contains(steps.plan.outputs.plan, 'No changes. Your infrastructure matches the configuration.')
+          !contains(steps.plan.outputs.stdout, 'No changes. Your infrastructure matches the configuration.')
       uses: peter-evans/create-or-update-comment@v2
       with:
         comment-id: ${{ steps.fc.outputs.comment-id }}
@@ -119,7 +119,7 @@ runs:
           <details><summary>Show Plan</summary>
 
           ```
-          ${{ steps.plan.outputs.plan }}
+          ${{ steps.plan.outputs.stdout }}
           ```
 
           </details>
@@ -129,7 +129,7 @@ runs:
       uses: detomarco/delete-comments@v1.0.4
       if: github.event.pull_request.draft == true &&
           github.event_name == 'pull_request' &&
-          contains(steps.plan.outputs.plan, 'No changes. Your infrastructure matches the configuration.')
+          contains(steps.plan.outputs.stdout, 'No changes. Your infrastructure matches the configuration.')
       with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
 
