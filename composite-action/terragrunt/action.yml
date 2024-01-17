@@ -42,36 +42,40 @@ runs:
         echo "tf_version=1.6.6" >> $GITHUB_ENV
         echo "tg_version=0.53.2" >> $GITHUB_ENV
 
-    - name: Check terragrunt HCL
-      uses: gruntwork-io/terragrunt-action@v2
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
       with:
-        tf_version: ${{ env.tf_version }}
-        tg_version: ${{ env.tg_version }}
-        tg_dir: ${{ inputs.working_directory }}
-        tg_command: 'hclfmt --terragrunt-check --terragrunt-diff'
+        terraform_version: v${{ env.tf_version }}
+        terraform_wrapper: false
+
+    - name: Setup Terragrunt
+      shell: bash
+      run: |
+        sudo wget -q -O /bin/terragrunt "https://github.com/gruntwork-io/terragrunt/releases/download/v${{ env.tg_version }}/terragrunt_linux_amd64"
+        sudo chmod +x /bin/terragrunt
+        terragrunt -v
+
+    - name: Check terragrunt HCL
+      working-directory: ${{ inputs.working_directory }}
+      shell: bash
+      run: |
+        terragrunt hclfmt --terragrunt-check --terragrunt-diff
 
     - name: Validate
-      uses: gruntwork-io/terragrunt-action@v2
-      with:
-        tf_version: ${{ env.tf_version }}
-        tg_version: ${{ env.tg_version }}
-        tg_dir: ${{ inputs.working_directory }}
-        tg_command: 'validate'
+      working-directory: ${{ inputs.working_directory }}
+      shell: bash
+      run: |
+        terragrunt validate
       env:
         AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
 
     - name: Plan
       if: github.event_name == 'pull_request'
-      uses: gruntwork-io/terragrunt-action@v2
       id: plan
-      with:
-        tf_version: ${{ env.tf_version }}
-        tg_version: ${{ env.tg_version }}
-        tg_dir: ${{ inputs.working_directory }}
-        tg_command: 'plan -no-color'
-        tg_comment: 1
+      working-directory: ${{ inputs.working_directory }}
       continue-on-error: true
+      shell: bash
       env:
         AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
@@ -83,18 +87,11 @@ runs:
         TF_VAR_slack_token: ${{ inputs.slack_token }}
         TF_VAR_new_relic_api_key: ${{ inputs.new_relic_api_key }}
         TF_VAR_new_relic_account_id: ${{ inputs.new_relic_account_id }}
-
-    - name: Plan output cleanup
-      if: always()
-      shell: bash
       run: |
-        TG_OUT=$(echo '${{ steps.plan.outputs.tg_action_output }}' | sed 's|%0A|\n|g ; s|%3C|<|g')
-        echo "TG_PLAN_OUTPUT<<EOF" >> $GITHUB_ENV
-        echo "${TG_OUT:0:65300}" >> $GITHUB_ENV
-        echo "EOF" >> $GITHUB_ENV
+        terragrunt plan -no-color  --terragrunt-non-interactive -out ${{ github.workspace }}/tfplan
 
     - name: Find Comment
-      if: github.event.pull_request.draft == true &&
+      if: github.event.pull_request.draft == false &&
           github.event_name == 'pull_request'
       uses: peter-evans/find-comment@v2
       id: fc
@@ -107,7 +104,7 @@ runs:
     - name: Create or Update Comment
       if: github.event.pull_request.draft == true &&
           github.event_name == 'pull_request' &&
-          !contains(env.TG_PLAN_OUTPUT, 'No changes. Your infrastructure matches the configuration.')
+          !contains(steps.plan.outputs.stdout, 'No changes. Your infrastructure matches the configuration.')
       uses: peter-evans/create-or-update-comment@v2
       with:
         comment-id: ${{ steps.fc.outputs.comment-id }}
@@ -118,7 +115,7 @@ runs:
           <details><summary>Show Plan</summary>
 
           ```
-          ${{ env.TG_PLAN_OUTPUT }}
+          ${{ steps.plan.outputs.stdout }}
           ```
 
           </details>
@@ -128,56 +125,57 @@ runs:
       uses: detomarco/delete-comments@v1.0.4
       if: github.event.pull_request.draft == true &&
           github.event_name == 'pull_request' &&
-          contains(env.TG_PLAN_OUTPUT, 'No changes. Your infrastructure matches the configuration.')
+          contains(steps.plan.outputs.stdout, 'No changes. Your infrastructure matches the configuration.')
       with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
 
-    - name: Terraform Plan Status
+    - name: Terragrunt Plan Status
       shell: bash
-      if: steps.plan.tg_action_exit_code != 0
+      if: steps.plan.outcome == 'failure'
       run: exit 1
-          #
-          #    - name: Terraform Apply
-          #      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-          #      run: |
-          #        if grep -q 'No changes.' tfplan; then
-          #          echo "No changes detected."
-          #        else
-          #          echo "Changes detected. Redeploying everything..."
-          #          terraform destroy -auto-approve -input=false
-          #          terraform apply -auto-approve -input=false
-          #        fi
-          #      shell: bash
-          #      working-directory: ${{ inputs.working_directory }}
-          #      env:
-          #        TF_VAR_do_token: ${{ inputs.do_token }}
-          #        TF_VAR_AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
-          #        TF_VAR_AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
-          #        AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
-          #        AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
-          #        TF_VAR_slack_token: ${{ inputs.slack_token }}
-          #        TF_VAR_R2_ACCESS_KEY: ${{ inputs.r2_access_key }}
-          #        TF_VAR_R2_SECRET_KEY: ${{ inputs.r2_secret_key }}
-          #        TF_VAR_NEW_RELIC_API_KEY: ${{ inputs.NEW_RELIC_API_KEY }}
-          #        TF_VAR_NR_LICENSE_KEY: ${{ inputs.NR_LICENSE_KEY }}
-          #        TF_VAR_NEW_RELIC_ACCOUNT_ID: ${{ inputs.new_relic_account_id }}
-          #
-          #    - name: Terraform Force Apply
-          #      if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
-          #      shell: bash
-          #      working-directory: ${{ inputs.working_directory }}
-          #      env:
-          #        TF_VAR_do_token: ${{ inputs.do_token }}
-          #        TF_VAR_AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
-          #        TF_VAR_AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
-          #        AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
-          #        AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
-          #        TF_VAR_R2_ACCESS_KEY: ${{ inputs.r2_access_key }}
-          #        TF_VAR_R2_SECRET_KEY: ${{ inputs.r2_secret_key }}
-          #        TF_VAR_slack_token: ${{ inputs.slack_token }}
-          #        TF_VAR_NEW_RELIC_API_KEY: ${{ inputs.new_relic_api_key }}
-          #        TF_VAR_NR_LICENSE_KEY: ${{ inputs.nr_license_key }}
-          #        TF_VAR_NEW_RELIC_ACCOUNT_ID: ${{ inputs.new_relic_account_id }}
-          #      run: |
-          #        terraform destroy -auto-approve -input=false
-          #        terraform apply -auto-approve -input=false
+
+    - name: Terragrunt Apply
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: |
+        if grep -q 'No changes.' tfplan; then
+          echo "No changes detected."
+        else
+          echo "Changes detected. Redeploying everything..."
+          terragrunt destroy -auto-approve --terragrunt-non-interactive
+          terragrunt apply -auto-approve --terragrunt-non-interactive
+        fi
+      shell: bash
+      working-directory: ${{ inputs.working_directory }}
+      env:
+        TF_VAR_do_token: ${{ inputs.do_token }}
+        TF_VAR_AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
+        TF_VAR_AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
+        AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
+        AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
+        TF_VAR_slack_token: ${{ inputs.slack_token }}
+        TF_VAR_R2_ACCESS_KEY: ${{ inputs.r2_access_key }}
+        TF_VAR_R2_SECRET_KEY: ${{ inputs.r2_secret_key }}
+        TF_VAR_NEW_RELIC_API_KEY: ${{ inputs.NEW_RELIC_API_KEY }}
+        TF_VAR_NR_LICENSE_KEY: ${{ inputs.NR_LICENSE_KEY }}
+        TF_VAR_NEW_RELIC_ACCOUNT_ID: ${{ inputs.new_relic_account_id }}
+
+    - name: Terragrunt Force Apply
+      if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
+      shell: bash
+      working-directory: ${{ inputs.working_directory }}
+      env:
+        TF_VAR_do_token: ${{ inputs.do_token }}
+        TF_VAR_AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
+        TF_VAR_AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
+        AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
+        AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
+        TF_VAR_R2_ACCESS_KEY: ${{ inputs.r2_access_key }}
+        TF_VAR_R2_SECRET_KEY: ${{ inputs.r2_secret_key }}
+        TF_VAR_slack_token: ${{ inputs.slack_token }}
+        TF_VAR_NEW_RELIC_API_KEY: ${{ inputs.new_relic_api_key }}
+        TF_VAR_NR_LICENSE_KEY: ${{ inputs.nr_license_key }}
+        TF_VAR_NEW_RELIC_ACCOUNT_ID: ${{ inputs.new_relic_account_id }}
+      run: |
+        terragrunt destroy -auto-approve --terragrunt-non-interactive
+        terragrunt apply -auto-approve --terragrunt-non-interactive
+
