@@ -4,8 +4,8 @@ description: |
   This action deploys the Forest infrastructure with Terragrunt
 
 inputs:
-  environment:
-    description: 'The terraform plan for the the environment infrastructure to be deployed'
+  service_name:
+    description: 'Human-readable name of the service'
     required: true
   do_token:
     description: 'The DigitalOcean access token to use for deploying the infrastructure'
@@ -46,6 +46,7 @@ runs:
       uses: hashicorp/setup-terraform@v2
       with:
         terraform_version: v${{ env.tf_version }}
+        # This is required for Terragrunt to parse Terraform outputs.
         terraform_wrapper: false
 
     - name: Setup Terragrunt
@@ -56,14 +57,14 @@ runs:
         terragrunt -v
 
     - name: Check terragrunt HCL
-      working-directory: ${{ inputs.working_directory }}
       shell: bash
+      working-directory: ${{ inputs.working_directory }}
       run: |
         terragrunt hclfmt --terragrunt-check --terragrunt-diff
 
     - name: Validate
-      working-directory: ${{ inputs.working_directory }}
       shell: bash
+      working-directory: ${{ inputs.working_directory }}
       run: |
         terragrunt validate
       env:
@@ -73,9 +74,9 @@ runs:
     - name: Plan
       if: github.event_name == 'pull_request'
       id: plan
+      shell: bash
       working-directory: ${{ inputs.working_directory }}
       continue-on-error: true
-      shell: bash
       env:
         AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
@@ -88,7 +89,10 @@ runs:
         TF_VAR_new_relic_api_key: ${{ inputs.new_relic_api_key }}
         TF_VAR_new_relic_account_id: ${{ inputs.new_relic_account_id }}
       run: |
-        terragrunt plan -no-color  --terragrunt-non-interactive -out ${{ github.workspace }}/tfplan
+        terragrunt plan -no-color --terragrunt-non-interactive -out ${{ github.workspace }}/tfplan | tee output
+        echo 'plan<<EOF' >> $GITHUB_OUTPUT
+        cat output >> $GITHUB_OUTPUT
+        echo 'EOF' >> $GITHUB_OUTPUT
 
     - name: Find Comment
       if: github.event.pull_request.draft == false &&
@@ -98,24 +102,24 @@ runs:
       with:
         issue-number: ${{ github.event.pull_request.number }}
         comment-author: 'github-actions[bot]'
-        body-regex: "^### Forest: ${{ inputs.environment }} Infrastructure Plan"
+        body-regex: "^### Forest: ${{ inputs.service_name }} Infrastructure Plan"
 
 
     - name: Create or Update Comment
       if: github.event.pull_request.draft == true &&
           github.event_name == 'pull_request' &&
-          !contains(steps.plan.outputs.stdout, 'No changes. Your infrastructure matches the configuration.')
+          !contains(steps.plan.outputs.plan, 'No changes. Your infrastructure matches the configuration.')
       uses: peter-evans/create-or-update-comment@v2
       with:
         comment-id: ${{ steps.fc.outputs.comment-id }}
         issue-number: ${{ github.event.pull_request.number }}
         body: |
-          ### Forest: ${{ inputs.environment }} Infrastructure Plan: ${{ steps.plan.outcome }}
+          ### Forest: ${{ inputs.service_name }} Infrastructure Plan: ${{ steps.plan.outcome }}
 
           <details><summary>Show Plan</summary>
 
           ```
-          ${{ steps.plan.outputs.stdout }}
+          ${{ steps.plan.outputs.plan }}
           ```
 
           </details>
@@ -125,56 +129,54 @@ runs:
       uses: detomarco/delete-comments@v1.0.4
       if: github.event.pull_request.draft == true &&
           github.event_name == 'pull_request' &&
-          contains(steps.plan.outputs.stdout, 'No changes. Your infrastructure matches the configuration.')
+          contains(steps.plan.outputs.plan, 'No changes. Your infrastructure matches the configuration.')
       with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
 
     - name: Terragrunt Plan Status
-      shell: bash
       if: steps.plan.outcome == 'failure'
+      shell: bash
       run: exit 1
 
     - name: Terragrunt Apply
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      shell: bash
       run: |
-        if grep -q 'No changes.' tfplan; then
+        if grep -q 'No changes.' ${{ github.workspace }}/tfplan; then
           echo "No changes detected."
         else
           echo "Changes detected. Redeploying everything..."
           terragrunt destroy -auto-approve --terragrunt-non-interactive
           terragrunt apply -auto-approve --terragrunt-non-interactive
         fi
-      shell: bash
       working-directory: ${{ inputs.working_directory }}
       env:
-        TF_VAR_do_token: ${{ inputs.do_token }}
-        TF_VAR_AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
-        TF_VAR_AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
         AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
-        TF_VAR_slack_token: ${{ inputs.slack_token }}
+        TF_VAR_digitalocean_token: ${{ inputs.do_token }}
+        TF_VAR_AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
+        TF_VAR_AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
         TF_VAR_R2_ACCESS_KEY: ${{ inputs.r2_access_key }}
         TF_VAR_R2_SECRET_KEY: ${{ inputs.r2_secret_key }}
-        TF_VAR_NEW_RELIC_API_KEY: ${{ inputs.NEW_RELIC_API_KEY }}
-        TF_VAR_NR_LICENSE_KEY: ${{ inputs.NR_LICENSE_KEY }}
-        TF_VAR_NEW_RELIC_ACCOUNT_ID: ${{ inputs.new_relic_account_id }}
+        TF_VAR_slack_token: ${{ inputs.slack_token }}
+        TF_VAR_new_relic_api_key: ${{ inputs.new_relic_api_key }}
+        TF_VAR_new_relic_account_id: ${{ inputs.new_relic_account_id }}
 
     - name: Terragrunt Force Apply
       if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
-      shell: bash
       working-directory: ${{ inputs.working_directory }}
       env:
-        TF_VAR_do_token: ${{ inputs.do_token }}
-        TF_VAR_AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
-        TF_VAR_AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
         AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
+        TF_VAR_digitalocean_token: ${{ inputs.do_token }}
+        TF_VAR_AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
+        TF_VAR_AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
         TF_VAR_R2_ACCESS_KEY: ${{ inputs.r2_access_key }}
         TF_VAR_R2_SECRET_KEY: ${{ inputs.r2_secret_key }}
         TF_VAR_slack_token: ${{ inputs.slack_token }}
-        TF_VAR_NEW_RELIC_API_KEY: ${{ inputs.new_relic_api_key }}
-        TF_VAR_NR_LICENSE_KEY: ${{ inputs.nr_license_key }}
-        TF_VAR_NEW_RELIC_ACCOUNT_ID: ${{ inputs.new_relic_account_id }}
+        TF_VAR_new_relic_api_key: ${{ inputs.new_relic_api_key }}
+        TF_VAR_new_relic_account_id: ${{ inputs.new_relic_account_id }}
+      shell: bash
       run: |
         terragrunt destroy -auto-approve --terragrunt-non-interactive
         terragrunt apply -auto-approve --terragrunt-non-interactive

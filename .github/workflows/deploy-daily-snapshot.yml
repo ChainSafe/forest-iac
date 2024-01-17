@@ -1,4 +1,4 @@
-name: Deploy Snapshot Service
+name: Snapshot Service
 concurrency: ci-${{ github.ref }}
 
 on:
@@ -23,7 +23,6 @@ on:
 
 jobs:
   deploy-daily-snapshot:
-    name: Deploy
     runs-on: ubuntu-latest
     permissions: write-all
     steps:
@@ -41,6 +40,6 @@ jobs:
           r2_secret_key: ${{ secrets.R2_SECRET_KEY }}
           slack_token: ${{ secrets.SLACK_TOKEN }}
           working_directory: tf-managed/live/environments/prod/applications/snapshot-service
-          environment: Snapshot Service
+          service_name: Snapshot Service
           new_relic_account_id: ${{ secrets.NEW_RELIC_ACCOUNT_ID }}
           new_relic_api_key: ${{ secrets.NEW_RELIC_API_KEY }}
