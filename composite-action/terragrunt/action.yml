@@ -178,4 +178,3 @@ runs:
       run: |
         terragrunt destroy -auto-approve --terragrunt-non-interactive
         terragrunt apply -auto-approve --terragrunt-non-interactive
-
