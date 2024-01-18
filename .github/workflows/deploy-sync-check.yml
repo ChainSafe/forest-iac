@@ -1,5 +1,5 @@
 name: Sync Check Service
-concurrency: ci-${{ github.ref }}
+concurrency: ci-${{ github.ref }}-sync-check
 
 on:
   pull_request:
@@ -39,7 +39,8 @@ jobs:
           r2_access_key: ${{ secrets.R2_ACCESS_KEY }}
           r2_secret_key: ${{ secrets.R2_SECRET_KEY }}
           slack_token: ${{ secrets.SLACK_TOKEN }}
-          working_directory: tf-managed/live/environments/prod/applications/sync-check
+          working_directory: tf-managed/live/environments/dev/applications/sync-check
           service_name: Sync Check Service
           new_relic_account_id: ${{ secrets.NEW_RELIC_ACCOUNT_ID }}
           new_relic_api_key: ${{ secrets.NEW_RELIC_API_KEY }}
+          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
