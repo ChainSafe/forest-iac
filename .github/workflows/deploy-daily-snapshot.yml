@@ -8,7 +8,7 @@ on:
     paths:
       - 'tf-managed/modules/daily_snapshot/**'
       - 'tf-managed/scripts/**'
-      - 'tf-managed/live/environments/prod/applications/snapshot-service'
+      - 'tf-managed/live/environments/prod/applications/snapshot-service/**'
     # This needs to be declared explicitly so that the job is actually
     # run when moved out of draft.
     types: [opened, synchronize, reopened, ready_for_review]
