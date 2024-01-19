@@ -54,7 +54,7 @@ try:
                 if key not in already_mirrored:
                     response = requests.get(asset.browser_download_url)
                     response.raise_for_status()
-                    s3.put_object(Bucket=S3_BUCKET, Key=key, Body=response.content)
+                    s3.put_object(Bucket=BUCKET_NAME, Key=key, Body=response.content)
 
 except Exception as e:
     send_slack_alert(f"⛔ Filecoin Actor mirroring failed: {e}")
