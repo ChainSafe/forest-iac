@@ -33,7 +33,7 @@ jobs:
         working-directory: scripts/mirror-actors
         run: poetry install --no-interaction --no-root
 
-      - name: Run tests
+      - name: Mirror Actors to DigitalOcean
         working-directory: scripts/mirror-actors
         if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
         run: |
