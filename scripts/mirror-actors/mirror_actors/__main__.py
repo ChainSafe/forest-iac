@@ -8,7 +8,7 @@ from slack_sdk.web import WebClient
 from github import Github
 
 # Define environment variables
-SLACK_TOKEN = os.environ["SLACK_TOKEN"]
+SLACK_API_TOKEN = os.environ["SLACK_API_TOKEN"]
 SLACK_CHANNEL = os.environ["SLACK_CHANNEL"]
 BUCKET_NAME = os.environ["BUCKET_NAME"]
 
@@ -16,7 +16,7 @@ GITHUB_REPO = "filecoin-project/builtin-actors"
 release_pattern = r'^v\d+\.\d+\.\d+.*$'
 
 # Initialize clients
-slack = WebClient(token=SLACK_TOKEN)
+slack = WebClient(token=SLACK_API_TOKEN)
 github = Github()
 s3 = boto3.client("s3",
                   endpoint_url='https://fra1.digitaloceanspaces.com')
