@@ -19,14 +19,14 @@ resource "newrelic_nrql_alert_condition" "disk_space" {
 
   critical {
     operator              = "above"
-    threshold             = 85.0
+    threshold             = 95.0
     threshold_duration    = 300
     threshold_occurrences = "ALL"
   }
 
   warning {
     operator              = "above"
-    threshold             = 70.0
+    threshold             = 85.0
     threshold_duration    = 300
     threshold_occurrences = "ALL"
   }

@@ -4,7 +4,7 @@ All Terragrunt configurations live here. To edit Terraform files, go to `../modu
 The Terragrunt configurations manage the actual environments and, in principle, should reflect the current state of the given environment.
 
 # Development
-As a developer, you should create your own environment, separated from the others. In this directory, execute `make environment` and one will be created for you. Do not work on the `dev` environment directly as others may be working on it as well.
+As a developer, you should create your own environment, separated from the others. In this directory, execute `make environment`, which will create one for you. Do not work on the `dev` environment directly, as others may also be working on it.
 
 ```
 ❯ make create-environment
@@ -15,33 +15,33 @@ Inside the specific application in the environment, run:
 ```
 ❯ terragrunt plan
 ```
+This command will show you the resources to be changed/created/destroyed.
 
-This should show you the resources to be changed/created/destroyed.
 ```
 ❯ terragrunt apply
 ```
 
 After ensuring the changes work correctly, merge the changes from your development environment to the base one and, possibly, `prod`.
 
-Remember to cleanup your environment. Use `terragrunt destroy` or use `make destroy-dev`. Refer to the [Makefile](./Makefile) for details.
+Remember to clean up your environment. Use `terragrunt destroy` or use `make destroy-dev`. Refer to the [Makefile](./Makefile) for details.
 
 
 # Conventions
 
 ## Environments
 
-There is currently no notion of `staging` environment, though one may be introduced in the future.
+There is no notion of a `staging` environment, though one may be introduced in the future.
 
 ```
 .
 ├── dev          # Development environment template for custom environments.
 ├── dev-<random> # Personal development environment
-└── prod         # Production environment. Should reflect reality.
+└── prod         # Production environment. It should reflect reality.
 ```
 
-The `prod` environment should be deployed only by GH worker and not manually.
+The `prod` environment should be deployed only by GH workers and not manually.
 
-Each environment contains its respective `applications/`. A `base-infrastructure` may be created in the future to denote resources shared between applications. Each application should contain a single `terragrunt.hcl` file which only sets its configuration and, optionally, defines dependencies. The application code itself should be defined in `../modules`.
+Each environment contains its respective `applications/`. A `base-infrastructure` may be created to denote resources shared between applications. Each application should include a single `terragrunt.hcl` file which only sets its configuration and, optionally, defines dependencies. The application code itself should be defined in `../modules`.
 
 
 ```
@@ -54,7 +54,7 @@ Each environment contains its respective `applications/`. A `base-infrastructure
         └── terragrunt.hcl
 ```
 
-The difference between a `prod` and a `dev` application should be minimal. This would include a different Slack notification channel (which is already handled by the root `terragrunt.hcl`) or using a larger instances for `prod` environment.
+The difference between a `prod` and a `dev` application should be minimal. This would include a different Slack notification channel (already handled by the root `terragrunt.hcl`) or using larger instances for the `prod` environment.
 
 ## Tags
 
@@ -64,7 +64,7 @@ Everywhere where it's applicable, the resources should include the following tag
 
 # Secrets
 
-There are several secrets that need to be defined and provided for the services to work. You can find them in the team's password manager. Each service defines their own set required variables, though all need access to DigitalOcean. See modules' documentation for more details.
+Several secrets need to be defined and provided for the services to work. You can find them in the team's password manager. Each service defines its own set of required variables, though all need access to DigitalOcean. See the modules' documentation for more details.
 
 ```
 #################################

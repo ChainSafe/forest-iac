@@ -97,7 +97,7 @@ runs:
         echo 'EOF' >> $GITHUB_OUTPUT
 
     - name: Find Comment
-      if: github.event.pull_request.draft == true &&
+      if: github.event.pull_request.draft == false &&
           github.event_name == 'pull_request'
       uses: peter-evans/find-comment@v2
       id: fc
@@ -108,7 +108,7 @@ runs:
 
 
     - name: Create or Update Comment
-      if: github.event.pull_request.draft == true &&
+      if: github.event.pull_request.draft == false &&
           github.event_name == 'pull_request' &&
           !contains(steps.plan.outputs.stdout, 'No changes. Your infrastructure matches the configuration.')
       uses: peter-evans/create-or-update-comment@v2
@@ -129,7 +129,7 @@ runs:
 
     - name: Delete Comment
       uses: detomarco/delete-comments@v1.0.4
-      if: github.event.pull_request.draft == true &&
+      if: github.event.pull_request.draft == false &&
           github.event_name == 'pull_request' &&
           contains(steps.plan.outputs.stdout, 'No changes. Your infrastructure matches the configuration.')
       with:

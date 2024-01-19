@@ -5,20 +5,20 @@ on:
   pull_request:
     branches:
       - main
-        #    paths:
-        #      - 'tf-managed/modules/daily_snapshot/**'
-        #      - 'tf-managed/scripts/**'
-        #      - 'tf-managed/live/environments/prod/applications/snapshot-service'
+    paths:
+      - 'tf-managed/modules/daily_snapshot/**'
+      - 'tf-managed/scripts/**'
+      - 'tf-managed/live/environments/prod/applications/snapshot-service'
     # This needs to be declared explicitly so that the job is actually
     # run when moved out of draft.
     types: [opened, synchronize, reopened, ready_for_review]
   push:
     branches:
       - main
-        #    paths:
-        #      - 'tf-managed/modules/daily_snapshot/**'
-        #      - 'tf-managed/scripts/**'
-        #      - 'tf-managed/live/environments/prod/applications/snapshot-service'
+    paths:
+      - 'tf-managed/modules/daily_snapshot/**'
+      - 'tf-managed/scripts/**'
+      - 'tf-managed/live/environments/prod/applications/snapshot-service'
   workflow_dispatch:
 
 jobs:
@@ -41,7 +41,7 @@ jobs:
           r2_access_key: ${{ secrets.R2_ACCESS_KEY }}
           r2_secret_key: ${{ secrets.R2_SECRET_KEY }}
           slack_token: ${{ secrets.SLACK_TOKEN }}
-          working_directory: tf-managed/live/environments/dev/applications/snapshot-service
+          working_directory: tf-managed/live/environments/prod/applications/snapshot-service
           service_name: Snapshot Service
           new_relic_account_id: ${{ secrets.NEW_RELIC_ACCOUNT_ID }}
           new_relic_api_key: ${{ secrets.NEW_RELIC_API_KEY }}
