@@ -3,7 +3,8 @@ export interface Env {
 }
 
 // Number of recent snapshots to keep. Roughly 1 new snapshot is uploaded every hour.
-const KEEP_COUNT: number = 10;
+// Keep 24*14=336 snapshots for approximately 14 days of retention.
+const KEEP_COUNT: number = 24 * 14;
 
 async function prune(env: Env, chain: string): Promise<string> {
   const listed = await env.FOREST_ARCHIVE.list({ prefix: chain + "/latest/" });
