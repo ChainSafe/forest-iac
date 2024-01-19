@@ -10,7 +10,9 @@ from github import Github
 # Define environment variables
 SLACK_API_TOKEN = os.environ["SLACK_API_TOKEN"]
 SLACK_CHANNEL = os.environ["SLACK_CHANNEL"]
-BUCKET_NAME = os.environ["BUCKET_NAME"]
+S3_BUCKET = os.environ["S3_BUCKET"]
+ENDPOINT_URL = os.environ["ENDPOINT_URL"]
+REGION_NAME = os.environ["REGION_NAME"]
 
 GITHUB_REPO = "filecoin-project/builtin-actors"
 release_pattern = r'^v\d+\.\d+\.\d+.*$'
@@ -18,8 +20,9 @@ release_pattern = r'^v\d+\.\d+\.\d+.*$'
 # Initialize clients
 slack = WebClient(token=SLACK_API_TOKEN)
 github = Github()
-s3 = boto3.client("s3",
-                  endpoint_url='https://fra1.digitaloceanspaces.com')
+s3 = boto3.client('s3',
+                       region_name=REGION_NAME,
+                       endpoint_url=ENDPOINT_URL)
 
 # Calculate the cutoff date (3 years ago from current date)
 three_years_ago = datetime.now() - relativedelta(years=3)
