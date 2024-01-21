@@ -17,7 +17,7 @@ For manual deployments, particularly useful for testing and debugging, set the f
 ## Required environment variables
 
 ```bash
-# DigitalOcean and CloudFlare Access Tokens depending which coud you want to mirror to
+# DigitalOcean or CloudFlare Access Tokens depending which cloud you want to mirror to
 export AWS_ACCESS_KEY_ID=
 export AWS_SECRET_ACCESS_KEY=
 
@@ -25,7 +25,7 @@ export AWS_SECRET_ACCESS_KEY=
 export SLACK_API_TOKEN=
 export SLACK_CHANNEL=
 
-# Boto client Configurations
+# s3 Boto client Configurations
 export BUCKET_NAME=
 export REGION_NAME=
 export ENDPOINT_URL=
