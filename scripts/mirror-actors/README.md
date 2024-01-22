@@ -12,6 +12,13 @@ The project uses GitHub Actions for automated deployment:
 
 # Manual deployments
 
+## Requirements
+
+### Software
+
+* [Python3](https://www.python.org/downloads/)
+* [Poetry](https://python-poetry.org/docs/)
+
 For manual deployments, particularly useful for testing and debugging, set the following environment variables:
 
 ## Required environment variables
