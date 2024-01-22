@@ -52,9 +52,9 @@ jobs:
       with:
         virtualenvs-create: true
 
-    # - name: Install dependencies
-    #   working-directory: scripts/mirror-actors
-    #   run: poetry install --no-interaction --no-root
+    - name: Install dependencies
+      working-directory: scripts/mirror-actors
+      run: poetry install --no-interaction --no-root
 
     - name: Lint Python Code
       working-directory: scripts/mirror-actors
