@@ -39,7 +39,7 @@ jobs:
         yarn lint
         yarn js-check
   run-py-linters:
-    runs-on: ubuntu-late
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     - name: Install Python
