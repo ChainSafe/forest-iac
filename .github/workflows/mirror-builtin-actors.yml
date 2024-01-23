@@ -36,9 +36,7 @@ jobs:
       - name: Mirror Actors to DigitalOcean
         working-directory: scripts/mirror-actors
         if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
-        run: |
-          source .venv/bin/activate
-          python3 mirror_actors/
+        run: poetry run python -m mirror_actors
         env:
             SLACK_API_TOKEN: ${{ secrets.SLACK_TOKEN }}
             SLACK_CHANNEL: "#forest-notifications"
@@ -47,6 +45,7 @@ jobs:
             AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             REGION_NAME: fra1
             ENDPOINT_URL: https://fra1.digitaloceanspaces.com
+            SINK_TYPE: "S3"
 
   mirror-releases-cf:
     runs-on: ubuntu-latest
@@ -73,9 +72,7 @@ jobs:
       - name: Mirror Actors to CloudFlare
         working-directory: scripts/mirror-actors
         if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
-        run: |
-          source .venv/bin/activate
-          python3 mirror_actors/
+        run: poetry run python -m mirror_actors
         env:
             SLACK_API_TOKEN: ${{ secrets.SLACK_TOKEN }}
             SLACK_CHANNEL: "#forest-notifications"
@@ -84,3 +81,4 @@ jobs:
             AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_KEY }}
             REGION_NAME: "auto"
             ENDPOINT_URL: "https://2238a825c5aca59233eab1f221f7aefb.r2.cloudflarestorage.com"
+            SINK_TYPE: "S3"
