@@ -28,8 +28,8 @@ jobs:
           ruby-version: '3.0'
       - name: Run rubocop
         run: |
-          gem install rubocop --no-document
-          rubocop tf-managed/scripts/ # TODO: Apply rubocop to tf-managed/modules/
+          gem install rubocop --no-document --version 1.60.1
+          rubocop
   run-js-linters:
     runs-on: ubuntu-latest
     steps:

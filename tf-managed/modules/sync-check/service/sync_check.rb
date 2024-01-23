@@ -9,7 +9,7 @@ require 'fileutils'
 
 # Retrieves an environmental variable, failing if its not set or empty.
 def get_and_assert_env_variable(name)
-  var = ENV[name]
+  var = ENV.fetch(name, nil)
   raise "Please set #{name} environmental variable" if var.nil? || var.empty?
 
   var

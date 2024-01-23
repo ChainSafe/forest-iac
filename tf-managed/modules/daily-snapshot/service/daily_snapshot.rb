@@ -13,13 +13,11 @@ SLACK_TOKEN = get_and_assert_env_variable 'SLACK_API_TOKEN'
 CHANNEL = get_and_assert_env_variable 'SLACK_NOTIF_CHANNEL'
 
 # Prune logs files(txt) older than 2 weeks
-def prune_logs(logs_folder = "logs")
+def prune_logs(logs_folder = 'logs')
   cutoff_date = Date.today - 14 # set the cutoff date to 14 days ago
 
   Dir.glob("#{logs_folder}/*.txt").each do |file|
-    if File.file?(file) && File.mtime(file).to_date < cutoff_date
-      File.delete(file)
-    end
+    File.delete(file) if File.file?(file) && File.mtime(file).to_date < cutoff_date
   end
 end
 
@@ -36,9 +34,21 @@ client = SlackClient.new CHANNEL, SLACK_TOKEN
 logger = Logger.new($stdout)
 
 # conditionally add timestamps to logs without timestamps
-add_timestamps_cmd = %q[awk '{ if ($0 !~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{6}Z/) print strftime("[%Y-%m-%d %H:%M:%S]"), $0; else print $0; fflush(); }']
-upload_cmd = "set -o pipefail && \
-timeout --signal=KILL 8h ./upload_snapshot.sh #{CHAIN_NAME} #{LOG_EXPORT_DAEMON} #{LOG_EXPORT_METRICS} | #{add_timestamps_cmd}"
+add_timestamps_cmd = <<~CMD
+  awk '{
+  if ($0 !~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{6}Z/)
+    print strftime("[%Y-%m-%d %H:%M:%S]"), $0;
+  else
+    print $0;
+  fflush();
+  }'
+CMD
+
+upload_cmd = <<~CMD.chomp
+  set -o pipefail && \
+  timeout --signal=KILL 8h ./upload_snapshot.sh #{CHAIN_NAME} #{LOG_EXPORT_DAEMON} #{LOG_EXPORT_METRICS} | \
+  #{add_timestamps_cmd}
+CMD
 
 # The command needs to be run indirectly to avoid syntax errors in the shell.
 logger.info "Running snapshot export script for #{CHAIN_NAME}..."
