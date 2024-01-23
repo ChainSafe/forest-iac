@@ -6,7 +6,7 @@ on:
     branches:
       - main
     paths:
-      - 'tf-managed/modules/daily_snapshot/**'
+      - 'tf-managed/modules/daily-snapshot/**'
       - 'tf-managed/scripts/**'
       - 'tf-managed/live/environments/prod/applications/snapshot-service/**'
     # This needs to be declared explicitly so that the job is actually
@@ -16,7 +16,7 @@ on:
     branches:
       - main
     paths:
-      - 'tf-managed/modules/daily_snapshot/**'
+      - 'tf-managed/modules/daily-snapshot/**'
       - 'tf-managed/scripts/**'
       - 'tf-managed/live/environments/prod/applications/snapshot-service'
   workflow_dispatch:
