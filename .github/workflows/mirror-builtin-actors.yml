@@ -61,7 +61,6 @@ jobs:
             AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             REGION_NAME: fra1
             ENDPOINT_URL: https://fra1.digitaloceanspaces.com
-            SINK_TYPE: "S3"
 
   mirror-releases-cf:
     runs-on: ubuntu-latest
@@ -113,4 +112,3 @@ jobs:
             AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_KEY }}
             REGION_NAME: "auto"
             ENDPOINT_URL: "https://2238a825c5aca59233eab1f221f7aefb.r2.cloudflarestorage.com"
-            SINK_TYPE: "S3"

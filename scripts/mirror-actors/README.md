@@ -25,20 +25,19 @@ For manual deployments, particularly useful for testing and debugging, set the f
 
 ```bash
 
-# Sink type: Indicates the target for mirroring actors (S3 or Local)
-export SINK_TYPE=
+# Defines if mirroring actors are on local storage or s3. Set to 'True' for local, 'False' for s3.
+export USE_LOCAL=
 
-# For local mirroring (SINK_TYPE=Local), specify the save path
+# Path to save mirrored data if local mirroring is enabled (USE_LOCAL=true)
 export LOCAL_SAVE_PATH=
 
-
-# For s3 mirroring (SINK_TYPE=S3)
-## Slack Access Token and channel
+# Configuration for s3 mirroring (USE_LOCAL=false)
+## Slack credentials and target channel
 export SLACK_API_TOKEN=
 export SLACK_CHANNEL=
 
-## s3 Boto3 client configurations
-### Access Tokens for DigitalOcean or CloudFlare, based on your cloud preference
+## Settings for s3 Boto3 client
+### Credentials for DigitalOcean or CloudFlare, depending on chosen cloud service
 export AWS_ACCESS_KEY_ID=
 export AWS_SECRET_ACCESS_KEY=
 
@@ -47,7 +46,6 @@ export REGION_NAME=
 export ENDPOINT_URL=
 
 ```
-
 
 Playbook:
 
