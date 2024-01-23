@@ -29,10 +29,6 @@ aws configure set aws_secret_access_key "$R2_SECRET_KEY"
 ## Create forest data directory
 mkdir forest_db logs
 chmod 777 forest_db logs
-mkdir --parents -- "$BASE_FOLDER/forest_db/filops"
-
-# Make the scripts executable
-chmod +x ./upload_filops_snapshot.sh
 
 # Run new_relic and fail2ban scripts
 bash newrelic_fail2ban.sh
