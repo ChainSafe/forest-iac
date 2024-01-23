@@ -73,9 +73,6 @@ class AbstractSink(abc.ABC):
 
 # S3 data sink
 class S3Sink(AbstractSink):
-    """
-    S3 data sink for saving content to an S3 bucket.
-    """
     def __init__(self, bucket):
         """
         Initialize the S3 client.
