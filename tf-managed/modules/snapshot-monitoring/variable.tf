@@ -46,3 +46,19 @@ variable "slack_channel_id" {
   default     = ""
   sensitive   = true
 }
+
+variable "pagerduty_enable" {
+  description = "Enable PagerDuty notifications"
+  type        = bool
+  default     = false
+}
+
+# This needs to be created manually. Afterwards, it can be found in
+# NR / Alerts & AI / Destinations. Otherwise, we'd need special permissions
+# to create it via the API.
+variable "pagerduty_destination_id" {
+  description = "PagerDuty destination id"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
