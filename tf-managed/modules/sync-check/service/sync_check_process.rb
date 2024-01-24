@@ -88,14 +88,14 @@ class SyncCheck
     cleanup_command = "docker run --rm --volume forest-data:#{FOREST_DATA} busybox sh -c 'rm -rf #{FOREST_DATA}/**'"
 
     stdout, stderr, status = Open3.capture3(cleanup_command)
-    unless status.success?
+    if status.success?
+      @logger.info 'Cleanup successful'
+      @client.attach_comment '🧹 Docker volume cleanup completed successfully ✅'
+    else
       error_message = "Cleanup failed with status: #{status.exitstatus}. STDOUT: #{stdout}, STDERR: #{stderr}"
       @logger.error error_message
       @client.attach_comment "Cleanup error: #{error_message}"
       raise 'Failed to clean up Docker volume'
-    else
-      @logger.info 'Cleanup successful'
-      @client.attach_comment '🧹 Docker volume cleanup completed successfully ✅'
     end
 
     @client.attach_comment '🧹 Cleanup finished ✅'
