@@ -1,0 +1,114 @@
+name: Mirror Builtin Actors Releases
+on:
+  schedule:
+    - cron: '0 * * * *'  # Runs every hour
+  pull_request:
+    paths:
+      - 'scripts/mirror-actors/**'
+  push:
+    paths:
+      - 'scripts/mirror-actors/**'
+  workflow_dispatch:
+
+jobs:
+  mirror-releases-do:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Load cached Poetry installation
+        id: cached-poetry
+        uses: actions/cache@v3
+        with:
+          path: ~/.local
+          key: poetry-0
+
+      - name: Install Poetry
+        if: steps.cached-poetry.outputs.cache-hit != 'true'
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          installer-parallel: true
+
+      - name: Load cached dependencies Install
+        id: cached-poetry-dependencies
+        uses: actions/cache@v3
+        with:
+          path: scripts/mirror-actors/.venv
+          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install dependencies
+        working-directory: scripts/mirror-actors
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction --no-root
+
+      - name: Mirror Actors to DigitalOcean
+        working-directory: scripts/mirror-actors
+        if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+        run: poetry run python -m mirror_actors
+        env:
+            SLACK_API_TOKEN: ${{ secrets.SLACK_TOKEN }}
+            SLACK_CHANNEL: "#forest-notifications"
+            BUCKET_NAME: filecoin-builtin-actors
+            AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            REGION_NAME: fra1
+            ENDPOINT_URL: https://fra1.digitaloceanspaces.com
+
+  mirror-releases-cf:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Load cached Poetry installation
+        id: cached-poetry
+        uses: actions/cache@v3
+        with:
+          path: ~/.local
+          key: poetry-1
+
+      - name: Install Poetry
+        if: steps.cached-poetry.outputs.cache-hit != 'true'
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          installer-parallel: true
+
+      - name: Load cached dependencies Install
+        id: cached-poetry-dependencies
+        uses: actions/cache@v3
+        with:
+          path: scripts/mirror-actors/.venv
+          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install dependencies
+        working-directory: scripts/mirror-actors
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction --no-root
+
+      - name: Mirror Actors to CloudFlare
+        working-directory: scripts/mirror-actors
+        if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+        run: poetry run python -m mirror_actors
+        env:
+            SLACK_API_TOKEN: ${{ secrets.SLACK_TOKEN }}
+            SLACK_CHANNEL: "#forest-notifications"
+            BUCKET_NAME: filecoin-builtin-actors
+            AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACTORS_ACCESS_KEY }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_ACTORS_SECRET_KEY }}
+            REGION_NAME: "auto"
+            ENDPOINT_URL: "https://2238a825c5aca59233eab1f221f7aefb.r2.cloudflarestorage.com"

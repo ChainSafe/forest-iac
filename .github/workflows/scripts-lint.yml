@@ -38,3 +38,24 @@ jobs:
         yarn install
         yarn lint
         yarn js-check
+  run-py-linters:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+      with:
+        virtualenvs-create: true
+
+    - name: Install dependencies
+      working-directory: scripts/mirror-actors
+      run: poetry install --no-interaction --no-root
+
+    - name: Lint Python Code
+      working-directory: scripts/mirror-actors
+      run: poetry run pylint mirror_actors/ -f actions
