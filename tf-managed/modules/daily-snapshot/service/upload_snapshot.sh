@@ -77,10 +77,10 @@ forest-cli --token=\$(cat token.txt) shutdown --force
 
 # Run full checks only for calibnet, given that it takes too long for mainnet.
 if [ "$CHAIN_NAME" = "calibnet" ]; then
-  forest-tool snapshot validate --check-network "$CHAIN_NAME" forest_db/forest_snapshot_*.forest.car.zst
+  timeout 5m forest-tool snapshot validate --check-network "$CHAIN_NAME" forest_db/forest_snapshot_*.forest.car.zst
 else
   forest-tool archive info forest_db/forest_snapshot_*.forest.car.zst
-  forest-tool snapshot validate --check-links 0 --check-network "$CHAIN_NAME" --check-stateroots 5 forest_db/forest_snapshot_*.forest.car.zst
+  timeout 30m forest-tool snapshot validate --check-links 0 --check-network "$CHAIN_NAME" --check-stateroots 5 forest_db/forest_snapshot_*.forest.car.zst
 fi
 
 
