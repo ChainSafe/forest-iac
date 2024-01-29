@@ -43,7 +43,7 @@ variable "project" {
   default     = "Forest-DEV" # Alternative: "Default"
 }
 
-variable "NEW_RELIC_REGION" {
+variable "new_relic_region" {
   description = "The New Relic Platform Region"
   type        = string
   default     = "EU"

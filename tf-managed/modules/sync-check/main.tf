@@ -40,7 +40,7 @@ locals {
     slack_channel             = var.slack_channel,
     NEW_RELIC_API_KEY         = var.new_relic_api_key,
     NEW_RELIC_ACCOUNT_ID      = var.new_relic_account_id,
-    NEW_RELIC_REGION          = var.NEW_RELIC_REGION,
+    NEW_RELIC_REGION          = var.new_relic_region,
     forest_tag                = "edge-fat"
   })
 }
