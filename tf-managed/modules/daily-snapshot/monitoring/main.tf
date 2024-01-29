@@ -118,3 +118,36 @@ resource "newrelic_workflow" "alerting-workflow-slack" {
     channel_id = newrelic_notification_channel.slack-channel[0].id
   }
 }
+
+# resource "newrelic_nrql_alert_condition" "snapshot_frequency_condition" {
+#   for_each    = toset(["mainnet", "calibnet"])
+#   policy_id   = newrelic_alert_policy.alert.id
+#   type        = "static"
+#   name        = format("Low snapshot generation frequency - %s", each.key)
+#   description = "Alert when snapshots are not generated within required time interval"
+#   enabled     = true
+# 
+#   # evaluation_delay = 7200 
+#   # aggregation_window = 14400
+#   aggregation_window = 360
+# 
+#   nrql {
+#     query = format("FROM Metric SELECT count(`${var.service_name}.${each.key}.snapshot_generation_ok`)")
+#   }
+# 
+#   warning {
+#     operator  = "below"
+#     threshold = 1
+#     # threshold_duration    = 14400
+#     threshold_duration    = 360
+#     threshold_occurrences = "ALL"
+#   }
+# 
+#   critical {
+#     operator  = "below"
+#     threshold = 1
+#     # threshold_duration    = 28800
+#     threshold_duration    = 720
+#     threshold_occurrences = "ALL"
+#   }
+# }

@@ -3,6 +3,13 @@ variable "service_name" {
   type        = string
 }
 
+variable "new_relic_account_id" {
+  description = "The New Relic Account ID"
+  default     = 0
+  type        = number
+  sensitive   = true
+}
+
 variable "alert_email" {
   description = "Email address to send alerts to"
   type        = string
