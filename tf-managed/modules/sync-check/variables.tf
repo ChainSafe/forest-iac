@@ -49,14 +49,14 @@ variable "NEW_RELIC_REGION" {
   default     = "EU"
 }
 
-variable "NEW_RELIC_API_KEY" {
+variable "new_relic_api_key" {
   description = "New Relic API KEY"
   default     = ""
   type        = string
   sensitive   = true
 }
 
-variable "NEW_RELIC_ACCOUNT_ID" {
+variable "new_relic_account_id" {
   description = "The New Relic Account ID"
   default     = ""
   type        = string

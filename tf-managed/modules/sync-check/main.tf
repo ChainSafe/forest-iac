@@ -38,8 +38,8 @@ locals {
     FOREST_TARGET_RUBY_COMMON = "/volumes/ruby_common",
     slack_token               = var.slack_token,
     slack_channel             = var.slack_channel,
-    NEW_RELIC_API_KEY         = var.NEW_RELIC_API_KEY,
-    NEW_RELIC_ACCOUNT_ID      = var.NEW_RELIC_ACCOUNT_ID,
+    NEW_RELIC_API_KEY         = var.new_relic_api_key,
+    NEW_RELIC_ACCOUNT_ID      = var.new_relic_account_id,
     NEW_RELIC_REGION          = var.NEW_RELIC_REGION,
     forest_tag                = "edge-fat"
   })
