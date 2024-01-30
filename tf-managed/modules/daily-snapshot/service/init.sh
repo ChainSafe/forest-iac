@@ -10,25 +10,8 @@ export DEBIAN_FRONTEND=noninteractive
 
 # Using timeout to ensure the script retries if the APT servers are temporarily unavailable.
 timeout 10m bash -c 'until apt-get -qqq --yes update && \
- apt-get -qqq --yes install ruby ruby-dev anacron awscli; do sleep 10; \
+ apt-get -qqq --yes install anacron ; do sleep 10; \
 done'
-
-# Install the gems
-gem install docker-api slack-ruby-client
-gem install activesupport -v 7.0.8
-
-# 1. Configure aws
-# 2. Create forest_db directory
-# 3. Copy scripts to /etc/cron.hourly
-
-## Configure aws
-aws configure set default.s3.multipart_chunksize 4GB
-aws configure set aws_access_key_id "$R2_ACCESS_KEY"
-aws configure set aws_secret_access_key "$R2_SECRET_KEY"
-
-## Create forest data directory
-mkdir forest_db logs
-chmod 777 forest_db logs
 
 # Run new_relic and fail2ban scripts
 bash newrelic_fail2ban.sh

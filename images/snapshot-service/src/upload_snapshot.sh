@@ -83,7 +83,6 @@ else
   timeout 30m forest-tool snapshot validate --check-links 0 --check-network "$CHAIN_NAME" --check-stateroots 5 forest_db/forest_snapshot_*.forest.car.zst
 fi
 
-
 # Kill the metrics writer process
 kill %1
 
@@ -95,23 +94,34 @@ CONTAINER_NAME="forest-snapshot-upload-node-$CHAIN_NAME"
 docker stop "$CONTAINER_NAME" || true
 docker rm --force "$CONTAINER_NAME"
 
-CHAIN_DB_DIR="$BASE_FOLDER/forest_db/$CHAIN_NAME"
-CHAIN_LOGS_DIR="$BASE_FOLDER/logs"
+CHAIN_DB_DIR="/opt/forest_db/$CHAIN_NAME"
+CHAIN_LOGS_DIR="/opt/logs/$CHAIN_NAME"
+mkdir -p "$CHAIN_DB_DIR"
+mkdir -p "$CHAIN_LOGS_DIR"
 
-# Delete any existing snapshot files. It may be that the previous run failed
-# before deleting those.
-rm "$CHAIN_DB_DIR/forest_snapshot_$CHAIN_NAME"*
+# Cleanup volumes from the previous if any.
+DB_VOLUME="${CHAIN_NAME}_db"
+LOG_VOLUME="${CHAIN_NAME}_logs"
+docker volume rm "${DB_VOLUME}" || true
+docker volume rm "${LOG_VOLUME}" || true
 
-# Run forest and generate a snapshot in forest_db/
+# Run forest and generate a snapshot in the `DB_VOLUME` volume.
 docker run \
   --name "$CONTAINER_NAME" \
   --rm \
   --user root \
-  -v "$CHAIN_DB_DIR:/home/forest/forest_db":z \
-  -v "$CHAIN_LOGS_DIR:/home/forest/logs":z \
+  -v "${DB_VOLUME}:/home/forest/forest_db" \
+  -v "${LOG_VOLUME}:/home/forest/logs" \
   --entrypoint /bin/bash \
   ghcr.io/chainsafe/forest:"${FOREST_TAG}" \
   -c "$COMMANDS" || exit 1
+
+# Dummy container to copy the snapshot files from the volume to the "host".
+COPIER=$(docker container create -v "${CHAIN_NAME}_db:/opt" busybox)
+docker run --rm -v "${DB_VOLUME}:/opt" busybox /bin/sh -c 'ls /opt/forest_snapshot_*.forest.car.zst' | while read -r file; do
+  docker cp "$COPIER":"$file" "$CHAIN_DB_DIR"
+done
+docker rm "$COPIER"
 
 aws --endpoint "$R2_ENDPOINT" s3 cp --no-progress "$CHAIN_DB_DIR/forest_snapshot_$CHAIN_NAME"*.forest.car.zst s3://"$SNAPSHOT_BUCKET"/"$CHAIN_NAME"/latest/ || exit 1
 

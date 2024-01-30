@@ -7,7 +7,7 @@
 
 // Ugly hack because 'archive_file' cannot mix files and folders.
 data "external" "sources_tar" {
-  program = ["bash", "${path.module}/prep_sources.sh", path.module, var.common_resources_dir]
+  program = ["bash", "${path.module}/prep_sources.sh", path.module]
 }
 
 
@@ -30,32 +30,30 @@ data "digitalocean_ssh_keys" "keys" {
   }
 }
 
-# Set required environment variables
+# Required environment variables for the snapshot service itself.
 locals {
-  env_content = templatefile("${path.module}/service/forest-env.tpl", {
-    R2_ACCESS_KEY        = var.R2_ACCESS_KEY,
-    R2_SECRET_KEY        = var.R2_SECRET_KEY,
-    r2_endpoint          = var.r2_endpoint,
-    slack_token          = var.slack_token,
-    slack_channel        = var.slack_channel,
-    snapshot_bucket      = var.snapshot_bucket,
-    snapshot_endpoint    = var.snapshot_endpoint,
-    NEW_RELIC_API_KEY    = var.new_relic_api_key,
-    NEW_RELIC_ACCOUNT_ID = var.new_relic_account_id,
-    NEW_RELIC_REGION     = var.new_relic_region,
-    BASE_FOLDER          = "/root",
-    forest_tag           = var.forest_tag
-  })
+  env_content = <<-EOT
+  R2_ACCESS_KEY=${var.R2_ACCESS_KEY}
+  R2_SECRET_KEY=${var.R2_SECRET_KEY}
+  R2_ENDPOINT=${var.r2_endpoint}
+  SNAPSHOT_BUCKET=${var.snapshot_bucket}
+  SLACK_API_TOKEN=${var.slack_token}
+  SLACK_NOTIFICATION_CHANNEL=${var.slack_channel}
+  FOREST_TAG=${var.forest_tag}
+  EOT
 }
 
 locals {
   init_commands = ["cd /root/",
     "tar xf sources.tar",
-    # Set required environment variables
     "echo '${local.env_content}' >> /root/.forest_env",
-    "echo '. ~/.forest_env' >> .bashrc",
-    ". ~/.forest_env",
-    "nohup sh ./init.sh > init_log.txt &",
+    <<-EOT
+    export NEW_RELIC_API_KEY=${var.new_relic_api_key}
+    export NEW_RELIC_ACCOUNT_ID=${var.new_relic_account_id}
+    export NEW_RELIC_REGION=${var.new_relic_region}
+    nohup sh ./init.sh > init_log.txt &
+    EOT
+    ,
     # Exiting without a sleep sometimes kills the script :-/
     "sleep 60s"
   ]
