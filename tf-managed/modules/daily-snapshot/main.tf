@@ -113,4 +113,5 @@ module "monitoring" {
   slack_enable         = var.monitoring.slack_enable
   slack_destination_id = var.monitoring.slack_destination_id
   slack_channel_id     = var.monitoring.slack_channel_id
+  new_relic_account_id = var.new_relic_account_id
 }

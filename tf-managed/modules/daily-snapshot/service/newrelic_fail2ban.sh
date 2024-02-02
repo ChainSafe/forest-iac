@@ -44,7 +44,8 @@ logs:
       newrelic-cli: true
       logtype: newrelic-cli
   - name: snapshot_logs
-    file: /root/logs/*_log.txt
+    file: /root/logs/*_events.log
+    pattern: ^[^#]
 EOF
 
   sudo systemctl restart newrelic-infra

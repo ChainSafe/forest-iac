@@ -33,6 +33,12 @@ LOG_EXPORT_METRICS = "logs/#{CHAIN_NAME}_#{DATE}_metrics.txt"
 client = SlackClient.new CHANNEL, SLACK_TOKEN
 logger = Logger.new($stdout)
 
+# Special logger for the events, so that they can be easily parsed by the monitoring tools
+event_logger = Logger.new("logs/#{CHAIN_NAME}_events.log")
+event_logger.formatter = proc do |_severity, datetime, _progname, msg|
+  "[#{datetime.strftime('%Y-%m-%dT%H:%M:%S')}] #{msg}\n"
+end
+
 # conditionally add timestamps to logs without timestamps
 add_timestamps_cmd = <<~CMD
   awk '{
@@ -52,15 +58,19 @@ CMD
 
 # The command needs to be run indirectly to avoid syntax errors in the shell.
 logger.info "Running snapshot export script for #{CHAIN_NAME}..."
+event_logger.info 'snapshot export started'
 snapshot_uploaded = system('bash', '-c', upload_cmd, %i[out err] => LOG_EXPORT_SCRIPT_RUN)
 logger.info "Snapshot export script finished for #{CHAIN_NAME}."
+event_logger.info 'snapshot export finished'
 
 if snapshot_uploaded
   # This log message is important, as it is used by the monitoring tools to determine whether the snapshot was
   # successfully uploaded.
   logger.info "Snapshot uploaded for #{CHAIN_NAME}."
+  event_logger.info 'snapshot uploaded'
 else
   logger.error "Snapshot upload failed for #{CHAIN_NAME}."
+  event_logger.error 'snapshot upload failed'
   client.post_message "⛔ Snapshot failed for #{CHAIN_NAME}. 🔥🌲🔥 "
   # attach the log file and print the contents to STDOUT
   [LOG_EXPORT_SCRIPT_RUN, LOG_EXPORT_DAEMON, LOG_EXPORT_METRICS].each do |log_file|
