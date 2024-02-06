@@ -8,16 +8,24 @@ require 'date'
 require 'logger'
 require 'fileutils'
 
+BASE_FOLDER = get_and_assert_env_variable 'BASE_FOLDER'
 SLACK_TOKEN = get_and_assert_env_variable 'SLACK_API_TOKEN'
-CHANNEL = get_and_assert_env_variable 'SLACK_NOTIFICATION_CHANNEL'
+CHANNEL = get_and_assert_env_variable 'SLACK_NOTIF_CHANNEL'
+
+# Prune logs files(txt) older than 2 weeks
+def prune_logs(logs_folder = 'logs')
+  cutoff_date = Date.today - 14 # set the cutoff date to 14 days ago
+
+  Dir.glob("#{logs_folder}/*.txt").each do |file|
+    File.delete(file) if File.file?(file) && File.mtime(file).to_date < cutoff_date
+  end
+end
 
 CHAIN_NAME = ARGV[0]
 raise 'No chain name supplied. Please provide chain identifier, e.g. calibnet or mainnet' if ARGV.empty?
 
 # Current datetime, to append to the log files
 DATE = Time.new.strftime '%FT%H:%M:%S'
-
-FileUtils.mkdir_p 'logs'
 LOG_EXPORT_SCRIPT_RUN = "logs/#{CHAIN_NAME}_#{DATE}_script_run.txt"
 LOG_EXPORT_DAEMON = "logs/#{CHAIN_NAME}_#{DATE}_daemon.txt"
 LOG_EXPORT_METRICS = "logs/#{CHAIN_NAME}_#{DATE}_metrics.txt"
@@ -38,7 +46,7 @@ CMD
 
 upload_cmd = <<~CMD.chomp
   set -o pipefail && \
-  timeout -s SIGKILL 8h ./upload_snapshot.sh #{CHAIN_NAME} #{LOG_EXPORT_DAEMON} #{LOG_EXPORT_METRICS} | \
+  timeout --signal=KILL 8h ./upload_snapshot.sh #{CHAIN_NAME} #{LOG_EXPORT_DAEMON} #{LOG_EXPORT_METRICS} | \
   #{add_timestamps_cmd}
 CMD
 
@@ -63,3 +71,6 @@ end
 [LOG_EXPORT_SCRIPT_RUN, LOG_EXPORT_DAEMON, LOG_EXPORT_METRICS].each do |log_file|
   logger.info "Snapshot export log:\n#{File.read(log_file)}\n\n" if File.exist?(log_file)
 end
+
+# Prune logs files(txt) in the logs directory older than 2 weeks
+prune_logs
