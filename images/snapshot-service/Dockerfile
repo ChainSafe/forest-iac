@@ -16,6 +16,8 @@ RUN apk add --no-cache \
 
 COPY ./src /opt/snapshot-service
 
+# `common` is defined via the `--build-context` flag in the `docker build` command, e.g.,
+# `docker build --build-context common=../../tf-managed/scripts/ -t ghcr.io/chainsafe/forest-snapshot-service:latest .`
 # TODO: Change this once `sync-check` is fully-dockerized as well.
 # hadolint ignore=DL3022
 COPY --from=common ruby_common /opt/snapshot-service/ruby_common
