@@ -4,15 +4,15 @@ FROM docker:24
 LABEL org.opencontainers.image.description "Forest snapshot service generator and uploader for Filecoin"
 
 RUN apk add --no-cache \
-        ruby=3.2.2-r1 \
-        ruby-dev=3.2.2-r1 \
-        docker=24.0.7-r0 \
-        aws-cli=2.13.25-r0 \
-        bash=5.2.21-r0 && \
+        ruby \
+        ruby-dev \
+        docker \
+        aws-cli \
+        bash && \
     gem install \
-        docker-api:1.28.0 \
-        slack-ruby-client:2.2 \
-        activesupport:7.0.8
+        docker-api \
+        slack-ruby-client \
+        activesupport
 
 COPY ./src /opt/snapshot-service
 
