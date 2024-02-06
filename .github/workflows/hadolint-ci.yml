@@ -17,4 +17,4 @@ jobs:
         dockerfile: "Dockerfile*"
         recursive: true
         # don't pin versions in dependencies
-        ignore: DL3028,DL3008,DL3018
+        ignore: DL3028,DL3008

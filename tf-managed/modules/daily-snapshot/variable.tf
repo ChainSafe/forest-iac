@@ -48,6 +48,12 @@ variable "r2_endpoint" {
   type        = string
 }
 
+variable "snapshot_endpoint" {
+  description = "S3 endpoint for the snapshots"
+  type        = string
+  default     = "https://fra1.digitaloceanspaces.com/"
+}
+
 variable "forest_tag" {
   description = "Image tag for the Forest container"
   type        = string
@@ -102,6 +108,10 @@ variable "new_relic_account_id" {
   default     = 0
   type        = number
   sensitive   = true
+}
+
+variable "common_resources_dir" {
+  type = string
 }
 
 variable "environment" {

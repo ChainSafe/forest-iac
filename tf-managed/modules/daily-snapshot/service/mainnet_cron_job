@@ -1,5 +1,6 @@
 #!/bin/bash
 
 # shellcheck source=/dev/null
-cd "$HOME" || exit
-flock -n /tmp/mainnet.lock -c "docker run --privileged -v /var/run/docker.sock:/var/run/docker.sock --rm --env-file .forest_env -e NETWORK_CHAIN=mainnet ghcr.io/chainsafe/forest-snapshot-service:latest >> mainnet_log.txt 2>&1"
+source ~/.forest_env
+cd "$BASE_FOLDER" || exit
+flock -n /tmp/mainnet.lock -c "ruby daily_snapshot.rb mainnet > mainnet_log.txt 2>&1" || exit
