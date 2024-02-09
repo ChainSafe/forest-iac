@@ -7,7 +7,6 @@ RUN apk add --no-cache \
         ruby \
         ruby-dev \
         docker \
-        aws-cli \
         bash && \
     gem install \
         docker-api \

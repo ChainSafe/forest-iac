@@ -12,8 +12,4 @@ set -euo pipefail
 : "${NETWORK_CHAIN:?}"
 : "${FOREST_TAG:?}"
 
-aws configure set default.s3.multipart_chunksize 4GB
-aws configure set aws_access_key_id "$R2_ACCESS_KEY"
-aws configure set aws_secret_access_key "$R2_SECRET_KEY"
-
 ruby daily_snapshot.rb "$NETWORK_CHAIN"
