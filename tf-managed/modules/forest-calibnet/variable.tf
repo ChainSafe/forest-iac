@@ -1,7 +1,6 @@
-variable "digitalocean_token" {
-  description = "Token for authentication."
+variable "image" {
+  description = "The ID of the AMI to use for the Droplet"
   type        = string
-  sensitive   = true
 }
 
 variable "name" {
@@ -9,130 +8,182 @@ variable "name" {
   type        = string
 }
 
-variable "size" {
-  description = "The size of the droplet instance to launch"
+variable "forest_user" {
+  description = "The name of Forest Droplet user"
   type        = string
-}
-
-variable "slack_channel" {
-  description = "slack channel name for notifications"
-  type        = string
-}
-
-variable "slack_token" {
-  description = "slack access token"
-  type        = string
-  sensitive   = true
-}
-
-variable "R2_ACCESS_KEY" {
-  description = "S3 access key id"
-  type        = string
-  sensitive   = true
-}
-
-variable "R2_SECRET_KEY" {
-  description = "S3 private access key"
-  type        = string
-  sensitive   = true
-}
-
-variable "snapshot_bucket" {
-  description = "S3 bucket containing the snapshots"
-  type        = string
-  default     = "forest-snapshots"
-}
-
-variable "r2_endpoint" {
-  description = "R2 endpoint for the snapshots"
-  type        = string
-}
-
-variable "forest_tag" {
-  description = "Image tag for the Forest container"
-  type        = string
-  default     = "latest"
-}
-
-variable "image" {
-  description = "The ID of the AMI to use for the Droplet"
-  type        = string
-  default     = "docker-20-04"
 }
 
 variable "region" {
   description = "The region where resources will be created"
   type        = string
-  default     = "fra1"
 }
 
-variable "project" {
-  description = "DigitalOcean project used as parent for the created droplet"
+variable "size" {
+  description = "The size of the EC2 instance to launch"
   type        = string
-  default     = "Forest-DEV" # Alternative: "Default"
 }
 
 variable "source_addresses" {
   description = "List of source addresses."
   type        = list(string)
-  default     = ["0.0.0.0/0", "::/0"]
+}
+
+variable "do_token" {
+  description = "Token for authentication."
+  type        = string
+  sensitive   = true
+}
+
+variable "volume_size" {
+  description = "The size of the volume to create, in gigabytes."
+  type        = number
+  default     = 100
+}
+
+variable "initial_filesystem_type" {
+  description = "The type of filesystem to create on the new volume."
+  type        = string
+  default     = "ext4"
+}
+
+variable "attach_volume" {
+  description = "If set to true, it will create and attached volume"
+  type        = bool
 }
 
 variable "destination_addresses" {
-  description = "List of destination addresses."
+  description = "address for the firewall reference"
   type        = list(string)
-  default     = ["0.0.0.0/0", "::/0"]
 }
 
-variable "new_relic_region" {
-  description = "The New Relic Platform Region"
+variable "rpc_port" {
+  description = "RPC Port for nodes"
   type        = string
-  default     = "EU"
 }
 
-variable "new_relic_api_key" {
+variable "chain" {
+  description = "The chain tag to apply to resources."
+  type        = string
+}
+
+variable "volume_name" {
+  description = "The name assigned to the volume in the cloud"
+  type        = string
+  default     = ""
+}
+
+variable "project" {
+  description = "The name assigned to the project in the cloud"
+  type        = string
+}
+
+variable "fw_name" {
+  description = "The name assigned to the firewall in the cloud"
+  type        = string
+}
+
+variable "NR_LICENSE_KEY" {
+  description = "New Relic Access Token"
+  default     = ""
+  type        = string
+  sensitive   = true
+}
+
+variable "NEW_RELIC_API_KEY" {
   description = "New Relic API KEY"
   default     = ""
   type        = string
   sensitive   = true
 }
 
-variable "new_relic_account_id" {
-  description = "The New Relic Account ID"
-  default     = 0
-  type        = number
+variable "NEW_RELIC_ACCOUNT_ID" {
+  description = "New Relic Account ID"
+  default     = ""
+  type        = string
   sensitive   = true
 }
 
-variable "environment" {
-  description = "The environment name"
+variable "NEW_RELIC_REGION" {
+  description = "The New Relic Platform Region"
+  type        = string
+  default     = "EU"
+}
+
+variable "script" {
+  description = "The Name of the Script Executed at the Initialization of the Droplet"
+  type        = string
+  default     = "forest.sh"
+}
+variable "image" {
+  description = "The ID of the AMI to use for the Droplet"
   type        = string
 }
 
-# Monitoring properties of the service. Can be declared partially.
-variable "monitoring" {
-  description = "Service monitoring properties"
-  type = object({
-    # Whether to enable monitoring on the service.
-    enable = optional(bool, false)
-    # Email (or comma-separated emails) to send alerts to in case of incidents. If empty, disabled email alerts.
-    alert_email = optional(string, "")
-    # Whether to enable Slack notifications on the given channel.
-    slack_enable = optional(bool, false)
-    # Due to the limitations of NewRelic, this needs to be manually created via UI.
-    # See Slack section in:
-    # https://registry.terraform.io/providers/newrelic/newrelic/latest/docs/resources/notification_destination
-    # https://docs.newrelic.com/docs/alerts-applied-intelligence/notifications/notification-integrations/#slack
-    slack_destination_id = optional(string, "")
-    # Unique Slack channel ID - can be obtained at the bottom of the channel properties.
-    slack_channel_id = optional(string, "")
-  })
+variable "name" {
+  description = "The name of Forest Droplet"
+  type        = string
+}
 
-  default = {
-    enable               = false,
-    alert_email          = ""
-    slack_enable         = false,
-    slack_destination_id = ""
-    slack_channel_id     = ""
-  }
+variable "forest_user" {
+  description = "The name of Forest Droplet user"
+  type        = string
+}
+
+variable "region" {
+  description = "The region where resources will be created"
+  type        = string
+}
+
+variable "size" {
+  description = "The size of the EC2 instance to launch"
+  type        = string
+}
+
+variable "source_addresses" {
+  description = "List of source addresses."
+  type        = list(string)
+}
+
+variable "do_token" {
+  description = "Token for authentication."
+  type        = string
+  sensitive   = true
+}
+
+variable "destination_addresses" {
+  description = "address for the firewall reference"
+  type        = list(string)
+}
+
+variable "chain" {
+  description = "The chain tag to apply to resources."
+  type        = string
+}
+
+variable "project" {
+  description = "The name assigned to the project in the cloud"
+  type        = string
+}
+
+variable "fw_name" {
+  description = "The name assigned to the volume in the cloud"
+  type        = string
+}
+
+variable "NR_LICENSE_KEY" {
+  description = "New Relic Access Token"
+  type        = string
+  sensitive   = true
+}
+
+variable "NEW_RELIC_API_KEY" {
+  description = "New Relic API KEY"
+  type        = string
+  sensitive   = true
+}
+
+variable "NEW_RELIC_ACCOUNT_ID" {
+  description = "The New Relic Account ID"
+  type        = string
+  sensitive   = true
 }
