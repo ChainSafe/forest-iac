@@ -1,5 +1,5 @@
-resource "digitalocean_firewall" "forest-firewall" {
-  name = format("%s-%s", var.environment, var.name)
+resource "digitalocean_firewall" "forest_firewall" {
+  name = var.fw_name
 
   inbound_rule {
     protocol         = "tcp"
@@ -9,19 +9,13 @@ resource "digitalocean_firewall" "forest-firewall" {
 
   inbound_rule {
     protocol         = "tcp"
-    port_range       = "2345"
+    port_range       = var.rpc_port
     source_addresses = var.source_addresses
   }
 
   inbound_rule {
     protocol         = "tcp"
     port_range       = "80"
-    source_addresses = var.source_addresses
-  }
-
-  inbound_rule {
-    protocol         = "udp"
-    port_range       = "53"
     source_addresses = var.source_addresses
   }
 
@@ -37,5 +31,19 @@ resource "digitalocean_firewall" "forest-firewall" {
     destination_addresses = var.destination_addresses
   }
 
+
+  // Outbound rule added to allow Network Time Protocol (NTP) traffic for time synchronization purposes.
+  outbound_rule {
+    protocol              = "udp"
+    port_range            = "123"
+    destination_addresses = var.destination_addresses
+  }
+  outbound_rule {
+    protocol              = "icmp"
+    destination_addresses = var.destination_addresses
+  }
+
   droplet_ids = [digitalocean_droplet.forest.id]
+
+  tags = [var.chain]
 }
