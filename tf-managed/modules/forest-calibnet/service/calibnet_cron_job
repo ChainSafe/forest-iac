@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# shellcheck source=/dev/null
+cd "$HOME" || exit
+flock -n /tmp/calibnet.lock -c "docker run --privileged -v /var/run/docker.sock:/var/run/docker.sock --rm --env-file .forest_env -e NETWORK_CHAIN=calibnet ghcr.io/chainsafe/forest-snapshot-service:latest >> calibnet_log.txt 2>&1"
