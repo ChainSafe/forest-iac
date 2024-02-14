@@ -1,3 +1,9 @@
+variable "digitalocean_token" {
+  description = "Token for authentication."
+  type        = string
+  sensitive   = true
+}
+
 variable "image" {
   description = "The ID of the AMI to use for the Droplet"
   type        = string
@@ -186,4 +192,9 @@ variable "NEW_RELIC_ACCOUNT_ID" {
   description = "The New Relic Account ID"
   type        = string
   sensitive   = true
+}
+
+variable "environment" {
+  description = "The environment name"
+  type        = string
 }
