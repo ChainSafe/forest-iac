@@ -5,14 +5,6 @@
 #  - Copy over the zip file
 #  - Run the init.sh script in the background
 
-// Note: The init.sh file is also included in the sources.zip such that the hash
-// of the archive captures the entire state of the machine.
-// This is a workaround, and because of this, we need to suppress the tflint warning here
-// for unused declarations related to the 'init.sh' file. tflint-ignore: terraform_unused_declarations
-data "local_file" "init" {
-  filename = "${path.module}/service/forest.sh"
-}
-
 data "digitalocean_ssh_keys" "keys" {
   sort {
     key       = "name"
@@ -29,7 +21,6 @@ resource "digitalocean_droplet" "forest" {
   name       = local.service_name
   region     = var.region
   size       = var.size
-  user_data  = data.local_file.init
   tags       = ["iac", var.environment]
   ssh_keys   = data.digitalocean_ssh_keys.keys.ssh_keys[*].fingerprint
   monitoring = true
@@ -42,14 +33,23 @@ resource "digitalocean_droplet" "forest" {
     type = "ssh"
   }
 
-  # Push the sources.tar file to the newly booted droplet
   provisioner "file" {
-    source      = data.local_file.sources.filename
-    destination = "/root/sources.tar"
+    content = templatefile("${path.module}/bootstrap.bash.tftpl",
+      {
+        NEW_USER             = var.forest_user
+        CHAIN                = var.chain
+        NR_LICENSE_KEY       = "" // var.NR_LICENSE_KEY
+        NEW_RELIC_API_KEY    = "" // var.NEW_RELIC_API_KEY
+        NEW_RELIC_ACCOUNT_ID = "" // var.NEW_RELIC_ACCOUNT_ID
+        NEW_RELIC_REGION     = "" // var.NEW_RELIC_REGION
+    })
+    destination = "/root/bootstrap.bash"
   }
 
   provisioner "remote-exec" {
-    inline = local.init_commands
+    inline = [
+      "script /root/bootstrap.log --command 'bash /root/bootstrap.bash'"
+    ]
   }
 }
 

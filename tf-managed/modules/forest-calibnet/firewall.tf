@@ -1,5 +1,5 @@
 resource "digitalocean_firewall" "forest_firewall" {
-  name = var.fw_name
+  name = format("%s-firewall", local.service_name)
 
   inbound_rule {
     protocol         = "tcp"
