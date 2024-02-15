@@ -75,6 +75,9 @@ timeout "$SYNC_TIMEOUT" forest-cli sync wait
 forest-cli snapshot export -o forest_db/
 forest-cli --token=\$(cat token.txt) shutdown --force
 
+# Snapshot is exported, remove the Forest DB to limit space usage.
+forest-tool db destroy --force --config config.toml --chain "$CHAIN_NAME"
+
 # Run full checks only for calibnet, given that it takes too long for mainnet.
 if [ "$CHAIN_NAME" = "calibnet" ]; then
   timeout 30m forest-tool snapshot validate --check-network "$CHAIN_NAME" forest_db/forest_snapshot_*.forest.car.zst
@@ -82,7 +85,6 @@ else
   forest-tool archive info forest_db/forest_snapshot_*.forest.car.zst
   timeout 30m forest-tool snapshot validate --check-links 0 --check-network "$CHAIN_NAME" --check-stateroots 5 forest_db/forest_snapshot_*.forest.car.zst
 fi
-
 
 # Kill the metrics writer process
 kill %1
@@ -95,25 +97,31 @@ CONTAINER_NAME="forest-snapshot-upload-node-$CHAIN_NAME"
 docker stop "$CONTAINER_NAME" || true
 docker rm --force "$CONTAINER_NAME"
 
-CHAIN_DB_DIR="$BASE_FOLDER/forest_db/$CHAIN_NAME"
-CHAIN_LOGS_DIR="$BASE_FOLDER/logs"
+CHAIN_DB_DIR="/opt/forest_db/$CHAIN_NAME"
+CHAIN_LOGS_DIR="/opt/logs/$CHAIN_NAME"
+mkdir -p "$CHAIN_DB_DIR"
+mkdir -p "$CHAIN_LOGS_DIR"
 
-# Delete any existing snapshot files. It may be that the previous run failed
-# before deleting those.
-rm "$CHAIN_DB_DIR/forest_snapshot_$CHAIN_NAME"*
+# Cleanup volumes from the previous if any.
+DB_VOLUME="${CHAIN_NAME}_db"
+LOG_VOLUME="${CHAIN_NAME}_logs"
+docker volume rm "${DB_VOLUME}" || true
+docker volume rm "${LOG_VOLUME}" || true
 
-# Run forest and generate a snapshot in forest_db/
+# Run forest and generate a snapshot in the `DB_VOLUME` volume.
 docker run \
   --name "$CONTAINER_NAME" \
   --rm \
   --user root \
-  -v "$CHAIN_DB_DIR:/home/forest/forest_db":z \
-  -v "$CHAIN_LOGS_DIR:/home/forest/logs":z \
+  -v "${DB_VOLUME}:/home/forest/forest_db" \
+  -v "${LOG_VOLUME}:/home/forest/logs" \
   --entrypoint /bin/bash \
   ghcr.io/chainsafe/forest:"${FOREST_TAG}" \
   -c "$COMMANDS" || exit 1
 
-aws --endpoint "$R2_ENDPOINT" s3 cp --no-progress "$CHAIN_DB_DIR/forest_snapshot_$CHAIN_NAME"*.forest.car.zst s3://"$SNAPSHOT_BUCKET"/"$CHAIN_NAME"/latest/ || exit 1
+# Mount the snapshot volume and copy the snapshot to the S3 bucket.
+docker run -v "${DB_VOLUME}":/opt/snapshots --rm --entrypoint /bin/bash --env AWS_ACCESS_KEY_ID="$R2_ACCESS_KEY" --env AWS_SECRET_ACCESS_KEY="$R2_SECRET_KEY"  \
+  public.ecr.aws/aws-cli/aws-cli:2.15.18 \
+  -c "aws configure set default.s3.multipart_chunksize 4GB && aws --endpoint ${R2_ENDPOINT} s3 cp --no-progress /opt/snapshots/forest_snapshot_${CHAIN_NAME}*.forest.car.zst s3://${SNAPSHOT_BUCKET}/${CHAIN_NAME}/latest/" || exit 1
 
-# Delete snapshot files
-rm "$CHAIN_DB_DIR/forest_snapshot_$CHAIN_NAME"*
+docker volume rm "${DB_VOLUME}" || true
