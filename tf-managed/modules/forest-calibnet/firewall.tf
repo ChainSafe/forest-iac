@@ -1,49 +1,46 @@
+locals {
+  /// CIDR for all IPv4 and all IPv6 addresses
+  any_address = ["0.0.0.0/0", "::/0"]
+}
+
 resource "digitalocean_firewall" "forest_firewall" {
-  name = format("%s-firewall", local.service_name)
+  name        = format("%s-firewall", local.droplet_name)
+  droplet_ids = [digitalocean_droplet.forest.id]
 
-  inbound_rule {
-    protocol         = "tcp"
-    port_range       = "22"
-    source_addresses = var.source_addresses
-  }
-
-  inbound_rule {
-    protocol         = "tcp"
-    port_range       = var.rpc_port
-    source_addresses = var.source_addresses
-  }
-
-  inbound_rule {
-    protocol         = "tcp"
-    port_range       = "80"
-    source_addresses = var.source_addresses
+  dynamic "inbound_rule" {
+    for_each = [
+      "22",   // SSH
+      "1234", // RPC
+      "80"    // HTTP
+    ]
+    iterator = port
+    content {
+      protocol         = "tcp"
+      port_range       = port.value
+      source_addresses = local.any_address
+    }
   }
 
   outbound_rule {
     protocol              = "tcp"
     port_range            = "all"
-    destination_addresses = var.destination_addresses
+    destination_addresses = local.any_address
   }
 
   outbound_rule {
     protocol              = "udp"
-    port_range            = "53"
-    destination_addresses = var.destination_addresses
+    port_range            = "53" // DNS
+    destination_addresses = local.any_address
   }
 
-
-  // Outbound rule added to allow Network Time Protocol (NTP) traffic for time synchronization purposes.
   outbound_rule {
     protocol              = "udp"
-    port_range            = "123"
-    destination_addresses = var.destination_addresses
+    port_range            = "123" // NTP
+    destination_addresses = local.any_address
   }
   outbound_rule {
     protocol              = "icmp"
-    destination_addresses = var.destination_addresses
+    destination_addresses = local.any_address
   }
 
-  droplet_ids = [digitalocean_droplet.forest.id]
-
-  tags = [var.chain]
 }
