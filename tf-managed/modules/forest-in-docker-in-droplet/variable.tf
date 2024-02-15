@@ -1,7 +1,6 @@
 variable "chain" {
-  description = "The chain tag to apply to resources."
+  description = "The chain to start forest with. This will also be included in the droplet name"
   type        = string
-  default     = "calibnet"
 }
 
 variable "droplet_size" {
