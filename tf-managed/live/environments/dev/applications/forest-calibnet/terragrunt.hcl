@@ -11,4 +11,5 @@ terraform {
 
 inputs = {
   chain = "calibnet"
+  droplet_size = "s-4vcpu-16gb-amd"
 }

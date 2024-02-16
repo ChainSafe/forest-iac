@@ -4,19 +4,16 @@ variable "chain" {
 }
 
 variable "droplet_size" {
-  type    = string
-  default = "s-4vcpu-16gb-amd"
+  type = string
 }
 
 variable "digitalocean_token" {
-  description = "Token for authentication."
-  type        = string
-  sensitive   = true
+  type      = string
+  sensitive = true
 }
 
 variable "environment" {
-  description = "The environment name"
-  type        = string
+  type = string
 }
 
 variable "new_relic_api_key" {
