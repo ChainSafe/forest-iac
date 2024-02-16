@@ -6,7 +6,7 @@ include "root" {
 
 # Load the actual Terraform module
 terraform {
-  source = format("%s/../modules/forest-in-docker-in-droplet", get_parent_terragrunt_dir())
+  source = format("%s/../modules/forest-droplet", get_parent_terragrunt_dir())
 }
 
 inputs = {
