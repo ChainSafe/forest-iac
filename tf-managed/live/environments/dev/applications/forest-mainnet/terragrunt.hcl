@@ -10,7 +10,6 @@ terraform {
 }
 
 inputs = {
-  chain = "mainnet"
+  chain        = "mainnet"
   droplet_size = "s-4vcpu-16gb-amd"
-
 }
