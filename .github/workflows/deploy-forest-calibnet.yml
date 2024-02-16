@@ -3,7 +3,7 @@ on:
     branches:
       - main
     paths:
-      - 'tf-managed/modules/forest-calibnet/**'
+      - 'tf-managed/modules/forest-droplet/**'
       - 'tf-managed/live/environments/prod/applications/forest-calibnet/**'
     # This needs to be declared explicitly so that the job is actually
     # run when moved out of draft.
@@ -12,18 +12,12 @@ on:
     branches:
       - main
     paths:
-      - 'tf-managed/modules/forest-calibnet/**'
+      - 'tf-managed/modules/forest-droplet/**'
       - 'tf-managed/live/environments/prod/applications/forest-calibnet/**'
   workflow_dispatch:
 
 jobs:
   deploy-forest-calibnet:
-    env:
-      TF_VAR_slack_enable: true
-      TF_VAR_slack_destination_id: ${{ secrets.SLACK_DESTINATION_ID }}
-      TF_VAR_slack_channel_id: ${{ secrets.SLACK_CHANNEL_ID }}
-      TF_VAR_pagerduty_enable: true
-      TF_VAR_pagerduty_destination_id: ${{ secrets.PAGERDUTY_DESTINATION_ID }}
     runs-on: ubuntu-latest
     permissions: write-all
     steps:
@@ -37,9 +31,6 @@ jobs:
           do_token: ${{ secrets.DO_TOKEN }}
           aws_access_key_id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          r2_access_key: ${{ secrets.R2_ACCESS_KEY }}
-          r2_secret_key: ${{ secrets.R2_SECRET_KEY }}
-          slack_token: ${{ secrets.SLACK_TOKEN }}
           working_directory: tf-managed/live/environments/prod/applications/forest-calibnet
           service_name: forest-calibnet
           new_relic_account_id: ${{ secrets.NEW_RELIC_ACCOUNT_ID }}
