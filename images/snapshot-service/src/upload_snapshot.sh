@@ -67,7 +67,9 @@ forest-tool db destroy --force --config config.toml --chain "$CHAIN_NAME"
 # Workaround for https://github.com/ChainSafe/forest/issues/3715
 # Normally, Forest should automatically download the latest snapshot. However, the performance
 # of the download gets randomly bad, and the download times out.
-aria2c -x5 https://forest-archive.chainsafe.dev/latest/$CHAIN_NAME/
+# Retry logic, because CF occassionally returns 500 (not 503) errors.
+for i in {1..5}; do aria2c -x5 https://forest-archive.chainsafe.dev/latest/$CHAIN_NAME/ && break || sleep 15; done
+
 forest --config config.toml --chain "$CHAIN_NAME" --consume-snapshot *.car.zst --halt-after-import
 
 forest --config config.toml --chain "$CHAIN_NAME" --no-gc --save-token=token.txt --target-peer-count 500 --detach
