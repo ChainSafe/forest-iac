@@ -7,6 +7,11 @@ variable "droplet_size" {
   type = string
 }
 
+variable "service_name" {
+  description = "A unique name for the droplet within this environment"
+  type        = string
+}
+
 variable "digitalocean_token" {
   type      = string
   sensitive = true

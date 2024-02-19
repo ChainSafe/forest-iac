@@ -12,4 +12,5 @@ terraform {
 inputs = {
   chain        = "calibnet"
   droplet_size = "s-4vcpu-16gb-amd"
+  service_name = "forest-calibnet"
 }

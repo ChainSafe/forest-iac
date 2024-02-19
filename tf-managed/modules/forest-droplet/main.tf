@@ -1,5 +1,5 @@
 locals {
-  droplet_name = format("%s-forest-%s", var.environment, var.chain)
+  droplet_name = format("%s-%s", var.environment, var.service_name)
 }
 
 data "digitalocean_ssh_keys" "keys" {
