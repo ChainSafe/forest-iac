@@ -99,11 +99,6 @@ CONTAINER_NAME="forest-snapshot-upload-node-$CHAIN_NAME"
 docker stop "$CONTAINER_NAME" || true
 docker rm --force "$CONTAINER_NAME"
 
-CHAIN_DB_DIR="/opt/forest_db/$CHAIN_NAME"
-CHAIN_LOGS_DIR="/opt/logs/$CHAIN_NAME"
-mkdir -p "$CHAIN_DB_DIR"
-mkdir -p "$CHAIN_LOGS_DIR"
-
 # Cleanup volumes from the previous if any.
 DB_VOLUME="${CHAIN_NAME}_db"
 LOG_VOLUME="${CHAIN_NAME}_logs"
@@ -113,13 +108,23 @@ docker volume rm "${LOG_VOLUME}" || true
 # Run forest and generate a snapshot in the `DB_VOLUME` volume.
 docker run \
   --name "$CONTAINER_NAME" \
-  --rm \
   --user root \
   -v "${DB_VOLUME}:/home/forest/forest_db" \
   -v "${LOG_VOLUME}:/home/forest/logs" \
   --entrypoint /bin/bash \
   ghcr.io/chainsafe/forest:"${FOREST_TAG}" \
-  -c "$COMMANDS" || exit 1
+  -c "$COMMANDS"
+
+generation_result=$?
+
+# Copy the logs to the current container. Mounting won't work because it would use the real host's filesystem.
+docker cp "$CONTAINER_NAME":/home/forest/logs/. "$(dirname "$LOG_EXPORT_DAEMON")"
+docker rm --force "$CONTAINER_NAME"
+
+if [[ $generation_result != 0 ]]; then
+  echo "Snapshot generation failed"
+  exit 1
+fi
 
 # Mount the snapshot volume and copy the snapshot to the S3 bucket.
 docker run -v "${DB_VOLUME}":/opt/snapshots --rm --entrypoint /bin/bash --env AWS_ACCESS_KEY_ID="$R2_ACCESS_KEY" --env AWS_SECRET_ACCESS_KEY="$R2_SECRET_KEY"  \
