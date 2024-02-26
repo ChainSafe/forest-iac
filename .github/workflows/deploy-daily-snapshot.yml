@@ -8,7 +8,7 @@ on:
     paths:
       - 'tf-managed/modules/daily-snapshot/**'
       - 'tf-managed/scripts/**'
-      - 'tf-managed/live/environments/prod/applications/snapshot-service/**'
+      - 'tf-managed/live/environments/prod/applications/snapshot-service**'
     # This needs to be declared explicitly so that the job is actually
     # run when moved out of draft.
     types: [opened, synchronize, reopened, ready_for_review]
@@ -18,11 +18,14 @@ on:
     paths:
       - 'tf-managed/modules/daily-snapshot/**'
       - 'tf-managed/scripts/**'
-      - 'tf-managed/live/environments/prod/applications/snapshot-service'
+      - 'tf-managed/live/environments/prod/applications/snapshot-service**'
   workflow_dispatch:
 
 jobs:
   deploy-daily-snapshot:
+    strategy:
+      matrix:
+        replica: ["snapshot-service", "snapshot-service-2"]
     env:
       TF_VAR_monitoring: "{ \"enable\": true,\"slack_enable\":true,\"slack_destination_id\":\"${{ secrets.SLACK_DESTINATION_ID }}\",\"slack_channel_id\":\"${{ secrets.SLACK_CHANNEL_ID }}\"}"
     runs-on: ubuntu-latest
@@ -41,8 +44,8 @@ jobs:
           r2_access_key: ${{ secrets.R2_ACCESS_KEY }}
           r2_secret_key: ${{ secrets.R2_SECRET_KEY }}
           slack_token: ${{ secrets.SLACK_TOKEN }}
-          working_directory: tf-managed/live/environments/prod/applications/snapshot-service
-          service_name: Snapshot Service
+          working_directory: tf-managed/live/environments/prod/applications/${{ matrix.replica }}
+          service_name: ${{ matrix.replica }}
           new_relic_account_id: ${{ secrets.NEW_RELIC_ACCOUNT_ID }}
           new_relic_api_key: ${{ secrets.NEW_RELIC_API_KEY }}
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
