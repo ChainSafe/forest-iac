@@ -15,6 +15,7 @@ inputs = {
   r2_endpoint     = "https://2238a825c5aca59233eab1f221f7aefb.r2.cloudflarestorage.com/"
   forest_tag      = "v0.16.6-fat"
   snapshot_bucket = "forest-archive"
+  region          = "sfo3"
 
   monitoring = {
     enable = true,
