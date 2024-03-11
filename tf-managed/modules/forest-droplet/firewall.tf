@@ -9,9 +9,11 @@ resource "digitalocean_firewall" "forest_firewall" {
 
   dynamic "inbound_rule" {
     for_each = [
-      "22",   // SSH
-      "1234", // RPC
-      "80"    // HTTP
+      "22",    // SSH
+      "2345",  // RPC
+      "6116",  // Metrics
+      "80",    // HTTP
+      "12345", // P2P
     ]
     iterator = port
     content {
