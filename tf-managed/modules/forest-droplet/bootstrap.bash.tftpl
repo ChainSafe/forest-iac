@@ -64,6 +64,7 @@ sudo --user="${NEW_USER}" -- \
   --config=/home/"${NEW_USER}"/forest_data/config.toml \
   --encrypt-keystore false \
   --auto-download-snapshot \
+  --rpc-address 0.0.0.0:2345 \
   --p2p-listen-address /ip4/0.0.0.0/tcp/12345 \
   --chain="${CHAIN}"
 
