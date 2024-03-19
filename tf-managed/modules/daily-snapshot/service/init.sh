@@ -8,9 +8,14 @@ cloud-init status --wait
 # Setting DEBIAN_FRONTEND to ensure non-interactive operations for APT
 export DEBIAN_FRONTEND=noninteractive
 
+# https://www.digitalocean.com/community/tutorials/how-to-set-up-time-synchronization-on-ubuntu-20-04
+# We will install the NTP service, so we need to disable the `systemd-timesyncd`.
+# This is to prevent the two services from conflicting with one another.
+timedatectl set-ntp no
+
 # Using timeout to ensure the script retries if the APT servers are temporarily unavailable.
 timeout 10m bash -c 'until apt-get -qqq --yes update && \
- apt-get -qqq --yes install anacron ; do sleep 10; \
+ apt-get -qqq --yes install anacron ntp ; do sleep 10; \
 done'
 
 # Run new_relic and fail2ban scripts

@@ -37,5 +37,12 @@ resource "digitalocean_firewall" "forest-firewall" {
     destination_addresses = var.destination_addresses
   }
 
+  # NTP
+  outbound_rule {
+    protocol              = "udp"
+    port_range            = "123"
+    destination_addresses = var.destination_addresses
+  }
+
   droplet_ids = [digitalocean_droplet.forest.id]
 }
