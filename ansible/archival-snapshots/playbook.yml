@@ -26,3 +26,6 @@
       ansible.builtin.shell:
         cmd: "./init.sh"
         chdir: "{{ remote_resources_path }}"
+      environment:
+        ARCHIVAL_SLACK_TOKEN: "{{ lookup('env', 'ARCHIVAL_SLACK_TOKEN') }}"
+        ENDPOINT: "{{ lookup('env', 'ENDPOINT') }}"

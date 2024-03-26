@@ -3,7 +3,6 @@
 ## Enable strict error handling, command tracing, and pipefail
 set -euxo pipefail
 
-ENDPOINT="$1"
 FOREST_CLI="/home/archie/forest-v0.16.3/forest-cli"
 FOREST_TOOL="/home/archie/forest-v0.16.3/forest-tool"
 
@@ -28,10 +27,10 @@ while ((LATEST_EPOCH - CURRENT_EPOCH > 30000)); do
 
    # Generate and upload diff snapshots
    ./diff_script.sh "$CURRENT_EPOCH" "$CURRENT_SNAPSHOT" "$NEW_SNAPSHOT"
-   ./upload_diff.sh "$CURRENT_EPOCH"
+   ./upload_diff.sh "$ENDPOINT"
 
    CURRENT_EPOCH=$NEW_EPOCH
 done
 
-# Send notification on slack
+# Send notification on slack channel
 ruby notify.rb "$CURRENT_EPOCH"

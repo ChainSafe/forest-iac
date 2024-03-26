@@ -2,8 +2,8 @@
 
 require 'slack-ruby-client'
 
-CHANNEL = ENV.fetch('SLACK_CHANNEL')
-SLACK_TOKEN = ENV.fetch('SLACK_TOKEN')
+CHANNEL = '#forest-notifications'
+SLACK_TOKEN = ENV.fetch('ARCHIVAL_SLACK_TOKEN')
 EPOCH = ARGV[0]
 
 client = Slack::Web::Client.new(token: SLACK_TOKEN)
