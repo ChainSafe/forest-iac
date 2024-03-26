@@ -13,4 +13,5 @@ inputs = {
   chain        = "butterflynet"
   droplet_size = "s-1vcpu-2gb-amd"
   service_name = "forest-butterflynet"
+  forest_tag   = "2024-03-25-44c3331-fat"
 }
