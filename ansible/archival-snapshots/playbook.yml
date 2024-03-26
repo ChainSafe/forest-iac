@@ -1,0 +1,28 @@
+---
+- name: Automate packaging, transferring, and executing a script
+  hosts: remote_server
+  vars:
+    local_resources_path: "resources"
+    remote_resources_path: "/mnt/md0/exported/archival"
+    zip_file_name: "resources.zip"
+  tasks:
+    - name: Zip the resources folder
+      ansible.builtin.command:
+        cmd: "zip -r {{ zip_file_name }} ."
+        chdir: "{{ local_resources_path }}"
+      delegate_to: localhost
+
+    - name: Transfer the zip file to the remote server
+      ansible.builtin.copy:
+        src: "{{ local_resources_path }}/{{ zip_file_name }}"
+        dest: "{{ remote_resources_path }}/{{ zip_file_name }}"
+
+    - name: Unzip the resources folder on the remote server
+      ansible.builtin.command:
+        cmd: "unzip {{ zip_file_name }}"
+        chdir: "{{ remote_resources_path }}"
+
+    - name: Execute the init.sh script
+      ansible.builtin.shell:
+        cmd: "./init.sh"
+        chdir: "{{ remote_resources_path }}"

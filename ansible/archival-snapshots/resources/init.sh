@@ -32,3 +32,6 @@ while ((LATEST_EPOCH - CURRENT_EPOCH > 30000)); do
 
    CURRENT_EPOCH=$NEW_EPOCH
 done
+
+# Send notification on slack
+ruby notify.rb "$CURRENT_EPOCH"
