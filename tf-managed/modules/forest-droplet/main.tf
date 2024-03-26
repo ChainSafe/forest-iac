@@ -21,6 +21,7 @@ resource "local_sensitive_file" "bootstrap_script" {
       NEW_RELIC_API_KEY    = var.new_relic_api_key != null ? var.new_relic_api_key : ""
       NEW_RELIC_ACCOUNT_ID = var.new_relic_account_id != null ? var.new_relic_account_id : ""
       NEW_RELIC_REGION     = "EU"
+      FOREST_TAG           = var.forest_tag
     }
   )
 }
