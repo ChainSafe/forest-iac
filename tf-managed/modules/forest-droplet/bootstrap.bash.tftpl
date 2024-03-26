@@ -60,7 +60,7 @@ sudo --user="${NEW_USER}" -- \
   --publish=6116:6116 \
   --publish=12345:12345 \
   --restart=always \
-  ghcr.io/chainsafe/forest:latest \
+  ghcr.io/chainsafe/forest:${FOREST_TAG} \
   --config=/home/"${NEW_USER}"/forest_data/config.toml \
   --encrypt-keystore false \
   --auto-download-snapshot \

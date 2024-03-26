@@ -32,3 +32,9 @@ variable "new_relic_account_id" {
   sensitive = true
   type      = string
 }
+
+# Tag of the Docker image to use for the Forest service
+variable "forest_tag" {
+  default = "latest-fat"
+  type    = string
+}
