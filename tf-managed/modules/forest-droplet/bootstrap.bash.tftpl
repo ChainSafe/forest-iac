@@ -52,13 +52,10 @@ sudo --user="${NEW_USER}" -- docker network create forest
 sudo --user="${NEW_USER}" -- \
   docker run \
   --detach \
-  --network=forest \
   --name=forest-"${CHAIN}" \
   --env "FOREST_GC_TRIGGER_FACTOR=1.4" \
   --volume=/home/"${NEW_USER}"/forest_data:/home/"${NEW_USER}"/forest_data:z \
-  --publish=2345:2345 \
-  --publish=6116:6116 \
-  --publish=12345:12345 \
+  --network=host \
   --restart=always \
   ghcr.io/chainsafe/forest:${FOREST_TAG} \
   --config=/home/"${NEW_USER}"/forest_data/config.toml \
@@ -75,7 +72,6 @@ sudo --user="${NEW_USER}" -- \
   docker run \
   --detach \
   --name=watchtower \
-  --network=forest \
   --volume=/var/run/docker.sock:/var/run/docker.sock \
   --restart=unless-stopped \
   containrrr/watchtower \
@@ -132,7 +128,7 @@ EOF
   sudo --user="${NEW_USER}" -- \
     docker run \
     --detach \
-    --network=forest \
+    --network=host \
     --name=nri-prometheus \
     --env LICENSE_KEY="${NR_LICENSE_KEY}" \
     --volume=/home/"${NEW_USER}"/forest_data/config.yml:/config.yml \
