@@ -10,5 +10,5 @@ while read -r file; do
     aws --profile prod --endpoint "$ENDPOINT" s3 cp diff_snapshots/"$file" "s3://forest-archive/mainnet/diff/"
 done < upload_files.txt
 
-# Remove uploaded diff snapshots 
+# Remove uploaded diff snapshots
 rm diff_snapshots/* -rf
