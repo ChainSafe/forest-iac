@@ -1,0 +1,42 @@
+name: Run Ansible playbook for archival snapshots
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install Ansible
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ansible
+
+      - name: Configure SSH
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -t rsa archie.chainsafe.dev >> ~/.ssh/known_hosts
+
+      - name: Run Ansible playbook
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: True
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+          ARCHIVAL_SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+          ENDPOINT: ${{ secrets.CLOUDFLARE_ENDPOINT }}
+        run: |
+          ansible-playbook playbook.yml -i inventory.ini
