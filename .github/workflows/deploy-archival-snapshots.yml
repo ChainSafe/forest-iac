@@ -1,9 +1,8 @@
 name: Run Ansible playbook for archival snapshots
 
 on:
-  push:
-    branches:
-      - main
+  schedule:
+    - cron: '0 0 */10 * *'
 
 jobs:
   build:
