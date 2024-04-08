@@ -5,7 +5,33 @@
     local_resources_path: "resources"
     remote_resources_path: "/mnt/md0/exported/archival"
     zip_file_name: "resources.zip"
+    forest_version: "v0.17.1"
+    forest_release_url: "https://github.com/ChainSafe/forest/releases/download/{{ forest_version }}/forest-{{ forest_version }}-linux-amd64.zip"
   tasks:
+    - name: Check if AWS CLI is installed
+      ansible.builtin.command:
+        cmd: "which aws"
+      register: aws_installed
+      changed_when: false
+      ignore_errors: true
+
+    - name: Install AWS CLI if not installed
+      ansible.builtin.command:
+        cmd: "sudo apt-get update && sudo apt-get install -y awscli"
+      when: aws_installed.rc != 0
+
+    - name: Check if Ruby is installed
+      ansible.builtin.command:
+        cmd: "which ruby"
+      register: ruby_installed
+      changed_when: false
+      ignore_errors: true
+
+    - name: Install Ruby if not installed
+      ansible.builtin.command:
+        cmd: "sudo apt-get update && sudo apt-get install -y ruby-full"
+      when: ruby_installed.rc != 0
+
     - name: Zip the resources folder
       ansible.builtin.command:
         cmd: "zip -r {{ zip_file_name }} ."
@@ -21,6 +47,35 @@
       ansible.builtin.command:
         cmd: "unzip {{ zip_file_name }}"
         chdir: "{{ remote_resources_path }}"
+
+    - name: Check if Forest is running
+      ansible.builtin.shell:
+        cmd: "ps aux | grep forest | grep -v grep"
+      register: forest_running
+      ignore_errors: true
+
+    - name: Download Forest release package
+      ansible.builtin.get_url:
+        url: "{{ forest_release_url }}"
+        dest: "{{ local_resources_path }}/forest.zip"
+      when: forest_running.rc != 0
+
+    - name: Transfer the forest.zip file to the remote server
+      ansible.builtin.copy:
+        src: "{{ local_resources_path }}/forest.zip"
+        dest: "{{ remote_resources_path }}/forest.zip"
+      when: forest_running.rc != 0
+
+    - name: Unzip the Forest release package on the remote server
+      ansible.builtin.command:
+        cmd: "unzip {{ remote_resources_path }}/forest.zip -d {{ remote_resources_path }}"
+      when: forest_running.rc != 0
+
+    - name: Execute the Forest command
+      ansible.builtin.shell:
+        cmd: "./forest --no-gc --encrypt-keystore --config ../config.toml --target-peer-count 500"
+        chdir: "{{ remote_resources_path }}"
+      when: forest_running.rc != 0
 
     - name: Execute the init.sh script
       ansible.builtin.shell:
