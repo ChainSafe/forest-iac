@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Execute the main.sh script
-./main.sh
-
 # Check if the main.sh script executed successfully
 if ./main.sh; then
     # If successful, call notify.rb with "success"
