@@ -4,13 +4,12 @@ require 'slack-ruby-client'
 
 CHANNEL = '#forest-notifications'
 SLACK_TOKEN = ENV.fetch('ARCHIVAL_SLACK_TOKEN')
-EPOCH = ARGV[0]
-STATUS = ARGV[1]
+STATUS = ARGV[0]
 
 client = Slack::Web::Client.new(token: SLACK_TOKEN)
 
 message = if STATUS == 'success'
-            "✅ Lite and Diff snapshots updated till #{EPOCH}. 🌲🌳🌲🌳🌲"
+            '✅ Lite and Diff snapshots updated. 🌲🌳🌲🌳🌲'
           else
             '❌ Failed to update Lite and Diff snapshots. 🔥🌲🔥'
           end
