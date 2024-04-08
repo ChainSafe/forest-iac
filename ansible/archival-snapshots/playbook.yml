@@ -57,12 +57,6 @@
     - name: Download Forest release package
       ansible.builtin.get_url:
         url: "{{ forest_release_url }}"
-        dest: "{{ local_resources_path }}/forest.zip"
-      when: forest_running.rc != 0
-
-    - name: Transfer the forest.zip file to the remote server
-      ansible.builtin.copy:
-        src: "{{ local_resources_path }}/forest.zip"
         dest: "{{ remote_resources_path }}/forest.zip"
       when: forest_running.rc != 0
 
