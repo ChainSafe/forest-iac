@@ -29,12 +29,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y ansible
 
-      - name: Install Cloudflared
+      - name: Download and install Cloudflared
         run: |
-          curl -O https://bin.equinox.io/c/VdrWdbjqyF/cloudflared-stable-linux-amd64.tgz
-          tar -xvf cloudflared-stable-linux-amd64.tgz
-          sudo cp ./cloudflared /usr/local/bin/
-          sudo chmod +x /usr/local/bin/cloudflared
+          wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-arm64.deb
+          sudo dpkg -i cloudflared-linux-arm64.deb
+          cloudflared --version
 
       - name: Configure ssh-agent
         uses: webfactory/ssh-agent@v0.8.0
