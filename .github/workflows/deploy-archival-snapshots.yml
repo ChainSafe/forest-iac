@@ -37,7 +37,7 @@ jobs:
           touch /home/runner/.ssh/id_rsa
           echo -e "${{secrets.SSH_KEY}}" > /home/runner/.ssh/id_rsa
           chmod 700 /home/runner/.ssh/id_rsa
-          ssh-keyscan -t rsa,dsa,ecdsa,ed25519 ${{secrets.SSH_HOST}} >> /home/runner/.ssh/known_hosts
+          ssh-keyscan -t rsa archie.chainsafe.dev >> /home/runner/.ssh/known_hosts
 
       - name: Verify SSH key
         run: ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no archie@archie.chainsafe.dev "echo 'SSH connection successful'"
