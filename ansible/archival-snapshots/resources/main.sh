@@ -12,7 +12,7 @@ FULL_SNAPSHOTS_DIR=/mnt/md0/exported/snapshots
 CURRENT_FULL_SNAPSHOT_PATH="$FULL_SNAPSHOTS_DIR/$CURRENT_SNAPSHOT"
 LITE_SNAPSHOT_DIR=/mnt/md0/exported/archival/lite_snapshots
 
-# Check if full snapshots directory exist, if not create 
+# Check if full snapshots directory exist, if not create
 if [ ! -d "$FULL_SNAPSHOTS_DIR" ]; then
     mkdir -p "$FULL_SNAPSHOTS_DIR"
 fi
