@@ -38,7 +38,7 @@ jobs:
       - name: Configure ssh-agent
         uses: webfactory/ssh-agent@v0.8.0
         with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          ssh-private-key: ${{ secrets.ARCHIE_PRIVATE_KEY }}
 
       - name: Verify SSH key
         run: ssh -o ProxyCommand='/usr/local/bin/cloudflared access ssh --hostname %h' archie.chainsafe.dev "echo 'SSH connection successful'"
