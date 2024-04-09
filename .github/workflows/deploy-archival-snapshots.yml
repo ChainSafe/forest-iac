@@ -30,11 +30,9 @@ jobs:
           sudo apt-get install -y ansible
 
       - name: Configure SSH
-        env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | base64 --decode > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -t rsa archie.chainsafe.dev >> ~/.ssh/known_hosts
 
