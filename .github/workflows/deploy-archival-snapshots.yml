@@ -29,10 +29,17 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y ansible
 
+      - name: Install Cloudflared
+        run: |
+          curl -O https://bin.equinox.io/c/VdrWdbjqyF/cloudflared-stable-linux-amd64.tgz
+          tar -xvf cloudflared-stable-linux-amd64.tgz
+          sudo cp ./cloudflared /usr/local/bin/
+          sudo chmod +x /usr/local/bin/cloudflared
+
       - name: Configure ssh-agent
         uses: webfactory/ssh-agent@v0.8.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Verify SSH key
-        run: ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no archie@archie.chainsafe.dev "echo 'SSH connection successful'"
+        run: ssh -o ProxyCommand='/usr/local/bin/cloudflared access ssh --hostname %h' archie.chainsafe.dev "echo 'SSH connection successful'"
