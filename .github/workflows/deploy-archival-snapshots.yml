@@ -29,15 +29,10 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y ansible
 
-      - name: Setup SSH
-        shell: bash
-        run: |
-          eval `ssh-agent -s`
-          mkdir -p /home/runner/.ssh/
-          touch /home/runner/.ssh/id_rsa
-          echo -e "${{secrets.SSH_PRIVATE_KEY}}" > /home/runner/.ssh/id_rsa
-          chmod 700 /home/runner/.ssh/id_rsa
-          ssh-keyscan -t rsa archie.chainsafe.dev >> /home/runner/.ssh/known_hosts
+      - name: Configure ssh-agent
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Verify SSH key
         run: ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no archie@archie.chainsafe.dev "echo 'SSH connection successful'"
