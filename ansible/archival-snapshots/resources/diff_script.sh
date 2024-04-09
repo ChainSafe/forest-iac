@@ -23,7 +23,7 @@ for i in $(seq 1 $DIFF_COUNT); do
     DATE=$(date --date=@"$EPOCH_TIMESTAMP" -u -I)
     FILE_NAME="forest_diff_mainnet_${DATE}_height_$((EPOCH-DIFF_STEP))+$DIFF_STEP.forest.car.zst"
     FILE="/mnt/md0/exported/archival/diff_snapshots/$FILE_NAME"
-    if ! grep -q "$FILENAME" "$UPLOADED_DIFFS"; then
+    if ! grep -q "$FILE_NAME" "$UPLOADED_DIFFS"; then
         if ! test -f "$FILE"; then
             # Export diff snapshot
             "$FOREST" archive export --depth "$DIFF_STEP" --epoch "$EPOCH" --diff $((EPOCH-DIFF_STEP)) --diff-depth 900 --output-path "$FILE" "$@"
