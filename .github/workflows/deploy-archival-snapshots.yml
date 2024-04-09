@@ -29,12 +29,15 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y ansible
 
-      - name: Configure SSH
+      - name: Setup SSH
+        shell: bash
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" | base64 --decode > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -t rsa archie.chainsafe.dev >> ~/.ssh/known_hosts
+          eval `ssh-agent -s`
+          mkdir -p /home/runner/.ssh/
+          touch /home/runner/.ssh/id_rsa
+          echo -e "${{secrets.SSH_KEY}}" > /home/runner/.ssh/id_rsa
+          chmod 700 /home/runner/.ssh/id_rsa
+          ssh-keyscan -t rsa,dsa,ecdsa,ed25519 ${{secrets.SSH_HOST}} >> /home/runner/.ssh/known_hosts
 
       - name: Verify SSH key
         run: ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no archie@archie.chainsafe.dev "echo 'SSH connection successful'"
