@@ -1,4 +1,4 @@
-name: Run Ansible playbook for archival snapshots
+name: Export archival snapshots
 
 on:
   schedule:
@@ -31,11 +31,5 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -t rsa archie.chainsafe.dev >> ~/.ssh/known_hosts
 
-      - name: Run Ansible playbook
-        env:
-          ANSIBLE_HOST_KEY_CHECKING: True
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-          ARCHIVAL_SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
-          ENDPOINT: ${{ secrets.CLOUDFLARE_ENDPOINT }}
-        run: |
-          ansible-playbook playbook.yml -i inventory.ini
+      - name: Verify SSH key
+        run: ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no archie@archie.chainsafe.dev "echo 'SSH connection successful'"
