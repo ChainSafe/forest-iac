@@ -45,7 +45,7 @@
 
     - name: Unzip the resources folder on the remote server
       ansible.builtin.command:
-        cmd: "unzip {{ zip_file_name }}"
+        cmd: "unzip -o {{ zip_file_name }}"
         chdir: "{{ remote_resources_path }}"
 
     - name: Check if Forest is running
@@ -58,12 +58,10 @@
       ansible.builtin.get_url:
         url: "{{ forest_release_url }}"
         dest: "{{ remote_resources_path }}/forest.zip"
-      when: forest_running.rc != 0
 
     - name: Unzip the Forest release package on the remote server
       ansible.builtin.command:
-        cmd: "unzip {{ remote_resources_path }}/forest.zip -d {{ remote_resources_path }}"
-      when: forest_running.rc != 0
+        cmd: "unzip -o {{ remote_resources_path }}/forest.zip -d {{ remote_resources_path }}"
 
     - name: Execute the Forest command
       ansible.builtin.shell:
