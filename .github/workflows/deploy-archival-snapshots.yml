@@ -43,7 +43,5 @@ jobs:
       - name: Verify SSH key
         run: |
           ssh-keyscan -t rsa archie.chainsafe.dev >> ~/.ssh/known_hosts
-          echo "${{ secrets.ARCHIE_PRIVATE_KEY }}" > ssh_key
-          chmod 600 ssh_key
-          ssh -o ProxyCommand='/usr/local/bin/cloudflared access ssh --hostname %h' -i ssh_key archie.chainsafe.dev "echo 'SSH connection successful'"
+          ssh -o ProxyCommand='/usr/local/bin/cloudflared access ssh --hostname %h' archie.chainsafe.dev "echo 'SSH connection successful'"
         shell: bash
