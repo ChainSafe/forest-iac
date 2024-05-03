@@ -23,12 +23,12 @@ bash newrelic_fail2ban.sh
 
 
 # Setup cron job
-if [ "$snapshot_type" = "mainnet" ]; then
+if [ "$SNAPSHOT_TYPE" = "mainnet" ]; then
     cp mainnet_cron_job /etc/cron.hourly/
     rm calibnet_cron_job
-elif [ "$snapshot_type" = "calibnet" ]; then
+elif [ "$SNAPSHOT_TYPE" = "calibnet" ]; then
     cp calibnet_cron_job /etc/cron.hourly/
     rm mainnet_cron_job
-elif [ "$snapshot_type" = "both" ]; then
+elif [ "$SNAPSHOT_TYPE" = "both" ]; then
     cp calibnet_cron_job mainnet_cron_job /etc/cron.hourly/
 fi

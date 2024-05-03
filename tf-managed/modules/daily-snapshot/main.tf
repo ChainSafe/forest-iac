@@ -40,7 +40,6 @@ locals {
   SLACK_API_TOKEN=${var.slack_token}
   SLACK_NOTIFICATION_CHANNEL=${var.slack_channel}
   FOREST_TAG=${var.forest_tag}
-  SNAPSHOT_TYPE=${var.snapshot_type}
   EOT
 }
 
@@ -52,6 +51,7 @@ locals {
     export NEW_RELIC_API_KEY=${var.new_relic_api_key}
     export NEW_RELIC_ACCOUNT_ID=${var.new_relic_account_id}
     export NEW_RELIC_REGION=${var.new_relic_region}
+    export SNAPSHOT_TYPE=${var.snapshot_type}
     nohup sh ./init.sh > init_log.txt &
     EOT
     ,
