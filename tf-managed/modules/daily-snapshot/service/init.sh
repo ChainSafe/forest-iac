@@ -21,14 +21,18 @@ done'
 # Run new_relic and fail2ban scripts
 bash newrelic_fail2ban.sh
 
-
 # Setup cron job
-if [ "$SNAPSHOT_TYPE" = "mainnet" ]; then
-    cp mainnet_cron_job /etc/cron.hourly/
-    rm calibnet_cron_job
-elif [ "$SNAPSHOT_TYPE" = "calibnet" ]; then
-    cp calibnet_cron_job /etc/cron.hourly/
-    rm mainnet_cron_job
-elif [ "$SNAPSHOT_TYPE" = "both" ]; then
-    cp calibnet_cron_job mainnet_cron_job /etc/cron.hourly/
-fi
+case "$SNAPSHOT_TYPE" in
+    mainnet)
+        cp mainnet_cron_job /etc/cron.hourly/ && rm calibnet_cron_job
+        ;;
+    calibnet)
+        cp calibnet_cron_job /etc/cron.hourly/ && rm mainnet_cron_job
+        ;;
+    both)
+        cp calibnet_cron_job mainnet_cron_job /etc/cron.hourly/
+        ;;
+    *)
+        echo "Error: Invalid SNAPSHOT_TYPE. Please specify 'mainnet', 'calibnet', or 'both'."
+        ;;
+esac
