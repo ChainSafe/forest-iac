@@ -109,6 +109,13 @@ variable "environment" {
   type        = string
 }
 
+
+variable "snapshot_type" {
+  description = "The type of snapshot the node should generate. Options are 'mainnet', 'calibnet', or 'both'."
+  default     = "both"
+  type        = string
+}
+
 # Monitoring properties of the service. Can be declared partially.
 variable "monitoring" {
   description = "Service monitoring properties"

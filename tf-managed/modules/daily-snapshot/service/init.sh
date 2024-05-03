@@ -21,5 +21,14 @@ done'
 # Run new_relic and fail2ban scripts
 bash newrelic_fail2ban.sh
 
-# Setup cron jobs
-cp calibnet_cron_job mainnet_cron_job /etc/cron.hourly/
+
+# Setup cron job
+if [ "$snapshot_type" = "mainnet" ]; then
+    cp mainnet_cron_job /etc/cron.hourly/
+    rm calibnet_cron_job
+elif [ "$snapshot_type" = "calibnet" ]; then
+    cp calibnet_cron_job /etc/cron.hourly/
+    rm mainnet_cron_job
+elif [ "$snapshot_type" = "both" ]; then
+    cp calibnet_cron_job mainnet_cron_job /etc/cron.hourly/
+fi

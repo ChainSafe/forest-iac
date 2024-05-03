@@ -40,6 +40,7 @@ locals {
   SLACK_API_TOKEN=${var.slack_token}
   SLACK_NOTIFICATION_CHANNEL=${var.slack_channel}
   FOREST_TAG=${var.forest_tag}
+  SNAPSHOT_TYPE=${var.snapshot_type}
   EOT
 }
 
