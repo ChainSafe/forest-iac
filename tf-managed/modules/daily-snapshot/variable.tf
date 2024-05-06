@@ -111,13 +111,13 @@ variable "environment" {
 
 
 variable "snapshot_type" {
-  type        = list(string)
-  description = "List of network types for snapshot generation. Valid options: 'mainnet', 'calibnet'."
-  default     = ["both"]
+  type        = string
+  description = "The type of snapshot the node should generate. Options are 'mainnet', 'calibnet', or 'both'."
+  default     = "both"
 
   validation {
-    condition     = alltrue([for val in var.snapshot_type : contains(["mainnet", "calibnet", "both"], val)])
-    error_message = "Only 'mainnet', 'calibnet', or 'both' are allowed for snapshot_type."
+    condition     = contains(["mainnet", "calibnet", "both"], var.snapshot_type)
+    error_message = "Invalid snapshot_type. Allowed values are 'mainnet', 'calibnet', or 'both'."
   }
 }
 
