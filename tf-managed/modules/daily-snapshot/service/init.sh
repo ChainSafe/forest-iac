@@ -24,13 +24,13 @@ bash newrelic_fail2ban.sh
 # Setup cron job
 case "$SNAPSHOT_TYPE" in
     mainnet)
-        cp mainnet_cron_job /etc/cron.hourly/ && rm calibnet_cron_job
+        mv mainnet_cron_job /etc/cron.hourly/
         ;;
     calibnet)
-        cp calibnet_cron_job /etc/cron.hourly/ && rm mainnet_cron_job
+        mv calibnet_cron_job /etc/cron.hourly/
         ;;
     both)
-        cp calibnet_cron_job mainnet_cron_job /etc/cron.hourly/
+        mv calibnet_cron_job mainnet_cron_job /etc/cron.hourly/
         ;;
     *)
         echo "Error: Invalid SNAPSHOT_TYPE. Please specify 'mainnet', 'calibnet', or 'both'."
