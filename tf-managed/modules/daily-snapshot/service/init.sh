@@ -21,18 +21,23 @@ done'
 # Run new_relic and fail2ban scripts
 bash newrelic_fail2ban.sh
 
+echo "$SNAPSHOT_TYPE"
+
 # Setup cron job
-case "$SNAPSHOT_TYPE" in
+IFS=',' read -ra ADDR <<< "$SNAPSHOT_TYPE"
+for type in "${ADDR[@]}"; do
+  case "$type" in
     mainnet)
-        mv mainnet_cron_job /etc/cron.hourly/
-        ;;
+      mv mainnet_cron_job /etc/cron.hourly/
+      ;;
     calibnet)
-        mv calibnet_cron_job /etc/cron.hourly/
-        ;;
-    both)
-        mv calibnet_cron_job mainnet_cron_job /etc/cron.hourly/
-        ;;
+      mv calibnet_cron_job /etc/cron.hourly/
+      ;;
+    all)
+      mv *_cron_job /etc/cron.hourly/
+      ;;
     *)
-        echo "Error: Invalid SNAPSHOT_TYPE. Please specify 'mainnet', 'calibnet', or 'both'."
-        ;;
-esac
+      echo "Error: Invalid network type '$type'"
+      ;;
+  esac
+done

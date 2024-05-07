@@ -44,6 +44,8 @@ locals {
 }
 
 locals {
+  snapshot_types = join(",", var.snapshot_type)
+
   init_commands = ["cd /root/",
     "tar xf sources.tar",
     "echo '${local.env_content}' >> /root/.forest_env",
@@ -51,8 +53,8 @@ locals {
     export NEW_RELIC_API_KEY=${var.new_relic_api_key}
     export NEW_RELIC_ACCOUNT_ID=${var.new_relic_account_id}
     export NEW_RELIC_REGION=${var.new_relic_region}
-    export SNAPSHOT_TYPE=${var.snapshot_type}
-    nohup sh ./init.sh > init_log.txt &
+    export SNAPSHOT_TYPE=${local.snapshot_types}
+    nohup bash ./init.sh > init_log.txt &
     EOT
     ,
     # Exiting without a sleep sometimes kills the script :-/
@@ -104,12 +106,12 @@ resource "digitalocean_project_resources" "connect_forest_project" {
   resources = [digitalocean_droplet.forest.urn]
 }
 
-module "monitoring" {
-  count                = var.monitoring.enable ? 1 : 0
-  source               = "./monitoring"
-  service_name         = local.service_name
-  alert_email          = var.monitoring.alert_email
-  slack_enable         = var.monitoring.slack_enable
-  slack_destination_id = var.monitoring.slack_destination_id
-  slack_channel_id     = var.monitoring.slack_channel_id
-}
+# module "monitoring" {
+#   count                = var.monitoring.enable ? 1 : 0
+#   source               = "./monitoring"
+#   service_name         = local.service_name
+#   alert_email          = var.monitoring.alert_email
+#   slack_enable         = var.monitoring.slack_enable
+#   slack_destination_id = var.monitoring.slack_destination_id
+#   slack_channel_id     = var.monitoring.slack_channel_id
+# }

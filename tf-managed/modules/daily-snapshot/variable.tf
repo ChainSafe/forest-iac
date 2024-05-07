@@ -111,16 +111,15 @@ variable "environment" {
 
 
 variable "snapshot_type" {
-  type        = string
-  description = "The type of snapshot the node should generate. Options are 'mainnet', 'calibnet', or 'both'."
-  default     = "both"
+  type        = set(string)
+  description = "Set of network types for snapshot generation. Valid options: 'mainnet', 'calibnet' or all"
+  default     = ["all"]
 
   validation {
-    condition     = contains(["mainnet", "calibnet", "both"], var.snapshot_type)
-    error_message = "Invalid snapshot_type. Allowed values are 'mainnet', 'calibnet', or 'both'."
+    condition     = alltrue([for val in var.snapshot_type : contains(["mainnet", "calibnet", "all"], val)])
+    error_message = "Allowed values for snapshot_type are 'mainnet' and/or 'calibnet'"
   }
 }
-
 
 # Monitoring properties of the service. Can be declared partially.
 variable "monitoring" {
