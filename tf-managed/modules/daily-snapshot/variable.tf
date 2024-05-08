@@ -112,11 +112,11 @@ variable "environment" {
 
 variable "snapshot_type" {
   type        = set(string)
-  description = "Set of network types for snapshot generation. Valid options: 'mainnet', 'calibnet' or all"
-  default     = ["all"]
+  description = "Set of network types for snapshot generation. Valid options: 'mainnet' and/or 'calibnet'"
+  default     = ["mainnet", "calibnet"]
 
   validation {
-    condition     = alltrue([for val in var.snapshot_type : contains(["mainnet", "calibnet", "all"], val)])
+    condition     = alltrue([for val in var.snapshot_type : contains(["mainnet", "calibnet"], val)])
     error_message = "Allowed values for snapshot_type are 'mainnet' and/or 'calibnet'"
   }
 }

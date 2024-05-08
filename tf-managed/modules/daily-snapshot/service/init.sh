@@ -33,9 +33,6 @@ for type in "${ADDR[@]}"; do
     calibnet)
       mv calibnet_cron_job /etc/cron.hourly/
       ;;
-    all)
-      mv -- *_cron_job /etc/cron.hourly/
-      ;;
     *)
       echo "Error: Invalid network type '$type'"
       ;;
