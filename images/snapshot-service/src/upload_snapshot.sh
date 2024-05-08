@@ -126,9 +126,14 @@ if [[ $generation_result != 0 ]]; then
   exit 1
 fi
 
-# Mount the snapshot volume and copy the snapshot to the S3 bucket.
-docker run -v "${DB_VOLUME}":/opt/snapshots --rm --entrypoint /bin/bash --env AWS_ACCESS_KEY_ID="$R2_ACCESS_KEY" --env AWS_SECRET_ACCESS_KEY="$R2_SECRET_KEY"  \
+# Mount the snapshot volume and copy the snapshot and corresponding shasum to the S3 bucket.
+docker run -v "${DB_VOLUME}:/opt/snapshots" --entrypoint /bin/bash \
+  --env AWS_ACCESS_KEY_ID="$R2_ACCESS_KEY" \
+  --env AWS_SECRET_ACCESS_KEY="$R2_SECRET_KEY" \
   public.ecr.aws/aws-cli/aws-cli:2.15.18 \
-  -c "aws configure set default.s3.multipart_chunksize 4GB && aws --endpoint ${R2_ENDPOINT} s3 cp --no-progress /opt/snapshots/forest_snapshot_${CHAIN_NAME}*.forest.car.zst s3://${SNAPSHOT_BUCKET}/${CHAIN_NAME}/latest/" || exit 1
+  -c 'aws configure set default.s3.multipart_chunksize 4GB && \
+      for file in /opt/snapshots/forest_snapshot_'"${CHAIN_NAME}"'*.forest.car*; do \
+          aws --endpoint '"${R2_ENDPOINT}"' s3 cp --no-progress $file "s3://'"${SNAPSHOT_BUCKET}"'/'"${CHAIN_NAME}"'/latest/" || exit 1; \
+      done'
 
 docker volume rm "${DB_VOLUME}" || true
