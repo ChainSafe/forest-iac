@@ -38,9 +38,9 @@ resource "digitalocean_droplet" "forest" {
   graceful_shutdown = false
 
   connection {
-    host    = self.ipv4_address
-    user    = "root"
-    type    = "ssh"
+    host = self.ipv4_address
+    user = "root"
+    type = "ssh"
   }
 
   provisioner "file" {
