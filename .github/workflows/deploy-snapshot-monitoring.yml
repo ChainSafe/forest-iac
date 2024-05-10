@@ -45,6 +45,8 @@ jobs:
           slack_token: ${{ secrets.SLACK_TOKEN }}
           working_directory: tf-managed/live/environments/prod/applications/snapshot-monitoring
           service_name: Snapshot Service
+          max_retries: '5'
+          retry_delay_seconds: '60s'
           new_relic_account_id: ${{ secrets.NEW_RELIC_ACCOUNT_ID }}
           new_relic_api_key: ${{ secrets.NEW_RELIC_API_KEY }}
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}

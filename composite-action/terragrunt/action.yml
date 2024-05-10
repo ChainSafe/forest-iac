@@ -33,6 +33,12 @@ inputs:
     description: 'CloudFlare R2 access key id'
   r2_secret_key:
     description: 'CloudFlare R2 private access key'
+  max_retries:
+    description: 'The maximum number of retry attempts for the Terragrunt apply command if it fails initially.'
+    required: true
+  retry_delay_seconds:
+    description: 'The number of seconds to wait between each retry attempt.'
+    required: true
 
 runs:
   using: "composite"
@@ -155,7 +161,22 @@ runs:
         else
           echo "Changes detected. Redeploying everything..."
           terragrunt destroy -auto-approve --terragrunt-non-interactive
-          terragrunt apply -auto-approve --terragrunt-non-interactive
+          max_retries=${{ inputs.max_retries }}
+          delay_seconds=${{ inputs.retry_delay_seconds }}
+          n=0
+          while [ $n -lt $max_retries ]; do
+            echo "Attempt $(($n + 1)) of $max_retries"
+            terragrunt apply -auto-approve --terragrunt-non-interactive && break
+            n=$((n+1))
+            if [ $n -lt $max_retries ]; then
+              echo "Retry $n/$max_retries of terragrunt apply failed. Retrying in $delay_seconds seconds..."
+              sleep $delay_seconds
+            fi
+          done
+          if [ $n -eq $max_retries ]; then
+            echo "Failed to apply changes after $max_retries attempts."
+            exit 1
+          fi
         fi
       working-directory: ${{ inputs.working_directory }}
       env:
@@ -169,6 +190,7 @@ runs:
         TF_VAR_slack_token: ${{ inputs.slack_token }}
         TF_VAR_new_relic_api_key: ${{ inputs.new_relic_api_key }}
         TF_VAR_new_relic_account_id: ${{ inputs.new_relic_account_id }}
+
 
     - name: Terragrunt Force Apply
       if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'

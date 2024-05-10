@@ -41,7 +41,6 @@ resource "digitalocean_droplet" "forest" {
     host    = self.ipv4_address
     user    = "root"
     type    = "ssh"
-    timeout = "30m"
   }
 
   provisioner "file" {

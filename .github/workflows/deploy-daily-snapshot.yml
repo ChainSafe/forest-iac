@@ -44,6 +44,8 @@ jobs:
           r2_access_key: ${{ secrets.R2_ACCESS_KEY }}
           r2_secret_key: ${{ secrets.R2_SECRET_KEY }}
           slack_token: ${{ secrets.SLACK_TOKEN }}
+          max_retries: '5'
+          retry_delay_seconds: '60s'
           working_directory: tf-managed/live/environments/prod/applications/${{ matrix.replica }}
           service_name: ${{ matrix.replica }}
           new_relic_account_id: ${{ secrets.NEW_RELIC_ACCOUNT_ID }}
