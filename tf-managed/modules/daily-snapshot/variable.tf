@@ -115,7 +115,7 @@ variable "snapshot_type" {
   default     = ["mainnet", "calibnet"]
 
   validation {
-    condition = alltrue([for val in var.snapshot_type : contains(["mainnet", "calibnet"], val)]) && length(var.snapshot_type) > 0
+    condition     = alltrue([for val in var.snapshot_type : contains(["mainnet", "calibnet"], val)]) && length(var.snapshot_type) > 0
     error_message = "Allowed values for snapshot_type are 'mainnet' and/or 'calibnet', and it cannot be empty."
   }
 }
