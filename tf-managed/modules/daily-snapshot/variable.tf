@@ -109,17 +109,17 @@ variable "environment" {
   type        = string
 }
 
-
 variable "snapshot_type" {
   type        = set(string)
   description = "Set of network types for snapshot generation. Valid options: 'mainnet' and/or 'calibnet'"
   default     = ["mainnet", "calibnet"]
 
   validation {
-    condition     = alltrue([for val in var.snapshot_type : contains(["mainnet", "calibnet"], val)])
-    error_message = "Allowed values for snapshot_type are 'mainnet' and/or 'calibnet'"
+    condition = alltrue([for val in var.snapshot_type : contains(["mainnet", "calibnet"], val)]) && length(var.snapshot_type) > 0
+    error_message = "Allowed values for snapshot_type are 'mainnet' and/or 'calibnet', and it cannot be empty."
   }
 }
+
 
 # Monitoring properties of the service. Can be declared partially.
 variable "monitoring" {
