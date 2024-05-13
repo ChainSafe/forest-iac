@@ -132,8 +132,10 @@ docker run -v "${DB_VOLUME}:/opt/snapshots" --entrypoint /bin/bash \
   --env AWS_SECRET_ACCESS_KEY="$R2_SECRET_KEY" \
   public.ecr.aws/aws-cli/aws-cli:2.15.18 \
   -c 'aws configure set default.s3.multipart_chunksize 4GB && \
-      for file in /opt/snapshots/forest_snapshot_'"${CHAIN_NAME}"'*.forest.car*; do \
+      ls /opt/snapshots/forest_snapshot_'"${CHAIN_NAME}"'*.forest.car* | while read file; do \
+          echo "Uploading $file to S3..." && \
           aws --endpoint '"${R2_ENDPOINT}"' s3 cp --no-progress $file "s3://'"${SNAPSHOT_BUCKET}"'/'"${CHAIN_NAME}"'/latest/" || exit 1; \
       done'
+
 
 docker volume rm "${DB_VOLUME}" || true
