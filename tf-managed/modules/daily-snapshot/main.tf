@@ -89,6 +89,10 @@ resource "digitalocean_droplet" "forest" {
   provisioner "remote-exec" {
     inline = local.init_commands
   }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 

@@ -56,6 +56,7 @@ resource "digitalocean_droplet" "forest" {
 
   lifecycle {
     replace_triggered_by = [local_sensitive_file.bootstrap_script]
+    create_before_destroy = true
   }
 }
 
