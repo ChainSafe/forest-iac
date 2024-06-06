@@ -55,7 +55,7 @@
 
     - name: Unzip the Forest release package on the remote server
       ansible.builtin.command:
-        cmd: "unzip -jo {{ remote_resources_path }}/forest.zip -d forest/"
+        cmd: "unzip -jo {{ remote_resources_path }}/forest.zip -d {{ remote_resources_path }}/forest/"
 
     - name: Execute the init.sh script
       ansible.builtin.shell:
