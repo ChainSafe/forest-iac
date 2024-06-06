@@ -2,7 +2,7 @@
 
 set -euxo pipefail
 
-FOREST=/mnt/md0/exported/archival/forest-v0.17.2/forest-tool
+FOREST=/mnt/md0/exported/archival/forest/forest-tool
 UPLOADED_DIFFS=/mnt/md0/exported/archival/uploaded-diff-snaps.txt
 UPLOAD_QUEUE="/mnt/md0/exported/archival/upload_files.txt"
 

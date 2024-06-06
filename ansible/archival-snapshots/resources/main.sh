@@ -6,9 +6,9 @@ set -euxo pipefail
 GENESIS_TIMESTAMP=1598306400
 SECONDS_PER_EPOCH=30
 
-FOREST="/mnt/md0/exported/archival/forest-v0.17.2/forest"
-FOREST_CLI="/mnt/md0/exported/archival/forest-v0.17.2/forest-cli"
-FOREST_TOOL="/mnt/md0/exported/archival/forest-v0.17.2/forest-tool"
+FOREST="/mnt/md0/exported/archival/forest/forest"
+FOREST_CLI="/mnt/md0/exported/archival/forest/forest-cli"
+FOREST_TOOL="/mnt/md0/exported/archival/forest/forest-tool"
 
 CURRENT_SNAPSHOT=$(aws --profile prod --endpoint "$ENDPOINT" s3 ls "s3://forest-archive/mainnet/lite/" | sort | tail -n 1 | awk '{print $NF}')
 CURRENT_EPOCH=$(echo "$CURRENT_SNAPSHOT" | awk -F'_' '{gsub(/[^0-9]/, "", $6); print $6}')
