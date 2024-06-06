@@ -5,7 +5,7 @@
     local_resources_path: "resources"
     remote_resources_path: "/mnt/md0/exported/archival"
     zip_file_name: "resources.zip"
-    forest_version: "v0.17.1"
+    forest_version: "v0.17.2"
     forest_release_url: "https://github.com/ChainSafe/forest/releases/download/{{ forest_version }}/forest-{{ forest_version }}-linux-amd64.zip"
   tasks:
     - name: Check if AWS CLI is installed
@@ -48,12 +48,6 @@
         cmd: "unzip -o {{ zip_file_name }}"
         chdir: "{{ remote_resources_path }}"
 
-    - name: Check if Forest is running
-      ansible.builtin.shell:
-        cmd: "ps aux | grep forest | grep -v grep"
-      register: forest_running
-      ignore_errors: true
-
     - name: Download Forest release package
       ansible.builtin.get_url:
         url: "{{ forest_release_url }}"
@@ -63,15 +57,9 @@
       ansible.builtin.command:
         cmd: "unzip -o {{ remote_resources_path }}/forest.zip -d {{ remote_resources_path }}"
 
-    - name: Execute the Forest command
-      ansible.builtin.shell:
-        cmd: "./forest --no-gc --encrypt-keystore --config ../config.toml --target-peer-count 500"
-        chdir: "{{ remote_resources_path }}"
-      when: forest_running.rc != 0
-
     - name: Execute the init.sh script
       ansible.builtin.shell:
-        cmd: "./init.sh"
+        cmd: "nohup ./init.sh > init.log 2>&1 &"
         chdir: "{{ remote_resources_path }}"
       environment:
         ARCHIVAL_SLACK_TOKEN: "{{ lookup('env', 'ARCHIVAL_SLACK_TOKEN') }}"

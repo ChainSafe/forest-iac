@@ -2,8 +2,9 @@
 
 set -euxo pipefail
 
-FOREST=/mnt/md0/exported/archival/forest-v0.17.1/forest-tool
+FOREST=/mnt/md0/exported/archival/forest-v0.17.2/forest-tool
 UPLOADED_DIFFS=/mnt/md0/exported/archival/uploaded-diff-snaps.txt
+UPLOAD_QUEUE="/mnt/md0/exported/archival/upload_files.txt"
 
 EPOCH_START="$1"
 shift
@@ -13,7 +14,11 @@ GENESIS_TIMESTAMP=1598306400
 SECONDS_PER_EPOCH=30
 
 # Clear Upload List
-rm /mnt/md0/exported/archival/upload_files.txt
+if [ -f "$UPLOAD_QUEUE" ]; then
+    # Clear the contents of the file
+    true > "$UPLOAD_QUEUE"
+fi
+
 
 aws --profile prod --endpoint "$ENDPOINT" s3 ls "s3://forest-archive/mainnet/diff/" > "$UPLOADED_DIFFS"
 
@@ -29,7 +34,7 @@ for i in $(seq 1 $DIFF_COUNT); do
             "$FOREST" archive export --depth "$DIFF_STEP" --epoch "$EPOCH" --diff $((EPOCH-DIFF_STEP)) --diff-depth 900 --output-path "$FILE" "$@"
         fi
         # Add exported diff snapshot to upload queue
-        echo "$FILE" >> /mnt/md0/exported/archival/upload_files.txt
+        echo "$FILE" >> "$UPLOAD_QUEUE"
     else
         echo "Skipping $FILE"
     fi

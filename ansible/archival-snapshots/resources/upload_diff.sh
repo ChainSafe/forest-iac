@@ -1,5 +1,8 @@
 #!/bin/bash
 
+## Enable strict error handling, command tracing, and pipefail
+set -euxo pipefail
+
 ENDPOINT="$1"
 
 while read -r file; do

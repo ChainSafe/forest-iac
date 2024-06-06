@@ -1,5 +1,10 @@
 #!/bin/bash
 
+## Enable strict error handling, command tracing, and pipefail
+set -eux
+
+echo "Current user: $(whoami)"
+
 LITE_SNAPSHOT_DIR="/mnt/md0/exported/archival/lite_snapshots"
 DIFF_SNAPSHOT_DIR="/mnt/md0/exported/archival/diff_snapshots"
 
@@ -17,11 +22,4 @@ else
     echo "$DIFF_SNAPSHOT_DIR exists"
 fi
 
-# Check if the main.sh script executed successfully
-if ./main.sh; then
-    # If successful, call notify.rb with "success"
-    ruby notify.rb "success"
-else
-    # If failed, call notify.rb with "failure"
-    ruby notify.rb "failure"
-fi
+./main.sh

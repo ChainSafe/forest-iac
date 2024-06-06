@@ -2,7 +2,7 @@
 
 require 'slack-ruby-client'
 
-CHANNEL = '#forest-notifications'
+CHANNEL = '#forest-dump'
 SLACK_TOKEN = ENV.fetch('ARCHIVAL_SLACK_TOKEN')
 STATUS = ARGV[0]
 
