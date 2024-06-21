@@ -25,10 +25,10 @@ function check_snapshot(url, genesisTime) {
 }
 
 check_snapshot(
-  "https://forest-archive.chainsafe.dev/latest/calibnet/",
+  "https://forest-internal.chainsafe.dev/latest/calibnet/",
   1667326380
 );
 check_snapshot(
-  "https://forest-archive.chainsafe.dev/latest/mainnet/",
+  "https://forest-internal.chainsafe.dev/latest/mainnet/",
   1598306400
 );
