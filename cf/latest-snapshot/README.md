@@ -3,7 +3,7 @@
 This worker acts on two endpoints:
 
 - `https://forest-internal.chainsafe.dev/latest/calibnet/`
-- `https://forest-archive.chainsafe.dev/latest/mainnet/`
+- `https://forest-internal.chainsafe.dev/latest/mainnet/`
 
 - `https://forest-internal.chainsafe.dev/archive/calibnet/*`
 - `https://forest-internal.chainsafe.dev/archive/mainnet/*`
