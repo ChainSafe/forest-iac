@@ -1,4 +1,4 @@
-const BASE_URL = 'https://forest-archive.chainsafe.dev';
+const BASE_URL = 'https://forest-internal.chainsafe.dev';
 
 interface Env {
   FOREST_ARCHIVE: R2Bucket;
