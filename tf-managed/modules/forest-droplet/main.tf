@@ -38,10 +38,9 @@ resource "digitalocean_droplet" "forest" {
   graceful_shutdown = false
 
   connection {
-    host    = self.ipv4_address
-    user    = "root"
-    type    = "ssh"
-    timeout = "30m"
+    host = self.ipv4_address
+    user = "root"
+    type = "ssh"
   }
 
   provisioner "file" {
@@ -56,7 +55,8 @@ resource "digitalocean_droplet" "forest" {
   }
 
   lifecycle {
-    replace_triggered_by = [local_sensitive_file.bootstrap_script]
+    replace_triggered_by  = [local_sensitive_file.bootstrap_script]
+    create_before_destroy = true
   }
 }
 

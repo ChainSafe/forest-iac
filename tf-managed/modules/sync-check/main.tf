@@ -74,10 +74,9 @@ resource "digitalocean_droplet" "forest" {
   graceful_shutdown = false
 
   connection {
-    host    = self.ipv4_address
-    user    = "root"
-    type    = "ssh"
-    timeout = "30m"
+    host = self.ipv4_address
+    user = "root"
+    type = "ssh"
   }
 
   # Push the sources.tar file to the newly booted droplet
@@ -88,6 +87,9 @@ resource "digitalocean_droplet" "forest" {
 
   provisioner "remote-exec" {
     inline = local.init_commands
+  }
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
