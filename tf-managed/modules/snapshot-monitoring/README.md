@@ -1,8 +1,8 @@
 # Snapshot monitoring
 
 This module creates New Relic resources to check the status of the global snapshot service. Note that this does not check the status of the [snapshot-service](../daily-snapshot), but rather the actual snapshots (and the epochs at which they were produced), available at:
-- <https://forest-archive.chainsafe.dev/mainnet/latest/>
-- <https://forest-archive.chainsafe.dev/calibnet/latest/>
+- <https://forest-internal.chainsafe.dev/mainnet/latest/>
+- <https://forest-internal.chainsafe.dev/calibnet/latest/>
 
 The logic is contained in the [snapshot-age-monitor](./snapshot-age-monitor.js).
 
