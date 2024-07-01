@@ -5,7 +5,7 @@ usage_model = "bundled"
 env = {}
 
 [route]
-pattern = "forest-archive.chainsafe.dev/list*"
+pattern = "forest-internal.chainsafe.dev/list*"
 zone_name = "chainsafe.dev"
 #script = "forest-snapshot-listing"
 
