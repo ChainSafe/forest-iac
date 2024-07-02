@@ -28,12 +28,24 @@ else
     echo "$LAST_FULL_SNAPSHOT_PATH snapshot exists."
 fi
 
+# Clean forest db
+$FOREST_TOOL db destroy --force
+
 echo "Starting forest daemon"
 nohup $FOREST --no-gc --config ./config.toml --save-token ./admin_token --rpc-address 127.0.0.1:3456 --metrics-address 127.0.0.1:5000 --import-snapshot "$LAST_FULL_SNAPSHOT_PATH" > forest.log 2>&1 &
 FOREST_NODE_PID=$!
 
 sleep 30
 echo "Forest process started with PID: $FOREST_NODE_PID"
+
+# Function to kill Forest daemon
+function kill_forest_daemon {
+    echo "Killing Forest daemon with PID: $FOREST_NODE_PID"
+    kill -KILL $FOREST_NODE_PID
+}
+
+# Set trap to kill Forest daemon on script exit or error
+trap kill_forest_daemon EXIT
 
 # Set required env variables
 function set_fullnode_api_info {
@@ -98,5 +110,3 @@ while ((LATEST_EPOCH - LAST_EPOCH > 30000)); do
 
    LAST_EPOCH=$NEW_EPOCH
 done
-
-kill -KILL $FOREST_NODE_PID

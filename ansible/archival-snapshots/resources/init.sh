@@ -31,3 +31,16 @@ fi
 
 # Trigger main script
 ./main.sh
+
+EXIT_STATUS=$?
+
+# Notify on slack channel
+if [ "$EXIT_STATUS" -eq 0 ]; then
+    echo "Script executed successfully"
+    ruby notify.rb success
+else
+    echo "Script execution failed"
+    ruby notify.rb failure
+fi
+
+exit "$EXIT_STATUS"
