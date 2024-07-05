@@ -13,7 +13,7 @@ inputs = {
   name            = "forest-snapshot"
   size            = "s-4vcpu-16gb-amd"
   r2_endpoint     = "https://2238a825c5aca59233eab1f221f7aefb.r2.cloudflarestorage.com/"
-  forest_tag      = "v0.17.2-fat"
+  forest_tag      = "v0.19.0-fat"
   snapshot_bucket = "forest-archive"
 
   monitoring = {
