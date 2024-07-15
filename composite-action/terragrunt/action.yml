@@ -11,10 +11,10 @@ inputs:
     description: 'The DigitalOcean access token to use for deploying the infrastructure'
     required: true
   aws_access_key_id:
-    description: 'S3 access keys id used by terraform and service like sync check, Deploy Snapshot Service etc'
+    description: 'S3 access keys id used by terraform and service like sync check'
     required: true
   aws_secret_access_key:
-    description: 'S3 secret access keys used by terraform and service like sync check, Deploy Snapshot Service etc'
+    description: 'S3 secret access keys used by terraform and service like sync check'
     required: true
   working_directory:
     description: 'The working Directory'

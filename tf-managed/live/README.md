@@ -46,10 +46,6 @@ Each environment contains its respective `applications/`. A `base-infrastructure
 
 ```
 └── applications
-    ├── snapshot-monitoring
-    │   └── terragrunt.hcl
-    ├── snapshot-service
-    │   └── terragrunt.hcl
     └── sync-check
         └── terragrunt.hcl
 ```

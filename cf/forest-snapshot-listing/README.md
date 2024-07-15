@@ -1,6 +1,6 @@
 # Snapshot listing worker
 
-This worker acts on endpoints at `https://forest-internal.chainsafe.dev/list**` and will list objects with `diff`, `lite`, and `latest` prefixes.
+This worker acts on endpoints at `https://forest-internal.chainsafe.dev/list**` and will list objects with `diff` and `lite` prefixes.
 
 # Local deployment
 
