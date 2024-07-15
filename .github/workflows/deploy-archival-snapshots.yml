@@ -1,0 +1,57 @@
+name: Export archival snapshots
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  pull_request:
+    paths:
+      - 'ansible/archival-snapshots/**'
+  push:
+    paths:
+      - 'ansible/archival-snapshots/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install Ansible
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ansible
+
+      - name: Download and install Cloudflared
+        run: |
+          wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+          sudo dpkg -i cloudflared-linux-amd64.deb
+          cloudflared --version
+
+      - name: Configure ssh-agent
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.ARCHIE_PRIVATE_KEY }}
+
+      - name: Store SSH key
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.ARCHIE_PRIVATE_KEY }}
+        run: |
+          cat "$GITHUB_WORKSPACE/ansible/archival-snapshots/resources/ssh_config" >> ~/.ssh/config
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa_archie
+          chmod 600 ~/.ssh/id_rsa_archie
+
+      - name: Run Ansible playbook
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: "False"
+          ARCHIVAL_SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+          ENDPOINT: https://2238a825c5aca59233eab1f221f7aefb.r2.cloudflarestorage.com/
+        run: |
+          ansible-playbook -i ansible/archival-snapshots/inventory.ini ansible/archival-snapshots/playbook.yml
