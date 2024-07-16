@@ -7,3 +7,7 @@ Feel free to contribute to the codebase by resolving any open issues, refactorin
 
 ## Questions
 Feel free to contact the team by creating an issue or raising a discussion [here](https://github.com/ChainSafe/forest/discussions) for more details on interacting with the infrastructure if the need arises during deployment.
+
+## Past Snapshot Service
+
+The snapshot service offered by the Forest team was transferred to the ChainSafe's infrastructure team for maintenance and further development. The previous implementation can be found [here](https://github.com/ChainSafe/forest-iac/pull/459).
