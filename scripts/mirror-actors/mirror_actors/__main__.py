@@ -13,7 +13,7 @@ from slack_sdk.web import WebClient
 from github import Github
 
 GITHUB_REPO = "filecoin-project/builtin-actors"
-RELEASE_PATTERN = r'^v\d+\.\d+\.\d+.*$'
+RELEASE_PATTERN = r'^v?\d+\.\d+\.\d+.*$'
 
 # Initialize GitHub client
 github = Github()
