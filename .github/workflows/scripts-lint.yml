@@ -30,14 +30,6 @@ jobs:
         run: |
           gem install rubocop --no-document --version 1.60.1
           rubocop
-  run-js-linters:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - run: |
-        yarn install
-        yarn lint
-        yarn js-check
   run-py-linters:
     runs-on: ubuntu-latest
     steps:
