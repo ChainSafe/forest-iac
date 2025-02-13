@@ -6,6 +6,8 @@ require 'slack-ruby-client'
 class SlackClient
   @last_thread = nil
   @channel = nil
+  # Some APIs require the `channel_id` instead of the channel name.
+  @channel_id = nil
   @client = nil
 
   def initialize(channel, token)
@@ -24,6 +26,7 @@ class SlackClient
   def post_message(text)
     msg = @client.chat_postMessage(channel: @channel, text: text)
     @last_thread = msg[:ts]
+    @channel_id = msg[:channel]
   end
 
   # Attaches a comment/reply to the latest posted thread.
@@ -45,10 +48,10 @@ class SlackClient
     return unless File.exist? file
     raise 'Need to create a thread before attaching a file.' if @last_thread.nil?
 
-    @client.files_upload(
-      channels: @channel,
-      file: Faraday::UploadIO.new(file, 'text/plain'),
+    @client.files_upload_v2(
       filename: File.basename(file),
+      content: File.read(file),
+      channel_id: @channel_id,
       initial_comment: 'Attached a file.',
       thread_ts: @last_thread
     )
