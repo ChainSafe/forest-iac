@@ -1,41 +1,50 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    docker-api (2.2.0)
-      excon (>= 0.47.0)
+    docker-api (2.4.0)
+      excon (>= 0.64.0)
       multi_json
-    excon (0.99.0)
-    faraday (2.7.4)
-      faraday-net_http (>= 2.0, < 3.1)
-      ruby2_keywords (>= 0.0.4)
+    excon (1.2.3)
+    faraday (2.12.2)
+      faraday-net_http (>= 2.0, < 3.5)
+      json
+      logger
     faraday-mashify (0.1.1)
       faraday (~> 2.0)
       hashie
-    faraday-multipart (1.0.4)
-      multipart-post (~> 2)
-    faraday-net_http (3.0.2)
-    ffi (1.15.5)
-    gli (2.21.0)
+    faraday-multipart (1.1.0)
+      multipart-post (~> 2.0)
+    faraday-net_http (3.4.0)
+      net-http (>= 0.5.0)
+    ffi (1.17.1-x86_64-linux-gnu)
+    gli (2.22.2)
+      ostruct
     hashie (5.0.0)
+    json (2.10.1)
+    logger (1.6.6)
     multi_json (1.15.0)
-    multipart-post (2.3.0)
-    ruby2_keywords (0.0.5)
-    slack-ruby-client (2.1.0)
+    multipart-post (2.4.1)
+    net-http (0.6.0)
+      uri
+    ostruct (0.6.1)
+    slack-ruby-client (2.5.1)
       faraday (>= 2.0)
       faraday-mashify
       faraday-multipart
       gli
       hashie
-    sys-filesystem (1.4.3)
+      logger
+    sys-filesystem (1.5.3)
       ffi (~> 1.1)
+    uri (1.0.2)
 
 PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
   docker-api (>= 2.2.0)
-  slack-ruby-client (>= 2.1.0)
+  slack-ruby-client (>= 2.5.1)
   sys-filesystem (>= 1.4.3)
 
 BUNDLED WITH
-   2.3.4
+   2.5.22
