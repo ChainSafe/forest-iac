@@ -57,7 +57,7 @@ echo "⏳ Waiting for Forest to start syncing (up to $timeout seconds)..."
 until [ -n "$tipset_start" ] || [ "$timeout" -le 0 ]
 do
   update_metrics
-  tipset_start="$(get_metric_value "last_validated_tipset_epoch")"
+  tipset_start="$(get_metric_value "head_epoch")"
   sleep 1
   timeout=$((timeout-1))
 done
@@ -76,7 +76,7 @@ sleep "$HEALTH_CHECK_DURATION_SECONDS"
 
 # Grab last synced tipset epoch
 update_metrics
-tipset_end="$(get_metric_value "last_validated_tipset_epoch")"
+tipset_end="$(get_metric_value "head_epoch")"
 
 if [ -z "$tipset_end" ]; then
   echo "❌ Did not manage to get sync status"
