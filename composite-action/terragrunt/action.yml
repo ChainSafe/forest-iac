@@ -41,8 +41,8 @@ runs:
     - name: Set TF/TG versions
       shell: bash
       run: |
-        echo "tf_version=1.6.6" >> $GITHUB_ENV
-        echo "tg_version=0.53.2" >> $GITHUB_ENV
+        echo "tf_version=1.11.3" >> $GITHUB_ENV
+        echo "tg_version=0.77.6" >> $GITHUB_ENV
 
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v2
@@ -62,7 +62,7 @@ runs:
       shell: bash
       working-directory: ${{ inputs.working_directory }}
       run: |
-        terragrunt hclfmt --terragrunt-check --terragrunt-diff
+        terragrunt hclfmt --check --diff
 
     - name: Validate
       shell: bash
