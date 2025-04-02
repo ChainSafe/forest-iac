@@ -62,7 +62,7 @@ runs:
       shell: bash
       working-directory: ${{ inputs.working_directory }}
       run: |
-        terragrunt hclfmt --terragrunt-check --terragrunt-diff
+        terragrunt hclfmt --check --diff
 
     - name: Validate
       shell: bash
