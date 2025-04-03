@@ -141,13 +141,13 @@ runs:
       run: exit 1
 
     - name: Configure ssh-agent
-      if: github.ref == 'refs/heads/main' && ( github.event_name == 'push' || github.event_name == 'workflow_dispatch' )
+    # if: github.ref == 'refs/heads/main' && ( github.event_name == 'push' || github.event_name == 'workflow_dispatch' )
       uses: webfactory/ssh-agent@v0.8.0
       with:
         ssh-private-key: ${{ inputs.ssh_private_key }}
 
     - name: Terragrunt Apply
-      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    # if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       shell: bash
       run: |
         if grep -q 'No changes.' ${{ github.workspace }}/tfplan; then
@@ -171,7 +171,7 @@ runs:
         TF_VAR_new_relic_account_id: ${{ inputs.new_relic_account_id }}
 
     - name: Terragrunt Force Apply
-      if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
+    # if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
       working-directory: ${{ inputs.working_directory }}
       env:
         AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
