@@ -45,28 +45,35 @@ locals {
   })
 }
 
-locals {
-  init_commands = [
-    "tar xf sources.tar",
-    # Set required environment variables
-    "echo '${local.env_content}' >> /root/.forest_env",
-    "echo '. ~/.forest_env' >> .bashrc",
-    ". ~/.forest_env",
-    "nohup sh ./init.sh > init_log.txt &",
-    "cp ./restart.service /etc/systemd/system/",
-    "systemctl enable restart.service",
-    # Exiting without a sleep sometimes kills the script :-/
-    "sleep 60s",
-  ]
-}
-
 resource "digitalocean_droplet" "forest" {
   image  = var.image
   name   = format("%s-%s", var.environment, var.name)
   region = var.region
   size   = var.size
   # Re-initialize resource if this hash changes:
-  user_data  = join("-", [data.local_file.sources.content_sha256, sha256(join("", local.init_commands))])
+  user_data = <<-EOT
+#!/bin/bash
+set -e
+
+# Extract sources
+tar xf /root/sources.tar -C /root
+
+# Set required environment variables
+cat <<EOF >> /root/.forest_env
+${local.env_content}
+EOF
+
+echo '. /root/.forest_env' >> /root/.bashrc
+source /root/.forest_env
+
+# Run initialization script
+nohup sh /root/init.sh > /root/init_log.txt
+
+# Configure and enable restart service
+cp /root/restart.service /etc/systemd/system/
+systemctl enable restart.service
+EOT
+
   tags       = ["iac", var.environment]
   ssh_keys   = data.digitalocean_ssh_keys.keys.ssh_keys[*].fingerprint
   monitoring = true
@@ -85,11 +92,8 @@ resource "digitalocean_droplet" "forest" {
     source      = data.local_file.sources.filename
     destination = "/root/sources.tar"
   }
-
-  provisioner "remote-exec" {
-    inline = local.init_commands
-  }
 }
+
 
 data "digitalocean_project" "forest_project" {
   name = var.project
