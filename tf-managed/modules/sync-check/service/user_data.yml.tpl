@@ -22,7 +22,7 @@ write_files:
       NEW_RELIC_ACCOUNT_ID="${NEW_RELIC_ACCOUNT_ID}"
       NEW_RELIC_REGION="${NEW_RELIC_REGION}"
       FOREST_TAG="${forest_tag}"
-  
+
 runcmd:
   - "tar xf /root/sources.tar -C /root"
   - "gem install slack-ruby-client sys-filesystem --no-document"
