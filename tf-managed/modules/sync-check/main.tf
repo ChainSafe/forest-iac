@@ -14,15 +14,6 @@ data "local_file" "sources" {
   filename = data.external.sources_tar.result.path
 }
 
-// Note: The init.sh file is also included in the sources.zip such that the hash
-// of the archive captures the entire state of the machine.
-// This is a workaround, and because of this, we need to suppress the tflint warning here
-// for unused declarations related to the 'init.sh' file.
-// tflint-ignore: terraform_unused_declarations
-data "local_file" "init" {
-  filename = "${path.module}/service/init.sh"
-}
-
 data "digitalocean_ssh_keys" "keys" {
   sort {
     key       = "name"
@@ -30,43 +21,26 @@ data "digitalocean_ssh_keys" "keys" {
   }
 }
 
-# Set required environment variables
-locals {
-  env_content = templatefile("${path.module}/service/forest-env.tpl", {
-    FOREST_TARGET_DATA        = "/volumes/forest_data",
-    FOREST_TARGET_SCRIPTS     = "/volumes/sync_check",
-    FOREST_TARGET_RUBY_COMMON = "/volumes/ruby_common",
-    slack_token               = var.slack_token,
-    slack_channel             = var.slack_channel,
-    NEW_RELIC_API_KEY         = var.new_relic_api_key,
-    NEW_RELIC_ACCOUNT_ID      = var.new_relic_account_id,
-    NEW_RELIC_REGION          = var.new_relic_region,
-    forest_tag                = "edge-fat"
-  })
-}
-
-locals {
-  init_commands = [
-    "tar xf sources.tar",
-    # Set required environment variables
-    "echo '${local.env_content}' >> /root/.forest_env",
-    "echo '. ~/.forest_env' >> .bashrc",
-    ". ~/.forest_env",
-    "nohup sh ./init.sh > init_log.txt &",
-    "cp ./restart.service /etc/systemd/system/",
-    "systemctl enable restart.service",
-    # Exiting without a sleep sometimes kills the script :-/
-    "sleep 60s",
-  ]
-}
-
 resource "digitalocean_droplet" "forest" {
   image  = var.image
   name   = format("%s-%s", var.environment, var.name)
   region = var.region
   size   = var.size
-  # Re-initialize resource if this hash changes:
-  user_data  = join("-", [data.local_file.sources.content_sha256, sha256(join("", local.init_commands))])
+  user_data = join("\n", [
+    templatefile("${path.module}/service/user_data.yml.tpl", {
+      FOREST_TARGET_DATA        = "/volumes/forest_data",
+      FOREST_TARGET_SCRIPTS     = "/volumes/sync_check",
+      FOREST_TARGET_RUBY_COMMON = "/volumes/ruby_common",
+      slack_token               = var.slack_token,
+      slack_channel             = var.slack_channel,
+      NEW_RELIC_API_KEY         = var.new_relic_api_key,
+      NEW_RELIC_ACCOUNT_ID      = var.new_relic_account_id,
+      NEW_RELIC_REGION          = var.new_relic_region,
+      forest_tag                = "edge-fat"
+    }),
+    "# sources sha256: ${data.local_file.sources.content_sha256}",
+  ])
+
   tags       = ["iac", var.environment]
   ssh_keys   = data.digitalocean_ssh_keys.keys.ssh_keys[*].fingerprint
   monitoring = true
@@ -85,11 +59,8 @@ resource "digitalocean_droplet" "forest" {
     source      = data.local_file.sources.filename
     destination = "/root/sources.tar"
   }
-
-  provisioner "remote-exec" {
-    inline = local.init_commands
-  }
 }
+
 
 data "digitalocean_project" "forest_project" {
   name = var.project

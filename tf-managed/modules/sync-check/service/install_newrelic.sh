@@ -1,22 +1,8 @@
 #!/bin/bash
-
-## Enable strict error handling, command tracing, and pipefail
 set -eux
-
-# Wait for cloud-init to finish initializing the machine
-cloud-init status --wait
 
 # Setting DEBIAN_FRONTEND to ensure non-interactive operations for APT
 export DEBIAN_FRONTEND=noninteractive
-
-# Using timeout to ensure the script retries if the APT servers are temporarily unavailable.
-timeout 10m bash -c 'until apt-get -qqq --yes update && \
- apt-get -qqq --yes install ruby ruby-dev gcc make; do sleep 10; \
-done'
-
-gem install slack-ruby-client sys-filesystem
-
-nohup /bin/bash ./run_service.sh > run_service_log.txt &
 
 if [ -n "$NEW_RELIC_API_KEY" ] ; then
   curl -Ls https://download.newrelic.com/install/newrelic-cli/scripts/install.sh | bash && \
@@ -59,8 +45,3 @@ EOF
 
   sudo systemctl restart newrelic-infra
 fi
-
-#set-up fail2ban with the default configuration
-sudo apt-get install fail2ban -y
-sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
-sudo systemctl enable fail2ban && sudo systemctl start fail2ban

@@ -4,4 +4,4 @@
 set -euxo pipefail
 
 ## Start Sync Check Service:
-/bin/bash ./run_service.sh
+/bin/bash /root/run_service.sh

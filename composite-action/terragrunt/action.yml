@@ -91,7 +91,7 @@ runs:
         TF_VAR_new_relic_api_key: ${{ inputs.new_relic_api_key }}
         TF_VAR_new_relic_account_id: ${{ inputs.new_relic_account_id }}
       run: |
-        terragrunt plan -no-color --terragrunt-non-interactive -out ${{ github.workspace }}/tfplan | tee output
+        terragrunt plan -no-color --non-interactive -out ${{ github.workspace }}/tfplan | tee output
         echo 'stdout<<EOF' >> $GITHUB_OUTPUT
         cat output >> $GITHUB_OUTPUT
         echo 'EOF' >> $GITHUB_OUTPUT
@@ -154,8 +154,8 @@ runs:
           echo "No changes detected."
         else
           echo "Changes detected. Redeploying everything..."
-          terragrunt destroy -auto-approve --terragrunt-non-interactive
-          terragrunt apply -auto-approve --terragrunt-non-interactive
+          terragrunt destroy -auto-approve --non-interactive
+          terragrunt apply -auto-approve --non-interactive
         fi
       working-directory: ${{ inputs.working_directory }}
       env:
@@ -186,5 +186,5 @@ runs:
         TF_VAR_new_relic_account_id: ${{ inputs.new_relic_account_id }}
       shell: bash
       run: |
-        terragrunt destroy -auto-approve --terragrunt-non-interactive
-        terragrunt apply -auto-approve --terragrunt-non-interactive
+        terragrunt destroy -auto-approve --non-interactive
+        terragrunt apply -auto-approve --non-interactive
