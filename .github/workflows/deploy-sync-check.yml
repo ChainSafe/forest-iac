@@ -36,8 +36,6 @@ jobs:
           do_token: ${{ secrets.DO_TOKEN }}
           aws_access_key_id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          r2_access_key: ${{ secrets.R2_ACCESS_KEY }}
-          r2_secret_key: ${{ secrets.R2_SECRET_KEY }}
           slack_token: ${{ secrets.SLACK_TOKEN }}
           working_directory: tf-managed/live/environments/prod/applications/sync-check
           service_name: Sync Check Service

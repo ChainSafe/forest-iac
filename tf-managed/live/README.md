@@ -80,10 +80,6 @@ export AWS_SECRET_ACCESS_KEY=
 # Required for services with Slack notifications
 export TF_VAR_slack_token=
 
-# Required for access to Cloudflare R2
-export TF_VAR_R2_ACCESS_KEY=
-export TF_VAR_R2_SECRET_KEY=
-
 # Required if NewRelic monitoring/alerting is enabled.
 export TF_VAR_new_relic_api_key=
 export TF_VAR_new_relic_account_id=
