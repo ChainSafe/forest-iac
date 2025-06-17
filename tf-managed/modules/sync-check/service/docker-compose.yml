@@ -25,7 +25,7 @@ services:
       - '--save-token'
       - '/tmp/admin_token'
     environment:
-      FOREST_GC_TRIGGER_FACTOR: "1.4"
+      FOREST_SNAPSHOT_GC_INTERVAL_EPOCHS: "8640" # every 3 days
     restart: unless-stopped
     labels:
       com.centurylinklabs.watchtower.enable: true
@@ -51,7 +51,7 @@ services:
       - '--save-token'
       - '/tmp/admin_token'
     environment:
-      FOREST_GC_TRIGGER_FACTOR: "1.2"
+      FOREST_SNAPSHOT_GC_INTERVAL_EPOCHS: "8640" # every 3 days
     restart: unless-stopped
     labels:
       com.centurylinklabs.watchtower.enable: true
