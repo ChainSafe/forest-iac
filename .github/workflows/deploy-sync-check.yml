@@ -18,7 +18,7 @@ on:
     paths:
       - 'tf-managed/modules/sync-check/**'
       - 'tf-managed/scripts/**'
-      - 'tf-managed/live/environments/prod/applications/sync-check'
+      - 'tf-managed/live/environments/prod/applications/sync-check/**'
   workflow_dispatch:
 
 jobs:
