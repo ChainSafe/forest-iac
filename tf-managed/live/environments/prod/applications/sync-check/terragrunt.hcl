@@ -11,5 +11,5 @@ terraform {
 
 inputs = {
   name = "sync-check"
-  size = "s-4vcpu-16gb-amd"
+  size = "s-4vcpu-16gb"
 }
