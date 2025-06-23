@@ -74,7 +74,7 @@ sudo --user="${NEW_USER}" -- \
   --volume=/var/run/docker.sock:/var/run/docker.sock \
   --restart=unless-stopped \
   containrrr/watchtower \
-  --include-stopped --revive-stopped --stop-timeout 120s --interval 600
+  --include-stopped --revive-stopped --stop-timeout 120s --interval 600 --cleanup
 
 # If new relic API key is provided, install the new relic agent
 if [ -n "${NEW_RELIC_API_KEY}" ] ; then
