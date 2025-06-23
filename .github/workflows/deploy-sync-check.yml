@@ -9,6 +9,7 @@ on:
       - 'tf-managed/modules/sync-check/**'
       - 'tf-managed/scripts/**'
       - 'tf-managed/live/environments/prod/applications/sync-check/**'
+      - '.github/workflows/deploy-sync-check.yml'
     # This needs to be declared explicitly so that the job is actually
     # run when moved out of draft.
     types: [opened, synchronize, reopened, ready_for_review]
@@ -19,6 +20,7 @@ on:
       - 'tf-managed/modules/sync-check/**'
       - 'tf-managed/scripts/**'
       - 'tf-managed/live/environments/prod/applications/sync-check/**'
+      - '.github/workflows/deploy-sync-check.yml'
   workflow_dispatch:
 
 jobs:
