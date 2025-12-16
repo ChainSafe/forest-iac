@@ -24,7 +24,7 @@ jobs:
 
       - name: Load cached Poetry installation
         id: cached-poetry
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.local
           key: poetry-0
@@ -39,7 +39,7 @@ jobs:
 
       - name: Load cached dependencies Install
         id: cached-poetry-dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: scripts/mirror-actors/.venv
           key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
@@ -75,7 +75,7 @@ jobs:
 
       - name: Load cached Poetry installation
         id: cached-poetry
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.local
           key: poetry-1
@@ -90,7 +90,7 @@ jobs:
 
       - name: Load cached dependencies Install
         id: cached-poetry-dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: scripts/mirror-actors/.venv
           key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
