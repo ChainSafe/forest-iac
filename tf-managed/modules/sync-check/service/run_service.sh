@@ -29,6 +29,7 @@ docker run \
     --restart unless-stopped \
     --privileged \
     -v /var/run/docker.sock:/var/run/docker.sock \
+    -e DOCKER_API_VERSION=1.52 \
     --name watchtower \
     containrrr/watchtower \
     --label-enable --include-stopped --revive-stopped --stop-timeout 120s --interval 600 --cleanup

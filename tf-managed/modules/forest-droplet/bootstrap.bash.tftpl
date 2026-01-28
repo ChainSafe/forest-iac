@@ -72,6 +72,7 @@ sudo --user="${NEW_USER}" -- \
   --detach \
   --name=watchtower \
   --volume=/var/run/docker.sock:/var/run/docker.sock \
+  -e DOCKER_API_VERSION=1.52 \
   --restart=unless-stopped \
   containrrr/watchtower \
   --include-stopped --revive-stopped --stop-timeout 120s --interval 600 --cleanup
