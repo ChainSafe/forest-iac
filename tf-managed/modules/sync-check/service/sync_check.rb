@@ -24,7 +24,7 @@ TARGET_DATA = get_and_assert_env_variable 'FOREST_TARGET_DATA'
 hostname = ARGV[0]
 raise 'No arguments supplied. Please provide Forest hostname, e.g. forest-mainnet' if ARGV.empty?
 
-network = hostname.match(/-(\w+)$/)[1]
+# network = hostname.match(/-(\w+)$/)[1]
 
 # Current datetime, to append to the log files
 DATE = Time.new.strftime '%FT%H:%M:%S'
