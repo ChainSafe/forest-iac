@@ -53,8 +53,8 @@ ensure
     client.post_message "✅ Sync check for #{hostname} passed. 🌲🌳🌲🌳🌲"
   else
     client.post_message "⛔ Sync check for #{hostname} fiascoed. 🔥🌲🔥"
-    FileUtils.rm_rf("#{TARGET_DATA}/#{network}")
-    logger.info 'DB Destroyed'
+    # FileUtils.rm_rf("#{TARGET_DATA}/#{network}")
+    # logger.info 'DB Destroyed'
   end
   client.attach_files(LOG_HEALTH, LOG_SYNC, LOG_FOREST)
 end
