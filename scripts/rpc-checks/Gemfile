@@ -1,0 +1,7 @@
+# frozen_string_literal: true
+
+source 'https://rubygems.org'
+
+# The dataset's daily files are served brotli-compressed; Net::HTTP does not
+# decode brotli, so inflate explicitly.
+gem 'brotli'
