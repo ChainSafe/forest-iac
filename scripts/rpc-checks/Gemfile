@@ -2,6 +2,10 @@
 
 source 'https://rubygems.org'
 
-# The dataset's daily files are served brotli-compressed; Net::HTTP does not
+# `it` block parameters make Ruby 3.4 the hard syntax floor; fail fast at
+# bundler instead of with a confusing mid-run NameError on older rubies.
+ruby '>= 3.4'
+
+# The dataset's daily files are served brotli-compressed; open-uri does not
 # decode brotli, so inflate explicitly.
 gem 'brotli'

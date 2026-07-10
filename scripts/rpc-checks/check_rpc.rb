@@ -15,6 +15,7 @@
 
 require 'json'
 require 'net/http'
+require 'open-uri'
 require 'optparse'
 require 'brotli'
 
@@ -22,6 +23,8 @@ SECONDS_IN_EPOCH = 30
 SECONDS_IN_DAY = 24 * 60 * 60
 EPOCHS_IN_DAY = SECONDS_IN_DAY / SECONDS_IN_EPOCH
 DIFF_LIMIT = 20
+# What counts as a transient network error, for both the node and the dataset.
+NET_ERRORS = [IOError, SystemCallError, Net::OpenTimeout, Net::ReadTimeout].freeze
 
 # Method -> daily archive file in the dataset. logs has no archive of its own:
 # its reference is derived from the receipts archive by flattening every
@@ -33,7 +36,53 @@ ARCHIVE_FILES = {
   'logs' => 'eth_getBlockReceipts'
 }.freeze
 
-def hex(n) = format('0x%x', n)
+# --- pure JSON-document helpers -----------------------------------------------
+
+def hex(num) = format('0x%x', num)
+
+# Known expected mismatches, dropped before comparing (remove as they get
+# fixed): logsBloom — Forest returns an all-ones placeholder for the
+# block-level bloom (PR #7156); accessList — the dataset normalizes the
+# field to [] on legacy txs where the node omits it (issue #7205).
+def norm_tx(txn) = txn.is_a?(Hash) ? txn.except('accessList') : txn
+
+def norm_txs(txs) = txs.map { norm_tx(it) }
+
+def norm_block(block)
+  return block unless block.is_a?(Hash)
+
+  block.except('logsBloom').tap do |b|
+    b['transactions'] = norm_txs(b['transactions']) if b['transactions'].is_a?(Array)
+  end
+end
+
+def error_message(resp) = resp.dig('error', 'message')
+
+# The dedicated error that blocks/receipts must answer with on a null round.
+def null_round_error?(resp) = resp['result'].nil? && error_message(resp).to_s.include?('null round')
+
+# The logs reference: every receipt's logs from the receipts archive, flattened.
+def expected_logs(entry) = (entry['result'] || []).flat_map { it['logs'] || [] }
+
+# Differing paths between two JSON documents (semantic: key order never matters).
+def deep_diff(node, archive, path = '$')
+  return [] if node == archive
+
+  case [node, archive]
+  in [Hash => a, Hash => b]
+    (a.keys | b.keys).flat_map { deep_diff(a[it], b[it], "#{path}.#{it}") }
+  in [Array => a, Array => b]
+    diff_arrays(a, b, path)
+  else
+    ["#{path}: node=#{node.to_json} archive=#{archive.to_json}"]
+  end
+end
+
+def diff_arrays(node, archive, path)
+  header = []
+  header << "#{path}: array sizes differ (node=#{node.size}, archive=#{archive.size})" if node.size != archive.size
+  header + node.take(archive.size).each_with_index.flat_map { |x, i| deep_diff(x, archive[i], "#{path}[#{i}]") }
+end
 
 # Minimal JSON-RPC client over a persistent connection (reconnects once if the
 # server closed an idle keep-alive connection).
@@ -45,13 +94,15 @@ class Rpc
   def call(method, params)
     request = Net::HTTP::Post.new(@uri.request_uri, 'Content-Type' => 'application/json')
     request.body = { jsonrpc: '2.0', id: 1, method:, params: }.to_json
-    JSON.parse(http.request(request).body)
-  rescue IOError, EOFError, SystemCallError
+    perform(request)
+  rescue *NET_ERRORS
     @http = nil
-    JSON.parse(http.request(request).body)
+    perform(request)
   end
 
   private
+
+  def perform(request) = JSON.parse(http.request(request).body)
 
   def http
     @http ||= Net::HTTP.start(@uri.host, @uri.port, use_ssl: @uri.scheme == 'https')
@@ -67,9 +118,11 @@ class Archive
     @mutex = Mutex.new
   end
 
-  # Lines of the day's ndjson, or nil if the day isn't published.
+  # Lines of the day's ndjson, or nil if the day isn't published. The cache
+  # holds one in-flight fetch per (file, date): same-key callers share it,
+  # different keys download concurrently — the lock only guards the insert.
   def daily(file, date)
-    @mutex.synchronize { @cache.fetch([file, date]) { @cache[[file, date]] = fetch(file, date) } }
+    @mutex.synchronize { @cache[[file, date]] ||= Thread.new { fetch(file, date) } }.value
   end
 
   private
@@ -77,23 +130,23 @@ class Archive
   def fetch(file, date, attempts: 3)
     uri = URI("https://chain.data.riba.plus/fil/#{@net}/daily/#{date}/#{file}.v1.r1.ndjson.brotli")
     attempts.times do |i|
-      case res = get(uri)
-      # The server only sends the compact brotli bytes to clients that ask for
-      # them (and decompresses transparently otherwise), so inflate iff marked.
-      when Net::HTTPSuccess
-        return (res['content-encoding'] == 'br' ? Brotli.inflate(res.body) : res.body).lines
-      when Net::HTTPNotFound then return nil
-      else sleep 1 + i
-      end
+      return download(uri).lines
+    rescue OpenURI::HTTPError => e
+      return nil if e.io.status.first == '404'
+
+      sleep 1 + i
+    rescue *NET_ERRORS
+      sleep 1 + i
     end
     nil
   end
 
-  def get(uri, hops = 3)
-    res = Net::HTTP.get_response(uri, 'Accept-Encoding' => 'br')
-    res.is_a?(Net::HTTPRedirection) && hops.positive? ? get(URI(res['location']), hops - 1) : res
-  rescue IOError, SystemCallError, Net::OpenTimeout, Net::ReadTimeout
-    nil
+  # The server only sends the compact brotli bytes to clients that ask for
+  # them (and decompresses transparently otherwise), so inflate iff marked.
+  def download(uri)
+    uri.open('Accept-Encoding' => 'br') do |f|
+      f.content_encoding.include?('br') ? Brotli.inflate(f.read) : f.read
+    end
   end
 end
 
@@ -105,7 +158,10 @@ class Checker
   attr_reader :out
 
   def initialize(method:, range:, rpc_url:, archive:, genesis:)
-    @method, @range, @archive, @genesis = method, range, archive, genesis
+    @method = method
+    @range = range
+    @archive = archive
+    @genesis = genesis
     @rpc = Rpc.new(rpc_url)
     @out = []
     @failed = false
@@ -114,37 +170,42 @@ class Checker
   # :pass / :fail (mismatch) / :no_data (archive day unavailable).
   def run
     epoch = @range.begin
-    while epoch <= @range.end
-      date, line = locate(epoch)
-      day_end = [epoch + EPOCHS_IN_DAY - line, @range.end].min
-      @out << "--- #{@method}: epochs #{epoch}..#{day_end} (#{date}, #{ARCHIVE_FILES[@method]}) ---"
-      entries = @archive.daily(ARCHIVE_FILES[@method], date)&.drop(line - 1) || []
-      (epoch..day_end).zip(entries) do |e, raw|
-        # A missing or empty entry means the daily file is unavailable or
-        # truncated (e.g. the current, not-yet-published day); the archive
-        # publishes chronologically, so every later epoch is missing too.
-        if raw.nil? || raw.strip.empty?
-          @out << "no archive for #{date} (day not published?); stopping #{@method} at epoch #{e}."
-          return @failed ? :fail : :no_data
-        end
-        check(e, JSON.parse(raw))
-      end
-      epoch = day_end + 1
-    end
-    @failed ? :fail : :pass
+    epoch = check_day(epoch) while epoch && epoch <= @range.end
+    return :fail if @failed
+
+    epoch ? :pass : :no_data
   end
 
   private
 
-  def check(epoch, entry) = send("check_#{@method}", epoch, entry)
+  # Checks the epochs from `epoch` to the end of its UTC day (or of the range);
+  # returns the next epoch to check, or nil if the archive day ran out.
+  def check_day(epoch)
+    date, line = locate(epoch)
+    day_end = [epoch + EPOCHS_IN_DAY - line, @range.end].min
+    @out << "--- #{@method}: epochs #{epoch}..#{day_end} (#{date}, #{ARCHIVE_FILES[@method]}) ---"
+    (epoch..day_end).zip(day_entries(date, line)) do |e, raw|
+      # A missing or empty entry means the daily file is unavailable or
+      # truncated (e.g. the current, not-yet-published day); the archive
+      # publishes chronologically, so every later epoch is missing too.
+      if raw.to_s.strip.empty?
+        @out << "no archive for #{date} (day not published?); stopping #{@method} at epoch #{e}."
+        return nil
+      end
+      send("check_#{@method}", e, JSON.parse(raw))
+    end
+    day_end + 1
+  end
+
+  def day_entries(date, line) = @archive.daily(ARCHIVE_FILES[@method], date)&.drop(line - 1) || []
 
   # The archive's daily files are partitioned on midnight UTC, so an epoch's
   # day is its own UTC date and its line is 1 + its offset from that day's
   # first (midnight) epoch. (Relies on genesis % SECONDS_IN_EPOCH == 0, which
   # holds on both networks.)
   def locate(epoch)
-    ts = epoch * SECONDS_IN_EPOCH + @genesis
-    [Time.at(ts, in: 'UTC').strftime('%Y/%m/%d'), 1 + ts % SECONDS_IN_DAY / SECONDS_IN_EPOCH]
+    ts = (epoch * SECONDS_IN_EPOCH) + @genesis
+    [Time.at(ts, in: 'UTC').strftime('%Y/%m/%d'), 1 + (ts % SECONDS_IN_DAY / SECONDS_IN_EPOCH)]
   end
 
   # --- per-method checks ----------------------------------------------------
@@ -156,25 +217,26 @@ class Checker
 
   def check_blocks(epoch, entry)
     resp = @rpc.call('eth_getBlockByNumber', [hex(epoch), true])
-    if entry.nil?
-      return null_round(label(epoch), resp, null_round_error?(resp),
-                        number: resp.dig('result', 'number'))
-    end
+    return null_round(epoch, resp, agreed: null_round_error?(resp), number: resp.dig('result', 'number')) if entry.nil?
+
     compare(label(epoch), norm_block(resp['result']), norm_block(entry['result']))
-    # Every tx the archive block carries must be returned identically by the
-    # node's per-index endpoint; called once per index, compared in one batch.
-    txs = entry.dig('result', 'transactions') || []
-    node_txs = txs.each_index.map { @rpc.call('eth_getTransactionByBlockNumberAndIndex', [hex(epoch), hex(_1)])['result'] }
+    check_txs(epoch, entry.dig('result', 'transactions') || [])
+  end
+
+  # Every tx the archive block carries must be returned identically by the
+  # node's per-index endpoint; called once per index, compared in one batch.
+  def check_txs(epoch, txs)
+    node_txs = txs.each_index.map do |i|
+      @rpc.call('eth_getTransactionByBlockNumberAndIndex', [hex(epoch), hex(i)])['result']
+    end
     compare("#{label(epoch)} (eth_getTransactionByBlockNumberAndIndex, indices 0..#{txs.size - 1})",
-            node_txs.map { norm_tx(_1) }, txs.map { norm_tx(_1) })
+            norm_txs(node_txs), norm_txs(txs))
   end
 
   def check_receipts(epoch, entry)
     resp = @rpc.call('eth_getBlockReceipts', [hex(epoch)])
-    if entry.nil?
-      return null_round(label(epoch), resp, null_round_error?(resp),
-                        receipts: resp['result']&.size)
-    end
+    return null_round(epoch, resp, agreed: null_round_error?(resp), receipts: resp['result']&.size) if entry.nil?
+
     compare(label(epoch), resp['result'], entry['result'])
   end
 
@@ -182,8 +244,7 @@ class Checker
     resp = @rpc.call('Filecoin.ChainGetTipSetByHeight', [epoch, nil])
     if entry.nil?
       height = resp.dig('result', 'Height')
-      return null_round(label(epoch), resp, height.is_a?(Integer) && height < epoch,
-                        height:)
+      return null_round(epoch, resp, agreed: height.is_a?(Integer) && height < epoch, height:)
     end
     compare(label(epoch), resp['result'], entry['result'])
   end
@@ -191,69 +252,35 @@ class Checker
   def check_logs(epoch, entry)
     resp = @rpc.call('eth_getLogs', [{ fromBlock: hex(epoch), toBlock: hex(epoch) }])
     if entry.nil?
-      return null_round(label(epoch), resp, resp['error'].nil? && resp['result'] == [],
-                        logs: resp['result']&.size)
+      agreed = resp['error'].nil? && resp['result'] == []
+      return null_round(epoch, resp, agreed:, logs: resp['result']&.size)
     end
-    expected = (entry['result'] || []).flat_map { _1['logs'] || [] }
-    compare(label(epoch), resp['result'], expected)
+    compare(label(epoch), resp['result'], expected_logs(entry))
   end
+
+  # --- reporting --------------------------------------------------------------
 
   def label(epoch) = "#{@method} epoch #{epoch}"
 
-  def null_round_error?(resp)
-    resp['result'].nil? && resp.dig('error', 'message').to_s.include?('null round')
-  end
-
-  # --- comparison and reporting ----------------------------------------------
-
-  # Known expected mismatches, dropped before comparing (remove as they get
-  # fixed): logsBloom — Forest returns an all-ones placeholder for the
-  # block-level bloom (PR #7156); accessList — the dataset normalizes the
-  # field to [] on legacy txs where the node omits it (issue #7205).
-  def norm_tx(tx) = tx.is_a?(Hash) ? tx.except('accessList') : tx
-
-  def norm_block(block)
-    return block unless block.is_a?(Hash)
-
-    block.except('logsBloom').tap do |b|
-      b['transactions'] = b['transactions'].map { norm_tx(_1) } if b['transactions'].is_a?(Array)
-    end
-  end
-
-  def compare(label, node, archive)
+  def compare(header, node, archive)
     diffs = deep_diff(node, archive)
     return if diffs.empty?
 
-    fail_with("MISMATCH #{label}:", diffs)
+    fail_with("#{header}:", diffs)
   end
 
-  def null_round(label, resp, agreed, detail)
+  def null_round(epoch, resp, agreed:, **detail)
     return if agreed
 
-    fail_with("MISMATCH #{label}: archive is a null round but the node did not agree:",
-              [detail.merge(error: resp.dig('error', 'message')).to_json])
+    fail_with("#{label(epoch)}: archive is a null round but the node did not agree:",
+              [detail.merge(error: error_message(resp)).to_json])
   end
 
   def fail_with(header, lines)
     @failed = true
-    @out << header
-    @out.concat(lines.first(DIFF_LIMIT).map { "  #{_1}" })
+    @out << "MISMATCH #{header}"
+    @out.concat(lines.first(DIFF_LIMIT).map { "  #{it}" })
     @out << "  … #{lines.size - DIFF_LIMIT} more" if lines.size > DIFF_LIMIT
-  end
-
-  # Differing paths between two JSON documents (semantic: key order never matters).
-  def deep_diff(node, archive, path = '$')
-    return [] if node == archive
-
-    case [node, archive]
-    in [Hash => a, Hash => b]
-      (a.keys | b.keys).flat_map { deep_diff(a[_1], b[_1], "#{path}.#{_1}") }
-    in [Array => a, Array => b]
-      header = a.size == b.size ? [] : ["#{path}: array sizes differ (node=#{a.size}, archive=#{b.size})"]
-      header + a.take(b.size).zip(b).each_with_index.flat_map { |(x, y), i| deep_diff(x, y, "#{path}[#{i}]") }
-    else
-      ["#{path}: node=#{node.to_json} archive=#{archive.to_json}"]
-    end
   end
 end
 
@@ -261,9 +288,11 @@ end
 
 methods = Checker::METHODS
 parser = OptionParser.new do |o|
-  o.banner = "Usage: #{File.basename($PROGRAM_NAME)} [--only m1,m2,...] <network> <start_epoch> [end_epoch]\n" \
-             "  env: FOREST_RPC_URL overrides the node URL (default localhost:2345/rpc/v1)"
-  o.on('--only LIST', Array, "Methods to run (#{methods.join(', ')}; default all)") { methods = _1 }
+  o.banner = <<~BANNER
+    Usage: #{File.basename($PROGRAM_NAME)} [--only m1,m2,...] <network> <start_epoch> [end_epoch]
+      env: FOREST_RPC_URL overrides the node URL (default localhost:2345/rpc/v1)
+  BANNER
+  o.on('--only LIST', Array, "Methods to run (#{methods.join(', ')}; default all)") { methods = it }
 end
 begin
   parser.parse!
@@ -308,8 +337,7 @@ summary = runs.to_h do |m, checker, thread|
 end
 
 puts '', "=== summary (#{net}, epochs #{range.begin}..#{range.end}) ==="
-summary.each { |m, s| puts format('%-10s %s', m, s.to_s.tr('_', '-').upcase) }
+summary.each { |m, s| puts "#{m.ljust(10)} #{s.to_s.tr('_', '-').upcase}" }
 
-# Any mismatch (1); otherwise partial coverage (2); otherwise 0.
 exit 1 if summary.value?(:fail)
 exit 2 if summary.value?(:no_data)
