@@ -1,6 +1,13 @@
 AllCops:
   NewCops: enable
+  # Describes scripts/rpc-checks (Dockerfile pins ruby:4.0); mind that
+  # tf-managed/modules/sync-check runs on an unpinned distro Ruby.
+  TargetRubyVersion: 4.0
 Layout/LineLength:
   Max: 120
 Metrics/MethodLength:
   Max: 20
+Style/OneClassPerFile:
+  Exclude:
+    # Deliberately a self-contained single-file CLI tool.
+    - scripts/rpc-checks/check_rpc.rb

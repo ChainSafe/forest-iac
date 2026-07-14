@@ -28,9 +28,9 @@ raise 'No arguments supplied. Please provide Forest hostname, e.g. forest-mainne
 
 # Current datetime, to append to the log files
 DATE = Time.new.strftime '%FT%H:%M:%S'
-LOG_HEALTH = "#{LOG_DIR}/#{hostname}_#{DATE}_health"
-LOG_FOREST = "#{LOG_DIR}/#{hostname}_#{DATE}_forest"
-LOG_SYNC = "#{LOG_DIR}/#{hostname}_#{DATE}_sync"
+LOG_HEALTH = "#{LOG_DIR}/#{hostname}_#{DATE}_health".freeze
+LOG_FOREST = "#{LOG_DIR}/#{hostname}_#{DATE}_forest".freeze
+LOG_SYNC = "#{LOG_DIR}/#{hostname}_#{DATE}_sync".freeze
 
 # Create log directory
 FileUtils.mkdir_p LOG_DIR
