@@ -10,10 +10,13 @@ the receipts archive), `Filecoin.ChainGetTipSetByHeight`.
 ## Usage
 
 ```
-check_rpc.rb [--only m1,m2,...] <network> <start_epoch> [end_epoch]
+check_rpc.rb [--only m1,m2,...] <start_epoch> [end_epoch]
   methods: blocks, receipts, tipsets, logs (default: all)
   env:     FOREST_RPC_URL overrides the node URL (default localhost:2345/rpc/v1)
 ```
+
+The network (mainnet/calibnet) is auto-detected from the node via
+`Filecoin.StateNetworkName`, so the right dataset is always compared against.
 
 Exit codes (CI): `0` all pass · `1` any mismatch (dominates) · `2` no mismatches but an
 archive day was unavailable (not yet published), so coverage is partial.
@@ -24,8 +27,8 @@ The node should run with `--no-gc`, or historical state may be pruned mid-run.
 
 ```sh
 bundle install
-bundle exec ruby check_rpc.rb calibnet 3865654 3871413
-FOREST_RPC_URL=localhost:2347/rpc/v1 bundle exec ruby check_rpc.rb --only logs calibnet 3865787
+bundle exec ruby check_rpc.rb 3865654 3871413
+FOREST_RPC_URL=localhost:2347/rpc/v1 bundle exec ruby check_rpc.rb --only logs 3865787
 ```
 
 ## Run via Docker
@@ -33,7 +36,7 @@ FOREST_RPC_URL=localhost:2347/rpc/v1 bundle exec ruby check_rpc.rb --only logs c
 ```sh
 docker build -t forest-rpc-checks .
 # --network host so the container can reach the node on localhost:
-docker run --rm --network host forest-rpc-checks calibnet 3865654 3865663
+docker run --rm --network host forest-rpc-checks 3865654 3865663
 docker run --rm --network host -e FOREST_RPC_URL=localhost:2347/rpc/v1 \
-  forest-rpc-checks --only receipts,logs calibnet 3865654 3865663
+  forest-rpc-checks --only receipts,logs 3865654 3865663
 ```

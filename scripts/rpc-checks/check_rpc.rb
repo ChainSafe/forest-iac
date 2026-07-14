@@ -23,8 +23,14 @@ SECONDS_IN_EPOCH = 30
 SECONDS_IN_DAY = 24 * 60 * 60
 EPOCHS_IN_DAY = SECONDS_IN_DAY / SECONDS_IN_EPOCH
 DIFF_LIMIT = 20
+# A diff line embeds whole JSON values; a null-vs-document mismatch would
+# otherwise print the entire archive entry (100 KB+) on a single line.
+DIFF_LINE_LIMIT = 512
 # What counts as a transient network error, for both the node and the dataset.
 NET_ERRORS = [IOError, SystemCallError, Net::OpenTimeout, Net::ReadTimeout].freeze
+
+# Node network name (Filecoin.StateNetworkName) -> dataset path segment.
+NETWORKS = { 'mainnet' => 'mainnet', 'calibrationnet' => 'calibnet' }.freeze
 
 # Method -> daily archive file in the dataset. logs has no archive of its own:
 # its reference is derived from the receipts archive by flattening every
@@ -74,8 +80,15 @@ def deep_diff(node, archive, path = '$')
   in [Array => a, Array => b]
     diff_arrays(a, b, path)
   else
-    ["#{path}: node=#{node.to_json} archive=#{archive.to_json}"]
+    ["#{path}: node=#{excerpt(node)} archive=#{excerpt(archive)}"]
   end
+end
+
+# Cap each side of a leaf diff line separately, so a huge node value can never
+# push the archive side out of the clipped line (and vice versa).
+def excerpt(value, limit = DIFF_LINE_LIMIT / 4)
+  json = value.to_json
+  json.size > limit ? "#{json[0, limit]}… (#{json.size} chars)" : json
 end
 
 def diff_arrays(node, archive, path)
@@ -279,9 +292,11 @@ class Checker
   def fail_with(header, lines)
     @failed = true
     @out << "MISMATCH #{header}"
-    @out.concat(lines.first(DIFF_LIMIT).map { "  #{it}" })
+    @out.concat(lines.first(DIFF_LIMIT).map { "  #{clip(it)}" })
     @out << "  … #{lines.size - DIFF_LIMIT} more" if lines.size > DIFF_LIMIT
   end
+
+  def clip(line) = line.size > DIFF_LINE_LIMIT ? "#{line[0, DIFF_LINE_LIMIT]}… (#{line.size} chars)" : line
 end
 
 # --- CLI ----------------------------------------------------------------------
@@ -289,8 +304,9 @@ end
 methods = Checker::METHODS
 parser = OptionParser.new do |o|
   o.banner = <<~BANNER
-    Usage: #{File.basename($PROGRAM_NAME)} [--only m1,m2,...] <network> <start_epoch> [end_epoch]
+    Usage: #{File.basename($PROGRAM_NAME)} [--only m1,m2,...] <start_epoch> [end_epoch]
       env: FOREST_RPC_URL overrides the node URL (default localhost:2345/rpc/v1)
+      The network is auto-detected from the node.
   BANNER
   o.on('--only LIST', Array, "Methods to run (#{methods.join(', ')}; default all)") { methods = it }
 end
@@ -299,21 +315,30 @@ begin
 rescue OptionParser::ParseError => e
   abort "#{e.message}\n#{parser.help}"
 end
-net, start_epoch, end_epoch = ARGV
-abort parser.help if net.nil? || start_epoch.nil?
-abort "Unknown network: #{net}" unless %w[mainnet calibnet].include?(net)
+start_epoch, end_epoch, extra = ARGV
+abort parser.help if start_epoch.nil? || !extra.nil?
 unknown = methods - Checker::METHODS
 abort "Unknown method(s): #{unknown.join(', ')} (expected: #{Checker::METHODS.join(', ')})" unless unknown.empty?
 
-range = Integer(start_epoch)..Integer(end_epoch || start_epoch)
+range = begin
+  Integer(start_epoch)..Integer(end_epoch || start_epoch)
+rescue ArgumentError
+  abort "Epochs must be integers (note: the network argument is gone, it is auto-detected).\n#{parser.help}"
+end
 rpc_url = ENV.fetch('FOREST_RPC_URL', 'localhost:2345/rpc/v1')
 
-# Genesis timestamp comes from the node itself, so it stays correct across networks.
-genesis = begin
-  Rpc.new(rpc_url).call('Filecoin.ChainGetGenesis', []).dig('result', 'Blocks', 0, 'Timestamp')
-rescue StandardError
-  nil
+# The network and the genesis timestamp both come from the node itself, so the
+# right dataset is always compared against, whatever the node runs.
+begin
+  rpc = Rpc.new(rpc_url)
+  network_name = rpc.call('Filecoin.StateNetworkName', [])['result']
+  genesis = rpc.call('Filecoin.ChainGetGenesis', []).dig('result', 'Blocks', 0, 'Timestamp')
+rescue StandardError => e
+  abort "Failed to query the node at #{rpc_url}: #{e.message}"
 end
+abort "Failed to fetch network name from #{rpc_url}" if network_name.nil?
+net = NETWORKS[network_name]
+abort "No dataset for network #{network_name.inspect} (expected: #{NETWORKS.keys.join(', ')})" if net.nil?
 abort "Failed to fetch genesis timestamp from #{rpc_url}" unless genesis.is_a?(Integer)
 
 # The methods are independent: run each in its own thread (blocks alone makes
