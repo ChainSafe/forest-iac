@@ -25,10 +25,10 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.0'
+          ruby-version: '4.0'
       - name: Run rubocop
         run: |
-          gem install rubocop --no-document --version 1.60.1
+          gem install rubocop --no-document --version 1.88.2
           rubocop
   run-py-linters:
     runs-on: ubuntu-latest
