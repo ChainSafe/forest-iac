@@ -46,6 +46,8 @@ ARCHIVE_FILES = {
 
 def hex(num) = format('0x%x', num)
 
+# Known expected mismatch, dropped before comparing (remove once fixed): Forest
+# omits accessList on legacy (type 0x0) txs, where the dataset emits [] (#7205).
 def norm_tx(txn) = txn.is_a?(Hash) ? txn.except('accessList') : txn
 
 def norm_txs(txs) = txs.map { norm_tx(it) }
