@@ -1,5 +1,9 @@
 name: rpc-checks image
 
+permissions:
+  contents: read
+  packages: write
+
 on:
   push:
     branches:
@@ -10,36 +14,39 @@ on:
   workflow_dispatch:
 
 jobs:
-  publish:
-    runs-on: ubuntu-slim
-    permissions:
-      contents: read
-      packages: write
+  build-and-push-docker-image:
+    name: Build image and push to GHCR
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v7
 
-      # ubuntu-slim ships the docker client, compose and buildx, but no engine,
-      # and every local buildx driver needs a daemon to build in.
-      - name: Set up Docker
-        uses: docker/setup-docker-action@v5
-
-      - name: Log in to GHCR
+      - name: Login to Github Packages
         if: github.ref == 'refs/heads/main'
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push
-        uses: docker/build-push-action@v6
+      # This step yields the following tags
+      # - latest,
+      # - date+sha, e.g. 2026-08-11-9a12a3b,
+      # and the default OCI labels, including image.source, which is what links
+      # the package to this repository.
+      - name: Docker Meta
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ghcr.io/chainsafe/forest-rpc-checks
+          tags: |
+            type=raw,value={{date 'YYYY-MM-DD'}}-{{sha}}
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build image and push to GitHub Container Registry
+        uses: docker/build-push-action@v7
         with:
           context: scripts/rpc-checks
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
           push: ${{ github.ref == 'refs/heads/main' }}
-          tags: |
-            ghcr.io/chainsafe/forest-rpc-checks:latest
-            ghcr.io/chainsafe/forest-rpc-checks:${{ github.sha }}
-          labels: |
-            org.opencontainers.image.source=https://github.com/${{ github.repository }}
-            org.opencontainers.image.revision=${{ github.sha }}
