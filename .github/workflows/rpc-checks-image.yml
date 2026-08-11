@@ -19,6 +19,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
 
+      # ubuntu-slim ships the docker client, compose and buildx, but no engine,
+      # and every local buildx driver needs a daemon to build in.
+      - name: Set up Docker
+        uses: docker/setup-docker-action@v5
+
       - name: Log in to GHCR
         if: github.ref == 'refs/heads/main'
         uses: docker/login-action@v3
