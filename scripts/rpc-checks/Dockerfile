@@ -1,14 +1,14 @@
 # Build the native gem extensions in a throwaway stage so the runtime image
 # ships without a compiler toolchain.
-FROM ruby:4.0-slim AS gems
-RUN apt-get update && apt-get install -y --no-install-recommends build-essential \
-    && rm -rf /var/lib/apt/lists/*
+FROM ruby:4.0-alpine AS gems
+RUN apk add --no-cache build-base
 WORKDIR /app
 ENV BUNDLE_FROZEN=true BUNDLE_PATH=/bundle
 COPY Gemfile Gemfile.lock ./
 RUN bundle install
 
-FROM ruby:4.0-slim
+FROM ruby:4.0-alpine
+
 WORKDIR /app
 ENV BUNDLE_PATH=/bundle
 COPY --from=gems /bundle /bundle

@@ -46,10 +46,8 @@ ARCHIVE_FILES = {
 
 def hex(num) = format('0x%x', num)
 
-# Known expected mismatches, dropped before comparing (remove as they get
-# fixed): logsBloom — Forest returns an all-ones placeholder for the
-# block-level bloom (PR #7156); accessList — the dataset normalizes the
-# field to [] on legacy txs where the node omits it (issue #7205).
+# Known expected mismatch, dropped before comparing (remove once fixed): Forest
+# omits accessList on legacy (type 0x0) txs, where the dataset emits [] (#7205).
 def norm_tx(txn) = txn.is_a?(Hash) ? txn.except('accessList') : txn
 
 def norm_txs(txs) = txs.map { norm_tx(it) }
@@ -57,7 +55,7 @@ def norm_txs(txs) = txs.map { norm_tx(it) }
 def norm_block(block)
   return block unless block.is_a?(Hash)
 
-  block.except('logsBloom').tap do |b|
+  block.dup.tap do |b|
     b['transactions'] = norm_txs(b['transactions']) if b['transactions'].is_a?(Array)
   end
 end
