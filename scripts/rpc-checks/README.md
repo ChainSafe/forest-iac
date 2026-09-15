@@ -10,7 +10,7 @@ the receipts archive), `Filecoin.ChainGetTipSetByHeight`.
 ## Usage
 
 ```
-check_rpc.rb [--only m1,m2,...] <start_epoch> [end_epoch]
+check_rpc.rb [--only m1,m2,...] [--probe [--network net]] <start_epoch> [end_epoch]
   methods: blocks, receipts, tipsets, logs (default: all)
   env:     FOREST_RPC_URL overrides the node URL (default localhost:2345/rpc/v1)
 ```
