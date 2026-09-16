@@ -1,14 +1,15 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-# Filecoin JSON-RPC verification against the https://chain.data.riba.plus
-# dataset. Exit codes:
-#   0 = all pass, 1 = any mismatch, 2 = no mismatches but an
-#   archive day was unavailable (not yet published), so coverage is partial.
+# Verifies Filecoin JSON-RPC answers against the https://chain.data.riba.plus
+# dataset. Exit codes: 0 all pass, 1 any mismatch, 2 no mismatch but an archive
+# day is not published yet (partial coverage).
 #
-# Methods (select with --only, default all):
-#   blocks   - eth_getBlockByNumber (+ eth_getTransactionByBlockNumberAndIndex
-#              for every tx in the archive block)
+# --probe only checks that the dataset has published every archive day the
+# range needs (0 yes, 2 no, 1 dataset unreachable), without touching a node.
+#
+# Methods (--only, default all):
+#   blocks   - eth_getBlockByNumber + eth_getTransactionByBlockNumberAndIndex
 #   receipts - eth_getBlockReceipts
 #   tipsets  - Filecoin.ChainGetTipSetByHeight
 #   logs     - eth_getLogs (reference derived from the receipts archive)
@@ -23,18 +24,16 @@ SECONDS_IN_EPOCH = 30
 SECONDS_IN_DAY = 24 * 60 * 60
 EPOCHS_IN_DAY = SECONDS_IN_DAY / SECONDS_IN_EPOCH
 DIFF_LIMIT = 20
-# A diff line embeds whole JSON values; a null-vs-document mismatch would
-# otherwise print the entire archive entry (100 KB+) on a single line.
 DIFF_LINE_LIMIT = 512
-# What counts as a transient network error, for both the node and the dataset.
 NET_ERRORS = [IOError, SystemCallError, Net::OpenTimeout, Net::ReadTimeout].freeze
+DATASET_URL = 'https://chain.data.riba.plus/fil'
 
-# Node network name (Filecoin.StateNetworkName) -> dataset path segment.
+# Filecoin.StateNetworkName -> dataset path segment.
 NETWORKS = { 'mainnet' => 'mainnet', 'calibrationnet' => 'calibnet' }.freeze
+# Dataset path segment -> genesis timestamp, for --probe --network (no node).
+GENESIS = { 'mainnet' => 1_598_306_400, 'calibnet' => 1_667_326_380 }.freeze
 
-# Method -> daily archive file in the dataset. logs has no archive of its own:
-# its reference is derived from the receipts archive by flattening every
-# receipt's logs.
+# Method -> daily archive file. logs has no archive; it derives from receipts.
 ARCHIVE_FILES = {
   'blocks' => 'eth_getBlockByNumber',
   'receipts' => 'eth_getBlockReceipts',
@@ -42,12 +41,10 @@ ARCHIVE_FILES = {
   'logs' => 'eth_getBlockReceipts'
 }.freeze
 
-# --- pure JSON-document helpers -----------------------------------------------
-
 def hex(num) = format('0x%x', num)
 
-# Known expected mismatch, dropped before comparing (remove once fixed): Forest
-# omits accessList on legacy (type 0x0) txs, where the dataset emits [] (#7205).
+# Forest omits accessList on legacy (type 0x0) txs where the dataset emits []
+# (#7205); dropped until fixed.
 def norm_tx(txn) = txn.is_a?(Hash) ? txn.except('accessList') : txn
 
 def norm_txs(txs) = txs.map { norm_tx(it) }
@@ -62,13 +59,11 @@ end
 
 def error_message(resp) = resp.dig('error', 'message')
 
-# The dedicated error that blocks/receipts must answer with on a null round.
 def null_round_error?(resp) = resp['result'].nil? && error_message(resp).to_s.include?('null round')
 
-# The logs reference: every receipt's logs from the receipts archive, flattened.
 def expected_logs(entry) = (entry['result'] || []).flat_map { it['logs'] || [] }
 
-# Differing paths between two JSON documents (semantic: key order never matters).
+# Differing paths between two JSON documents; key order never matters.
 def deep_diff(node, archive, path = '$')
   return [] if node == archive
 
@@ -82,8 +77,6 @@ def deep_diff(node, archive, path = '$')
   end
 end
 
-# Cap each side of a leaf diff line separately, so a huge node value can never
-# push the archive side out of the clipped line (and vice versa).
 def excerpt(value, limit = DIFF_LINE_LIMIT / 4)
   json = value.to_json
   json.size > limit ? "#{json[0, limit]}… (#{json.size} chars)" : json
@@ -95,8 +88,14 @@ def diff_arrays(node, archive, path)
   header + node.take(archive.size).each_with_index.flat_map { |x, i| deep_diff(x, archive[i], "#{path}[#{i}]") }
 end
 
-# Minimal JSON-RPC client over a persistent connection (reconnects once if the
-# server closed an idle keep-alive connection).
+# Daily files split at midnight UTC: an epoch's day is its UTC date and its line
+# is 1 + its offset from that day's first epoch (genesis % 30 == 0 on both networks).
+def locate(epoch, genesis)
+  ts = (epoch * SECONDS_IN_EPOCH) + genesis
+  [Time.at(ts, in: 'UTC').strftime('%Y/%m/%d'), 1 + (ts % SECONDS_IN_DAY / SECONDS_IN_EPOCH)]
+end
+
+# JSON-RPC over a persistent connection; reconnects once if the server closed it.
 class Rpc
   def initialize(url)
     @uri = URI(url.include?('://') ? url : "http://#{url}")
@@ -120,26 +119,43 @@ class Rpc
   end
 end
 
-# Daily archive files, each downloaded (and brotli-inflated) once per run and
-# shared across method threads — receipts and logs use the same file.
+# Daily archive files, downloaded once per run and shared across method threads.
 class Archive
-  def initialize(net)
+  def initialize(net, base: ENV.fetch('DATASET_URL', DATASET_URL))
     @net = net
+    @base = base
     @cache = {}
     @mutex = Mutex.new
   end
 
-  # Lines of the day's ndjson, or nil if the day isn't published. The cache
-  # holds one in-flight fetch per (file, date): same-key callers share it,
-  # different keys download concurrently — the lock only guards the insert.
+  # Lines of the day's ndjson, or nil if the day isn't published. One in-flight
+  # fetch per (file, date); the lock only guards the insert.
   def daily(file, date)
     @mutex.synchronize { @cache[[file, date]] ||= Thread.new { fetch(file, date) } }.value
   end
 
+  # 200 is published, 404 is not. Anything else after retries raises, so an
+  # outage never passes for a missing day.
+  def published?(file, date, attempts: 3)
+    uri = url(file, date)
+    last = nil
+    attempts.times do |i|
+      sleep i
+      last = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == 'https') { it.head(uri.request_uri) }
+      return true if last.is_a?(Net::HTTPSuccess)
+      return false if last.is_a?(Net::HTTPNotFound)
+    rescue *NET_ERRORS => e
+      last = e
+    end
+    raise "#{uri}: #{last.is_a?(Exception) ? last.message : "HTTP #{last.code}"} after #{attempts} attempts"
+  end
+
   private
 
+  def url(file, date) = URI("#{@base}/#{@net}/daily/#{date}/#{file}.v1.r1.ndjson.brotli")
+
   def fetch(file, date, attempts: 3)
-    uri = URI("https://chain.data.riba.plus/fil/#{@net}/daily/#{date}/#{file}.v1.r1.ndjson.brotli")
+    uri = url(file, date)
     attempts.times do |i|
       return download(uri).lines
     rescue OpenURI::HTTPError => e
@@ -152,8 +168,7 @@ class Archive
     nil
   end
 
-  # The server only sends the compact brotli bytes to clients that ask for
-  # them (and decompresses transparently otherwise), so inflate iff marked.
+  # The server only sends brotli bytes to clients that ask for them.
   def download(uri)
     uri.open('Accept-Encoding' => 'br') do |f|
       f.content_encoding.include?('br') ? Brotli.inflate(f.read) : f.read
@@ -161,8 +176,8 @@ class Archive
   end
 end
 
-# One verification method over an epoch range: walks the daily archive files in
-# lockstep with the epoch counter and diffs every entry against the node.
+# One verification method over an epoch range, diffing every archive entry
+# against the node.
 class Checker
   METHODS = ARCHIVE_FILES.keys.freeze
 
@@ -189,16 +204,14 @@ class Checker
 
   private
 
-  # Checks the epochs from `epoch` to the end of its UTC day (or of the range);
-  # returns the next epoch to check, or nil if the archive day ran out.
+  # Checks from `epoch` to the end of its UTC day (or of the range); returns the
+  # next epoch, or nil if the archive day ran out.
   def check_day(epoch)
-    date, line = locate(epoch)
+    date, line = locate(epoch, @genesis)
     day_end = [epoch + EPOCHS_IN_DAY - line, @range.end].min
     @out << "--- #{@method}: epochs #{epoch}..#{day_end} (#{date}, #{ARCHIVE_FILES[@method]}) ---"
     (epoch..day_end).zip(day_entries(date, line)) do |e, raw|
-      # A missing or empty entry means the daily file is unavailable or
-      # truncated (e.g. the current, not-yet-published day); the archive
-      # publishes chronologically, so every later epoch is missing too.
+      # The archive publishes chronologically, so every later epoch is missing too.
       if raw.to_s.strip.empty?
         @out << "no archive for #{date} (day not published?); stopping #{@method} at epoch #{e}."
         return nil
@@ -210,21 +223,9 @@ class Checker
 
   def day_entries(date, line) = @archive.daily(ARCHIVE_FILES[@method], date)&.drop(line - 1) || []
 
-  # The archive's daily files are partitioned on midnight UTC, so an epoch's
-  # day is its own UTC date and its line is 1 + its offset from that day's
-  # first (midnight) epoch. (Relies on genesis % SECONDS_IN_EPOCH == 0, which
-  # holds on both networks.)
-  def locate(epoch)
-    ts = (epoch * SECONDS_IN_EPOCH) + @genesis
-    [Time.at(ts, in: 'UTC').strftime('%Y/%m/%d'), 1 + (ts % SECONDS_IN_DAY / SECONDS_IN_EPOCH)]
-  end
-
-  # --- per-method checks ----------------------------------------------------
-  # Null-round semantics: blocks/receipts must answer with the dedicated
-  # "requested epoch was a null round" error (any other response — including
-  # other errors, e.g. missing state — is a discrepancy); logs must return an
-  # empty list; tipsets walks back to the nearest lower non-null tipset, so it
-  # agrees iff the returned Height < epoch.
+  # Null rounds: blocks/receipts must answer with the "null round" error (any
+  # other response is a discrepancy); logs must return []; tipsets walks back to
+  # the nearest lower tipset, so it agrees iff Height < epoch.
 
   def check_blocks(epoch, entry)
     resp = @rpc.call('eth_getBlockByNumber', [hex(epoch), true])
@@ -234,8 +235,6 @@ class Checker
     check_txs(epoch, entry.dig('result', 'transactions') || [])
   end
 
-  # Every tx the archive block carries must be returned identically by the
-  # node's per-index endpoint; called once per index, compared in one batch.
   def check_txs(epoch, txs)
     node_txs = txs.each_index.map do |i|
       @rpc.call('eth_getTransactionByBlockNumberAndIndex', [hex(epoch), hex(i)])['result']
@@ -269,8 +268,6 @@ class Checker
     compare(label(epoch), resp['result'], expected_logs(entry))
   end
 
-  # --- reporting --------------------------------------------------------------
-
   def label(epoch) = "#{@method} epoch #{epoch}"
 
   def compare(header, node, archive)
@@ -297,22 +294,83 @@ class Checker
   def clip(line) = line.size > DIFF_LINE_LIMIT ? "#{line[0, DIFF_LINE_LIMIT]}… (#{line.size} chars)" : line
 end
 
+# Whether the dataset has published every archive day an epoch range needs.
+class Probe
+  attr_reader :out
+
+  def initialize(range:, archive:, genesis:)
+    @range = range
+    @archive = archive
+    @genesis = genesis
+    @out = []
+  end
+
+  # :pass / :no_data (a day is missing) / :fail (dataset unreachable).
+  def run
+    published = days.product(ARCHIVE_FILES.values.uniq).map do |date, file|
+      ok = @archive.published?(file, date)
+      @out << "#{date} #{file}: #{ok ? 'published' : 'missing'}"
+      ok
+    end
+    published.all? ? :pass : :no_data
+  rescue StandardError => e
+    @out << "ERROR #{e.message} (#{e.class})"
+    :fail
+  end
+
+  private
+
+  # Stepping a full day from the start visits each UTC day once; the range end
+  # may still fall one day further.
+  def days = @range.step(EPOCHS_IN_DAY).map { day(it) } | [day(@range.end)]
+
+  def day(epoch) = locate(epoch, @genesis).first
+end
+
 # --- CLI ----------------------------------------------------------------------
 
+def network_and_genesis(rpc_url)
+  rpc = Rpc.new(rpc_url)
+  name = rpc.call('Filecoin.StateNetworkName', [])['result']
+  genesis = rpc.call('Filecoin.ChainGetGenesis', []).dig('result', 'Blocks', 0, 'Timestamp')
+  net = NETWORKS[name]
+  abort "No dataset for network #{name.inspect} (expected: #{NETWORKS.keys.join(', ')})" if net.nil?
+  abort "Failed to fetch genesis timestamp from #{rpc_url}" unless genesis.is_a?(Integer)
+  [net, genesis]
+rescue StandardError => e
+  abort "Failed to query the node at #{rpc_url}: #{e.message}"
+end
+
+def probe!(net, genesis, range)
+  probe = Probe.new(range:, archive: Archive.new(net), genesis:)
+  status = probe.run
+  puts probe.out
+  puts '', "=== probe (#{net}, epochs #{range.begin}..#{range.end}) === #{status.to_s.tr('_', '-').upcase}"
+  exit({ pass: 0, no_data: 2 }.fetch(status, 1))
+end
+
 methods = Checker::METHODS
+probing = false
+network = nil
 parser = OptionParser.new do |o|
   o.banner = <<~BANNER
-    Usage: #{File.basename($PROGRAM_NAME)} [--only m1,m2,...] <start_epoch> [end_epoch]
+    Usage: #{File.basename($PROGRAM_NAME)} [--only m1,m2,...] [--probe [--network net]] <start_epoch> [end_epoch]
       env: FOREST_RPC_URL overrides the node URL (default localhost:2345/rpc/v1)
+           DATASET_URL overrides the dataset base (default #{DATASET_URL})
       The network is auto-detected from the node.
   BANNER
   o.on('--only LIST', Array, "Methods to run (#{methods.join(', ')}; default all)") { methods = it }
+  o.on('--probe', 'Only check that the dataset has published the range; exit 2 if not') { probing = true }
+  o.on('--network NET', GENESIS.keys, "With --probe, skip the node and probe NET (#{GENESIS.keys.join(', ')})") do |net|
+    network = net
+  end
 end
 begin
   parser.parse!
 rescue OptionParser::ParseError => e
   abort "#{e.message}\n#{parser.help}"
 end
+abort "--network only applies with --probe\n#{parser.help}" if network && !probing
 start_epoch, end_epoch, extra = ARGV
 abort parser.help if start_epoch.nil? || !extra.nil?
 unknown = methods - Checker::METHODS
@@ -325,23 +383,10 @@ rescue ArgumentError
 end
 rpc_url = ENV.fetch('FOREST_RPC_URL', 'localhost:2345/rpc/v1')
 
-# The network and the genesis timestamp both come from the node itself, so the
-# right dataset is always compared against, whatever the node runs.
-begin
-  rpc = Rpc.new(rpc_url)
-  network_name = rpc.call('Filecoin.StateNetworkName', [])['result']
-  genesis = rpc.call('Filecoin.ChainGetGenesis', []).dig('result', 'Blocks', 0, 'Timestamp')
-rescue StandardError => e
-  abort "Failed to query the node at #{rpc_url}: #{e.message}"
-end
-abort "Failed to fetch network name from #{rpc_url}" if network_name.nil?
-net = NETWORKS[network_name]
-abort "No dataset for network #{network_name.inspect} (expected: #{NETWORKS.keys.join(', ')})" if net.nil?
-abort "Failed to fetch genesis timestamp from #{rpc_url}" unless genesis.is_a?(Integer)
+net, genesis = network ? [network, GENESIS.fetch(network)] : network_and_genesis(rpc_url)
+probe!(net, genesis, range) if probing
 
-# The methods are independent: run each in its own thread (blocks alone makes
-# ~1+ntx node calls per epoch and would otherwise dominate a sequential run)
-# and print the buffered outputs in a stable order.
+# Methods are independent, so each runs in its own thread; output is printed in a stable order.
 archive = Archive.new(net)
 runs = methods.map do |m|
   checker = Checker.new(method: m, range:, rpc_url:, archive:, genesis:)
