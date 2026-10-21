@@ -43,20 +43,6 @@ ARCHIVE_FILES = {
 
 def hex(num) = format('0x%x', num)
 
-# Forest omits accessList on legacy (type 0x0) txs where the dataset emits []
-# (#7205); dropped until fixed.
-def norm_tx(txn) = txn.is_a?(Hash) ? txn.except('accessList') : txn
-
-def norm_txs(txs) = txs.map { norm_tx(it) }
-
-def norm_block(block)
-  return block unless block.is_a?(Hash)
-
-  block.dup.tap do |b|
-    b['transactions'] = norm_txs(b['transactions']) if b['transactions'].is_a?(Array)
-  end
-end
-
 def error_message(resp) = resp.dig('error', 'message')
 
 def null_round_error?(resp) = resp['result'].nil? && error_message(resp).to_s.include?('null round')
@@ -231,7 +217,7 @@ class Checker
     resp = @rpc.call('eth_getBlockByNumber', [hex(epoch), true])
     return null_round(epoch, resp, agreed: null_round_error?(resp), number: resp.dig('result', 'number')) if entry.nil?
 
-    compare(label(epoch), norm_block(resp['result']), norm_block(entry['result']))
+    compare(label(epoch), resp['result'], entry['result'])
     check_txs(epoch, entry.dig('result', 'transactions') || [])
   end
 
@@ -239,8 +225,7 @@ class Checker
     node_txs = txs.each_index.map do |i|
       @rpc.call('eth_getTransactionByBlockNumberAndIndex', [hex(epoch), hex(i)])['result']
     end
-    compare("#{label(epoch)} (eth_getTransactionByBlockNumberAndIndex, indices 0..#{txs.size - 1})",
-            norm_txs(node_txs), norm_txs(txs))
+    compare("#{label(epoch)} (eth_getTransactionByBlockNumberAndIndex, indices 0..#{txs.size - 1})", node_txs, txs)
   end
 
   def check_receipts(epoch, entry)
