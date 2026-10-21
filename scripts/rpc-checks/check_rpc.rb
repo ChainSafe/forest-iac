@@ -55,13 +55,22 @@ def deep_diff(node, archive, path = '$')
 
   case [node, archive]
   in [Hash => a, Hash => b]
-    (a.keys | b.keys).flat_map { deep_diff(a[it], b[it], "#{path}.#{it}") }
+    (a.keys | b.keys).flat_map { diff_key(a, b, it, "#{path}.#{it}") }
   in [Array => a, Array => b]
     diff_arrays(a, b, path)
   else
     ["#{path}: node=#{excerpt(node)} archive=#{excerpt(archive)}"]
   end
 end
+
+# A key present only on one side is reported as `missing`, never as null.
+def diff_key(node, archive, key, path)
+  return deep_diff(node[key], archive[key], path) if node.key?(key) && archive.key?(key)
+
+  ["#{path}: node=#{excerpt_key(node, key)} archive=#{excerpt_key(archive, key)}"]
+end
+
+def excerpt_key(hash, key) = hash.key?(key) ? excerpt(hash[key]) : 'missing'
 
 def excerpt(value, limit = DIFF_LINE_LIMIT / 4)
   json = value.to_json
