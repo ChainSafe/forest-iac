@@ -43,20 +43,6 @@ ARCHIVE_FILES = {
 
 def hex(num) = format('0x%x', num)
 
-# Forest omits accessList on legacy (type 0x0) txs where the dataset emits []
-# (#7205); dropped until fixed.
-def norm_tx(txn) = txn.is_a?(Hash) ? txn.except('accessList') : txn
-
-def norm_txs(txs) = txs.map { norm_tx(it) }
-
-def norm_block(block)
-  return block unless block.is_a?(Hash)
-
-  block.dup.tap do |b|
-    b['transactions'] = norm_txs(b['transactions']) if b['transactions'].is_a?(Array)
-  end
-end
-
 def error_message(resp) = resp.dig('error', 'message')
 
 def null_round_error?(resp) = resp['result'].nil? && error_message(resp).to_s.include?('null round')
@@ -69,13 +55,22 @@ def deep_diff(node, archive, path = '$')
 
   case [node, archive]
   in [Hash => a, Hash => b]
-    (a.keys | b.keys).flat_map { deep_diff(a[it], b[it], "#{path}.#{it}") }
+    (a.keys | b.keys).flat_map { diff_key(a, b, it, "#{path}.#{it}") }
   in [Array => a, Array => b]
     diff_arrays(a, b, path)
   else
     ["#{path}: node=#{excerpt(node)} archive=#{excerpt(archive)}"]
   end
 end
+
+# A key present only on one side is reported as `missing`, never as null.
+def diff_key(node, archive, key, path)
+  return deep_diff(node[key], archive[key], path) if node.key?(key) && archive.key?(key)
+
+  ["#{path}: node=#{excerpt_key(node, key)} archive=#{excerpt_key(archive, key)}"]
+end
+
+def excerpt_key(hash, key) = hash.key?(key) ? excerpt(hash[key]) : 'missing'
 
 def excerpt(value, limit = DIFF_LINE_LIMIT / 4)
   json = value.to_json
@@ -231,23 +226,22 @@ class Checker
     resp = @rpc.call('eth_getBlockByNumber', [hex(epoch), true])
     return null_round(epoch, resp, agreed: null_round_error?(resp), number: resp.dig('result', 'number')) if entry.nil?
 
-    compare(label(epoch), norm_block(resp['result']), norm_block(entry['result']))
+    compare(label(epoch), resp, entry['result'])
     check_txs(epoch, entry.dig('result', 'transactions') || [])
   end
 
   def check_txs(epoch, txs)
-    node_txs = txs.each_index.map do |i|
-      @rpc.call('eth_getTransactionByBlockNumberAndIndex', [hex(epoch), hex(i)])['result']
+    txs.each_with_index do |txn, i|
+      resp = @rpc.call('eth_getTransactionByBlockNumberAndIndex', [hex(epoch), hex(i)])
+      compare("#{label(epoch)} (eth_getTransactionByBlockNumberAndIndex, index #{i})", resp, txn)
     end
-    compare("#{label(epoch)} (eth_getTransactionByBlockNumberAndIndex, indices 0..#{txs.size - 1})",
-            norm_txs(node_txs), norm_txs(txs))
   end
 
   def check_receipts(epoch, entry)
     resp = @rpc.call('eth_getBlockReceipts', [hex(epoch)])
     return null_round(epoch, resp, agreed: null_round_error?(resp), receipts: resp['result']&.size) if entry.nil?
 
-    compare(label(epoch), resp['result'], entry['result'])
+    compare(label(epoch), resp, entry['result'])
   end
 
   def check_tipsets(epoch, entry)
@@ -256,7 +250,7 @@ class Checker
       height = resp.dig('result', 'Height')
       return null_round(epoch, resp, agreed: height.is_a?(Integer) && height < epoch, height:)
     end
-    compare(label(epoch), resp['result'], entry['result'])
+    compare(label(epoch), resp, entry['result'])
   end
 
   def check_logs(epoch, entry)
@@ -265,13 +259,15 @@ class Checker
       agreed = resp['error'].nil? && resp['result'] == []
       return null_round(epoch, resp, agreed:, logs: resp['result']&.size)
     end
-    compare(label(epoch), resp['result'], expected_logs(entry))
+    compare(label(epoch), resp, expected_logs(entry))
   end
 
   def label(epoch) = "#{@method} epoch #{epoch}"
 
-  def compare(header, node, archive)
-    diffs = deep_diff(node, archive)
+  def compare(header, resp, archive)
+    return fail_with("#{header}: node returned an error:", [resp['error'].to_json]) if resp['error']
+
+    diffs = deep_diff(resp['result'], archive)
     return if diffs.empty?
 
     fail_with("#{header}:", diffs)
