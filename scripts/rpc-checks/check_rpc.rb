@@ -226,23 +226,22 @@ class Checker
     resp = @rpc.call('eth_getBlockByNumber', [hex(epoch), true])
     return null_round(epoch, resp, agreed: null_round_error?(resp), number: resp.dig('result', 'number')) if entry.nil?
 
-    compare(label(epoch), resp, entry)
+    compare(label(epoch), resp, entry['result'])
     check_txs(epoch, entry.dig('result', 'transactions') || [])
   end
 
   def check_txs(epoch, txs)
-    header = "#{label(epoch)} (eth_getTransactionByBlockNumberAndIndex, indices 0..#{txs.size - 1})"
-    resps = txs.each_index.map { @rpc.call('eth_getTransactionByBlockNumberAndIndex', [hex(epoch), hex(it)]) }
-    errors = resps.each_with_index.filter_map { |r, i| "index #{i}: #{r['error'].to_json}" if r['error'] }
-    return fail_with("#{header}: node returned errors:", errors) unless errors.empty?
-    compare(header, resps.map { it['result'] }, txs)
+    txs.each_with_index do |txn, i|
+      resp = @rpc.call('eth_getTransactionByBlockNumberAndIndex', [hex(epoch), hex(i)])
+      compare("#{label(epoch)} (eth_getTransactionByBlockNumberAndIndex, index #{i})", resp, txn)
+    end
   end
 
   def check_receipts(epoch, entry)
     resp = @rpc.call('eth_getBlockReceipts', [hex(epoch)])
     return null_round(epoch, resp, agreed: null_round_error?(resp), receipts: resp['result']&.size) if entry.nil?
 
-    compare(label(epoch), resp, entry)
+    compare(label(epoch), resp, entry['result'])
   end
 
   def check_tipsets(epoch, entry)
@@ -251,7 +250,7 @@ class Checker
       height = resp.dig('result', 'Height')
       return null_round(epoch, resp, agreed: height.is_a?(Integer) && height < epoch, height:)
     end
-    compare(label(epoch), resp, entry)
+    compare(label(epoch), resp, entry['result'])
   end
 
   def check_logs(epoch, entry)
@@ -265,10 +264,10 @@ class Checker
 
   def label(epoch) = "#{@method} epoch #{epoch}"
 
-  def compare(header, node, archive)
-    return fail_with("#{header}: node returned an error:", [node['error'].to_json]) if node['error']
+  def compare(header, resp, archive)
+    return fail_with("#{header}: node returned an error:", [resp['error'].to_json]) if resp['error']
 
-    diffs = deep_diff(node['result'], archive['result'])
+    diffs = deep_diff(resp['result'], archive)
     return if diffs.empty?
 
     fail_with("#{header}:", diffs)
