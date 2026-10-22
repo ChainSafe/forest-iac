@@ -226,22 +226,23 @@ class Checker
     resp = @rpc.call('eth_getBlockByNumber', [hex(epoch), true])
     return null_round(epoch, resp, agreed: null_round_error?(resp), number: resp.dig('result', 'number')) if entry.nil?
 
-    compare(label(epoch), resp['result'], entry['result'])
+    compare(label(epoch), resp, entry)
     check_txs(epoch, entry.dig('result', 'transactions') || [])
   end
 
   def check_txs(epoch, txs)
-    node_txs = txs.each_index.map do |i|
-      @rpc.call('eth_getTransactionByBlockNumberAndIndex', [hex(epoch), hex(i)])['result']
-    end
-    compare("#{label(epoch)} (eth_getTransactionByBlockNumberAndIndex, indices 0..#{txs.size - 1})", node_txs, txs)
+    header = "#{label(epoch)} (eth_getTransactionByBlockNumberAndIndex, indices 0..#{txs.size - 1})"
+    resps = txs.each_index.map { @rpc.call('eth_getTransactionByBlockNumberAndIndex', [hex(epoch), hex(it)]) }
+    errors = resps.each_with_index.filter_map { |r, i| "index #{i}: #{r['error'].to_json}" if r['error'] }
+    return fail_with("#{header}: node returned errors:", errors) unless errors.empty?
+    compare(header, resps.map { it['result'] }, txs)
   end
 
   def check_receipts(epoch, entry)
     resp = @rpc.call('eth_getBlockReceipts', [hex(epoch)])
     return null_round(epoch, resp, agreed: null_round_error?(resp), receipts: resp['result']&.size) if entry.nil?
 
-    compare(label(epoch), resp['result'], entry['result'])
+    compare(label(epoch), resp, entry)
   end
 
   def check_tipsets(epoch, entry)
@@ -250,7 +251,7 @@ class Checker
       height = resp.dig('result', 'Height')
       return null_round(epoch, resp, agreed: height.is_a?(Integer) && height < epoch, height:)
     end
-    compare(label(epoch), resp['result'], entry['result'])
+    compare(label(epoch), resp, entry)
   end
 
   def check_logs(epoch, entry)
@@ -259,13 +260,15 @@ class Checker
       agreed = resp['error'].nil? && resp['result'] == []
       return null_round(epoch, resp, agreed:, logs: resp['result']&.size)
     end
-    compare(label(epoch), resp['result'], expected_logs(entry))
+    compare(label(epoch), resp, expected_logs(entry))
   end
 
   def label(epoch) = "#{@method} epoch #{epoch}"
 
   def compare(header, node, archive)
-    diffs = deep_diff(node, archive)
+    return fail_with("#{header}: node returned an error:", [node['error'].to_json]) if node['error']
+
+    diffs = deep_diff(node['result'], archive['result'])
     return if diffs.empty?
 
     fail_with("#{header}:", diffs)
